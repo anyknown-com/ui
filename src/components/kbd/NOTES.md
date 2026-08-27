@@ -1,5 +1,7 @@
 # Kbd
 
+**已實作** — `Kbd.tsx`,測試 `Kbd.test.tsx`;playground 的 `#kbd` 區可實際操作。
+
 快捷鍵標示:surface 底 + border + 1px 下緣陰影做出按鍵感,Geist Mono,單鍵/組合/序列三種排法。
 
 ## API 草案

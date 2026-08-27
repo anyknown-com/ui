@@ -1,5 +1,7 @@
 # Radio / RadioGroup
 
+**已實作** — `Radio.tsx`、`RadioGroup.tsx`,測試 `Radio.test.tsx`;playground 的 `#radio` 區可實際操作。
+
 原生 `<input type="radio">` + `fieldset/legend` 群組。內圈 dot 用 `scale` 進場(140ms)。
 
 ## API 草案

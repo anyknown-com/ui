@@ -1,5 +1,7 @@
 # Voice Indicator
 
+**已實作** — `VoiceIndicator.tsx`,測試 `VoiceIndicator.test.tsx`;playground 的 `#voice-indicator` 區可實際操作。
+
 語音通話的狀態顯示:一眼看出 agent 現在是在聽你、在想、還是在說——對應 STT → runtime LLM → TTS pipeline 的三個活動段。
 
 ## 需求(定案)

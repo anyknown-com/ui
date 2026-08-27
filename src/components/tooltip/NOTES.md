@@ -1,5 +1,7 @@
 # Tooltip
 
+**已實作** — `Tooltip.tsx`,測試 `Tooltip.test.tsx`;playground 的 `#tooltip` 區可實際操作。
+
 純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,反色小氣泡,只放一行文字(可附 Kbd 快捷鍵),絕不放互動內容。
 
 ## API 草案

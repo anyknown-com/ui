@@ -1,5 +1,7 @@
 # EmptyState
 
+**已實作** — `EmptyState.tsx`,測試 `EmptyState.test.tsx`;playground 的 `#empty-state` 區可實際操作。
+
 空狀態 = 行動邀請:icon + 一句說明 + 主要動作,文案永遠說「下一步做什麼」,不只陳述「沒有東西」。
 
 ## API 草案

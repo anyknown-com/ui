@@ -1,5 +1,7 @@
 # Progress / Spinner
 
+**已實作** — `Progress.tsx`,測試 `Progress.test.tsx`;playground 的 `#progress` 區可實際操作。
+
 進行中狀態,用「訊息是纖維、進度是織線」的品牌比喻:一條條訊息像纖維交織推進到 100%。唯一例外是 context 用量環——要求精確讀數,不玩比喻。
 
 ## 形態

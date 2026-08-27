@@ -1,5 +1,7 @@
 # Interaction Card
 
+**已實作** — `InteractionCard.tsx`,測試 `InteractionCard.test.tsx`;playground 的 `#interaction-card` 區可實際操作。
+
 agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)。pending 是可操作物,回覆後收成過去區的不可改收據。
 
 ## 需求(定案)

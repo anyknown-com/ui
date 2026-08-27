@@ -1,5 +1,7 @@
 # Toast
 
+**已實作** — `Toast.tsx`,測試 `Toast.test.tsx`;playground 的 `#toast` 區可實際操作。
+
 非阻斷通知:疊在右下角、slide+fade 進場、5 秒後自動消失(hover 暫停);danger/success 用色點區分,可帶一個動作按鈕(「已刪除 · 復原」)。
 
 ## API 草案

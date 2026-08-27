@@ -1,5 +1,7 @@
 # Handoff Receipt
 
+**已實作** — `HandoffReceipt.tsx`,測試 `HandoffReceipt.test.tsx`;playground 的 `#handoff-receipt` 區可實際操作。
+
 rotation 分隔線:thread 過去區裡一條安靜的細列「換班完成 · 時間 · ctx 50% → 新 session」,可展開看交接摘要。用戶不管理 session,這是他唯一看見換班的地方。
 
 ## 需求(定案)

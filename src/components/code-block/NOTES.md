@@ -1,5 +1,7 @@
 # Code block
 
+**已實作** — `CodeBlock.tsx`,測試 `CodeBlock.test.tsx`;playground 的 `#code-block` 區可實際操作。
+
 markdown 裡的程式碼區塊:header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體,超寬只在 block 內橫向捲動。
 
 ## API 草案

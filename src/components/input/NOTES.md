@@ -1,5 +1,7 @@
 # Input
 
+**已實作** — `Input.tsx`,測試 `Input.test.tsx`;playground 的 `#input` 區可實際操作。
+
 單行文字輸入。`prototype.html` 為視覺與狀態規格。
 
 ## API 草案

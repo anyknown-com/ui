@@ -1,5 +1,7 @@
 # Action bar
 
+**已實作** — `ActionBar.tsx`,測試 `ActionBar.test.tsx`;playground 的 `#action-bar` 區可實際操作。
+
 assistant 訊息底部的 hover 動作列:高度永遠保留(pb + 負 mb 技法),hover 只切 opacity,turn 節奏零跳動。
 
 ## API 草案

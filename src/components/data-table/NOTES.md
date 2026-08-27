@@ -1,5 +1,7 @@
 # DataTable
 
+**已實作** — `DataTable.tsx`,測試 `DataTable.test.tsx`;playground 的 `#data-table` 區可實際操作。
+
 排序、過濾、選取、inline edit 的資料表。第一個消費者是 i18n 字典編輯(key / zh-TW / en / 狀態);prototype 全部互動可實際操作。
 
 ## 需求(定案)

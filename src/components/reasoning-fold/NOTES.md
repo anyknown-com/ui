@@ -1,5 +1,7 @@
 # Reasoning fold
 
+**已實作** — `ReasoningFold.tsx`,測試 `ReasoningFold.test.tsx`;playground 的 `#reasoning-fold` 區可實際操作。
+
 思考過程的摺疊列:預設收合只留「思考了 N 秒」,串流中撐開、標籤 shimmer「思考中…」,內容永遠是 muted 斜體的配角。
 
 ## API 草案

@@ -1,5 +1,7 @@
 # Skeleton
 
+**已實作** — `Skeleton.tsx`,測試 `Skeleton.test.tsx`;playground 的 `#skeleton` 區可實際操作。
+
 載入骨架:占位形狀 + shimmer,形狀對齊實際內容的排版(thread 骨架就長得像 thread),避免載入完成時跳版。
 
 ## API 草案

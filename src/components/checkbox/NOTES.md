@@ -1,5 +1,7 @@
 # Checkbox
 
+**已實作** — `Checkbox.tsx`,測試 `Checkbox.test.tsx`;playground 的 `#checkbox` 區可實際操作。
+
 原生 `<input type="checkbox">` 隱藏 + 自繪 box;勾勾用 SVG stroke-dashoffset 畫出(160ms ease-out)。
 
 ## API 草案

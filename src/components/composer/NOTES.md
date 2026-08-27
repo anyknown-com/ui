@@ -1,5 +1,7 @@
 # Composer
 
+**已實作** — `Composer.tsx`,測試 `Composer.test.tsx`;playground 的 `#composer` 區可實際操作。
+
 釘在現在線上的 prompt bar:說話發生在現在——送出後上方多一條收據、下方未來區當場重排。永遠可用,不被 pending 卡阻塞。
 
 ## 需求(定案)

@@ -1,5 +1,7 @@
 # Switch
 
+**已實作** — `Switch.tsx`,測試 `Switch.test.tsx`;playground 的 `#switch` 區可實際操作。
+
 即時生效的開關(相對於 Checkbox 的「提交後生效」)。原生 checkbox + `role="switch"`。
 
 ## API 草案

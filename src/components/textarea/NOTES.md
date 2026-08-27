@@ -1,5 +1,7 @@
 # Textarea
 
+**已實作** — `Textarea.tsx`,測試 `Textarea.test.tsx`;playground 的 `#textarea` 區可實際操作。
+
 多行輸入。與 Input 共用 border/focus/error 樣式語言。
 
 ## API 草案

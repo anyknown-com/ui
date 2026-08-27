@@ -1,5 +1,7 @@
 # PasswordInput / PassphraseField
 
+**已實作** — `PasswordInput.tsx`,測試 `PasswordInput.test.tsx`;playground 的 `#password-input` 區可實際操作。
+
 密碼與 vault passphrase 欄:顯示/隱藏切換、四段強度計、Caps Lock 警告、confirm 欄不一致錯誤。prototype 可操作:輸入時強度計即時變化(長度 + 字元類別評分)、Caps Lock 實際偵測、confirm 欄輸入不同內容即出錯。
 
 ## API 草案

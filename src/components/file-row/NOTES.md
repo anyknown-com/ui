@@ -1,5 +1,7 @@
 # FileRow
 
+**已實作** — `FileRow.tsx`,測試 `FileRow.test.tsx`;playground 的 `#file-row` 區可實際操作。
+
 檔案列表的一列:類型圖示 + 檔名 + 大小(mono、tabular)+ 修改時間 + hover 才浮現的動作(下載/改名/刪除)與選取 checkbox;另有資料夾列與加密中/上傳中 busy 列。prototype 的 hover、點列選取、checkbox、Space 選取、動作鈕都可操作。
 
 ## API 草案

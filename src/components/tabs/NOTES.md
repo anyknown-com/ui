@@ -1,5 +1,7 @@
 # Tabs
 
+**已實作** — `Tabs.tsx`,測試 `Tabs.test.tsx`;playground 的 `#tabs` 區可實際操作。
+
 同層內容切換(對話/記憶/換班紀錄),underline 為預設 variant,pills 用於篩選型切換(時間範圍等)。
 
 ## API 草案

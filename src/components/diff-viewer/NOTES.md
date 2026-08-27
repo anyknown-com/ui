@@ -1,5 +1,7 @@
 # DiffViewer
 
+**已實作** — `DiffViewer.tsx`,測試 `DiffViewer.test.tsx`;playground 的 `#diff-viewer` 區可實際操作。
+
 行級 unified diff + 行內字級 highlight。給 plan 審查 takeover(changeset 的 before/after)與 i18n 譯文修改對照用;prototype 的收合區段可實際展開/收合。
 
 ## 需求(定案)

@@ -1,5 +1,7 @@
 # Tool card
 
+**已實作** — `ToolCard.tsx`,測試 `ToolCard.test.tsx`;playground 的 `#tool-card` 區可實際操作。
+
 工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,展開看輸入/輸出;subagent 是它的變體,不是新元件家族。
 
 ## API 草案

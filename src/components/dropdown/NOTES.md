@@ -1,5 +1,7 @@
 # Dropdown Menu
 
+**已實作** — `DropdownMenu.tsx`,測試 `DropdownMenu.test.tsx`;playground 的 `#dropdown` 區可實際操作。
+
 動作選單(相對於 Select 的「選值」)。prototype 可操作:群組、分隔線、checkbox item、快捷鍵欄、兩層 submenu(hover/focus 展開)。
 
 ## 需求(定案)

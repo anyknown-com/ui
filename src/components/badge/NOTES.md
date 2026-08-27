@@ -1,5 +1,7 @@
 # Badge / Chip
 
+**已實作** — `Badge.tsx`,測試 `Badge.test.tsx`;playground 的 `#badge` 區可實際操作。
+
 小型狀態與計數標示:badge 是唯讀語意標籤,chip 是可互動(可移除)的篩選單位,同一家族收斂。
 
 ## API 草案

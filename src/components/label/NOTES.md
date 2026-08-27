@@ -1,5 +1,7 @@
 # Label
 
+**已實作** — `Label.tsx`、`Field.tsx`、`fieldContext.ts`,測試 `Label.test.tsx`;playground 的 `#label` 區可實際操作。
+
 表單標籤,含 required / optional 標記。實作上建議連同 `Field`(label + control + help/error 的組合容器)一起做,自動接好 `for`/`aria-describedby`。
 
 ## API 草案

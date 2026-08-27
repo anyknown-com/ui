@@ -1,5 +1,7 @@
 # Message
 
+**已實作** — `Message.tsx`,測試 `Message.test.tsx`;playground 的 `#message` 區可實際操作。
+
 過去區的訊息節奏:user 右對齊氣泡、assistant 全寬純文字,turn 24px / part 8px,字級只走 plan 24 的三個 token。
 
 ## API 草案

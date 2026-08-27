@@ -1,5 +1,7 @@
 # Select / Combobox
 
+**已實作** — `Select.tsx`,測試 `Select.test.tsx`;playground 的 `#select` 區可實際操作。
+
 觸發鈕 + popover(頂部搜尋框 + 分組列表)。prototype 是可操作的:打字過濾、方向鍵移動、Enter 選取、Esc 關閉、多選 chips。
 
 ## 需求(定案)

@@ -1,5 +1,7 @@
 # Scrollbar
 
+**已實作** — `src/scrollbar.css`(不是元件,是一份全域 CSS);playground 的 `#scrollbar` 區有實際捲動容器可看。
+
 全產品線的客製捲軸,隨 `@anyknown/ui/scrollbar.css` 全域套用(不是元件,是一份 CSS)。
 
 ## 設計

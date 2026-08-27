@@ -1,5 +1,7 @@
 # Dialog / ConfirmDialog
 
+**已實作** — `Dialog.tsx`,測試 `Dialog.test.tsx`;playground 的 `#dialog` 區可實際操作。
+
 模態對話框:半透明 blur backdrop、scale+fade 進場、Esc/backdrop 關閉;danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 
 ## API 草案

@@ -1,5 +1,7 @@
 # Popover
 
+**已實作** — `Popover.tsx`,測試 `Popover.test.tsx`;playground 的 `#popover` 區可實際操作。
+
 定位浮層基礎件:trigger 錨定的 surface 卡片,select/dropdown/combobox 都疊在它上面;也直接承載富內容(記憶詳情、成員卡片)。
 
 ## API 草案
