@@ -48,3 +48,15 @@ describe("Field", () => {
 		expect(screen.getByRole("textbox", { name: "裝置名稱" })).toBeDisabled()
 	})
 })
+
+describe("Field regressions", () => {
+	test("owns the control id so the label always resolves", () => {
+		render(
+			<Field label="Email">
+				<Input id="ignored-by-field" />
+			</Field>,
+		)
+		const input = screen.getByRole("textbox", { name: "Email" })
+		expect(document.querySelector(`label[for="${input.id}"]`)).not.toBeNull()
+	})
+})

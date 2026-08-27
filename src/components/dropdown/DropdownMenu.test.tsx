@@ -102,3 +102,12 @@ describe("DropdownMenu", () => {
 		expect(trigger).toHaveFocus()
 	})
 })
+
+describe("DropdownMenu accessibility", () => {
+	test("the shortcut is announced as a key shortcut, not part of the name", async () => {
+		render(<ThreadMenu />)
+		await userEvent.click(screen.getByRole("button", { name: "Thread 動作" }))
+		const item = await screen.findByRole("menuitem", { name: "新增交接備註" })
+		expect(item).toHaveAttribute("aria-keyshortcuts", "⌘N")
+	})
+})

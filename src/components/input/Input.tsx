@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
+import { styled } from "../../lib/styled"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -58,14 +59,15 @@ export type InputProps = Omit<ComponentProps<"input">, "size"> & {
 }
 
 export function Input({ size = "md", invalid, leadingIcon, ...props }: InputProps) {
-	const field = useFieldControl(props)
-	const isInvalid = invalid ?? field["aria-invalid"] === true
+	const { invalid: fieldInvalid, ...field } = useFieldControl(props)
+	const isInvalid = invalid ?? fieldInvalid
 	const input = (
 		<input
 			{...props}
 			{...field}
 			aria-invalid={isInvalid || undefined}
-			{...stylex.props(
+			{...styled(
+				props,
 				controlStyles.base,
 				controlStyles[size],
 				isInvalid && controlStyles.invalid,

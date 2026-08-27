@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { Checkbox } from "./Checkbox"
 
@@ -46,6 +47,51 @@ describe("Checkbox", () => {
 		render(<Checkbox label="端對端加密" defaultChecked disabled />)
 		const box = screen.getByRole("checkbox", { name: "端對端加密" })
 		await userEvent.click(box)
+		expect(box).toBeChecked()
+	})
+})
+
+describe("Checkbox in a Field", () => {
+	test("inherits disabled and aria-describedby from the field", async () => {
+		const { Field } = await import("../label/Field")
+		render(
+			<Field help="每次 handoff 都會通知。" disabled>
+				<Checkbox label="換班時通知我" />
+			</Field>,
+		)
+		const box = screen.getByRole("checkbox", { name: "換班時通知我" })
+		expect(box).toBeDisabled()
+		const describedBy = box.getAttribute("aria-describedby")
+		expect(describedBy).not.toBeNull()
+		expect(document.getElementById(describedBy as string)).toBeInTheDocument()
+	})
+})
+
+describe("Checkbox description", () => {
+	test("the description is the accessible description, not part of the name", () => {
+		render(<Checkbox label="換班時通知我" description="每次 handoff 都會收到桌面通知。" />)
+		const box = screen.getByRole("checkbox", { name: "換班時通知我" })
+		const describedBy = box.getAttribute("aria-describedby")
+		expect(document.getElementById(describedBy as string)).toHaveTextContent("每次 handoff 都會收到桌面通知。")
+	})
+
+	test("clears the mixed state once the user toggles", async () => {
+		function Parent() {
+			const [state, setState] = useState<"mixed" | boolean>("mixed")
+			return (
+				<Checkbox
+					label="全選記憶"
+					indeterminate={state === "mixed"}
+					checked={state === true}
+					onCheckedChange={setState}
+				/>
+			)
+		}
+		render(<Parent />)
+		const box = screen.getByRole("checkbox", { name: "全選記憶" }) as HTMLInputElement
+		expect(box.indeterminate).toBe(true)
+		await userEvent.click(box)
+		expect(box.indeterminate).toBe(false)
 		expect(box).toBeChecked()
 	})
 })

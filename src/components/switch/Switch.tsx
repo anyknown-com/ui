@@ -1,9 +1,11 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps, ReactNode } from "react"
+import { type ComponentProps, type ReactNode, useId } from "react"
 import { FabricPattern } from "../../lib/Fabric"
+import { styled } from "../../lib/styled"
 import { useSvgId } from "../../lib/svgId"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -82,14 +84,29 @@ export function Switch({
 	...props
 }: SwitchProps) {
 	const patternId = useSvgId("ak-fabric")
+	const base = useId()
+	const labelId = `${base}label`
+	const descriptionId = `${base}description`
+	const { invalid, ...field } = useFieldControl(props)
+	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
+		.filter(Boolean)
+		.join(" ")
 	const [isOn, setOn] = useControllableState(checked, defaultChecked ?? false, onCheckedChange)
 
 	return (
 		<label {...stylex.props(styles.root)}>
 			{(label != null || description != null) && (
 				<span>
-					{label != null && <span {...stylex.props(styles.labelText)}>{label}</span>}
-					{description != null && <span {...stylex.props(styles.description)}>{description}</span>}
+					{label != null && (
+						<span id={labelId} {...stylex.props(styles.labelText)}>
+							{label}
+						</span>
+					)}
+					{description != null && (
+						<span id={descriptionId} {...stylex.props(styles.description)}>
+							{description}
+						</span>
+					)}
 				</span>
 			)}
 			<span {...stylex.props(styles.track)}>
@@ -97,12 +114,16 @@ export function Switch({
 					type="checkbox"
 					role="switch"
 					{...props}
+					{...field}
+					aria-invalid={invalid || undefined}
+					aria-labelledby={label != null ? labelId : undefined}
+					aria-describedby={describedBy || undefined}
 					checked={isOn}
 					onChange={(event) => {
 						setOn(event.currentTarget.checked)
 						onChange?.(event)
 					}}
-					{...stylex.props(styles.input)}
+					{...styled(props, styles.input)}
 				/>
 				<svg viewBox="0 0 44 22" aria-hidden="true" {...stylex.props(styles.svg)}>
 					<FabricPattern id={patternId} />

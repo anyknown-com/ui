@@ -24,7 +24,12 @@ const styles = stylex.create({
 		outline: "none",
 		userSelect: "none",
 	},
-	highlighted: { backgroundColor: color.accentSubtle },
+	highlighted: {
+		backgroundColor: color.accentSubtle,
+		outline: `2px solid ${color.focusRing}`,
+		outlineOffset: -2,
+		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
+	},
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
 	danger: { color: color.danger },
 	icon: { color: color.textMuted, flex: "none", display: "flex" },
@@ -94,14 +99,23 @@ export type DropdownItemProps = {
 
 export function DropdownItem({ icon, shortcut, variant, onSelect, children, ...rest }: DropdownItemProps) {
 	return (
-		<Menu.Item {...rest} onClick={onSelect} className={itemClassName(variant)}>
+		<Menu.Item
+			{...rest}
+			aria-keyshortcuts={shortcut}
+			onClick={onSelect}
+			className={itemClassName(variant)}
+		>
 			{icon != null && (
 				<span aria-hidden="true" {...stylex.props(styles.icon)}>
 					{icon}
 				</span>
 			)}
 			{children}
-			{shortcut != null && <span {...stylex.props(styles.shortcut)}>{shortcut}</span>}
+			{shortcut != null && (
+				<span aria-hidden="true" {...stylex.props(styles.shortcut)}>
+					{shortcut}
+				</span>
+			)}
 		</Menu.Item>
 	)
 }

@@ -1,0 +1,11 @@
+@stylex;
+
+@import "@anyknown/ui/tokens.css";
+@import "@anyknown/ui/scrollbar.css";
+
+body {
+	margin: 0;
+	background: var(--ak-bg);
+	color: var(--ak-text);
+	font-family: "Geist", system-ui, sans-serif;
+}

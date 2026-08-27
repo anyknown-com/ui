@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
+import { styled } from "../../lib/styled"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -18,7 +19,7 @@ const styles = stylex.create({
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
 		transitionProperty: "background-color, border-color, color",
-		transitionDuration: motion.fast,
+		transitionDuration: { default: motion.fast, "@media (prefers-reduced-motion: reduce)": "0s" },
 		transitionTimingFunction: motion.ease,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
@@ -63,5 +64,5 @@ type ButtonProps = ComponentProps<"button"> & {
 }
 
 export function Button({ variant = "primary", size = "md", ...props }: ButtonProps) {
-	return <button type="button" {...props} {...stylex.props(styles.base, styles[size], styles[variant])} />
+	return <button type="button" {...props} {...styled(props, styles.base, styles[size], styles[variant])} />
 }

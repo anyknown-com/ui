@@ -1,10 +1,12 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ComponentProps, type ReactNode, useCallback } from "react"
+import { type ComponentProps, type ReactNode, useCallback, useEffect, useId, useRef } from "react"
 import { FabricPattern } from "../../lib/Fabric"
 import { assignRef } from "../../lib/mergeRefs"
+import { styled } from "../../lib/styled"
 import { useSvgId } from "../../lib/svgId"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -85,17 +87,29 @@ export function Checkbox({
 	...props
 }: CheckboxProps) {
 	const patternId = useSvgId("ak-fabric")
+	const base = useId()
+	const labelId = `${base}label`
+	const descriptionId = `${base}description`
+	const { invalid, ...field } = useFieldControl(props)
 	const [isChecked, setChecked] = useControllableState(checked, defaultChecked ?? false, onCheckedChange)
 
+	const node = useRef<HTMLInputElement>(null)
 	const setNode = useCallback(
-		(node: HTMLInputElement | null) => {
-			if (node) node.indeterminate = indeterminate
-			return assignRef(ref, node)
+		(element: HTMLInputElement | null) => {
+			node.current = element
+			assignRef(ref, element)
 		},
-		[indeterminate, ref],
+		[ref],
 	)
 
+	useEffect(() => {
+		if (node.current) node.current.indeterminate = indeterminate
+	}, [indeterminate, isChecked])
+
 	const filled = isChecked || indeterminate
+	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
+		.filter(Boolean)
+		.join(" ")
 
 	return (
 		<label {...stylex.props(styles.root)}>
@@ -103,13 +117,17 @@ export function Checkbox({
 				<input
 					type="checkbox"
 					{...props}
+					{...field}
+					aria-invalid={invalid || undefined}
+					aria-labelledby={label != null ? labelId : undefined}
+					aria-describedby={describedBy || undefined}
 					ref={setNode}
 					checked={isChecked}
 					onChange={(event) => {
 						setChecked(event.currentTarget.checked)
 						onChange?.(event)
 					}}
-					{...stylex.props(styles.input)}
+					{...styled(props, styles.input)}
 				/>
 				<svg viewBox="0 0 24 24" aria-hidden="true" {...stylex.props(styles.svg)}>
 					<FabricPattern id={patternId} />
@@ -128,8 +146,16 @@ export function Checkbox({
 			</span>
 			{(label != null || description != null) && (
 				<span>
-					{label != null && <span {...stylex.props(styles.labelText)}>{label}</span>}
-					{description != null && <span {...stylex.props(styles.description)}>{description}</span>}
+					{label != null && (
+						<span id={labelId} {...stylex.props(styles.labelText)}>
+							{label}
+						</span>
+					)}
+					{description != null && (
+						<span id={descriptionId} {...stylex.props(styles.description)}>
+							{description}
+						</span>
+					)}
 				</span>
 			)}
 		</label>

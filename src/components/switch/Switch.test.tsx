@@ -40,3 +40,15 @@ describe("Switch", () => {
 		expect(control).toBeChecked()
 	})
 })
+
+describe("Switch in a Field", () => {
+	test("inherits disabled from the field", async () => {
+		const { Field } = await import("../label/Field")
+		render(
+			<Field disabled>
+				<Switch label="語音喚醒" />
+			</Field>,
+		)
+		expect(screen.getByRole("switch", { name: "語音喚醒" })).toBeDisabled()
+	})
+})

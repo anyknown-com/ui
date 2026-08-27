@@ -66,3 +66,17 @@ describe("RadioGroup", () => {
 		expect(screen.getByRole("radio", { name: "Claude" })).toBeChecked()
 	})
 })
+
+describe("RadioGroup uncontrolled", () => {
+	test("selects without a value prop", async () => {
+		render(
+			<RadioGroup legend="來源" defaultValue="claude">
+				<Radio value="claude" label="Claude" />
+				<Radio value="chatgpt" label="ChatGPT" />
+			</RadioGroup>,
+		)
+		expect(screen.getByRole("radio", { name: "Claude" })).toBeChecked()
+		await userEvent.click(screen.getByRole("radio", { name: "ChatGPT" }))
+		expect(screen.getByRole("radio", { name: "ChatGPT" })).toBeChecked()
+	})
+})

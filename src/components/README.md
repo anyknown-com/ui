@@ -21,3 +21,19 @@
 3. 動效:進場 140ms scale+fade、控件過渡 `motion.fast`;一律包 `prefers-reduced-motion`。
 4. focus ring 統一:`focus-visible` 2px `color.focusRing`,offset 2(嵌在框內的用 -1)。
 5. 表單錯誤:控件設 `aria-invalid` + `aria-describedby`,訊息由 Field 層渲染。
+
+## 已知的對比問題(待設計決策,實作未自行更動 palette)
+
+a11y review 量測 `tokens.css` 兩個主題後發現三處低於 WCAG 門檻。因為 `prototype.html` 是視覺的唯一真相,實作沒有擅自改 token 值,改動與否請設計決定:
+
+| Token 組合 | 實測 | 門檻 | 出現處 |
+| --- | --- | --- | --- |
+| `textFaint` on `surface` | 2.97:1(light)/ 3.16:1(dark) | 4.5:1(小字) | input placeholder、select 群組標題與 hint、dropdown 快捷鍵、label 的「選填」 |
+| `borderStrong` on `surface` | 1.76:1(light) | 3:1(UI 邊界) | checkbox / radio 未勾邊框、switch 關閉時的軌道 |
+| checkbox / radio 命中區 | 16.8px;switch 高 22.4px | 24px | 只在省略 `label` 時會踩到(有 label 時整條 label 是命中區) |
+
+建議修法(擇一):把帶語意的 faint 文字改用 `textMuted`(已達 4.5:1),或把 `textFaint` / `borderStrong` 各壓深一階。
+
+## Field 的使用範圍
+
+`Field` 擁有它那顆控件的 `id`(控件自己傳的 `id` 在 Field 內會被忽略),所以一個 `Field` 只放一顆控件。`Checkbox` / `Radio` / `Switch` 自帶 label,放進 `Field` 時只給 `help` / `error` / `disabled`,不要再給 `label`。

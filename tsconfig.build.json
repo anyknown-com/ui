@@ -4,6 +4,7 @@
 		"noEmit": false,
 		"declaration": true,
 		"types": [],
+		"allowImportingTsExtensions": false,
 		"outDir": "dist"
 	},
 	"include": ["src"],

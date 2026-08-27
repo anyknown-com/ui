@@ -1,6 +1,6 @@
 import { Combobox } from "@base-ui/react/combobox"
 import * as stylex from "@stylexjs/stylex"
-import { Children, type ReactElement, type ReactNode, isValidElement, useMemo, useState } from "react"
+import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { popupStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -160,7 +160,12 @@ const styles = stylex.create({
 		outline: "none",
 		userSelect: "none",
 	},
-	optionHighlighted: { backgroundColor: color.accentSubtle },
+	optionHighlighted: {
+		backgroundColor: color.accentSubtle,
+		outline: `2px solid ${color.focusRing}`,
+		outlineOffset: -2,
+		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
+	},
 	optionDisabled: { opacity: 0.5, cursor: "not-allowed" },
 	hint: { color: color.textFaint, fontSize: "0.72rem" },
 	tick: { marginInlineStart: "auto", color: color.accent, display: "flex" },
@@ -216,6 +221,7 @@ function OptionRow({ option }: { option: Option }) {
 
 export type SelectProps = {
 	value?: string | string[]
+	defaultValue?: string | string[]
 	onValueChange?: (value: never) => void
 	placeholder?: string
 	searchPlaceholder?: string
@@ -226,11 +232,13 @@ export type SelectProps = {
 	disabled?: boolean
 	name?: string
 	"aria-label"?: string
+	"aria-labelledby"?: string
 	children: ReactNode
 }
 
 export function Select({
 	value,
+	defaultValue,
 	onValueChange,
 	placeholder = "選擇…",
 	searchPlaceholder = "搜尋…",
@@ -241,20 +249,33 @@ export function Select({
 	disabled,
 	name,
 	children,
-	...rest
+	"aria-label": ariaLabel,
+	"aria-labelledby": ariaLabelledBy,
 }: SelectProps) {
+	const base = useId()
+	const labelId = `${base}label`
+	const triggerId = `${base}trigger`
+	const nameId = ariaLabelledBy ?? (ariaLabel != null ? labelId : undefined)
+	const triggerLabelledBy = nameId ? `${nameId} ${triggerId}` : undefined
 	const { options, groups } = useMemo(() => collect(children), [children])
 	const byValue = useMemo(() => new Map(options.map((o) => [o.value, o])), [options])
 
+	const isControlled = value !== undefined
+	const [internal, setInternal] = useState<string | string[]>(defaultValue ?? (multiple ? [] : ""))
+	const current = isControlled ? value : internal
 	const selectedList = useMemo(
-		() => (Array.isArray(value) ? value : []).map((v) => byValue.get(v)).filter((o): o is Option => o != null),
-		[value, byValue],
+		() => (Array.isArray(current) ? current : []).map((v) => byValue.get(v)).filter((o): o is Option => o != null),
+		[current, byValue],
 	)
-	const selectedOne = typeof value === "string" ? (byValue.get(value) ?? null) : null
+	const selectedOne = typeof current === "string" && current !== "" ? (byValue.get(current) ?? null) : null
 	const selected = multiple ? selectedList : selectedOne
 	const [query, setQuery] = useState("")
 
-	const emit = onValueChange as ((next: string | string[]) => void) | undefined
+	const notify = onValueChange as ((next: string | string[]) => void) | undefined
+	const emit = (next: string | string[]) => {
+		if (!isControlled) setInternal(next)
+		notify?.(next)
+	}
 
 	const items = groups.length > 0 ? groups : options
 
@@ -270,14 +291,20 @@ export function Select({
 			itemToStringValue={(item: Option) => item.value}
 			onInputValueChange={setQuery}
 			onValueChange={(next: Option | Option[] | null) => {
-				if (multiple) emit?.(((next as Option[]) ?? []).map((o) => o.value))
-				else emit?.((next as Option | null)?.value ?? "")
+				if (multiple) emit(((next as Option[]) ?? []).map((o) => o.value))
+				else emit((next as Option | null)?.value ?? "")
 			}}
 		>
+			{ariaLabel != null && ariaLabelledBy == null && (
+				<span id={labelId} hidden>
+					{ariaLabel}
+				</span>
+			)}
 			<Combobox.Trigger
+				id={triggerId}
+				aria-labelledby={triggerLabelledBy}
 				nativeButton={!multiple}
 				render={multiple ? <div /> : undefined}
-				{...rest}
 				{...stylex.props(styles.trigger)}
 			>
 				{multiple ? (
@@ -290,9 +317,11 @@ export function Select({
 								<button
 									type="button"
 									aria-label={`移除 ${option.text}`}
+									onPointerDown={(event) => event.stopPropagation()}
+									onMouseDown={(event) => event.stopPropagation()}
 									onClick={(event) => {
 										event.stopPropagation()
-										emit?.(selectedList.filter((o) => o.value !== option.value).map((o) => o.value))
+										emit(selectedList.filter((o) => o.value !== option.value).map((o) => o.value))
 									}}
 									{...stylex.props(styles.chipRemove)}
 								>
@@ -315,7 +344,10 @@ export function Select({
 
 			<Combobox.Portal>
 				<Combobox.Positioner align="start" sideOffset={6} {...stylex.props(popupStyles.positioner)}>
-					<Combobox.Popup {...stylex.props(popupStyles.surface, popupStyles.anchorWidth)}>
+					<Combobox.Popup
+						aria-labelledby={nameId}
+						{...stylex.props(popupStyles.surface, popupStyles.anchorWidth)}
+					>
 						{searchable ? (
 							<div {...stylex.props(styles.search)}>
 								<span {...stylex.props(styles.searchIcon)}>
@@ -328,11 +360,12 @@ export function Select({
 								/>
 							</div>
 						) : (
-							<Combobox.Input aria-label={searchLabel} {...stylex.props(styles.srOnly)} />
+							<Combobox.Input
+								aria-labelledby={nameId}
+								aria-label={nameId ? undefined : searchLabel}
+								{...stylex.props(styles.srOnly)}
+							/>
 						)}
-						<Combobox.Empty {...stylex.props(styles.empty)}>
-							{emptyLabel ? emptyLabel(query) : `找不到「${query}」。`}
-						</Combobox.Empty>
 						<Combobox.List {...stylex.props(styles.list)}>
 							{groups.length > 0
 								? (group: Group) => (
@@ -347,6 +380,9 @@ export function Select({
 									)
 								: (option: Option) => <OptionRow key={option.value} option={option} />}
 						</Combobox.List>
+						<Combobox.Empty {...stylex.props(styles.empty)}>
+							{emptyLabel ? emptyLabel(query) : `找不到「${query}」。`}
+						</Combobox.Empty>
 					</Combobox.Popup>
 				</Combobox.Positioner>
 			</Combobox.Portal>

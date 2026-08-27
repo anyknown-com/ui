@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps, ReactNode } from "react"
+import { type ComponentProps, type ReactNode, useId } from "react"
 import { COIL_PATH } from "../../lib/paths"
+import { styled } from "../../lib/styled"
+import { useFieldControl } from "../label/fieldContext"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { useRadioGroup } from "./RadioGroup"
 
@@ -68,23 +70,40 @@ export type RadioProps = Omit<ComponentProps<"input">, "type" | "value" | "child
 
 export function Radio({ value, label, description, onChange, disabled, ...props }: RadioProps) {
 	const group = useRadioGroup()
+	const base = useId()
+	const labelId = `${base}label`
+	const descriptionId = `${base}description`
+	const { invalid, id: _fieldId, ...field } = useFieldControl(props)
 	const checked = group.value === value
+	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
+		.filter(Boolean)
+		.join(" ")
 
 	return (
-		<label {...stylex.props(styles.root, group.variant === "card" && styles.card, group.variant === "card" && checked && styles.cardOn)}>
+		<label
+			{...stylex.props(
+				styles.root,
+				group.variant === "card" && styles.card,
+				group.variant === "card" && checked && styles.cardOn,
+			)}
+		>
 			<span {...stylex.props(styles.dot, checked && styles.dotOn)}>
 				<input
 					type="radio"
 					{...props}
+					{...field}
 					name={group.name}
 					value={value}
 					checked={checked}
-					disabled={disabled ?? group.disabled}
+					aria-invalid={invalid || undefined}
+					aria-labelledby={label != null ? labelId : undefined}
+					aria-describedby={describedBy || undefined}
+					disabled={disabled ?? field.disabled ?? group.disabled}
 					onChange={(event) => {
-						if (event.currentTarget.checked) group.onValueChange?.(value)
+						if (event.currentTarget.checked) group.select(value)
 						onChange?.(event)
 					}}
-					{...stylex.props(styles.input)}
+					{...styled(props, styles.input)}
 				/>
 				<svg viewBox="0 0 24 24" aria-hidden="true" {...stylex.props(styles.svg)}>
 					<path d={COIL_PATH} pathLength="100" {...stylex.props(styles.coil, checked && styles.coilOn)} />
@@ -92,8 +111,16 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 			</span>
 			{(label != null || description != null) && (
 				<span>
-					{label != null && <span {...stylex.props(styles.labelText)}>{label}</span>}
-					{description != null && <span {...stylex.props(styles.description)}>{description}</span>}
+					{label != null && (
+						<span id={labelId} {...stylex.props(styles.labelText)}>
+							{label}
+						</span>
+					)}
+					{description != null && (
+						<span id={descriptionId} {...stylex.props(styles.description)}>
+							{description}
+						</span>
+					)}
 				</span>
 			)}
 		</label>

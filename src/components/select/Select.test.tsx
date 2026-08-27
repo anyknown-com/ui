@@ -107,3 +107,46 @@ describe("Select", () => {
 		await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith([]))
 	})
 })
+
+describe("Select uncontrolled", () => {
+	test("updates the trigger without a value prop", async () => {
+		render(
+			<Select aria-label="無控" placeholder="選擇模型…">
+				<SelectItem value="opus-5">Opus 5</SelectItem>
+			</Select>,
+		)
+		await userEvent.click(screen.getByRole("combobox", { name: "無控" }))
+		await userEvent.click(await screen.findByRole("option", { name: "Opus 5" }))
+		await waitFor(() => expect(screen.getByRole("combobox", { name: "無控" })).toHaveTextContent("Opus 5"))
+	})
+})
+
+describe("Select accessibility", () => {
+	// role="combobox" forbids name-from-content, so the value is exposed with the APG
+	// select-only pattern: aria-labelledby = "<label> <trigger itself>".
+	test("the trigger's name references both its label and its own value", async () => {
+		render(
+			<Select aria-label="模型" placeholder="選擇模型…">
+				<SelectItem value="fable-5">Fable 5</SelectItem>
+			</Select>,
+		)
+		const trigger = screen.getByRole("combobox", { name: "模型" })
+		const [labelRef, selfRef] = (trigger.getAttribute("aria-labelledby") ?? "").split(" ")
+		expect(document.getElementById(labelRef)).toHaveTextContent("模型")
+		expect(selfRef).toBe(trigger.id)
+		expect(trigger).toHaveTextContent("選擇模型…")
+		await userEvent.click(trigger)
+		await userEvent.click(await screen.findByRole("option", { name: "Fable 5" }))
+		await waitFor(() => expect(trigger).toHaveTextContent("Fable 5"))
+	})
+
+	test("removing a chip does not open the popup", async () => {
+		render(<Memories />)
+		await userEvent.click(screen.getByRole("combobox", { name: "選擇記憶" }))
+		await userEvent.click(await screen.findByRole("option", { name: /偏好 pnpm/ }))
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+		await userEvent.click(screen.getByRole("button", { name: "移除 偏好 pnpm" }))
+		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+	})
+})

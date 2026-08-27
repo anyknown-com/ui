@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react"
+import { type AriaAttributes, createContext, useContext } from "react"
 
 export type FieldContextValue = {
 	controlId: string
@@ -11,8 +11,8 @@ export type FieldContextValue = {
 export const FieldContext = createContext<FieldContextValue | null>(null)
 
 type ControlProps = {
-	id?: string
 	"aria-describedby"?: string
+	"aria-invalid"?: AriaAttributes["aria-invalid"]
 	required?: boolean
 	disabled?: boolean
 }
@@ -20,19 +20,20 @@ type ControlProps = {
 export type FieldControlProps = {
 	id?: string
 	"aria-describedby"?: string
-	"aria-invalid"?: true
 	required?: boolean
 	disabled?: boolean
 }
 
-export function useFieldControl(props: ControlProps): FieldControlProps {
+/** A Field owns its control's id, so a caller-supplied `id` is ignored inside one. */
+export function useFieldControl(props: ControlProps): FieldControlProps & { invalid: boolean } {
 	const field = useContext(FieldContext)
-	if (!field) return {}
+	const ownInvalid = props["aria-invalid"] === true || props["aria-invalid"] === "true"
+	if (!field) return { invalid: ownInvalid }
 	return {
-		id: props.id ?? field.controlId,
+		id: field.controlId,
 		"aria-describedby": props["aria-describedby"] ?? field.describedBy,
-		"aria-invalid": field.invalid || undefined,
 		required: props.required ?? field.required,
 		disabled: props.disabled ?? field.disabled,
+		invalid: ownInvalid || field.invalid,
 	}
 }

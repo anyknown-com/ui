@@ -30,3 +30,17 @@ describe("Input", () => {
 		expect(input).toHaveValue("")
 	})
 })
+
+describe("Input regressions", () => {
+	test("keeps the caller's className and style", () => {
+		render(<Input aria-label="樣式" className="caller-class" style={{ width: "123px" }} />)
+		const input = screen.getByRole("textbox", { name: "樣式" })
+		expect(input.className).toContain("caller-class")
+		expect(input).toHaveStyle({ width: "123px" })
+	})
+
+	test("respects an explicitly passed aria-invalid", () => {
+		render(<Input aria-label="外部" aria-invalid="true" />)
+		expect(screen.getByRole("textbox", { name: "外部" })).toHaveAttribute("aria-invalid", "true")
+	})
+})

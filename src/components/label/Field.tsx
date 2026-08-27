@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId, useMemo } from "react"
+import { styled } from "../../lib/styled"
 import { color, font, space, text } from "../../tokens.stylex"
 import { FieldContext } from "./fieldContext"
 import { Label } from "./Label"
@@ -49,7 +50,7 @@ export function Field({
 	)
 
 	return (
-		<div {...props} {...stylex.props(styles.group, styles.dimmed)}>
+		<div {...props} {...styled(props, styles.group, styles.dimmed)}>
 			<FieldContext value={value}>
 				{label != null && (
 					<Label htmlFor={controlId} required={required} optional={optional}>
@@ -58,7 +59,7 @@ export function Field({
 				)}
 				{children}
 				{error != null && (
-					<p id={errorId} {...stylex.props(styles.error)}>
+					<p id={errorId} role="alert" {...stylex.props(styles.error)}>
 						{error}
 					</p>
 				)}
