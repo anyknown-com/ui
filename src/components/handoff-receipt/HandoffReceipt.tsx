@@ -80,7 +80,7 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		fontFamily: font.body,
 		fontSize: text.xs,
-		display: "grid",
+		display: { default: "grid", ":is([hidden])": "none" },
 		gap: space.xxs,
 		animationName: { default: slideIn, [REDUCED]: "none" },
 		animationDuration: "160ms",
@@ -194,31 +194,27 @@ export function HandoffReceipt({
 				</svg>
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 			</button>
-			{open && (
-				<div id={bodyId} {...stylex.props(styles.body)}>
-					<p {...stylex.props(styles.check)}>
-						<CheckIcon />
-						<b {...stylex.props(styles.checkTitle)}>記憶</b>
-						<span {...stylex.props(styles.checkText)}>
-							{`${memory.count} 筆耐久事實已落盤`}
-							{memory.items?.length ? `(${memory.items.join("、")})` : ""}。
-						</span>
-					</p>
-					<p {...stylex.props(styles.check)}>
-						<CheckIcon />
-						<b {...stylex.props(styles.checkTitle)}>摘要</b>
-						<span {...stylex.props(styles.checkText)}>handoff 已交給下一輪,讀後即銷毀。</span>
-					</p>
-					<p {...stylex.props(styles.check)}>
-						<CheckIcon />
-						<b {...stylex.props(styles.checkTitle)}>Ledger</b>
-						<span
-							{...stylex.props(styles.checkText)}
-						>{`本輪 ${ledgerCount} 條收據可查,不進新 context。`}</span>
-					</p>
-					{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
-				</div>
-			)}
+			<div id={bodyId} hidden={!open} {...stylex.props(styles.body)}>
+				<p {...stylex.props(styles.check)}>
+					<CheckIcon />
+					<b {...stylex.props(styles.checkTitle)}>記憶</b>
+					<span {...stylex.props(styles.checkText)}>
+						{`${memory.count} 筆耐久事實已落盤`}
+						{memory.items?.length ? `(${memory.items.join("、")})` : ""}。
+					</span>
+				</p>
+				<p {...stylex.props(styles.check)}>
+					<CheckIcon />
+					<b {...stylex.props(styles.checkTitle)}>摘要</b>
+					<span {...stylex.props(styles.checkText)}>handoff 已交給下一輪,讀後即銷毀。</span>
+				</p>
+				<p {...stylex.props(styles.check)}>
+					<CheckIcon />
+					<b {...stylex.props(styles.checkTitle)}>Ledger</b>
+					<span {...stylex.props(styles.checkText)}>{`本輪 ${ledgerCount} 條收據可查,不進新 context。`}</span>
+				</p>
+				{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
+			</div>
 		</div>
 	)
 }

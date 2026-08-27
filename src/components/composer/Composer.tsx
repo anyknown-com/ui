@@ -244,12 +244,14 @@ export function Composer({
 	commandsLabel = "/ 指令",
 }: ComposerProps) {
 	const listId = useId()
+	const suggestible = sources != null || commands != null
 	const textarea = useRef<HTMLTextAreaElement>(null)
 	const [value, setValue] = useState("")
 	const [caret, setCaret] = useState(0)
 	const [items, setItems] = useState<SourceRef[]>([])
-	const [active, setActive] = useState(0)
+	const [rawActive, setActive] = useState(0)
 	const [picked, setPicked] = useState<SourceRef[]>([])
+	const [dismissed, setDismissed] = useState("")
 
 	const before = value.slice(0, caret)
 	const atMatch = AT_PATTERN.exec(before)
@@ -280,15 +282,19 @@ export function Composer({
 				? items
 				: []
 
-	const open = mode != null && options.length > 0
+	const token = `${mode ?? ""}:${query}`
+	const open = mode != null && options.length > 0 && dismissed !== token
+	const active = options.length === 0 ? 0 : Math.min(rawActive, options.length - 1)
 	const canSend = value.trim().length > 0
 
 	function complete(option: SourceRef) {
-		const marker = mode === "commands" ? "/" : "@"
-		const pattern = mode === "commands" ? SLASH_PATTERN : AT_PATTERN
-		const next = `${before.replace(pattern, (_, lead = "") => `${lead}${marker}${option.label} `)}${value.slice(caret)}`
-		setValue(next)
-		setCaret(next.length - value.slice(caret).length)
+		const tail = value.slice(caret)
+		const head =
+			mode === "commands"
+				? before.replace(SLASH_PATTERN, `/${option.label} `)
+				: before.replace(AT_PATTERN, (_, lead: string) => `${lead}@${option.label} `)
+		setValue(head + tail)
+		setCaret(head.length)
 		if (mode === "sources") setPicked((refs) => [...refs, option])
 		textarea.current?.focus()
 	}
@@ -317,11 +323,9 @@ export function Composer({
 			submit()
 			return
 		}
-		if (event.key === "Escape" && mode != null) {
+		if (event.key === "Escape" && open) {
 			event.preventDefault()
-			setCaret(value.length)
-			setValue((current) => current)
-			setItems([])
+			setDismissed(token)
 		}
 	}
 
@@ -368,6 +372,10 @@ export function Composer({
 				ref={textarea}
 				rows={1}
 				aria-label={label}
+				role={suggestible ? "combobox" : undefined}
+				aria-expanded={suggestible ? open : undefined}
+				aria-autocomplete={suggestible ? "list" : undefined}
+				aria-haspopup={suggestible ? "listbox" : undefined}
 				aria-controls={open ? listId : undefined}
 				aria-activedescendant={open ? `${listId}-${active}` : undefined}
 				placeholder={placeholder}

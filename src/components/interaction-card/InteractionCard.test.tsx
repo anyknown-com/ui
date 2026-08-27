@@ -125,3 +125,35 @@ describe("DecisionCard", () => {
 		expect(screen.queryByRole("radio")).not.toBeInTheDocument()
 	})
 })
+
+describe("PermissionCard regressions", () => {
+	test("Enter activates the focused button rather than always allowing once", async () => {
+		const onReply = vi.fn()
+		render(<PermissionCard verb="執行指令" subject="pnpm publish" onReply={onReply} />)
+		screen.getByRole("button", { name: /拒絕/ }).focus()
+		await userEvent.keyboard("{Enter}")
+		expect(onReply).toHaveBeenCalledTimes(1)
+		expect(onReply).toHaveBeenLastCalledWith({ reject: true })
+	})
+
+	test("shortcut glyphs stay out of the accessible name", () => {
+		render(<PermissionCard verb="執行指令" subject="pnpm publish" />)
+		expect(screen.getByRole("button", { name: "允許一次" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "拒絕" })).toHaveAttribute("aria-keyshortcuts", "Escape")
+	})
+
+	test("the receipt region exists before it is filled, so the change is announced", () => {
+		const { rerender } = render(<PermissionCard verb="執行指令" subject="pnpm publish" />)
+		const region = document.querySelector("[aria-live='polite']")
+		expect(region).not.toBeNull()
+		rerender(<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已允許一次" }} />)
+		expect(document.querySelector("[aria-live='polite']")).toHaveTextContent("已允許一次")
+	})
+})
+
+describe("DecisionCard regressions", () => {
+	test("an unlabelled options block still names its group", () => {
+		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
+		expect(screen.getByRole("group", { name: "先出哪一版?" })).toHaveAttribute("aria-required", "true")
+	})
+})

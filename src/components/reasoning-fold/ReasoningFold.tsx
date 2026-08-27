@@ -98,20 +98,23 @@ export function ReasoningFold({
 	const [userToggled, setUserToggled] = useState(false)
 	const [open, setOpen] = useState(defaultOpen || streaming)
 	const [wasStreaming, setWasStreaming] = useState(streaming)
+	const [justFinished, setJustFinished] = useState(false)
 
 	if (wasStreaming !== streaming) {
 		setWasStreaming(streaming)
+		setJustFinished(!streaming)
 		if (streaming && !userToggled) setOpen(true)
 	}
 
 	useEffect(() => {
-		if (userToggled || streaming) return
+		if (userToggled || streaming || !justFinished) return
 		const timer = setTimeout(() => {
 			setOpen(false)
 			if (body.current?.contains(document.activeElement)) row.current?.focus()
+			setJustFinished(false)
 		}, AUTO_COLLAPSE_MS)
 		return () => clearTimeout(timer)
-	}, [streaming, userToggled])
+	}, [streaming, userToggled, justFinished])
 
 	const label = streaming ? (
 		<span {...stylex.props(styles.shimmer)}>{streamingLabel}</span>

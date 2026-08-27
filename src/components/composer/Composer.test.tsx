@@ -13,7 +13,7 @@ const sources = async (query: string) =>
 	SOURCES.filter((source) => source.label.toLowerCase().includes(query.toLowerCase()))
 
 describe("Composer", () => {
-	test("the textarea is labelled and send starts disabled", () => {
+	test("without suggestions it is a plain labelled textbox", () => {
 		render(<Composer onSubmit={() => {}} />)
 		expect(screen.getByRole("textbox", { name: "訊息" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "送出" })).toBeDisabled()
@@ -32,7 +32,7 @@ describe("Composer", () => {
 
 	test("typing @ opens a source listbox filtered by the query", async () => {
 		render(<Composer onSubmit={() => {}} sources={sources} />)
-		const box = screen.getByRole("textbox", { name: "訊息" })
+		const box = screen.getByRole("combobox", { name: "訊息" })
 		await userEvent.type(box, "看一下 @config")
 		const listbox = await screen.findByRole("listbox", { name: "@ 來源" })
 		await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(1))
@@ -44,7 +44,7 @@ describe("Composer", () => {
 	test("arrow keys move the active option and Enter completes it", async () => {
 		const onSubmit = vi.fn()
 		render(<Composer onSubmit={onSubmit} sources={sources} />)
-		const box = screen.getByRole("textbox", { name: "訊息" })
+		const box = screen.getByRole("combobox", { name: "訊息" })
 		await userEvent.type(box, "@")
 		await screen.findByRole("listbox")
 		await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(3))
@@ -58,7 +58,7 @@ describe("Composer", () => {
 	test("picked sources are handed to onSubmit", async () => {
 		const onSubmit = vi.fn()
 		render(<Composer onSubmit={onSubmit} sources={sources} />)
-		const box = screen.getByRole("textbox", { name: "訊息" })
+		const box = screen.getByRole("combobox", { name: "訊息" })
 		await userEvent.type(box, "@config")
 		await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(1))
 		await userEvent.keyboard("{Enter}")
@@ -68,7 +68,7 @@ describe("Composer", () => {
 
 	test("typing / opens the command list", async () => {
 		render(<Composer onSubmit={() => {}} commands={[{ id: "c1", label: "handoff" }]} />)
-		await userEvent.type(screen.getByRole("textbox", { name: "訊息" }), "/")
+		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "/")
 		expect(await screen.findByRole("listbox", { name: "/ 指令" })).toHaveTextContent("handoff")
 	})
 
@@ -76,7 +76,7 @@ describe("Composer", () => {
 		render(<Composer onSubmit={() => {}} sources={sources} />)
 		const at = screen.getByRole("button", { name: "加入來源(@)" })
 		await userEvent.click(at)
-		expect(screen.getByRole("textbox", { name: "訊息" })).toHaveValue("@")
+		expect(screen.getByRole("combobox", { name: "訊息" })).toHaveValue("@")
 		await waitFor(() => expect(at).toHaveAttribute("aria-expanded", "true"))
 	})
 
@@ -87,6 +87,37 @@ describe("Composer", () => {
 		expect(mic).toHaveAttribute("aria-pressed", "true")
 		await userEvent.click(mic)
 		expect(onMicToggle).toHaveBeenCalledTimes(1)
+	})
+
+	test("Escape closes the command popup too, not only the source popup", async () => {
+		render(<Composer onSubmit={() => {}} commands={[{ id: "c1", label: "handoff" }]} />)
+		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "/")
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+	})
+
+	test("the active option index is clamped when the list shrinks", async () => {
+		render(
+			<Composer
+				onSubmit={() => {}}
+				commands={[
+					{ id: "a", label: "alpha" },
+					{ id: "b", label: "beta" },
+					{ id: "c", label: "beta-two" },
+				]}
+			/>,
+		)
+		const box = screen.getByRole("combobox", { name: "訊息" })
+		await userEvent.type(box, "/")
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{ArrowDown}{ArrowDown}")
+		expect(screen.getAllByRole("option")[2]).toHaveAttribute("aria-selected", "true")
+		await userEvent.type(box, "alpha")
+		expect(screen.getAllByRole("option")).toHaveLength(1)
+		expect(screen.getAllByRole("option")[0]).toHaveAttribute("aria-selected", "true")
+		await userEvent.keyboard("{Enter}")
+		expect(box).toHaveValue("/alpha ")
 	})
 
 	test("the model picker is a labelled select", async () => {
@@ -105,7 +136,7 @@ describe("Composer", () => {
 
 	test("Escape closes the suggestion popup", async () => {
 		render(<Composer onSubmit={() => {}} sources={sources} />)
-		await userEvent.type(screen.getByRole("textbox", { name: "訊息" }), "@")
+		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "@")
 		await screen.findByRole("listbox")
 		await userEvent.keyboard("{Escape}")
 		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())

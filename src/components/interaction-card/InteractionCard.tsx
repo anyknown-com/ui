@@ -108,7 +108,25 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	markdown: { fontSize: text.sm, lineHeight: text.leadingRelaxed, margin: 0, color: color.textMuted },
-	options: { display: "grid", gap: space.xxs, margin: 0, padding: 0, listStyle: "none" },
+	options: {
+		display: "grid",
+		gap: space.xxs,
+		margin: 0,
+		padding: 0,
+		borderWidth: 0,
+		listStyle: "none",
+	},
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 	option: {
 		display: "flex",
 		alignItems: "flex-start",
@@ -272,14 +290,13 @@ export function PermissionCard({
 	onReply,
 	resolved,
 }: PermissionCardProps) {
+	// Plain Enter is left to the focused button's own activation; only the
+	// card-level shortcuts are intercepted.
 	function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
 		if (resolved) return
 		if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault()
 			onReply?.({ always: scope })
-		} else if (event.key === "Enter") {
-			event.preventDefault()
-			onReply?.("once")
 		} else if (event.key === "Escape") {
 			event.preventDefault()
 			onReply?.({ reject: true })
@@ -299,14 +316,17 @@ export function PermissionCard({
 					{resolved ? "已回覆" : blockingLabel}
 				</span>
 			</div>
-			{resolved ? (
-				<p aria-live="polite" {...stylex.props(styles.receipt)}>
-					<ReceiptIcon rejected={resolved.rejected} />
-					{resolved.text}
-					{" · "}
-					<code {...stylex.props(styles.receiptMono)}>{subject}</code>
-				</p>
-			) : (
+			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
+				{resolved != null && (
+					<>
+						<ReceiptIcon rejected={resolved.rejected} />
+						{resolved.text}
+						{" · "}
+						<code {...stylex.props(styles.receiptMono)}>{subject}</code>
+					</>
+				)}
+			</p>
+			{resolved ? null : (
 				<div {...stylex.props(styles.body)}>
 					<pre tabIndex={0} role="region" aria-label={verb} {...stylex.props(styles.mono)}>
 						{subject}
@@ -319,25 +339,33 @@ export function PermissionCard({
 							{...stylex.props(styles.button, styles.primary)}
 						>
 							允許一次
-							<kbd {...stylex.props(styles.shortcut)}>⏎</kbd>
+							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
+								⏎
+							</kbd>
 						</button>
 						<button
 							type="button"
+							aria-keyshortcuts="Meta+Enter Control+Enter"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ always: scope })}
 							{...stylex.props(styles.button)}
 						>
 							總是允許
-							<kbd {...stylex.props(styles.shortcut)}>⌘⏎</kbd>
+							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
+								⌘⏎
+							</kbd>
 						</button>
 						<button
 							type="button"
+							aria-keyshortcuts="Escape"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ reject: true })}
 							{...stylex.props(styles.button, styles.danger)}
 						>
 							拒絕
-							<kbd {...stylex.props(styles.shortcut)}>Esc</kbd>
+							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
+								Esc
+							</kbd>
 						</button>
 					</div>
 					{policyHint != null && (
@@ -427,12 +455,15 @@ export function DecisionCard({
 					{resolved ? "已決定" : blocking ? "等你才能繼續" : (deadlineLabel ?? "等你")}
 				</span>
 			</div>
-			{resolved ? (
-				<p aria-live="polite" {...stylex.props(styles.receipt)}>
-					<ReceiptIcon />
-					{resolved.text}
-				</p>
-			) : (
+			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
+				{resolved != null && (
+					<>
+						<ReceiptIcon />
+						{resolved.text}
+					</>
+				)}
+			</p>
+			{resolved ? null : (
 				<div {...stylex.props(styles.body)}>
 					<p {...stylex.props(styles.question)}>{title}</p>
 					{blocks.map((block) => {
@@ -459,8 +490,14 @@ export function DecisionCard({
 						}
 						const selected = answer[block.id]
 						return (
-							<fieldset key={block.id} {...stylex.props(styles.options)}>
-								{block.label != null && <legend {...stylex.props(styles.question)}>{block.label}</legend>}
+							<fieldset
+								key={block.id}
+								aria-required={block.required || undefined}
+								{...stylex.props(styles.options)}
+							>
+								<legend {...stylex.props(block.label != null ? styles.question : styles.srOnly)}>
+									{block.label ?? title}
+								</legend>
 								{block.options.map((option) => {
 									const checked = block.multiple
 										? Array.isArray(selected) && selected.includes(option.value)

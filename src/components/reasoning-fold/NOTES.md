@@ -20,7 +20,7 @@
 - 收合列:`text-meta` muted,chevron 展開時旋轉 90 度;hover 升到 `foreground`。
 - 標籤:串流中「思考中…」shimmer 脈動;結束「思考了 N 秒」。
 - 內容:`text-meta` muted 斜體,左側 2px border 縮排,markdown 渲染(實作走 streamdown)。
-- 串流中:預設撐開且內容貼底跟隨(stick-to-bottom 的區域版);結束 1s 後自動收合;使用者手動切換過就永遠尊重手動狀態。
+- 串流中:預設撐開;**只在 streaming → 結束的那次轉換**才起 1s 自動收合的計時器(掛載時就 `defaultOpen` 的不會被自己收掉);使用者手動切換過就永遠尊重手動狀態。
 - shimmer 與 chevron transition 包 `prefers-reduced-motion: reduce`。
 
 ## a11y

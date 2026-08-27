@@ -50,6 +50,17 @@ const styles = stylex.create({
 		animationTimingFunction: "steps(2, start)",
 		animationIterationCount: "infinite",
 	},
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 	pending: {
 		display: "inline-block",
 		width: "0.5rem",
@@ -80,11 +91,12 @@ export function Thread({ children, ...rest }: ThreadProps) {
 	)
 }
 
-export type UserMessageProps = { children: ReactNode }
+export type UserMessageProps = { children: ReactNode; authorLabel?: string }
 
-export function UserMessage({ children }: UserMessageProps) {
+export function UserMessage({ children, authorLabel = "你說:" }: UserMessageProps) {
 	return (
 		<div {...stylex.props(styles.turn, styles.userTurn)}>
+			<span {...stylex.props(styles.srOnly)}>{authorLabel}</span>
 			<div {...stylex.props(styles.bubble)}>{children}</div>
 		</div>
 	)
@@ -94,6 +106,7 @@ export type AssistantMessageProps = {
 	streaming?: boolean
 	pending?: boolean
 	pendingLabel?: string
+	authorLabel?: string
 	children?: ReactNode
 }
 
@@ -101,6 +114,7 @@ export function AssistantMessage({
 	streaming = false,
 	pending = false,
 	pendingLabel = "回覆中",
+	authorLabel = "助理說:",
 	children,
 }: AssistantMessageProps) {
 	const body = useRef<HTMLDivElement>(null)
@@ -110,8 +124,12 @@ export function AssistantMessage({
 	return (
 		<MessageBodyContext value={body}>
 			<div ref={body} {...stylex.props(styles.turn, styles.assistant)}>
+				<span {...stylex.props(styles.srOnly)}>{authorLabel}</span>
 				{pending ? (
-					<span role="status" aria-label={pendingLabel} {...stylex.props(styles.pending)} />
+					<span role="status">
+						<span aria-hidden="true" {...stylex.props(styles.pending)} />
+						<span {...stylex.props(styles.srOnly)}>{pendingLabel}</span>
+					</span>
 				) : (
 					parts.map((part, index) => (
 						<StreamingContext key={index} value={streaming && index === last}>

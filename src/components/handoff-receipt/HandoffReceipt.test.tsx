@@ -59,3 +59,13 @@ describe("HandoffReceipt", () => {
 		expect(screen.getAllByRole("button")).toHaveLength(1)
 	})
 })
+
+describe("HandoffReceipt regressions", () => {
+	test("aria-controls resolves while collapsed, and the body is hidden", () => {
+		render(<HandoffReceipt {...props} />)
+		const row = screen.getByRole("button")
+		const body = document.getElementById(row.getAttribute("aria-controls") as string)
+		expect(body).not.toBeNull()
+		expect(body).not.toBeVisible()
+	})
+})

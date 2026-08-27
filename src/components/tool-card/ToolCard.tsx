@@ -84,7 +84,7 @@ const styles = stylex.create({
 		borderTopColor: color.border,
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
-		display: "grid",
+		display: { default: "grid", ":is([hidden])": "none" },
 		gap: space.xxs,
 	},
 	ioLabel: {
@@ -220,6 +220,17 @@ const styles = stylex.create({
 		margin: 0,
 	},
 	nestedText: { fontFamily: font.body, fontSize: text.xs, lineHeight: text.leadingSnug, margin: 0 },
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 })
 
 const VERBS: Record<string, string> = {
@@ -290,6 +301,9 @@ export function ToolCard({
 }: ToolCardProps) {
 	const detailId = useId()
 	const [open, setOpen] = useState(defaultOpen ?? (state === "error" || DEFAULT_OPEN_TOOLS.has(tool)))
+	const STATE_LABELS = { running: runningLabel, completed: completedLabel, error: errorLabel }
+	const retryText =
+		retry != null ? `重試中(第 ${retry.attempt} 次,${Math.round(retry.delayMs / 1000)} 秒後)…` : ""
 
 	return (
 		<div {...stylex.props(styles.card, state === "error" && styles.cardError)}>
@@ -300,17 +314,17 @@ export function ToolCard({
 				onClick={() => setOpen((value) => !value)}
 				{...stylex.props(styles.row)}
 			>
-				{state === "running" && (
-					<span role="status" aria-label={runningLabel} {...stylex.props(styles.spinner)} />
-				)}
+				{state === "running" && <span aria-hidden="true" {...stylex.props(styles.spinner)} />}
 				{state === "completed" && (
-					<span aria-label={completedLabel} {...stylex.props(styles.ok)}>
-						✓
+					<span {...stylex.props(styles.ok)}>
+						<span aria-hidden="true">✓</span>
+						<span {...stylex.props(styles.srOnly)}>{completedLabel}</span>
 					</span>
 				)}
 				{state === "error" && (
-					<span aria-label={errorLabel} {...stylex.props(styles.bad)}>
-						✗
+					<span {...stylex.props(styles.bad)}>
+						<span aria-hidden="true">✗</span>
+						<span {...stylex.props(styles.srOnly)}>{errorLabel}</span>
 					</span>
 				)}
 				<span {...stylex.props(styles.title)}>{title ?? VERBS[tool] ?? tool}</span>
@@ -326,12 +340,15 @@ export function ToolCard({
 				{children}
 			</div>
 			{retry != null && (
-				<div role="status" {...stylex.props(styles.retryLine)}>
-					<span aria-hidden="true" {...stylex.props(styles.spinner, styles.spinnerWarning)} />
-					{`重試中(第 ${retry.attempt} 次,${Math.round(retry.delayMs / 1000)} 秒後)…`}
+				<div aria-hidden="true" {...stylex.props(styles.retryLine)}>
+					<span {...stylex.props(styles.spinner, styles.spinnerWarning)} />
+					{retryText}
 					<span {...stylex.props(styles.retryCount)}>{`重試 ${retry.attempt}/${retry.max}`}</span>
 				</div>
 			)}
+			<span role="status" {...stylex.props(styles.srOnly)}>
+				{[STATE_LABELS[state], retryText].filter(Boolean).join(" · ")}
+			</span>
 		</div>
 	)
 }
@@ -340,7 +357,7 @@ export function ToolInput({ json, label = "輸入" }: { json: unknown; label?: s
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
-			<pre tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.io)}>
+			<pre tabIndex={0} role="group" aria-label={label} {...stylex.props(styles.io)}>
 				{typeof json === "string" ? json : JSON.stringify(json, null, 1)}
 			</pre>
 		</>
@@ -351,7 +368,7 @@ export function ToolOutput({ text: value, label = "輸出" }: { text: string; la
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
-			<pre tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.io)}>
+			<pre tabIndex={0} role="group" aria-label={label} {...stylex.props(styles.io)}>
 				{value}
 			</pre>
 		</>
@@ -375,7 +392,7 @@ export function ToolError({
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
-			<pre tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.io, styles.ioError)}>
+			<pre tabIndex={0} role="group" aria-label={label} {...stylex.props(styles.io, styles.ioError)}>
 				{value}
 			</pre>
 			<button type="button" onClick={() => copy(value)} {...stylex.props(styles.copyError)}>

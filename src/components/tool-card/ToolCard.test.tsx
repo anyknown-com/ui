@@ -26,24 +26,25 @@ describe("ToolCard", () => {
 		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true")
 	})
 
-	test("running exposes a status spinner", () => {
-		render(<ToolCard tool="search" state="running" subtitle="parentCallID" />)
-		expect(screen.getByRole("status", { name: "執行中" })).toBeInTheDocument()
+	test("a persistent live region reports the card's state", () => {
+		const { rerender } = render(<ToolCard tool="search" state="running" subtitle="parentCallID" />)
+		expect(screen.getByRole("status")).toHaveTextContent("執行中")
+		rerender(<ToolCard tool="search" state="completed" subtitle="parentCallID" />)
+		expect(screen.getByRole("status")).toHaveTextContent("完成")
 	})
 
 	test("state icons carry a text label, not colour alone", () => {
 		const { unmount } = render(<ToolCard tool="read" state="completed" />)
-		expect(screen.getByLabelText("完成")).toBeInTheDocument()
+		expect(screen.getByRole("button")).toHaveTextContent("完成")
 		unmount()
 		render(<ToolCard tool="read" state="error" />)
-		expect(screen.getByLabelText("失敗")).toBeInTheDocument()
+		expect(screen.getByRole("button")).toHaveTextContent("失敗")
 	})
 
 	test("retry is announced with its attempt count", () => {
 		render(<ToolCard tool="shell" state="error" retry={{ attempt: 2, max: 3, delayMs: 3000 }} />)
-		const line = screen.getByRole("status")
-		expect(line).toHaveTextContent("重試中(第 2 次,3 秒後)")
-		expect(line).toHaveTextContent("重試 2/3")
+		expect(screen.getByRole("status")).toHaveTextContent("重試中(第 2 次,3 秒後)")
+		expect(screen.getByText("重試 2/3")).toBeInTheDocument()
 	})
 
 	test("the error block copies its text", async () => {
@@ -95,5 +96,17 @@ describe("ToolCard", () => {
 		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "false")
 		expect(screen.getByText("缺口在 turn.ts")).toBeVisible()
 		expect(screen.getByText("7 工具")).toBeInTheDocument()
+	})
+})
+
+describe("ToolCard regressions", () => {
+	// `display: grid` in the style would otherwise beat the UA's [hidden] rule
+	test("the collapsed detail panel really is hidden", () => {
+		render(
+			<ToolCard tool="read" subtitle="a.ts">
+				<ToolOutput text="secret" />
+			</ToolCard>,
+		)
+		expect(screen.getByText("secret")).not.toBeVisible()
 	})
 })

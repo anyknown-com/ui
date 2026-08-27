@@ -33,7 +33,7 @@
 ## A11y
 
 - textarea 帶 `aria-label`;@ 鈕 `aria-expanded` 對應浮層;Esc 關浮層
-- 浮層實作時應為 `role="listbox"` + 方向鍵導航(prototype 簡化為點選)
+- 浮層是 `role="listbox"` + 方向鍵導航;有 `sources`/`commands` 時 textarea 本身升為 `role="combobox"`(`aria-expanded`/`aria-autocomplete="list"`/`aria-activedescendant`),否則浮層開了 SR 不會知道。沒給建議來源時維持單純 textbox。
 - 所有 icon 鈕有 `aria-label` 與 focus-visible ring;送出 disabled 用原生 `disabled`
 
 ## References

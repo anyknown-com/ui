@@ -26,7 +26,7 @@
 
 ## a11y
 
-- pending 點是 `role="status"` + `aria-label="回覆中"`,cursor 是純裝飾 `aria-hidden`。
+- pending 點是 `role="status"`,**文字放在 region 內**(`aria-label` 不是內容,live region 不會播報空的 region);cursor 是純裝飾 `aria-hidden`。每個 turn 前面加一段視覺隱藏的「你說:」/「助理說:」,線性閱讀時才分得出誰在說話。
 - 氣泡與正文顏色只用 semantic token,對比走 `foreground` on `muted`。
 
 ## References

@@ -19,17 +19,30 @@ describe("Message", () => {
 		expect(screen.getByText("selectVisibleMessages").tagName).toBe("CODE")
 	})
 
-	test("pending renders a status dot with a readable label", () => {
+	test("pending puts its label inside the live region so it is announced", () => {
 		render(
 			<Thread>
 				<AssistantMessage pending />
 			</Thread>,
 		)
-		expect(screen.getByRole("status", { name: "回覆中" })).toBeInTheDocument()
+		expect(screen.getByRole("status")).toHaveTextContent("回覆中")
+	})
+
+	test("each turn names its author for linear reading", () => {
+		render(
+			<Thread>
+				<UserMessage>問題</UserMessage>
+				<AssistantMessage>
+					<TextPart>回答</TextPart>
+				</AssistantMessage>
+			</Thread>,
+		)
+		expect(screen.getByText("你說:")).toBeInTheDocument()
+		expect(screen.getByText("助理說:")).toBeInTheDocument()
 	})
 
 	test("the streaming cursor is decorative and only on the last part", () => {
-		const { container } = render(
+		render(
 			<Thread>
 				<AssistantMessage streaming>
 					<TextPart>第一段</TextPart>
@@ -37,9 +50,9 @@ describe("Message", () => {
 				</AssistantMessage>
 			</Thread>,
 		)
-		const cursors = container.querySelectorAll("[aria-hidden='true']")
-		expect(cursors).toHaveLength(1)
-		expect(screen.getByText("第二段").contains(cursors[0])).toBe(true)
+		const cursor = screen.getByText("第二段").querySelector("[aria-hidden='true']")
+		expect(cursor).not.toBeNull()
+		expect(screen.getByText("第一段").querySelector("[aria-hidden='true']")).toBeNull()
 	})
 
 	test("no cursor when not streaming", () => {
@@ -50,6 +63,6 @@ describe("Message", () => {
 				</AssistantMessage>
 			</Thread>,
 		)
-		expect(container.querySelectorAll("[aria-hidden='true']")).toHaveLength(0)
+		expect(container.querySelector("p [aria-hidden='true']")).toBeNull()
 	})
 })

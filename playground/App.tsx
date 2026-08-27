@@ -3,6 +3,7 @@ import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import { Toaster } from "@anyknown/ui"
 import { BasicsDemos } from "./demos/basics"
 import { DesktopDemos } from "./demos/desktop"
+import { StorageDemos } from "./demos/storage"
 import { FormsDemos } from "./demos/forms"
 
 const GROUPS: Record<string, string[]> = {
@@ -31,6 +32,7 @@ const GROUPS: Record<string, string[]> = {
 		"composer",
 		"voice-indicator",
 	],
+	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
 }
 
 const styles = stylex.create({
@@ -89,6 +91,7 @@ export function App() {
 				<FormsDemos />
 				<BasicsDemos />
 				<DesktopDemos />
+				<StorageDemos />
 			</main>
 			<Toaster />
 		</div>

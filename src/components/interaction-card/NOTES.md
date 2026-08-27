@@ -35,8 +35,8 @@ agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)�
 ## A11y
 
 - options 用原生 radio/checkbox 包 label,`:has(input:checked)` 上色、`:has(input:focus-visible)` 畫 focus ring
-- 快捷鍵僅在卡 focus 時生效;所有按鈕可 tab、focus-visible outline
-- 收據狀態變化應以 `aria-live="polite"` 通知(prototype 未實作)
+- 快捷鍵僅在卡 focus 時生效,綁在三顆按鈕上;**只攔 Esc 與 ⌘⏎**,單獨的 ⏎ 留給被聚焦的按鈕自己(否則 tab 到「拒絕」按 ⏎ 會變成允許)。glyph 用 `aria-hidden` + `aria-keyshortcuts`,不進 accessible name
+- 收據的 `aria-live="polite"` 區塊**常駐**(pending 時是空的視覺隱藏節點),回覆後才填字 —— region 跟文字一起掛上是不會播報的
 
 ## References
 
