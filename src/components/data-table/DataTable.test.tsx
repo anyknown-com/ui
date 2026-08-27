@@ -197,4 +197,32 @@ describe("DataTable regressions", () => {
 		render(<Dictionary />)
 		expect(screen.getByRole("region", { name: "字典" })).toHaveAttribute("tabindex", "0")
 	})
+
+	test("without onFilterChange there is no filter toolbar", () => {
+		render(
+			<DataTable
+				label="字典"
+				rows={ENTRIES}
+				rowKey={(row) => row.key}
+				columns={[{ id: "key", header: "key", value: (row) => row.key }]}
+			/>,
+		)
+		expect(screen.queryByRole("searchbox")).not.toBeInTheDocument()
+		expect(screen.queryByText(`${ENTRIES.length} / ${ENTRIES.length}`)).not.toBeInTheDocument()
+	})
+
+	test("an open editor does not survive its row disappearing and coming back", async () => {
+		const columns: DataTableColumn<Entry>[] = [
+			{ id: "zh", header: "zh-TW", editable: true, value: (row) => row.zh },
+		]
+		const table = (rows: Entry[]) => (
+			<DataTable label="字典" rows={rows} rowKey={(row) => row.key} columns={columns} />
+		)
+		const { rerender } = render(table(ENTRIES))
+		await userEvent.dblClick(screen.getByText("專案"))
+		expect(screen.getByRole("textbox", { name: "編輯 nav.projects 的 zh-TW" })).toBeInTheDocument()
+		rerender(table(ENTRIES.slice(1)))
+		rerender(table(ENTRIES))
+		expect(screen.queryByRole("textbox", { name: /編輯 nav.projects/ })).not.toBeInTheDocument()
+	})
 })

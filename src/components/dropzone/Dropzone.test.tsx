@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { Dropzone, type UploadJob, UploadList } from "./Dropzone"
 
-function file(name: string, size: number) {
-	const value = new File(["x"], name, { type: "text/plain" })
+function file(name: string, size: number, type = "text/plain") {
+	const value = new File(["x"], name, { type })
 	Object.defineProperty(value, "size", { value: size })
 	return value
 }
@@ -56,6 +56,30 @@ describe("Dropzone", () => {
 		fireEvent.drop(zone, drag([small, big]))
 		expect(onFiles).toHaveBeenCalledWith([small])
 		expect(onReject).toHaveBeenCalledWith([{ file: big, reason: "size" }])
+	})
+
+	// Drops bypass the input's own accept/multiple, so the zone enforces them.
+	test("dropped files outside accept are rejected by type", () => {
+		const onFiles = vi.fn()
+		const onReject = vi.fn()
+		const { container } = render(<Dropzone onFiles={onFiles} onReject={onReject} accept="image/*,.pdf" />)
+		const image = file("photo.png", 10, "image/png")
+		const pdf = file("Scan.PDF", 10, "application/pdf")
+		const text = file("notes.txt", 10)
+		fireEvent.drop(container.firstElementChild as HTMLElement, drag([image, pdf, text]))
+		expect(onFiles).toHaveBeenCalledWith([image, pdf])
+		expect(onReject).toHaveBeenCalledWith([{ file: text, reason: "type" }])
+	})
+
+	test("a single-file zone keeps the first dropped file and rejects the rest", () => {
+		const onFiles = vi.fn()
+		const onReject = vi.fn()
+		const { container } = render(<Dropzone onFiles={onFiles} onReject={onReject} multiple={false} />)
+		const first = file("a.txt", 10)
+		const second = file("b.txt", 10)
+		fireEvent.drop(container.firstElementChild as HTMLElement, drag([first, second]))
+		expect(onFiles).toHaveBeenCalledWith([first])
+		expect(onReject).toHaveBeenCalledWith([{ file: second, reason: "count" }])
 	})
 
 	test("the hidden file input is out of the accessibility tree", () => {

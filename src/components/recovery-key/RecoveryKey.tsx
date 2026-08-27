@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { Fragment, type ReactNode, useId, useState } from "react"
+import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
@@ -194,7 +194,6 @@ export function RecoveryKey({
 	copiedLabel = "✓ 已複製",
 	downloadLabel = "下載 .txt",
 }: RecoveryKeyProps) {
-	const veilId = useId()
 	const [revealed, setRevealed] = useState(false)
 	const { copied, copy } = useCopy()
 
@@ -208,10 +207,7 @@ export function RecoveryKey({
 	return (
 		<div {...stylex.props(styles.card)}>
 			<p {...stylex.props(styles.intro)}>{intro}</p>
-			<div
-				onClick={() => setRevealed((shown) => !shown)}
-				{...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}
-			>
+			<div {...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}>
 				{/* The key itself is plain text so screen readers can read it out; the
 				    blur is purely visual and the reveal is the button below. */}
 				<div {...stylex.props(styles.groups)}>
@@ -222,7 +218,7 @@ export function RecoveryKey({
 						</Fragment>
 					))}
 				</div>
-				<span id={veilId} aria-hidden="true" {...stylex.props(styles.veil)}>
+				<span aria-hidden="true" {...stylex.props(styles.veil)}>
 					{veilLabel}
 				</span>
 			</div>

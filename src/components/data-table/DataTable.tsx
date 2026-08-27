@@ -252,6 +252,11 @@ export function DataTable<Row>({
 		if (selectAll.current) selectAll.current.indeterminate = selectedCount > 0 && !allSelected
 	}, [selectedCount, allSelected])
 
+	// A row that disappears while being edited would otherwise strand the draft
+	// and re-open with it when the row comes back. Adjusted during render rather
+	// than in an effect, so the stale cell never gets painted.
+	if (editing != null && !keys.includes(editing.key)) setEditing(null)
+
 	function startEdit(key: string, col: string, value: string) {
 		setEditing({ key, col })
 		setDraft(value)
@@ -295,24 +300,26 @@ export function DataTable<Row>({
 
 	return (
 		<div>
-			<div {...stylex.props(styles.toolbar)}>
-				<div {...stylex.props(styles.filter)}>
-					<span {...stylex.props(styles.filterIcon)}>
-						<SearchIcon />
+			{onFilterChange != null && (
+				<div {...stylex.props(styles.toolbar)}>
+					<div {...stylex.props(styles.filter)}>
+						<span {...stylex.props(styles.filterIcon)}>
+							<SearchIcon />
+						</span>
+						<input
+							type="search"
+							aria-label={filterPlaceholder}
+							placeholder={filterPlaceholder}
+							value={filter}
+							onChange={(event) => onFilterChange(event.currentTarget.value)}
+							{...stylex.props(styles.filterInput)}
+						/>
+					</div>
+					<span aria-live="polite" {...stylex.props(styles.count)}>
+						{countLabel(visible.length, total ?? rows.length)}
 					</span>
-					<input
-						type="search"
-						aria-label={filterPlaceholder}
-						placeholder={filterPlaceholder}
-						value={filter}
-						onChange={(event) => onFilterChange?.(event.currentTarget.value)}
-						{...stylex.props(styles.filterInput)}
-					/>
 				</div>
-				<span aria-live="polite" {...stylex.props(styles.count)}>
-					{countLabel(visible.length, total ?? rows.length)}
-				</span>
-			</div>
+			)}
 			<div tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.wrap)}>
 				<table aria-label={label} {...stylex.props(styles.table)}>
 					<thead>

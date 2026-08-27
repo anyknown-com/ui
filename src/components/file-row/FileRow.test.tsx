@@ -35,6 +35,18 @@ describe("FileRow", () => {
 		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "false")
 	})
 
+	test("double-click opens without undoing the first click's selection", async () => {
+		const onOpen = vi.fn()
+		function Row() {
+			const [selected, setSelected] = useState(false)
+			return <FileRow item={FOLDER} selected={selected} onSelectChange={setSelected} onOpen={onOpen} />
+		}
+		render(<Row />)
+		await userEvent.dblClick(screen.getByRole("row"))
+		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "true")
+		expect(onOpen).toHaveBeenCalledTimes(1)
+	})
+
 	test("Space selects and Enter opens", async () => {
 		const onSelectChange = vi.fn()
 		const onOpen = vi.fn()
@@ -81,6 +93,8 @@ describe("FileRow", () => {
 		)
 		const row = screen.getByRole("row")
 		expect(row).toHaveAttribute("aria-busy", "true")
+		expect(row).toHaveAttribute("tabindex", "0")
+		expect(row).toHaveAttribute("aria-selected", "false")
 		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument()
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})

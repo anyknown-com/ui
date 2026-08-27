@@ -53,6 +53,14 @@ describe("diff lib", () => {
 		expect(first.kind).toBe("fold")
 	})
 
+	test("a negative context behaves like zero instead of slicing badly", () => {
+		const rows = buildDiffRows(LONG_BEFORE, LONG_AFTER)
+		const blocks = collapseRows(rows, -3)
+		expect(blocks.some((block) => block.kind === "fold")).toBe(true)
+		expect(blocks.every((block) => block.rows.length > 0)).toBe(true)
+		expect(blocks.flatMap((block) => block.rows)).toHaveLength(rows.length)
+	})
+
 	test("Infinity context never collapses", () => {
 		const blocks = collapseRows(buildDiffRows(LONG_BEFORE, LONG_AFTER), Number.POSITIVE_INFINITY)
 		expect(blocks).toHaveLength(1)

@@ -206,13 +206,21 @@ export function FileRow({
 
 	if (busy) {
 		return (
-			<div role="row" aria-busy="true" {...stylex.props(styles.row, styles.busy)}>
-				<span role="gridcell" />
-				<span role="gridcell">{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}</span>
+			<div
+				role="row"
+				tabIndex={0}
+				aria-busy="true"
+				aria-selected={selected}
+				{...stylex.props(styles.row, styles.busy)}
+			>
+				<span role="gridcell" aria-label={selectLabel(item.name)} />
+				<span role="gridcell" aria-hidden="true">
+					{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
+				</span>
 				<span role="gridcell" {...stylex.props(styles.name)}>
 					{item.name}
 				</span>
-				<span role="gridcell" {...stylex.props(styles.busyCell)}>
+				<span role="gridcell" aria-colspan={3} {...stylex.props(styles.busyCell)}>
 					{state === "encrypting" ? (
 						<>
 							<span aria-hidden="true" {...stylex.props(styles.spinner)} />
@@ -234,7 +242,6 @@ export function FileRow({
 						</>
 					)}
 				</span>
-				<span role="gridcell" />
 			</div>
 		)
 	}
@@ -244,7 +251,11 @@ export function FileRow({
 			role="row"
 			tabIndex={0}
 			aria-selected={selected}
-			onClick={() => onSelectChange?.(!selected)}
+			onClick={(event) => {
+				// The second click of a double-click must not undo the first's toggle.
+				if (event.detail > 1) return
+				onSelectChange?.(!selected)
+			}}
 			onDoubleClick={() => onOpen?.()}
 			onKeyDown={onKeyDown}
 			{...stylex.props(styles.row, selected && styles.selected)}
@@ -259,7 +270,9 @@ export function FileRow({
 					{...stylex.props(styles.check)}
 				/>
 			</span>
-			<span role="gridcell">{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}</span>
+			<span role="gridcell" aria-hidden="true">
+				{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
+			</span>
 			<span role="gridcell" {...stylex.props(styles.name)}>
 				{item.name}
 			</span>

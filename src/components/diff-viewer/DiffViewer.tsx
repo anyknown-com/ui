@@ -247,7 +247,7 @@ export function DiffViewer({
 			<div tabIndex={0} role="region" aria-label={`${file.path} 的變更`} {...stylex.props(styles.body)}>
 				{blocks.map((block, index) =>
 					block.kind === "fold" ? (
-						<Fold key={index} rows={block.rows} label={foldLabel(block.rows.length)} />
+						<Fold key={`${file.path}-${index}`} rows={block.rows} label={foldLabel(block.rows.length)} />
 					) : (
 						block.rows.map((row, rowIndex) => <Line key={`${index}-${rowIndex}`} row={row} />)
 					),

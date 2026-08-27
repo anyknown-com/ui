@@ -106,8 +106,9 @@ export function buildDiffRows(
 }
 
 /** Collapses runs of untouched lines longer than 2 × context into fold blocks. */
-export function collapseRows(rows: DiffRow[], context: number): DiffBlock[] {
-	if (!Number.isFinite(context)) return rows.length > 0 ? [{ kind: "lines", rows }] : []
+export function collapseRows(rows: DiffRow[], rawContext: number): DiffBlock[] {
+	if (!Number.isFinite(rawContext)) return rows.length > 0 ? [{ kind: "lines", rows }] : []
+	const context = Math.max(0, rawContext)
 
 	const blocks: DiffBlock[] = []
 	let index = 0

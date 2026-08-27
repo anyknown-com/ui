@@ -171,7 +171,7 @@ function isFileDrag(event: DragEvent) {
 	return Array.from(event.dataTransfer?.types ?? []).includes("Files")
 }
 
-export type Rejection = { file: File; reason: "size" }
+export type Rejection = { file: File; reason: "size" | "type" | "count" }
 
 export type DropzoneProps = {
 	onFiles: (files: File[]) => void
@@ -202,36 +202,60 @@ export function Dropzone({
 	const depth = useRef(0)
 	const [over, setOver] = useState(false)
 
+	function matchesAccept(file: File) {
+		if (!accept) return true
+		return accept
+			.split(",")
+			.map((pattern) => pattern.trim().toLowerCase())
+			.filter(Boolean)
+			.some((pattern) => {
+				if (pattern.startsWith(".")) return file.name.toLowerCase().endsWith(pattern)
+				if (pattern.endsWith("/*")) return file.type.startsWith(pattern.slice(0, -1))
+				return file.type === pattern
+			})
+	}
+
+	// Drops bypass the input's own `accept`/`multiple`, so both are enforced here.
 	function accepted(files: File[]) {
-		const passed = files.filter((file) => file.size <= maxSize)
-		const rejected = files.filter((file) => file.size > maxSize)
+		const passed: File[] = []
+		const rejected: Rejection[] = []
+		for (const file of files) {
+			if (file.size > maxSize) rejected.push({ file, reason: "size" })
+			else if (!matchesAccept(file)) rejected.push({ file, reason: "type" })
+			else if (!multiple && passed.length === 1) rejected.push({ file, reason: "count" })
+			else passed.push(file)
+		}
 		if (passed.length > 0) onFiles(passed)
-		if (rejected.length > 0) onReject?.(rejected.map((file) => ({ file, reason: "size" as const })))
+		if (rejected.length > 0) onReject?.(rejected)
 	}
 
 	return (
 		<div
 			onDragEnter={(event) => {
-				if (disabled || !isFileDrag(event)) return
+				if (!isFileDrag(event)) return
 				event.preventDefault()
+				if (disabled) return
 				depth.current += 1
 				setOver(true)
 			}}
 			onDragOver={(event) => {
-				if (disabled || !isFileDrag(event)) return
+				if (!isFileDrag(event)) return
+				// Always prevented: without it the browser handles the drop itself and
+				// navigates the window to the file, taking the app's state with it.
 				event.preventDefault()
-				event.dataTransfer.dropEffect = "copy"
+				event.dataTransfer.dropEffect = disabled ? "none" : "copy"
 			}}
 			onDragLeave={(event) => {
-				if (disabled || !isFileDrag(event)) return
+				if (!isFileDrag(event)) return
 				depth.current = Math.max(0, depth.current - 1)
 				if (depth.current === 0) setOver(false)
 			}}
 			onDrop={(event) => {
-				if (disabled || !isFileDrag(event)) return
+				if (!isFileDrag(event)) return
 				event.preventDefault()
 				depth.current = 0
 				setOver(false)
+				if (disabled) return
 				accepted(Array.from(event.dataTransfer.files))
 			}}
 			{...stylex.props(styles.zone, over && styles.over, disabled && styles.disabled)}
@@ -305,7 +329,6 @@ export type UploadListProps = {
 export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: UploadListProps) {
 	return (
 		<ul
-			role="list"
 			aria-live="polite"
 			aria-label={label}
 			{...stylex.props(styles.jobs, jobs.length === 0 && styles.empty)}
