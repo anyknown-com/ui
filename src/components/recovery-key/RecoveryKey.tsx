@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useId, useState } from "react"
+import { Fragment, type ReactNode, useId, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
@@ -19,7 +19,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 	},
 	intro: { margin: 0, fontSize: text.xs, color: color.textMuted },
-	key: {
+	keyBox: {
 		position: "relative",
 		backgroundColor: color.bg,
 		borderWidth: 1,
@@ -34,6 +34,17 @@ const styles = stylex.create({
 		"--ak-veil-opacity": { default: "1", ":hover": "0", ":focus-visible": "0" },
 	},
 	keyRevealed: { "--ak-key-blur": "none", "--ak-veil-opacity": "0" },
+	separator: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 	groups: {
 		display: "flex",
 		flexWrap: "wrap",
@@ -161,6 +172,7 @@ export type RecoveryKeyProps = {
 	warning?: ReactNode
 	ackLabel?: ReactNode
 	revealLabel?: string
+	hideLabel?: string
 	veilLabel?: string
 	copyLabel?: string
 	copiedLabel?: string
@@ -176,6 +188,7 @@ export function RecoveryKey({
 	warning = "我們沒有你的金鑰副本,遺失就無法復原。把它抄在紙上,或存進密碼管理器。",
 	ackLabel = "我已把復原金鑰抄下並存放在安全的地方。",
 	revealLabel = "顯示復原金鑰",
+	hideLabel = "隱藏復原金鑰",
 	veilLabel = "hover 或點一下顯示",
 	copyLabel = "複製",
 	copiedLabel = "✓ 已複製",
@@ -189,36 +202,39 @@ export function RecoveryKey({
 		const url = URL.createObjectURL(new Blob([`${value}\n`], { type: "text/plain" }))
 		const anchor = Object.assign(document.createElement("a"), { href: url, download: filename })
 		anchor.click()
-		URL.revokeObjectURL(url)
+		setTimeout(() => URL.revokeObjectURL(url), 0)
 	}
 
 	return (
 		<div {...stylex.props(styles.card)}>
 			<p {...stylex.props(styles.intro)}>{intro}</p>
 			<div
-				role="button"
-				tabIndex={0}
-				aria-label={revealLabel}
-				aria-pressed={revealed}
-				aria-describedby={veilId}
 				onClick={() => setRevealed((shown) => !shown)}
-				onKeyDown={(event) => {
-					if (event.key !== "Enter" && event.key !== " ") return
-					event.preventDefault()
-					setRevealed((shown) => !shown)
-				}}
-				{...stylex.props(styles.key, revealed && styles.keyRevealed)}
+				{...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}
 			>
+				{/* The key itself is plain text so screen readers can read it out; the
+				    blur is purely visual and the reveal is the button below. */}
 				<div {...stylex.props(styles.groups)}>
 					{value.split("-").map((group, index) => (
-						<span key={`${group}-${index}`}>{group}</span>
+						<Fragment key={`${group}-${index}`}>
+							{index > 0 && <span {...stylex.props(styles.separator)}>-</span>}
+							<span>{group}</span>
+						</Fragment>
 					))}
 				</div>
-				<span id={veilId} {...stylex.props(styles.veil)}>
+				<span id={veilId} aria-hidden="true" {...stylex.props(styles.veil)}>
 					{veilLabel}
 				</span>
 			</div>
 			<div {...stylex.props(styles.actions)}>
+				<button
+					type="button"
+					aria-pressed={revealed}
+					onClick={() => setRevealed((shown) => !shown)}
+					{...stylex.props(styles.button)}
+				>
+					{revealed ? hideLabel : revealLabel}
+				</button>
 				<button
 					type="button"
 					onClick={() => copy(value)}

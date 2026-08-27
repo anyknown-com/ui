@@ -12,15 +12,23 @@ describe("RecoveryKey", () => {
 		for (const group of KEY.split("-")) expect(screen.getByText(group)).toBeInTheDocument()
 	})
 
-	test("the mask is a keyboard-operable button that says what it does", async () => {
+	test("the reveal is a real button and the key stays readable to AT", async () => {
 		render(<RecoveryKey value={KEY} />)
-		const veil = screen.getByRole("button", { name: "顯示復原金鑰" })
-		expect(veil).toHaveAttribute("aria-pressed", "false")
-		veil.focus()
+		const reveal = screen.getByRole("button", { name: "顯示復原金鑰" })
+		expect(reveal).toHaveAttribute("aria-pressed", "false")
+		// the key characters are plain text, not swallowed by a role="button" wrapper
+		expect(screen.getByText("K7PQ")).toBeInTheDocument()
+		reveal.focus()
 		await userEvent.keyboard("{Enter}")
-		expect(veil).toHaveAttribute("aria-pressed", "true")
+		expect(screen.getByRole("button", { name: "隱藏復原金鑰" })).toHaveAttribute("aria-pressed", "true")
 		await userEvent.keyboard(" ")
-		expect(veil).toHaveAttribute("aria-pressed", "false")
+		expect(screen.getByRole("button", { name: "顯示復原金鑰" })).toHaveAttribute("aria-pressed", "false")
+	})
+
+	test("selecting the rendered key by hand still yields the hyphens", () => {
+		const { container } = render(<RecoveryKey value={KEY} />)
+		const groups = container.querySelector("[class*='groups']") as HTMLElement
+		expect(groups.textContent).toBe(KEY)
 	})
 
 	test("copy writes the full key with its dashes", async () => {

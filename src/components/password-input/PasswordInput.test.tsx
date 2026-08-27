@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { PasswordInput, defaultScorer } from "./PasswordInput"
 
 describe("defaultScorer", () => {
@@ -16,6 +16,20 @@ describe("defaultScorer", () => {
 })
 
 describe("PasswordInput", () => {
+	test("the caps-lock and mismatch regions are mounted before they have text", () => {
+		render(<PasswordInput aria-label="Vault passphrase" />)
+		expect(document.querySelectorAll("[role='status']").length).toBeGreaterThan(0)
+	})
+
+	test("chains the caller's own handlers", async () => {
+		const onChange = vi.fn()
+		const onKeyDown = vi.fn()
+		render(<PasswordInput aria-label="Vault passphrase" onChange={onChange} onKeyDown={onKeyDown} />)
+		await userEvent.type(screen.getByLabelText("Vault passphrase"), "a")
+		expect(onChange).toHaveBeenCalled()
+		expect(onKeyDown).toHaveBeenCalled()
+	})
+
 	test("starts masked and toggles to visible", async () => {
 		render(<PasswordInput aria-label="Vault passphrase" />)
 		const input = screen.getByLabelText("Vault passphrase")
@@ -69,12 +83,12 @@ describe("PasswordInput", () => {
 		}
 		render(<Pair />)
 		const confirm = screen.getByLabelText("再輸入一次")
-		expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+		expect(screen.queryByText("兩次輸入的 passphrase 不一樣。")).not.toBeInTheDocument()
 		await userEvent.type(screen.getByLabelText("passphrase"), "correct-horse")
 		await userEvent.type(confirm, "wrong")
-		expect(screen.getByRole("alert")).toHaveTextContent("兩次輸入的 passphrase 不一樣。")
+		const message = screen.getByText("兩次輸入的 passphrase 不一樣。")
 		expect(confirm).toHaveAttribute("aria-invalid", "true")
-		expect(confirm.getAttribute("aria-describedby")).toContain(screen.getByRole("alert").id)
+		expect(confirm.getAttribute("aria-describedby")).toContain(message.id)
 	})
 
 	test("Caps Lock warning appears while the key is on and clears on blur", async () => {
@@ -82,9 +96,11 @@ describe("PasswordInput", () => {
 		const input = screen.getByLabelText("Vault passphrase")
 		input.focus()
 		await userEvent.keyboard("{CapsLock}a")
-		expect(screen.getByRole("status")).toHaveTextContent("Caps Lock 開著。")
+		expect(screen.getByText("Caps Lock 開著。")).toBeInTheDocument()
+		// the live region itself stays mounted so the change is announced
+		expect(screen.getAllByRole("status").length).toBeGreaterThan(0)
 		await userEvent.tab()
-		expect(screen.queryByRole("status")).not.toBeInTheDocument()
+		expect(screen.queryByText("Caps Lock 開著。")).not.toBeInTheDocument()
 		await userEvent.keyboard("{CapsLock}")
 	})
 })

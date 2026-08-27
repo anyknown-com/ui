@@ -42,12 +42,13 @@ const styles = stylex.create({
 	barStrong: { backgroundColor: color.accent },
 	label: { fontFamily: font.body, fontSize: text.xs, color: color.textMuted, minHeight: "1.2em", margin: 0 },
 	labelWeak: { color: color.danger },
+	warningIcon: { color: color.warning, flex: "none" },
 	caps: {
 		display: "flex",
 		alignItems: "center",
 		gap: space.xxs,
 		backgroundColor: color.warningSubtle,
-		color: color.warning,
+		color: color.text,
 		borderRadius: radius.sm,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
@@ -56,6 +57,17 @@ const styles = stylex.create({
 		marginTop: space.xxs,
 	},
 	error: { fontFamily: font.body, fontSize: text.xs, color: color.danger, margin: 0, marginTop: space.xxs },
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 })
 
 const LEVEL_LABELS = [
@@ -125,7 +137,7 @@ function WarningIcon() {
 	)
 }
 
-export type PasswordInputProps = Omit<ComponentProps<"input">, "type" | "size" | "value" | "onChange"> & {
+export type PasswordInputProps = Omit<ComponentProps<"input">, "type" | "size" | "value"> & {
 	value?: string
 	defaultValue?: string
 	onValueChange?: (value: string) => void
@@ -138,6 +150,7 @@ export type PasswordInputProps = Omit<ComponentProps<"input">, "type" | "size" |
 	mismatchLabel?: string
 	showLabel?: string
 	hideLabel?: string
+	shownStatus?: string
 	invalid?: boolean
 }
 
@@ -154,6 +167,7 @@ export function PasswordInput({
 	mismatchLabel = "兩次輸入的 passphrase 不一樣。",
 	showLabel = "顯示 passphrase",
 	hideLabel = "隱藏 passphrase",
+	shownStatus = "passphrase 已顯示",
 	invalid,
 	autoComplete = "new-password",
 	...props
@@ -197,9 +211,18 @@ export function PasswordInput({
 					value={current}
 					aria-invalid={isInvalid || undefined}
 					aria-describedby={describedBy || undefined}
-					onChange={(event) => setCurrent(event.currentTarget.value)}
-					onKeyDown={readCapsLock}
-					onKeyUp={readCapsLock}
+					onChange={(event) => {
+						setCurrent(event.currentTarget.value)
+						props.onChange?.(event)
+					}}
+					onKeyDown={(event) => {
+						readCapsLock(event)
+						props.onKeyDown?.(event)
+					}}
+					onKeyUp={(event) => {
+						readCapsLock(event)
+						props.onKeyUp?.(event)
+					}}
 					onBlur={(event) => {
 						setCapsOn(false)
 						props.onBlur?.(event)
@@ -237,17 +260,22 @@ export function PasswordInput({
 					</p>
 				</div>
 			)}
-			{capsLockWarning && capsOn && (
-				<p id={capsId} role="status" {...stylex.props(styles.caps)}>
-					<WarningIcon />
-					{capsLockLabel}
+			{capsLockWarning && (
+				<p id={capsId} role="status" {...stylex.props(capsOn ? styles.caps : styles.srOnly)}>
+					{capsOn && (
+						<>
+							<WarningIcon />
+							{capsLockLabel}
+						</>
+					)}
 				</p>
 			)}
-			{mismatched && (
-				<p id={errorId} role="alert" {...stylex.props(styles.error)}>
-					{mismatchLabel}
-				</p>
-			)}
+			<p id={errorId} {...stylex.props(mismatched ? styles.error : styles.srOnly)}>
+				{mismatched ? mismatchLabel : ""}
+			</p>
+			<span role="status" {...stylex.props(styles.srOnly)}>
+				{revealed ? shownStatus : ""}
+			</span>
 		</div>
 	)
 }

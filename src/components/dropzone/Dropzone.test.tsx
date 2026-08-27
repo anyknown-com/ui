@@ -23,7 +23,7 @@ describe("Dropzone", () => {
 	test("choosing files reports them and lets the same file be picked again", async () => {
 		const onFiles = vi.fn()
 		render(<Dropzone onFiles={onFiles} />)
-		const input = screen.getByLabelText("選擇檔案") as HTMLInputElement
+		const input = document.querySelector("input[type='file']") as HTMLInputElement
 		await userEvent.upload(input, file("a.txt", 10))
 		expect(onFiles).toHaveBeenCalledTimes(1)
 		expect(input.value).toBe("")
@@ -58,6 +58,14 @@ describe("Dropzone", () => {
 		expect(onReject).toHaveBeenCalledWith([{ file: big, reason: "size" }])
 	})
 
+	test("the hidden file input is out of the accessibility tree", () => {
+		render(<Dropzone onFiles={() => {}} />)
+		const input = document.querySelector("input[type='file']") as HTMLInputElement
+		expect(input).toHaveAttribute("aria-hidden", "true")
+		expect(input).toHaveAttribute("tabindex", "-1")
+		expect(screen.getAllByRole("button", { name: "選擇檔案" })).toHaveLength(1)
+	})
+
 	test("disabled ignores drops and disables the picker", () => {
 		const onFiles = vi.fn()
 		const { container } = render(<Dropzone onFiles={onFiles} disabled />)
@@ -75,7 +83,7 @@ const JOBS: UploadJob[] = [
 describe("UploadList", () => {
 	test("announces changes politely and labels each cancel", () => {
 		render(<UploadList jobs={JOBS} onCancel={() => {}} />)
-		expect(screen.getByLabelText("上傳中的檔案")).toHaveAttribute("aria-live", "polite")
+		expect(screen.getByRole("list", { name: "上傳中的檔案" })).toHaveAttribute("aria-live", "polite")
 		expect(screen.getByRole("button", { name: "取消上傳 護照掃描.pdf" })).toBeInTheDocument()
 	})
 
@@ -92,8 +100,12 @@ describe("UploadList", () => {
 		expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
 	})
 
-	test("renders nothing when there is no queue", () => {
-		const { container } = render(<UploadList jobs={[]} />)
-		expect(container).toBeEmptyDOMElement()
+	// The live region has to be mounted before the first job arrives, or the
+	// first upload is never announced.
+	test("the live region exists while the queue is empty, but shows nothing", () => {
+		render(<UploadList jobs={[]} />)
+		const list = screen.getByRole("list", { name: "上傳中的檔案" })
+		expect(list).toHaveAttribute("aria-live", "polite")
+		expect(list).toBeEmptyDOMElement()
 	})
 })

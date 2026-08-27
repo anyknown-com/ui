@@ -105,3 +105,13 @@ describe("DiffViewer", () => {
 		expect(screen.getByText("+0")).toBeInTheDocument()
 	})
 })
+
+describe("DiffViewer regressions", () => {
+	test("the changeset kind is stated in words, not only by the dot colour", () => {
+		const { unmount } = render(<DiffViewer file={{ path: "a.ts", before: BEFORE, after: AFTER }} />)
+		expect(screen.getByText("已修改")).toBeInTheDocument()
+		unmount()
+		render(<DiffViewer file={{ path: "new.ts", after: AFTER }} />)
+		expect(screen.getByText("新增檔案")).toBeInTheDocument()
+	})
+})

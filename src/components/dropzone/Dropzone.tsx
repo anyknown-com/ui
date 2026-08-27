@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type DragEvent, type ReactNode, useId, useRef, useState } from "react"
+import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { formatBytes } from "../../lib/format"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -88,6 +88,17 @@ const styles = stylex.create({
 		backgroundColor: color.surface,
 		overflow: "hidden",
 		fontFamily: font.body,
+	},
+	empty: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
 	},
 	job: {
 		display: "grid",
@@ -187,7 +198,6 @@ export function Dropzone({
 	pickLabel = "選擇檔案",
 	children,
 }: DropzoneProps) {
-	const inputId = useId()
 	const input = useRef<HTMLInputElement>(null)
 	const depth = useRef(0)
 	const [over, setOver] = useState(false)
@@ -212,7 +222,8 @@ export function Dropzone({
 				event.preventDefault()
 				event.dataTransfer.dropEffect = "copy"
 			}}
-			onDragLeave={() => {
+			onDragLeave={(event) => {
+				if (disabled || !isFileDrag(event)) return
 				depth.current = Math.max(0, depth.current - 1)
 				if (depth.current === 0) setOver(false)
 			}}
@@ -251,14 +262,13 @@ export function Dropzone({
 				{pickLabel}
 			</button>
 			<input
-				id={inputId}
 				ref={input}
 				type="file"
+				aria-hidden="true"
 				tabIndex={-1}
 				multiple={multiple}
 				accept={accept}
 				disabled={disabled}
-				aria-label={pickLabel}
 				onChange={(event) => {
 					accepted(Array.from(event.currentTarget.files ?? []))
 					event.currentTarget.value = ""
@@ -293,9 +303,13 @@ export type UploadListProps = {
 }
 
 export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: UploadListProps) {
-	if (jobs.length === 0) return null
 	return (
-		<ul aria-live="polite" aria-label={label} {...stylex.props(styles.jobs)}>
+		<ul
+			role="list"
+			aria-live="polite"
+			aria-label={label}
+			{...stylex.props(styles.jobs, jobs.length === 0 && styles.empty)}
+		>
 			{jobs.map((job) => {
 				const failed = job.state === "failed"
 				return (

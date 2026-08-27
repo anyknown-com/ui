@@ -42,6 +42,11 @@ a11y review 量測 `tokens.css` 兩個主題後發現三處低於 WCAG 門檻。
 | weave 第 3–5 條纖維 | 3.10 / 2.35 / 1.82:1 | 3:1(圖形) | `Progress` 的深度層次;讀數由最前面那條線與 `aria-valuetext` 承載 |
 | tidy 織布線 | 1.78:1 | 3:1(圖形) | `Progress`(indeterminate);布是裝飾,階段名是文字 |
 | scrollbar thumb 可見寬 | 4px(10px 減 3px 透明邊距) | — | scrollbar/NOTES 明訂的設計,只是很細 |
+| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.21–1.32:1 | 3:1(圖形) | diff-viewer 行內字級 highlight —— 「哪幾個字變了」目前只靠這層底色 |
+| `textFaint` on `successSubtle` / `dangerSubtle` | 2.44–2.71:1 | — | diff-viewer 的行號(`aria-hidden`,只影響低視力的視覺使用者) |
+| dropzone 取消鈕 22.4px / file-row checkbox 16px / data-table checkbox 13.6px | — | 24px | 這三個沒有 label 包住可以放大命中區 |
+
+`textFaint`、`borderStrong`、`*Hl` 三組都是 palette 決定,實作沒有擅自改;要動的話一次調 `tokens.stylex.ts` 與 `tokens.css` 兩邊。
 
 建議修法(擇一):把帶語意的 faint 文字改用 `textMuted`(已達 4.5:1),或把 `textFaint` / `borderStrong` 各壓深一階。
 

@@ -39,6 +39,8 @@ const styles = stylex.create({
 	},
 	count: { fontFamily: font.mono, fontSize: "0.72rem", lineHeight: 1, color: color.textFaint },
 	wrap: {
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: -2,
 		backgroundColor: color.surface,
 		borderWidth: 1,
 		borderStyle: "solid",
@@ -183,6 +185,8 @@ export type DataTableColumn<Row> = {
 
 export type DataTableProps<Row> = {
 	rows: Row[]
+	/** Total before filtering, for the "N / M" readout. Defaults to `rows.length`. */
+	total?: number
 	rowKey: (row: Row) => string
 	columns: DataTableColumn<Row>[]
 	label: string
@@ -215,6 +219,7 @@ function cellValue<Row>(column: DataTableColumn<Row>, row: Row): string {
 
 export function DataTable<Row>({
 	rows,
+	total,
 	rowKey,
 	columns,
 	label,
@@ -234,6 +239,7 @@ export function DataTable<Row>({
 	clearLabel = "清除過濾",
 }: DataTableProps<Row>) {
 	const [editing, setEditing] = useState<{ key: string; col: string } | null>(null)
+	const cancelling = useRef(false)
 	const [draft, setDraft] = useState("")
 	const selectAll = useRef<HTMLInputElement>(null)
 
@@ -246,10 +252,31 @@ export function DataTable<Row>({
 		if (selectAll.current) selectAll.current.indeterminate = selectedCount > 0 && !allSelected
 	}, [selectedCount, allSelected])
 
-	const commit = useCallback((column: DataTableColumn<Row>, row: Row, next: string) => {
+	function startEdit(key: string, col: string, value: string) {
+		setEditing({ key, col })
+		setDraft(value)
+	}
+
+	// Returning focus to the cell keeps a keyboard user's place after Enter/Escape,
+	// but moving focus off the still-mounted input would fire its blur commit.
+	function leaveEdit(cell: HTMLElement | null) {
+		cancelling.current = true
 		setEditing(null)
-		if (next !== cellValue(column, row)) column.onCommit?.(row, next)
-	}, [])
+		cell?.focus()
+		cancelling.current = false
+	}
+
+	const commit = useCallback(
+		(column: DataTableColumn<Row>, row: Row, next: string, cell: HTMLElement | null) => {
+			if (cancelling.current) return
+			cancelling.current = true
+			setEditing(null)
+			cell?.focus()
+			cancelling.current = false
+			if (next !== cellValue(column, row)) column.onCommit?.(row, next)
+		},
+		[],
+	)
 
 	function toggleSort(column: DataTableColumn<Row>) {
 		if (!column.sortable) return
@@ -283,10 +310,10 @@ export function DataTable<Row>({
 					/>
 				</div>
 				<span aria-live="polite" {...stylex.props(styles.count)}>
-					{countLabel(visible.length, rows.length)}
+					{countLabel(visible.length, total ?? rows.length)}
 				</span>
 			</div>
-			<div {...stylex.props(styles.wrap)}>
+			<div tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.wrap)}>
 				<table aria-label={label} {...stylex.props(styles.table)}>
 					<thead>
 						<tr>
@@ -370,11 +397,14 @@ export function DataTable<Row>({
 											return (
 												<td
 													key={column.id}
-													onDoubleClick={
-														column.editable
-															? () => {
-																	setEditing({ key, col: column.id })
-																	setDraft(value)
+													tabIndex={column.editable ? 0 : undefined}
+													onDoubleClick={column.editable ? () => startEdit(key, column.id, value) : undefined}
+													onKeyDown={
+														column.editable && !isEditing
+															? (event) => {
+																	if (event.key !== "Enter" && event.key !== "F2") return
+																	event.preventDefault()
+																	startEdit(key, column.id, value)
 																}
 															: undefined
 													}
@@ -390,14 +420,17 @@ export function DataTable<Row>({
 															aria-label={editLabel(column.header, key)}
 															value={draft}
 															onChange={(event) => setDraft(event.currentTarget.value)}
-															onBlur={() => commit(column, row, draft)}
+															onBlur={(event) =>
+																commit(column, row, draft, event.currentTarget.closest("td"))
+															}
 															onKeyDown={(event) => {
+																const cell = event.currentTarget.closest("td") as HTMLElement | null
 																if (event.key === "Enter") {
 																	event.preventDefault()
-																	commit(column, row, draft)
+																	commit(column, row, draft, cell)
 																} else if (event.key === "Escape") {
 																	event.preventDefault()
-																	setEditing(null)
+																	leaveEdit(cell)
 																}
 															}}
 															{...stylex.props(styles.cellInput)}

@@ -54,6 +54,7 @@ function Dictionary({ onCommit }: { onCommit?: (row: Entry, next: string) => voi
 		<DataTable
 			label="字典"
 			rows={rows}
+			total={ENTRIES.length}
 			rowKey={(row) => row.key}
 			columns={columns}
 			filter={filter}
@@ -100,7 +101,7 @@ describe("DataTable", () => {
 		render(<Dictionary />)
 		await userEvent.type(screen.getByRole("searchbox", { name: "過濾 key 或譯文" }), "nav")
 		expect(screen.getAllByRole("row")).toHaveLength(3)
-		const count = screen.getByText("2 / 2 keys")
+		const count = screen.getByText(`2 / ${ENTRIES.length} keys`)
 		expect(count).toHaveAttribute("aria-live", "polite")
 	})
 
@@ -168,5 +169,32 @@ describe("DataTable", () => {
 	test("a custom cell renderer is used for the status column", () => {
 		render(<Dictionary />)
 		expect(screen.getByText("missing")).toBeInTheDocument()
+	})
+})
+
+describe("DataTable regressions", () => {
+	test("the count reports the pre-filter total, not the filtered length twice", async () => {
+		render(<Dictionary />)
+		expect(screen.getByText(`${ENTRIES.length} / ${ENTRIES.length} keys`)).toBeInTheDocument()
+		await userEvent.type(screen.getByRole("searchbox", { name: "過濾 key 或譯文" }), "nav")
+		expect(screen.getByText(`2 / ${ENTRIES.length} keys`)).toBeInTheDocument()
+	})
+
+	test("Enter and F2 open an editable cell, and focus comes back to it", async () => {
+		render(<Dictionary />)
+		const cell = screen.getByText("專案").closest("td") as HTMLElement
+		cell.focus()
+		await userEvent.keyboard("{Enter}")
+		const input = screen.getByRole("textbox", { name: /編輯 nav.projects/ })
+		await userEvent.keyboard("{Escape}")
+		expect(input).not.toBeInTheDocument()
+		expect(cell).toHaveFocus()
+		await userEvent.keyboard("{F2}")
+		expect(screen.getByRole("textbox", { name: /編輯 nav.projects/ })).toBeInTheDocument()
+	})
+
+	test("the scrolling container is keyboard reachable", () => {
+		render(<Dictionary />)
+		expect(screen.getByRole("region", { name: "字典" })).toHaveAttribute("tabindex", "0")
 	})
 })

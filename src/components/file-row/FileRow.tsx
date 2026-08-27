@@ -39,6 +39,7 @@ const styles = stylex.create({
 	},
 	selected: { backgroundColor: color.accentSubtle, "--ak-row-affordance": "1" },
 	busy: { color: color.textMuted, cursor: "progress" },
+	checkCell: { display: "grid", placeItems: "center" },
 	check: {
 		justifySelf: "center",
 		width: "1rem",
@@ -76,6 +77,13 @@ const styles = stylex.create({
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.surface },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+	},
+	count: {
+		fontFamily: font.body,
+		fontSize: "0.78rem",
+		color: color.textMuted,
+		margin: 0,
+		marginTop: space.xxs,
 	},
 	busyCell: {
 		gridColumn: "4 / 7",
@@ -184,7 +192,9 @@ export function FileRow({
 	const busy = state !== "idle"
 
 	function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-		if (busy) return
+		// Only the row's own keys; anything bubbling from the checkbox or an
+		// action button belongs to that control.
+		if (busy || event.target !== event.currentTarget) return
 		if (event.key === " ") {
 			event.preventDefault()
 			onSelectChange?.(!selected)
@@ -197,8 +207,8 @@ export function FileRow({
 	if (busy) {
 		return (
 			<div role="row" aria-busy="true" {...stylex.props(styles.row, styles.busy)}>
-				<span />
-				{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
+				<span role="gridcell" />
+				<span role="gridcell">{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}</span>
 				<span role="gridcell" {...stylex.props(styles.name)}>
 					{item.name}
 				</span>
@@ -224,6 +234,7 @@ export function FileRow({
 						</>
 					)}
 				</span>
+				<span role="gridcell" />
 			</div>
 		)
 	}
@@ -238,15 +249,17 @@ export function FileRow({
 			onKeyDown={onKeyDown}
 			{...stylex.props(styles.row, selected && styles.selected)}
 		>
-			<input
-				type="checkbox"
-				checked={selected}
-				aria-label={selectLabel(item.name)}
-				onClick={(event) => event.stopPropagation()}
-				onChange={(event) => onSelectChange?.(event.currentTarget.checked)}
-				{...stylex.props(styles.check)}
-			/>
-			{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
+			<span role="gridcell" {...stylex.props(styles.checkCell)}>
+				<input
+					type="checkbox"
+					checked={selected}
+					aria-label={selectLabel(item.name)}
+					onClick={(event) => event.stopPropagation()}
+					onChange={(event) => onSelectChange?.(event.currentTarget.checked)}
+					{...stylex.props(styles.check)}
+				/>
+			</span>
+			<span role="gridcell">{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}</span>
 			<span role="gridcell" {...stylex.props(styles.name)}>
 				{item.name}
 			</span>
@@ -276,12 +289,29 @@ export function FileRow({
 	)
 }
 
-export type FileListProps = { label: string; children: ReactNode }
+export type FileListProps = {
+	label: string
+	selectedCount?: number
+	selectedLabel?: (count: number) => string
+	children: ReactNode
+}
 
-export function FileList({ label, children }: FileListProps) {
+export function FileList({
+	label,
+	selectedCount,
+	selectedLabel = (count) => `已選取 ${count} 個項目`,
+	children,
+}: FileListProps) {
 	return (
-		<div role="grid" aria-label={label} {...stylex.props(styles.list)}>
-			{children}
-		</div>
+		<>
+			<div role="grid" aria-label={label} aria-multiselectable="true" {...stylex.props(styles.list)}>
+				{children}
+			</div>
+			{selectedCount != null && (
+				<p aria-live="polite" {...stylex.props(styles.count)}>
+					{selectedCount > 0 ? selectedLabel(selectedCount) : ""}
+				</p>
+			)}
+		</>
 	)
 }

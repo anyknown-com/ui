@@ -115,6 +115,8 @@ const styles = stylex.create({
 	},
 })
 
+const KIND_LABEL = { modified: "已修改", added: "新增檔案", deleted: "已刪除" } as const
+
 const SIGN = { context: " ", add: "+", del: "−" } as const
 const PREFIX = { context: "", add: "新增行 ", del: "刪除行 " } as const
 
@@ -188,7 +190,7 @@ function Fold({ rows, label }: { rows: DiffRow[]; label: string }) {
 				</svg>
 				{label}
 			</button>
-			<div id={id} hidden={!open} {...stylex.props(styles.foldLines)}>
+			<div id={id} hidden={!open} {...stylex.props(open && styles.foldLines)}>
 				{rows.map((row, index) => (
 					<Line key={index} row={row} />
 				))}
@@ -235,6 +237,7 @@ export function DiffViewer({
 						kind === "deleted" && styles.dotDeleted,
 					)}
 				/>
+				<span {...stylex.props(styles.srOnly)}>{KIND_LABEL[kind]}</span>
 				{file.path}
 				<span {...stylex.props(styles.stat)}>
 					<b {...stylex.props(styles.plus)}>{`+${added}`}</b>{" "}
