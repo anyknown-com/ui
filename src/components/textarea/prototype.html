@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>textarea — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--danger:#B3402E;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--danger:#DD7059;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.2rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(26rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+label{font:500 .875rem/1.3 "Geist"}
+.ta{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:.5rem;color:var(--text);font:inherit;font-size:.9rem;line-height:1.55;padding:.6rem .75rem;min-height:4.5rem;resize:vertical;transition:border-color 120ms}
+.ta::placeholder{color:var(--faint)}
+.ta:hover{border-color:var(--border-strong)}
+.ta:focus-visible{outline:2px solid var(--focus);outline-offset:-1px;border-color:var(--focus)}
+.ta:disabled{opacity:.5;cursor:not-allowed}
+.ta[aria-invalid="true"]{border-color:var(--danger)}
+.grow{field-sizing:content;max-height:14rem;resize:none}
+.foot{display:flex;justify-content:space-between;font-size:.75rem;color:var(--faint)}
+.foot .count{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.error-msg{font-size:.8rem;color:var(--danger);margin:0}
+</style>
+<h1>Textarea</h1>
+
+<section>
+  <h2>default</h2>
+  <label for="a">回報問題</label>
+  <textarea class="ta" id="a" placeholder="發生了什麼事?"></textarea>
+</section>
+
+<section>
+  <h2>auto-grow(field-sizing: content,max 14rem)</h2>
+  <textarea class="ta grow" placeholder="跟同一條 thread 說話…">打字時高度會跟著內容長,到上限後出現捲軸。</textarea>
+</section>
+
+<section>
+  <h2>char count</h2>
+  <label for="b">交接備註</label>
+  <textarea class="ta" id="b" maxlength="200" oninput="this.parentElement.querySelector('.count').textContent=this.value.length+' / 200'">給下一班的自己。</textarea>
+  <div class="foot"><span>選填</span><span class="count">8 / 200</span></div>
+</section>
+
+<section>
+  <h2>error / disabled</h2>
+  <textarea class="ta" aria-invalid="true">內容超過 200 字上限。</textarea>
+  <p class="error-msg">最多 200 字,目前 214 字。</p>
+  <textarea class="ta" disabled>唯讀的交接摘要。</textarea>
+</section>
+</html>

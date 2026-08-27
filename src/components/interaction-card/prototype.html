@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>interaction-card — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--danger:#B3402E;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1);--warning:#9A6B15;--warning-subtle:#F5EDDC}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--danger:#DD7059;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4);--warning:#CFA24C;--warning-subtle:#332B1B}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(30rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:.6rem;padding:.9rem 1rem;display:grid;gap:.7rem}
+.card.blocking{border-color:var(--warning)}
+.card.blocking.decision{border-color:var(--accent)}
+.card-head{display:flex;align-items:center;gap:.5rem}
+.card-head svg{flex:none;color:var(--warning)}
+.decision .card-head svg{color:var(--accent)}
+.verb{font:500 .9rem/1.3 "Geist"}
+.state{margin-left:auto;font:600 .68rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.state.strong{color:var(--warning)}
+.decision .state.strong{color:var(--accent)}
+.state.quiet{color:var(--faint)}
+.mono{font:400 .82rem/1.5 "Geist Mono",ui-monospace,monospace;background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.5rem .65rem;overflow-x:auto;white-space:pre;margin:0}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.btn{font:500 .85rem/1 "Geist";border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:.45rem;padding:.5rem .85rem;cursor:pointer;transition:border-color 120ms,background 120ms}
+.btn:hover{border-color:var(--border-strong)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.btn.danger{color:var(--danger)}
+.btn kbd{font:500 .68rem/1 "Geist Mono",ui-monospace,monospace;color:inherit;opacity:.65;margin-left:.35rem}
+.policy{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:.6rem;margin:0}
+.policy svg{flex:none;color:var(--faint)}
+.question{font:500 .95rem/1.4 "Geist";margin:0}
+.opts{display:grid;gap:.4rem;margin:0;padding:0;list-style:none}
+.opt{display:flex;align-items:flex-start;gap:.6rem;border:1px solid var(--border);border-radius:.45rem;padding:.55rem .7rem;cursor:pointer;transition:border-color 120ms,background 120ms}
+.opt:hover{border-color:var(--border-strong)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-subtle)}
+.opt:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:1px}
+.opt input{accent-color:var(--accent);margin-top:.2rem}
+.opt b{font-weight:500;font-size:.87rem;display:block}
+.opt small{color:var(--muted);font-size:.76rem}
+.opt .rec{font:600 .62rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:var(--accent-subtle);border-radius:.3rem;padding:.15rem .35rem;margin-left:.3rem;vertical-align:middle}
+.free{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:.45rem;color:var(--text);font:inherit;font-size:.85rem;padding:.5rem .7rem;resize:vertical;min-height:2.4rem;transition:border-color 120ms}
+.free::placeholder{color:var(--faint)}
+.free:focus-visible{outline:2px solid var(--focus);outline-offset:-1px;border-color:var(--focus)}
+.receipt{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted)}
+.receipt svg{flex:none;color:var(--accent)}
+.receipt.rejected svg{color:var(--danger)}
+.card[data-done]{border-color:var(--border)}
+.card[data-done] .pending-body{display:none}
+.card:not([data-done]) .receipt{display:none}
+@media(prefers-reduced-motion:no-preference){.card{transition:border-color 180ms ease}}
+</style>
+<h1>Interaction Card</h1>
+
+<section>
+  <h2>permission — pending(blocking)</h2>
+  <div class="card blocking" id="perm">
+    <div class="card-head">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span class="verb">執行指令</span>
+      <span class="state strong">等你才能繼續</span>
+    </div>
+    <div class="pending-body" style="display:grid;gap:.7rem">
+      <pre class="mono">pnpm publish --access public</pre>
+      <div class="actions">
+        <button class="btn primary" data-reply="已允許一次">允許一次<kbd>⏎</kbd></button>
+        <button class="btn" data-reply="已總是允許(這個指令)">總是允許<kbd>⌘⏎</kbd></button>
+        <button class="btn danger" data-reply="已拒絕" data-reject>拒絕<kbd>Esc</kbd></button>
+      </div>
+      <p class="policy">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/></svg>
+        只在花錢、發佈、動到安全的時候停下來問你——publish 屬於發佈,所以問了。「總是允許」會寫進規則,換班後仍有效。
+      </p>
+    </div>
+    <p class="receipt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><span data-receipt-text></span> · <code style="font:inherit;font-family:'Geist Mono',ui-monospace,monospace">pnpm publish</code></p>
+  </div>
+</section>
+
+<section>
+  <h2>decision — blocking(單選 + 自由輸入)</h2>
+  <div class="card blocking decision" id="dec-b">
+    <div class="card-head">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+      <span class="verb">決定</span>
+      <span class="state strong">等你才能繼續</span>
+    </div>
+    <div class="pending-body" style="display:grid;gap:.7rem">
+      <p class="question">landing 的定價區塊,先出哪一版?</p>
+      <ul class="opts">
+        <li><label class="opt" style="display:flex"><input type="radio" name="dec-b-opt" value="三檔方案"><span><b>三檔方案<span class="rec">建議</span></b><small>Free / Pro / Team,對齊現有 config 分層。</small></span></label></li>
+        <li><label class="opt" style="display:flex"><input type="radio" name="dec-b-opt" value="單一價"><span><b>單一價</b><small>先驗證願付,之後再拆檔。</small></span></label></li>
+        <li><label class="opt" style="display:flex"><input type="radio" name="dec-b-opt" value="先不放定價"><span><b>先不放定價</b><small>只收 waitlist,價格談了再說。</small></span></label></li>
+      </ul>
+      <textarea class="free" rows="1" placeholder="想補充什麼,寫在這裡(選填)…"></textarea>
+      <div class="actions">
+        <button class="btn primary" data-submit disabled>送出決定</button>
+        <button class="btn" data-rec="三檔方案">照建議</button>
+      </div>
+    </div>
+    <p class="receipt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><span data-receipt-text></span></p>
+  </div>
+</section>
+
+<section>
+  <h2>decision — non-blocking(安靜)</h2>
+  <div class="card decision" id="dec-nb">
+    <div class="card-head">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+      <span class="verb">決定</span>
+      <span class="state quiet">等你 · 2h 後照建議</span>
+    </div>
+    <div class="pending-body" style="display:grid;gap:.7rem">
+      <p class="question">changelog 要不要一併發到 Discord?我先繼續寫,你有空再答。</p>
+      <ul class="opts">
+        <li><label class="opt" style="display:flex"><input type="radio" name="dec-nb-opt" value="發"><span><b>發<span class="rec">建議</span></b><small>同一份文案,發佈前你會再看到權限卡。</small></span></label></li>
+        <li><label class="opt" style="display:flex"><input type="radio" name="dec-nb-opt" value="不發"><span><b>不發</b><small>只留在網站 changelog。</small></span></label></li>
+      </ul>
+      <textarea class="free" rows="1" placeholder="想補充什麼,寫在這裡(選填)…"></textarea>
+      <div class="actions">
+        <button class="btn primary" data-submit disabled>送出決定</button>
+        <button class="btn" data-rec="發">照建議</button>
+      </div>
+    </div>
+    <p class="receipt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><span data-receipt-text></span></p>
+  </div>
+</section>
+
+<script>
+const perm = document.getElementById("perm")
+for (const btn of perm.querySelectorAll("[data-reply]")) {
+  btn.addEventListener("click", () => resolveCard(perm, btn.dataset.reply, btn.hasAttribute("data-reject")))
+}
+
+for (const card of [document.getElementById("dec-b"), document.getElementById("dec-nb")]) {
+  const submit = card.querySelector("[data-submit]")
+  const picked = () => card.querySelector("input:checked")?.value
+  card.addEventListener("change", () => { submit.disabled = !picked() })
+  submit.addEventListener("click", () => {
+    const note = card.querySelector(".free").value.trim()
+    resolveCard(card, `已決定 · 你選了「${picked()}」${note ? " · 備註:" + note : ""}`)
+  })
+  card.querySelector("[data-rec]").addEventListener("click", e => {
+    resolveCard(card, `已決定 · 照建議「${e.currentTarget.dataset.rec}」`)
+  })
+}
+
+function resolveCard(card, text, rejected) {
+  card.setAttribute("data-done", "")
+  card.classList.remove("blocking")
+  const receipt = card.querySelector(".receipt")
+  if (rejected) receipt.classList.add("rejected")
+  receipt.querySelector("[data-receipt-text]").textContent = text
+  card.querySelector(".state").textContent = "已回覆"
+  card.querySelector(".state").className = "state quiet"
+}
+</script>
+</html>

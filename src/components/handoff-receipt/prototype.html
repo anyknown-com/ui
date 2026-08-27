@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>handoff-receipt — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(30rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+
+.receipt{border:1px solid var(--border);border-radius:.55rem;background:var(--surface)}
+.row{all:unset;display:flex;align-items:center;gap:.6rem;width:100%;padding:.5rem .75rem;cursor:pointer;font-size:.82rem;color:var(--muted)}
+.row:hover{color:var(--text)}
+.row:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:.55rem}
+.rule{flex:1;border-top:1px dashed var(--border-strong);min-width:1rem;transition:border-color 300ms}
+/* 換班 = 接線:展開時左右兩段線接上(虛轉實),中間打一個結 */
+.receipt[data-open] .rule{border-top-style:solid;border-top-color:var(--accent)}
+.knot{flex:none;overflow:visible}
+.knot .lead{stroke:var(--faint);transition:opacity 200ms}
+.knot .loop{stroke:var(--accent);stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 500ms ease 120ms}
+.receipt[data-open] .knot .lead{opacity:0}
+.receipt[data-open] .knot .loop{stroke-dashoffset:0}
+.row .label{white-space:nowrap;display:flex;align-items:center;gap:.45rem}
+.row svg{flex:none;color:var(--faint)}
+.row .mono{font:400 .76rem/1 "Geist Mono",ui-monospace,monospace}
+.row .chev{transition:rotate 160ms ease}
+.receipt[data-open] .chev{rotate:180deg}
+.body{display:none;border-top:1px solid var(--border);padding:.7rem .85rem;font-size:.82rem}
+.receipt[data-open] .body{display:grid;gap:.55rem;animation:in 160ms ease-out}
+@keyframes in{from{opacity:0;translate:0 -3px}}
+.check{display:flex;align-items:baseline;gap:.55rem;margin:0}
+.check svg{flex:none;color:var(--accent);translate:0 2px}
+.check b{font-weight:500;white-space:nowrap}
+.check span{color:var(--muted)}
+.summary{margin:0;color:var(--muted);border-left:2px solid var(--border);padding-left:.65rem}
+@media(prefers-reduced-motion:reduce){.receipt[data-open] .body{animation:none}.row .chev,.rule,.knot .lead,.knot .loop{transition:none}}
+</style>
+<h1>Handoff Receipt</h1>
+
+<section>
+  <h2>collapsed(預設)— 點一列展開</h2>
+  <div class="receipt" data-receipt>
+    <button class="row" aria-expanded="false">
+      <span class="rule"></span>
+      <span class="label">
+        <svg class="knot" width="15" height="13" viewBox="0 0 15 13" fill="none" stroke-width="1.7" stroke-linecap="round"><path class="lead" d="M1 7h13"/><path class="loop" pathLength="100" d="M1 8 C3 3 8.5 2 10 5.5 C11.5 9 6.5 11 5 7.5 C3.8 4.7 8 2.5 14 7.5"/></svg>
+        換班完成 · <span class="mono">14:32</span> · <span class="mono">ctx 50%</span> → 新 session
+      </span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      <span class="rule"></span>
+    </button>
+    <div class="body">
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>記憶</b><span>3 筆耐久事實已落盤(偏好 pnpm、部署走 Cloudflare、先出 desktop)。</span></p>
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>摘要</b><span>handoff 已交給下一輪,讀後即銷毀。</span></p>
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>Ledger</b><span>本輪 42 條收據可查,不進新 context。</span></p>
+      <p class="summary">交接:landing 定價區塊寫到三檔方案的表格,下一步接 FAQ;changelog 卡在 Discord 要不要發,等你決定。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>reason 變體 — 硬上限強制切</h2>
+  <div class="receipt" data-receipt>
+    <button class="row" aria-expanded="false">
+      <span class="rule"></span>
+      <span class="label">
+        <svg class="knot" width="15" height="13" viewBox="0 0 15 13" fill="none" stroke-width="1.7" stroke-linecap="round"><path class="lead" d="M1 7h13"/><path class="loop" pathLength="100" d="M1 8 C3 3 8.5 2 10 5.5 C11.5 9 6.5 11 5 7.5 C3.8 4.7 8 2.5 14 7.5"/></svg>
+        換班完成 · <span class="mono">09:05</span> · <span class="mono">ctx 80%</span>(硬上限)→ 新 session
+      </span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      <span class="rule"></span>
+    </button>
+    <div class="body">
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>記憶</b><span>1 筆耐久事實已落盤。</span></p>
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>摘要</b><span>handoff 已交給下一輪,讀後即銷毀。</span></p>
+      <p class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg><b>Ledger</b><span>本輪 117 條收據可查。</span></p>
+      <p class="summary">交接:大型 refactor 進行到 store 層,測試 3 紅,下一步先修 rotation 測試再繼續。</p>
+    </div>
+  </div>
+</section>
+
+<script>
+for (const r of document.querySelectorAll("[data-receipt]")) {
+  const btn = r.querySelector(".row")
+  btn.addEventListener("click", () => {
+    const open = r.toggleAttribute("data-open")
+    btn.setAttribute("aria-expanded", open)
+  })
+}
+</script>
+</html>

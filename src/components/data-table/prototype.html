@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>data-table — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--danger:#B3402E;--danger-subtle:#F6E7E2;--warning-text:#8A6A1F;--warning-subtle:#F4ECD7;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--danger:#DD7059;--danger-subtle:#3A231D;--warning-text:#D9B45C;--warning-subtle:#37301C;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(46rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+.help{font-size:.8rem;color:var(--muted);margin:0}
+.filter{position:relative;width:min(18rem,100%)}
+.filter svg{position:absolute;left:.65rem;top:50%;translate:0 -50%;color:var(--faint);pointer-events:none}
+.filter input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:.5rem;color:var(--text);font:inherit;font-size:.85rem;padding:.35rem .6rem .35rem 2rem;min-height:1.9rem;transition:border-color 120ms}
+.filter input::placeholder{color:var(--faint)}
+.filter input:hover{border-color:var(--border-strong)}
+.filter input:focus-visible{outline:2px solid var(--focus);outline-offset:-1px;border-color:var(--focus)}
+.wrap{background:var(--surface);border:1px solid var(--border);border-radius:.6rem;max-height:20rem;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{position:sticky;top:0;z-index:1;background:var(--surface);box-shadow:inset 0 -1px var(--border);text-align:left;padding:0;white-space:nowrap}
+thead th.check,tbody td.check{width:2rem;padding:.45rem .3rem .45rem .65rem}
+th .sort{all:unset;display:flex;align-items:center;gap:.3rem;width:100%;cursor:pointer;padding:.5rem .65rem;font:600 .68rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+th .sort:hover{color:var(--text)}
+th .sort:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:.3rem}
+th .arrow{color:var(--accent);visibility:hidden;font-size:.6rem}
+th[aria-sort="ascending"] .arrow::after{content:"▲"}
+th[aria-sort="descending"] .arrow::after{content:"▼"}
+th[aria-sort] .arrow{visibility:visible}
+tbody td{border-top:1px solid var(--border);padding:.42rem .65rem;vertical-align:middle}
+tbody tr:first-child td{border-top:0}
+tbody tr:hover{background:var(--bg)}
+tbody tr[data-selected]{background:var(--accent-subtle)}
+td.key{font:400 .78rem/1.5 "Geist Mono",ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+td.editable{cursor:text}
+td.editable:hover{box-shadow:inset 0 0 0 1px var(--border-strong);border-radius:.25rem}
+td.editable .cell-input{all:unset;width:100%;font-size:.85rem;box-shadow:inset 0 0 0 2px var(--focus);border-radius:.25rem;padding:0 .2rem;margin:0 -.2rem;background:var(--surface)}
+.badge{display:inline-block;border-radius:.35rem;padding:.12rem .45rem;font-size:.72rem;font-weight:500;white-space:nowrap}
+.badge.ok{background:var(--accent-subtle);color:var(--accent)}
+.badge.missing{background:var(--danger-subtle);color:var(--danger)}
+.badge.review{background:var(--warning-subtle);color:var(--warning-text)}
+input[type="checkbox"]{accent-color:var(--accent);width:.85rem;height:.85rem;cursor:pointer}
+input[type="checkbox"]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.empty-row td{padding:2rem 1rem;text-align:center;color:var(--muted);border-top:1px solid var(--border)}
+.empty-row button{all:unset;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.empty-row button:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:.2rem}
+.count{font:400 .72rem/1 "Geist Mono",ui-monospace,monospace;color:var(--faint)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+</style>
+<h1>Data table</h1>
+
+<section>
+  <h2>interactive:sort / filter / select / inline edit / sticky header</h2>
+  <p class="help">i18n 字典。欄頭點擊排序;上方輸入框即時過濾;<b>雙擊</b> zh-TW / en 儲存格編輯,Enter 確認、Esc 取消。</p>
+  <div class="toolbar">
+    <div class="filter">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" placeholder="過濾 key 或譯文…" aria-label="過濾字典">
+    </div>
+    <span class="count" id="count" aria-live="polite"></span>
+  </div>
+  <div class="wrap">
+    <table aria-label="i18n 字典">
+      <thead>
+        <tr>
+          <th class="check"><input type="checkbox" id="all" aria-label="選取全部"></th>
+          <th data-col="key"><button class="sort">key<span class="arrow" aria-hidden="true"></span></button></th>
+          <th data-col="zh"><button class="sort">zh-TW<span class="arrow" aria-hidden="true"></span></button></th>
+          <th data-col="en"><button class="sort">en<span class="arrow" aria-hidden="true"></span></button></th>
+          <th data-col="status"><button class="sort">狀態<span class="arrow" aria-hidden="true"></span></button></th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>empty(靜態示意)</h2>
+  <div class="wrap">
+    <table aria-label="i18n 字典(空結果)">
+      <thead>
+        <tr>
+          <th class="check"><input type="checkbox" disabled aria-label="選取全部"></th>
+          <th><button class="sort">key<span class="arrow" aria-hidden="true"></span></button></th>
+          <th><button class="sort">zh-TW<span class="arrow" aria-hidden="true"></span></button></th>
+          <th><button class="sort">en<span class="arrow" aria-hidden="true"></span></button></th>
+          <th><button class="sort">狀態<span class="arrow" aria-hidden="true"></span></button></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="empty-row"><td colspan="5">找不到符合「onboarding」的 key。<button type="button">清除過濾</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+const STATUS = { ok: ["ok", "已翻譯"], missing: ["missing", "缺譯"], review: ["review", "待審"] }
+let rows = [
+  { key: "nav.projects", zh: "專案", en: "Projects", status: "ok" },
+  { key: "nav.settings", zh: "設定", en: "Settings", status: "ok" },
+  { key: "nav.activity", zh: "活動紀錄", en: "Activity", status: "review" },
+  { key: "common.loading", zh: "載入中…", en: "Loading…", status: "ok" },
+  { key: "common.retry", zh: "重試", en: "Retry", status: "ok" },
+  { key: "error.load", zh: "載入失敗,請再試一次。", en: "Failed to load. Please try again.", status: "review" },
+  { key: "editor.addKey", zh: "新增 key", en: "Add key", status: "ok" },
+  { key: "editor.import", zh: "匯入 JSON", en: "Import JSON", status: "ok" },
+  { key: "editor.publish", zh: "發布全部變更", en: "Publish all changes", status: "review" },
+  { key: "status.saved", zh: "已儲存於 {time}", en: "", status: "missing" },
+  { key: "status.conflict", zh: "有衝突,workspace 未動", en: "", status: "missing" },
+]
+const selected = new Set()
+let sort = null // { col, dir: 1 | -1 }
+
+const tb = document.getElementById("tb")
+const q = document.getElementById("q")
+const all = document.getElementById("all")
+const count = document.getElementById("count")
+
+function visible() {
+  const needle = q.value.trim().toLowerCase()
+  let out = rows.filter(r => !needle || [r.key, r.zh, r.en].some(v => v.toLowerCase().includes(needle)))
+  if (sort) out = [...out].sort((a, b) => String(a[sort.col]).localeCompare(String(b[sort.col]), "zh-Hant") * sort.dir)
+  return out
+}
+
+function render() {
+  const out = visible()
+  tb.replaceChildren()
+  for (const r of out) {
+    const tr = document.createElement("tr")
+    if (selected.has(r.key)) tr.setAttribute("data-selected", "")
+    const [cls, label] = STATUS[r.status]
+    tr.innerHTML = `
+      <td class="check"><input type="checkbox" aria-label="選取 ${r.key}" ${selected.has(r.key) ? "checked" : ""}></td>
+      <td class="key">${r.key}</td>
+      <td class="editable" data-field="zh" title="雙擊編輯">${r.zh || "<span style='color:var(--faint)'>—</span>"}</td>
+      <td class="editable" data-field="en" title="雙擊編輯">${r.en || "<span style='color:var(--faint)'>—</span>"}</td>
+      <td><span class="badge ${cls}">${label}</span></td>`
+    tr.querySelector("input").addEventListener("change", e => {
+      e.target.checked ? selected.add(r.key) : selected.delete(r.key)
+      render()
+    })
+    for (const td of tr.querySelectorAll(".editable")) {
+      td.addEventListener("dblclick", () => edit(td, r))
+    }
+    tb.append(tr)
+  }
+  if (!out.length) {
+    const tr = document.createElement("tr")
+    tr.className = "empty-row"
+    tr.innerHTML = `<td colspan="5">找不到符合「${q.value.trim()}」的 key。<button type="button">清除過濾</button></td>`
+    tr.querySelector("button").onclick = () => { q.value = ""; render(); q.focus() }
+    tb.append(tr)
+  }
+  count.textContent = `${out.length} / ${rows.length} keys`
+  all.checked = out.length > 0 && out.every(r => selected.has(r.key))
+  all.indeterminate = !all.checked && out.some(r => selected.has(r.key))
+}
+
+function edit(td, r) {
+  const field = td.dataset.field
+  const input = document.createElement("input")
+  input.className = "cell-input"
+  input.value = r[field]
+  input.setAttribute("aria-label", `編輯 ${r.key} 的 ${field === "zh" ? "zh-TW" : "en"} 譯文`)
+  td.replaceChildren(input)
+  input.focus(); input.select()
+  let done = false
+  const commit = () => {
+    if (done) return; done = true
+    r[field] = input.value.trim()
+    if (r.status !== "review") r.status = r.zh && r.en ? "ok" : "missing"
+    render()
+  }
+  const cancel = () => { if (done) return; done = true; render() }
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") commit()
+    else if (e.key === "Escape") cancel()
+  })
+  input.addEventListener("blur", commit)
+}
+
+q.addEventListener("input", render)
+
+all.addEventListener("change", () => {
+  const out = visible()
+  if (all.checked) out.forEach(r => selected.add(r.key))
+  else out.forEach(r => selected.delete(r.key))
+  render()
+})
+
+for (const th of document.querySelectorAll("thead th[data-col]")) {
+  th.querySelector(".sort").addEventListener("click", () => {
+    const col = th.dataset.col
+    sort = sort?.col === col && sort.dir === 1 ? { col, dir: -1 } : { col, dir: 1 }
+    for (const t of document.querySelectorAll("thead th[data-col]")) t.removeAttribute("aria-sort")
+    th.setAttribute("aria-sort", sort.dir === 1 ? "ascending" : "descending")
+    render()
+  })
+}
+
+render()
+</script>
+</html>

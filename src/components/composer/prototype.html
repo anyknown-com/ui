@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>composer — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1)}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem 10rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(34rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+
+.composer{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:.5rem .6rem;display:grid;gap:.4rem;transition:border-color 140ms}
+.composer:focus-within{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:-1px}
+.composer textarea{all:unset;width:100%;font:400 .92rem/1.5 "Geist";color:var(--text);padding:.25rem .3rem;resize:none;max-height:11rem;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.composer textarea::placeholder{color:var(--faint)}
+.bar{display:flex;align-items:center;gap:.35rem}
+.iconbtn{all:unset;display:grid;place-items:center;width:1.9rem;height:1.9rem;border-radius:.45rem;color:var(--muted);cursor:pointer;transition:background 120ms,color 120ms}
+.iconbtn:hover{background:var(--accent-subtle);color:var(--text)}
+.iconbtn:focus-visible{outline:2px solid var(--focus);outline-offset:-1px}
+.iconbtn[aria-pressed="true"]{background:var(--accent-subtle);color:var(--accent)}
+.spacer{flex:1}
+.model{font:500 .78rem/1 "Geist";color:var(--muted);background:none;border:1px solid transparent;border-radius:.4rem;padding:.35rem .4rem;cursor:pointer;transition:border-color 120ms}
+.model:hover{border-color:var(--border)}
+.model:focus-visible{outline:2px solid var(--focus);outline-offset:-1px}
+.send{all:unset;display:grid;place-items:center;width:1.9rem;height:1.9rem;border-radius:.45rem;background:var(--accent);color:var(--accent-text);cursor:pointer}
+.send:disabled{background:var(--border);color:var(--faint);cursor:not-allowed}
+.send:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.hint{font-size:.72rem;color:var(--faint);margin:.1rem .2rem 0}
+.pop{position:absolute;z-index:10;bottom:calc(100% + 6px);left:.5rem;width:min(20rem,calc(100% - 1rem));background:var(--surface);border:1px solid var(--border);border-radius:.6rem;box-shadow:var(--shadow);overflow:hidden;transform-origin:bottom;animation:in 140ms ease-out}
+@keyframes in{from{opacity:0;scale:1 .97}}
+.pop[hidden]{display:none}
+.pop .group-label{font:600 .65rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:.55rem .6rem .3rem}
+.pop ul{list-style:none;margin:0;padding:.25rem}
+.pop .opt{display:flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.42rem .6rem;font-size:.85rem;cursor:pointer}
+.pop .opt:hover,.pop .opt[data-active]{background:var(--accent-subtle)}
+.pop .opt svg{flex:none;color:var(--faint)}
+.pop .opt small{color:var(--faint);font-size:.72rem;margin-left:auto}
+@media(prefers-reduced-motion:reduce){.pop{animation:none}}
+</style>
+<h1>Composer</h1>
+
+<section>
+  <h2>prompt bar — 釘在現在線,打「@」看來源建議</h2>
+  <div class="composer" id="composer">
+    <div class="pop" id="atpop" hidden>
+      <div class="group-label">@ 來源</div>
+      <ul>
+        <li class="opt" data-active><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M13 2v7h7"/></svg>packages/server/src/config-store.ts<small>檔案</small></li>
+        <li class="opt"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg>昨天的換班摘要<small>ledger</small></li>
+        <li class="opt"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/><path d="M9 18h6"/></svg>部署走 Cloudflare<small>記憶</small></li>
+      </ul>
+    </div>
+    <textarea id="ta" rows="1" placeholder="跟 agent 說話——它只在花錢、發佈、動到安全的時候停下來問你" aria-label="訊息"></textarea>
+    <div class="bar">
+      <button class="iconbtn" id="atbtn" aria-label="加入來源(@)" aria-expanded="false" title="@ 來源">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></svg>
+      </button>
+      <button class="iconbtn" aria-label="指令(/)" title="/ 指令">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 4-8 16"/></svg>
+      </button>
+      <span class="spacer"></span>
+      <select class="model" aria-label="模型">
+        <option>Fable 5</option>
+        <option>Opus 5</option>
+        <option>Sonnet 5</option>
+        <option>GPT-5.4</option>
+      </select>
+      <button class="iconbtn" aria-label="語音輸入" title="麥克風">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4"/></svg>
+      </button>
+      <button class="send" id="send" aria-label="送出" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
+  <p class="hint">⏎ 送出 · ⇧⏎ 換行 · @ 帶來源 · / 帶指令</p>
+</section>
+
+<script>
+const ta = document.getElementById("ta")
+const send = document.getElementById("send")
+const pop = document.getElementById("atpop")
+const atbtn = document.getElementById("atbtn")
+
+function grow() {
+  ta.style.height = "auto"
+  ta.style.height = ta.scrollHeight + "px"
+}
+function sync() {
+  grow()
+  send.disabled = !ta.value.trim()
+  const atOpen = /(^|\s)@\S*$/.test(ta.value.slice(0, ta.selectionStart))
+  pop.hidden = !atOpen
+  atbtn.setAttribute("aria-expanded", String(atOpen))
+}
+ta.addEventListener("input", sync)
+ta.addEventListener("keyup", sync)
+
+ta.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!send.disabled) submit() }
+  if (e.key === "Escape") { pop.hidden = true; atbtn.setAttribute("aria-expanded", "false") }
+})
+
+atbtn.addEventListener("click", () => {
+  const pos = ta.selectionStart
+  ta.setRangeText((pos && !/\s$/.test(ta.value.slice(0, pos)) ? " " : "") + "@", pos, pos, "end")
+  ta.focus(); sync()
+})
+
+pop.addEventListener("click", e => {
+  const li = e.target.closest(".opt"); if (!li) return
+  ta.value = ta.value.replace(/@\S*$/, "@" + li.childNodes[1].textContent + " ")
+  pop.hidden = true; ta.focus(); sync()
+})
+
+send.addEventListener("click", submit)
+function submit() {
+  ta.value = ""; sync()
+  ta.placeholder = "已送出——上方多一條收據,未來區當場重排"
+}
+sync()
+</script>
+</html>

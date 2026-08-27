@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>checkbox — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.2rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.8rem;width:min(24rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+p.hint{font-size:.8rem;color:var(--muted);margin:0}
+.cb{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.cb input{position:absolute;opacity:0;width:1.05rem;height:1.05rem;margin:0;cursor:pointer}
+.box{flex:none;width:1.05rem;height:1.05rem;margin-top:.16rem;border:1px solid var(--border);border-radius:.3rem;background:var(--surface);overflow:hidden;transition:border-color 160ms}
+.box svg{display:block;width:100%;height:100%}
+/* 勾選 = 布織進格子(width 從左往右長),再由線把勾縫上去 */
+.weave{height:24px;width:0;fill:url(#cbfab);transition:width 200ms cubic-bezier(.32,.85,.45,1)}
+.mark{stroke:var(--accent);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mark .check{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset 200ms ease-out}
+.mark .dash{stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset 200ms ease-out}
+.cb input:checked+.box,.cb input:indeterminate+.box{border-color:var(--accent)}
+.cb input:checked+.box .weave,.cb input:indeterminate+.box .weave{width:24px}
+.cb input:checked+.box .check{stroke-dashoffset:0;transition-delay:110ms}
+.cb input:indeterminate+.box .check{display:none}
+.cb input:indeterminate+.box .dash{stroke-dashoffset:0;transition-delay:110ms}
+.cb input:not(:indeterminate)+.box .dash{display:none}
+.cb input:focus-visible+.box{outline:2px solid var(--focus);outline-offset:2px}
+.cb:has(input:disabled){opacity:.5;cursor:not-allowed}
+.cb b{font-weight:500;font-size:.9rem;display:block}
+.cb small{font-size:.8rem;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.box,.weave,.mark .check,.mark .dash{transition:none}}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <pattern id="cbfab" width="5" height="5" patternUnits="userSpaceOnUse">
+    <rect width="5" height="5" style="fill:var(--accent-subtle)"/>
+    <path d="M0,5 L5,0 M-1.2,1.2 L1.2,-1.2 M3.8,6.2 L6.2,3.8" style="stroke:var(--accent);stroke-width:.8" opacity=".55"/>
+    <path d="M0,0 L5,5 M3.8,-1.2 L6.2,1.2 M-1.2,3.8 L1.2,6.2" style="stroke:var(--accent);stroke-width:.6" opacity=".3"/>
+  </pattern>
+</defs></svg>
+<h1>Checkbox</h1>
+<p class="hint">勾選 = 布從左織進格子,推滿後一條線把勾縫上去;取消則布退出。</p>
+
+<section>
+  <h2>基本</h2>
+  <label class="cb"><input type="checkbox" checked><span class="box"><svg viewBox="0 0 24 24"><rect class="weave" rx="3"/><g class="mark" transform="translate(4.2 4.2) scale(.65)"><path class="check" d="M2.5 12.5 9 19 21.5 4.5"/><path class="dash" d="M3.5 12h17"/></g></svg></span><span><b>記住這台裝置</b></span></label>
+  <label class="cb"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24"><rect class="weave" rx="3"/><g class="mark" transform="translate(4.2 4.2) scale(.65)"><path class="check" d="M2.5 12.5 9 19 21.5 4.5"/><path class="dash" d="M3.5 12h17"/></g></svg></span><span><b>換班時通知我</b><small>每次 handoff 都會收到桌面通知。</small></span></label>
+</section>
+
+<section>
+  <h2>indeterminate(部分選取)</h2>
+  <label class="cb"><input type="checkbox" id="ind"><span class="box"><svg viewBox="0 0 24 24"><rect class="weave" rx="3"/><g class="mark" transform="translate(4.2 4.2) scale(.65)"><path class="check" d="M2.5 12.5 9 19 21.5 4.5"/><path class="dash" d="M3.5 12h17"/></g></svg></span><span><b>全選記憶(3 / 7)</b></span></label>
+</section>
+
+<section>
+  <h2>disabled</h2>
+  <label class="cb"><input type="checkbox" checked disabled><span class="box"><svg viewBox="0 0 24 24"><rect class="weave" rx="3"/><g class="mark" transform="translate(4.2 4.2) scale(.65)"><path class="check" d="M2.5 12.5 9 19 21.5 4.5"/><path class="dash" d="M3.5 12h17"/></g></svg></span><span><b>端對端加密</b><small>永遠開啟。</small></span></label>
+</section>
+<script>document.getElementById("ind").indeterminate = true</script>
+</html>

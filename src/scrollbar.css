@@ -1,0 +1,29 @@
+/* @anyknown/ui — 客製 scrollbar(Ledger)
+ * 細、圓、安靜:thumb 是一條線(borderStrong),hover 才加深;track 透明。
+ * Chromium/Safari 走 ::-webkit-scrollbar;Firefox 走標準屬性(兩者互斥,用 @supports 分流)。 */
+
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--ak-border-strong, #c8c3b4);
+	border-radius: 999px;
+	border: 3px solid transparent;
+	background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--ak-text-faint, #9c958a);
+	background-clip: padding-box;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: var(--ak-border-strong, #c8c3b4) transparent;
+	}
+}

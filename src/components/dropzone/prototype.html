@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dropzone — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--danger:#B3402E;--danger-subtle:#F7E7E3;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1)}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--danger:#DD7059;--danger-subtle:#3A241F;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.6rem;width:min(28rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+.help{font-size:.8rem;color:var(--muted);margin:0}
+.zone{position:relative;display:grid;justify-items:center;gap:.5rem;border-radius:.75rem;padding:2.2rem 1.5rem;text-align:center;transition:background 140ms}
+/* 縫線邊框:dragover 時虛線蟻行,像在把檔案縫進 vault */
+.stitch{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.stitch rect{x:1.5px;y:1.5px;width:calc(100% - 3px);height:calc(100% - 3px);rx:11px;fill:none;stroke:var(--border-strong);stroke-width:2;stroke-dasharray:7 6;transition:stroke 140ms}
+.zone[data-over] .stitch rect{stroke:var(--accent);animation:sew .5s linear infinite}
+@keyframes sew{to{stroke-dashoffset:-13}}
+.zone>svg{color:var(--faint);transition:color 140ms}
+.zone p{margin:0;font-size:.9rem}
+.zone small{color:var(--muted);font-size:.78rem}
+.zone[data-over]{background:var(--accent-subtle)}
+.zone[data-over]>svg{color:var(--accent)}
+.pick{background:var(--surface);border:1px solid var(--border);border-radius:.5rem;color:var(--text);font:500 .82rem/1 "Geist";padding:.45rem .8rem;cursor:pointer;margin-top:.25rem}
+.pick:hover{border-color:var(--border-strong)}
+.pick:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.jobs{list-style:none;margin:0;padding:0;border:1px solid var(--border);border-radius:.6rem;background:var(--surface);overflow:hidden}
+.jobs:empty{display:none}
+.jobs li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem .6rem;padding:.6rem .8rem;border-bottom:1px solid var(--border);font-size:.85rem}
+.jobs li:last-child{border-bottom:0}
+.jobs .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jobs .cancel{all:unset;cursor:pointer;color:var(--muted);width:1.4rem;height:1.4rem;display:grid;place-items:center;border-radius:.35rem;justify-self:end}
+.jobs .cancel:hover{background:var(--accent-subtle);color:var(--text)}
+.jobs .cancel:focus-visible{outline:2px solid var(--focus)}
+.track{grid-column:1/-1;height:.25rem;border-radius:99px;background:var(--border);overflow:hidden}
+.track b{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width 200ms linear}
+.jobs .st{grid-column:1/-1;font-size:.75rem;color:var(--muted)}
+.jobs li[data-error]{background:var(--danger-subtle)}
+.jobs li[data-error] .st{color:var(--danger)}
+.jobs li[data-error] .track{display:none}
+@media(prefers-reduced-motion:reduce){.zone,.zone svg,.track b,.stitch rect{transition:none}.zone[data-over] .stitch rect{animation:none}}
+</style>
+<h1>Dropzone</h1>
+
+<section>
+  <h2>idle → dragover(拖檔案進來,或用按鈕選檔;上限 10 MB)</h2>
+  <div class="zone" id="zone">
+    <svg class="stitch" aria-hidden="true"><rect/></svg>
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 16.2A4.5 4.5 0 0 1 6.6 8a6 6 0 0 1 11.6 1.6A4 4 0 0 1 18 17"/><path d="M12 12v9m0-9 3.5 3.5M12 12l-3.5 3.5"/></svg>
+    <p>把檔案拖到這裡上傳</p>
+    <small>加密在你的裝置上完成,才會離開瀏覽器。</small>
+    <button class="pick" type="button" id="pick">選擇檔案</button>
+    <input type="file" id="file" multiple hidden>
+  </div>
+  <ul class="jobs" id="jobs" aria-live="polite"></ul>
+  <p class="help">上傳中列表模擬進度;超過 10 MB 的檔案會顯示錯誤列。</p>
+</section>
+
+<script>
+const LIMIT = 10 * 1024 * 1024
+const zone = document.getElementById("zone")
+const jobs = document.getElementById("jobs")
+let depth = 0
+
+// depth counter 避免拖過子元素時閃爍(同 storage DropZone)
+zone.addEventListener("dragenter", e => { e.preventDefault(); depth++; zone.setAttribute("data-over", "") })
+zone.addEventListener("dragover", e => { e.preventDefault(); e.dataTransfer.dropEffect = "copy" })
+zone.addEventListener("dragleave", () => { depth = Math.max(0, depth - 1); if (!depth) zone.removeAttribute("data-over") })
+zone.addEventListener("drop", e => {
+  e.preventDefault(); depth = 0; zone.removeAttribute("data-over")
+  add([...e.dataTransfer.files])
+})
+
+const input = document.getElementById("file")
+document.getElementById("pick").addEventListener("click", () => input.click())
+input.addEventListener("change", () => { add([...input.files]); input.value = "" })
+
+function fmt(n) { return n < 1048576 ? (n / 1024).toFixed(0) + " KB" : (n / 1048576).toFixed(1) + " MB" }
+
+function add(files) {
+  if (!files.length) files = [{ name: "demo-photo.jpg", size: 3.2 * 1048576 }] // 拖文字等無檔案時給個示範
+  for (const f of files) {
+    const li = document.createElement("li")
+    if (f.size > LIMIT) {
+      li.setAttribute("data-error", "")
+      li.innerHTML = `<span class="name"></span><button class="cancel" aria-label="移除">✕</button><span class="st">超過 10 MB 上限(${fmt(f.size)}),沒有上傳。</span>`
+    } else {
+      li.innerHTML = `<span class="name"></span><button class="cancel" aria-label="取消上傳">✕</button><div class="track"><b></b></div><span class="st">加密中…</span>`
+      simulate(li, f.size)
+    }
+    li.querySelector(".name").textContent = f.name
+    li.querySelector(".cancel").onclick = () => { li.dataset.dead = 1; li.remove() }
+    jobs.append(li)
+  }
+}
+
+function simulate(li, size) {
+  const bar = li.querySelector(".track b"), st = li.querySelector(".st")
+  let pct = 0
+  const tick = () => {
+    if (li.dataset.dead) return
+    pct = Math.min(100, pct + 4 + Math.random() * 10)
+    bar.style.width = pct + "%"
+    st.textContent = pct < 15 ? "加密中…" : pct < 100 ? `上傳中 ${fmt(size * pct / 100)} / ${fmt(size)}` : "完成"
+    if (pct >= 100) { li.querySelector(".cancel").remove(); return }
+    setTimeout(tick, 300)
+  }
+  tick()
+}
+</script>
+</html>

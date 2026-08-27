@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>toast — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--danger:#B3402E;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1)}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--danger:#DD7059;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center;align-content:start}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(24rem,100%);justify-items:start}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+.btn{font:500 .875rem/1 "Geist",system-ui,sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:.5rem;color:var(--text);padding:.55rem .9rem;cursor:pointer;transition:border-color 120ms}
+.btn:hover{border-color:var(--border-strong)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.stack{position:fixed;bottom:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.5rem;z-index:50;width:min(20rem,calc(100vw - 2.5rem))}
+.toast{position:relative;overflow:hidden;display:flex;align-items:center;gap:.6rem;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;box-shadow:var(--shadow);padding:.8rem .85rem .7rem;font-size:.85rem;animation:in 180ms ease-out}
+.toast.leaving{opacity:0;translate:.5rem 0;transition:opacity 160ms,translate 160ms}
+@keyframes in{from{opacity:0;translate:1rem 0}}
+/* 倒數 = 一條退織的線:從滿慢慢退光,退完 toast 收走;hover 線停住 */
+.count{position:absolute;top:0;left:0;width:100%;height:5px}
+.count path{fill:none;stroke:var(--faint);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:100;animation:unweave linear forwards}
+.toast[data-variant="success"] .count path{stroke:var(--accent)}
+.toast[data-variant="danger"] .count path{stroke:var(--danger)}
+@keyframes unweave{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+.toast:hover .count path,.toast:focus-within .count path{animation-play-state:paused}
+.toast .dot{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:var(--faint)}
+.toast[data-variant="success"] .dot{background:var(--accent)}
+.toast[data-variant="danger"] .dot{background:var(--danger)}
+.toast .msg{flex:1}
+.toast .msg small{display:block;color:var(--muted);font-size:.78rem}
+.toast .action{all:unset;font:500 .8rem/1 "Geist",system-ui,sans-serif;color:var(--accent);cursor:pointer;padding:.25rem .4rem;border-radius:.35rem}
+.toast .action:hover{background:var(--accent-subtle)}
+.toast .action:focus-visible{outline:2px solid var(--focus);outline-offset:-1px}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}.toast.leaving{transition:none}}
+</style>
+<h1>Toast</h1>
+
+<section>
+  <h2>variants</h2>
+  <button class="btn" onclick="toast({msg:'交接摘要已複製'})">default</button>
+  <button class="btn" onclick="toast({variant:'success',msg:'換班完成',sub:'3 則記憶已帶進新 thread'})">success</button>
+  <button class="btn" onclick="toast({variant:'danger',msg:'無法連到 vault',sub:'稍後會自動重試'})">danger</button>
+</section>
+
+<section>
+  <h2>with action(復原)</h2>
+  <button class="btn" onclick="toast({msg:'已刪除「偏好 pnpm」',action:'復原'})">刪除記憶</button>
+</section>
+
+<div class="stack" aria-live="polite"></div>
+
+<script>
+const stack = document.querySelector(".stack")
+const DURATION = 5000
+const reduced = matchMedia("(prefers-reduced-motion:reduce)").matches
+// 微波動的線(不是直線),退織時看得出是纖維
+const COUNT_PATH = (() => {
+  let d = ""
+  for (let x = 0; x <= 320; x += 10) d += (x ? "L" : "M") + x + "," + (3 + 1.4 * Math.sin(x / 34)).toFixed(1)
+  return d
+})()
+
+function toast({ variant = "default", msg, sub, action }) {
+  const el = document.createElement("div")
+  el.className = "toast"
+  el.dataset.variant = variant
+  el.innerHTML = `<svg class="count" viewBox="0 0 320 6" preserveAspectRatio="none" aria-hidden="true"><path pathLength="100" d="${COUNT_PATH}"/></svg>
+    <span class="dot"></span><span class="msg">${msg}${sub ? `<small>${sub}</small>` : ""}</span>`
+  if (action) {
+    const btn = document.createElement("button")
+    btn.className = "action"
+    btn.textContent = action
+    btn.onclick = () => dismiss(el)
+    el.append(btn)
+  }
+  stack.append(el)
+
+  if (reduced) {
+    // 不玩線,退回計時器;hover 暫停
+    el.querySelector(".count").remove()
+    let timer = setTimeout(() => dismiss(el), DURATION)
+    el.addEventListener("mouseenter", () => clearTimeout(timer))
+    el.addEventListener("mouseleave", () => { timer = setTimeout(() => dismiss(el), DURATION) })
+  } else {
+    // 線退完 = 時間到;hover 由 CSS 暫停動畫,計時自然同步
+    const line = el.querySelector(".count path")
+    line.style.animationDuration = DURATION + "ms"
+    line.addEventListener("animationend", () => dismiss(el))
+  }
+}
+
+function dismiss(el) {
+  el.classList.add("leaving")
+  const done = () => el.remove()
+  matchMedia("(prefers-reduced-motion:reduce)").matches ? done() : el.addEventListener("transitionend", done, { once: true })
+}
+</script>
+</html>

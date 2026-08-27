@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>tool-card — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--danger:#B3402E;--focus:#23705A;--success:#23705A;--warning:#9A6A1F;--danger-subtle:#F7E9E6}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--danger:#DD7059;--focus:#4FA184;--success:#4FA184;--warning:#C9954A;--danger-subtle:#3A2620}}
+/* plan 24 §1 token */
+:root{--text-body:14px;--leading-body:1.6;--text-meta:12px;--leading-meta:1.4;--text-code:13px;--leading-code:1.5;--part-gap:8px;--card-pad:10px 12px}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(26.25rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+
+.card{border:1px solid var(--border);border-radius:.6rem;background:var(--surface);overflow:hidden}
+.card.error{border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+.row{all:unset;display:flex;align-items:center;gap:.5rem;width:100%;padding:var(--card-pad);font-size:var(--text-meta);line-height:var(--leading-meta);cursor:pointer}
+.row:hover{background:color-mix(in srgb,var(--border) 22%,var(--surface))}
+.row:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.title{font-weight:500;flex:none}
+.subtitle{color:var(--muted);font-family:"Geist Mono",ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.time{margin-left:auto;color:var(--faint);font-variant-numeric:tabular-nums;flex:none}
+.chev{color:var(--faint);flex:none;transition:rotate 140ms}
+[aria-expanded="true"] .chev{rotate:180deg}
+.ok{color:var(--success);flex:none}.bad{color:var(--danger);flex:none}
+.spin{width:11px;height:11px;flex:none;border:1.5px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.detail{border-top:1px solid var(--border);padding:var(--card-pad);display:grid;gap:.45rem}
+.detail[hidden]{display:none}
+.io-label{font:600 .62rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.io{margin:0;font:400 var(--text-code)/var(--leading-code) "Geist Mono",ui-monospace,monospace;background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.5rem .6rem;overflow-x:auto;white-space:pre}
+.io.err{background:var(--danger-subtle);border-color:color-mix(in srgb,var(--danger) 35%,var(--border));color:var(--danger);white-space:pre-wrap}
+.retry-line{display:flex;align-items:center;gap:.4rem;padding:6px 12px;border-top:1px solid var(--border);font-size:var(--text-meta);color:var(--warning)}
+.retry-line .spin{border-top-color:var(--warning)}
+.copy-err{all:unset;font-size:var(--text-meta);color:var(--danger);cursor:pointer;justify-self:start;border:1px solid color-mix(in srgb,var(--danger) 40%,var(--border));border-radius:.4rem;padding:.2rem .55rem}
+.copy-err:focus-visible{outline:2px solid var(--danger);outline-offset:1px}
+/* subagent 變體(plan 28) */
+.sub-line{display:flex;align-items:center;gap:.45rem;padding:0 12px 8px;font-size:var(--text-meta);color:var(--muted)}
+.chip{font:400 .68rem/1.2 "Geist Mono",ui-monospace,monospace;color:var(--faint);border:1px solid var(--border);border-radius:.3rem;padding:.05rem .35rem;flex:none}
+.now{background:linear-gradient(90deg,var(--muted) 30%,var(--faint) 50%,var(--muted) 70%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.6s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.summary{padding:0 12px 10px;font-size:var(--text-meta);line-height:var(--leading-meta);color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.nested{border-left:2px solid var(--border);margin:2px 12px 10px;padding-left:12px;display:grid;gap:var(--part-gap)}
+.quote{border-left:2px solid var(--border-strong);padding-left:8px;color:var(--muted);font-size:var(--text-meta);line-height:var(--leading-meta)}
+.nested-text{font-size:var(--text-meta);line-height:var(--leading-meta);margin:0}
+@media(prefers-reduced-motion:reduce){.spin{animation-duration:1.6s}.now{animation:none;color:var(--muted)}.chev{transition:none}}
+</style>
+<h1>Tool card</h1>
+
+<section>
+  <h2>running — spinner + 收合</h2>
+  <div class="card">
+    <button class="row" aria-expanded="false" data-toggle>
+      <span class="spin" role="status" aria-label="執行中"></span>
+      <span class="title">搜尋</span>
+      <span class="subtitle">parentCallID</span>
+      <span class="time">2.4s</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="detail" hidden>
+      <span class="io-label">輸入</span>
+      <pre class="io">{ "pattern": "parentCallID", "path": "packages/contract" }</pre>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>completed — 預設收合,點列展開輸入/輸出</h2>
+  <div class="card">
+    <button class="row" aria-expanded="false" data-toggle>
+      <span class="ok" aria-label="完成">✓</span>
+      <span class="title">讀取</span>
+      <span class="subtitle">apps/desktop/src/thread/tool-part.tsx</span>
+      <span class="time">0.3s</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="detail" hidden>
+      <span class="io-label">輸入</span>
+      <pre class="io">{ "filePath": "apps/desktop/src/thread/tool-part.tsx" }</pre>
+      <span class="io-label">輸出</span>
+      <pre class="io">export function ToolPart({ part }: { part: ToolPartData }) {
+  if (part.tool === "subagent") return &lt;SubagentCard part={part} /&gt;
+  …</pre>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>shell — 預設展開(看輸出)</h2>
+  <div class="card">
+    <button class="row" aria-expanded="true" data-toggle>
+      <span class="ok" aria-label="完成">✓</span>
+      <span class="title">執行</span>
+      <span class="subtitle">pnpm test --filter desktop</span>
+      <span class="time">8.1s</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="detail">
+      <span class="io-label">輸出</span>
+      <pre class="io">Test Files  12 passed (12)
+     Tests  84 passed (84)
+  Duration  6.92s</pre>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>error + 自動重試可見化</h2>
+  <div class="card error">
+    <button class="row" aria-expanded="true" data-toggle>
+      <span class="bad" aria-label="失敗">✗</span>
+      <span class="title">執行</span>
+      <span class="subtitle">pnpm build</span>
+      <span class="time">12.0s</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="detail">
+      <span class="io-label">錯誤</span>
+      <pre class="io err">Error: ENOMEM: not enough memory
+    at ChildProcess.spawn (node:child_process:761:9)</pre>
+      <button class="copy-err">複製錯誤</button>
+    </div>
+    <div class="retry-line" role="status"><span class="spin" aria-hidden="true"></span>重試中(第 2 次,3 秒後)… <span style="margin-left:auto;font-variant-numeric:tabular-nums">重試 2/3</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>subagent — running(now line)</h2>
+  <div class="card">
+    <button class="row" aria-expanded="false" data-toggle>
+      <span class="spin" role="status" aria-label="執行中"></span>
+      <span class="title">委派</span>
+      <span class="subtitle">調查 retry 事件缺漏</span>
+      <span class="time">01:24</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="sub-line"><span class="chip">sonnet-5</span><span class="now">搜尋 session.retrying</span></div>
+    <div class="detail" hidden>
+      <div class="nested">
+        <p class="quote">找出 runtime 裡 429/5xx 自動重試的事件為什麼沒進 SSE,回報缺哪一段。</p>
+        <p class="nested-text">先看 retry.ts 的事件發送點…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>subagent — completed(摘要 clamp 3 行)</h2>
+  <div class="card">
+    <button class="row" aria-expanded="false" data-toggle>
+      <span class="ok" aria-label="完成">✓</span>
+      <span class="title">委派</span>
+      <span class="subtitle">調查 retry 事件缺漏</span>
+      <span class="time">03:41</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="sub-line"><span class="chip">sonnet-5</span><span>7 工具</span></div>
+    <div class="summary">缺口在 turn.ts:retry 迴圈只 log 不發事件,contract 的 EVENTS 也沒有 session.retrying 型別。建議在 withRetry 的 onRetry callback 發 bus 事件,payload 帶 attempt 與 delayMs,UI 端折進 footer 狀態即可,不需要新 route。</div>
+    <div class="detail" hidden>
+      <div class="nested">
+        <p class="quote">找出 runtime 裡 429/5xx 自動重試的事件為什麼沒進 SSE,回報缺哪一段。</p>
+        <p class="nested-text">結論:缺 session.retrying 事件與 contract 型別,詳見摘要。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+for (const btn of document.querySelectorAll("[data-toggle]")) {
+  btn.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") === "true"
+    btn.setAttribute("aria-expanded", String(!open))
+    const detail = btn.parentElement.querySelector(".detail")
+    if (detail) detail.hidden = open
+  })
+}
+document.querySelector(".copy-err")?.addEventListener("click", e => {
+  e.target.textContent = "已複製 ✓"
+  setTimeout(() => { e.target.textContent = "複製錯誤" }, 2000)
+})
+</script>
+</html>

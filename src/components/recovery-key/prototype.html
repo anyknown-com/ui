@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>recovery-key — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--danger:#B3402E;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1);--warn:#8A6116;--warn-subtle:#F5EDD8}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--danger:#DD7059;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4);--warn:#D3A94E;--warn-subtle:#332B1A}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.6rem;width:min(26rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+.help{font-size:.8rem;color:var(--muted);margin:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1rem;display:grid;gap:.9rem}
+.key{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:.6rem;padding:1rem;cursor:pointer}
+.key .groups{display:flex;flex-wrap:wrap;gap:.35rem .7rem;justify-content:center;font:500 1.05rem/1.6 "Geist Mono",ui-monospace,monospace;letter-spacing:.06em;user-select:all;filter:blur(7px);transition:filter 160ms}
+.key:hover .groups,.key:focus-visible .groups,.key[data-revealed] .groups{filter:none}
+.key .veil{position:absolute;inset:0;display:grid;place-items:center;font-size:.8rem;color:var(--muted);pointer-events:none}
+.key:hover .veil,.key:focus-visible .veil,.key[data-revealed] .veil{opacity:0}
+.key:focus-visible{outline:2px solid var(--focus);outline-offset:-1px}
+.actions{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--surface);border:1px solid var(--border);border-radius:.5rem;color:var(--text);font:500 .82rem/1 "Geist";padding:.45rem .75rem;cursor:pointer;transition:border-color 120ms}
+.btn:hover{border-color:var(--border-strong)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.btn[data-copied]{color:var(--accent);border-color:var(--accent)}
+.warnbox{display:flex;gap:.55rem;background:var(--warn-subtle);color:var(--text);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);border-radius:.55rem;padding:.6rem .7rem;font-size:.82rem}
+.warnbox svg{color:var(--warn);flex:none;margin-top:.1rem}
+.ack{display:flex;align-items:flex-start;gap:.55rem;font-size:.85rem;cursor:pointer}
+.ack input{width:1rem;height:1rem;margin:.15rem 0 0;accent-color:var(--accent)}
+.cta{width:100%;background:var(--accent);color:var(--accent-text);border:0;border-radius:.5rem;font:500 .9rem/1 "Geist";padding:.65rem;cursor:pointer}
+.cta:disabled{opacity:.45;cursor:not-allowed}
+.cta:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.key .groups{transition:none}}
+</style>
+<h1>Recovery key</h1>
+
+<section>
+  <h2>展示卡 — hover / 點擊顯示,複製、下載、確認後才能繼續</h2>
+  <div class="card">
+    <p class="help" style="margin:0">這是你的復原金鑰。忘記 passphrase 時,它是唯一能開回 vault 的東西 — 只會顯示這一次。</p>
+    <div class="key" tabindex="0" role="button" aria-label="顯示復原金鑰" aria-describedby="key-veil">
+      <div class="groups" id="key-text"></div>
+      <span class="veil" id="key-veil">hover 或點一下顯示</span>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" id="copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>複製</span></button>
+      <button class="btn" type="button" id="dl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>下載 .txt</button>
+    </div>
+    <div class="warnbox" role="note">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 10v4m0 3h.01"/></svg>
+      <p style="margin:0">我們沒有你的金鑰副本,遺失就無法復原。把它抄在紙上,或存進密碼管理器。</p>
+    </div>
+    <label class="ack"><input type="checkbox" id="ack">我已把復原金鑰抄下並存放在安全的地方。</label>
+    <button class="cta" type="button" id="next" disabled>繼續建立 vault</button>
+  </div>
+</section>
+
+<script>
+const KEY = "K7PQ-WM2X-9RDF-H4TN-ZC8B-JE6V-A3YS-UG5L"
+const groups = document.getElementById("key-text")
+for (const g of KEY.split("-")) { const s = document.createElement("span"); s.textContent = g; groups.append(s) }
+
+const keyBox = document.querySelector(".key")
+keyBox.addEventListener("click", () => keyBox.toggleAttribute("data-revealed"))
+keyBox.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); keyBox.toggleAttribute("data-revealed") } })
+
+const copyBtn = document.getElementById("copy")
+copyBtn.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(KEY) } catch { return }
+  copyBtn.setAttribute("data-copied", "")
+  copyBtn.querySelector("span").textContent = "✓ 已複製"
+  setTimeout(() => { copyBtn.removeAttribute("data-copied"); copyBtn.querySelector("span").textContent = "複製" }, 2000)
+})
+
+document.getElementById("dl").addEventListener("click", () => {
+  const url = URL.createObjectURL(new Blob([KEY + "\n"], { type: "text/plain" }))
+  const a = Object.assign(document.createElement("a"), { href: url, download: "anyknown-storage-recovery-key.txt" })
+  a.click(); URL.revokeObjectURL(url)
+})
+
+const ack = document.getElementById("ack"), next = document.getElementById("next")
+ack.addEventListener("change", () => { next.disabled = !ack.checked })
+next.addEventListener("click", () => alert("(demo)進入下一步"))
+</script>
+</html>

@@ -1,0 +1,32 @@
+# Skeleton
+
+載入骨架:占位形狀 + shimmer,形狀對齊實際內容的排版(thread 骨架就長得像 thread),避免載入完成時跳版。
+
+## API 草案
+
+```tsx
+<Skeleton width="70%" height={14} />
+<Skeleton shape="circle" size={36} />
+{/* 組合由使用端排,提供常用預組: */}
+<ThreadSkeleton messages={2} />
+```
+
+## 行為
+
+- shimmer:linear-gradient 掃過(background-position 動畫,1.6s linear infinite),只動 background,不觸發 layout
+- `prefers-reduced-motion`:改為 opacity 脈動(2.4s ease);若要完全靜態,拿掉 pulse 即可,骨架本身已可辨識
+- 骨架顏色用專屬 `bone`/`sheen` token(比 border 淺、比 surface 深),light/dark 各一組
+
+## a11y
+
+- 骨架區塊本身 `aria-hidden`,外層容器 `role=status` + `aria-label="…載入中"`,只報一次,不逐塊報
+- 內容到達後整組替換,不留殘骸;避免 aria-live 對骨架本身開火
+
+## 實作建議
+
+原生 div + StyleX keyframes,不需 primitive。`bone`/`sheen` 需補進 `tokens.stylex.ts`。
+
+## References
+
+- https://ui.shadcn.com/docs/components/base/skeleton
+- https://www.nngroup.com/articles/skeleton-screens/

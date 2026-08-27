@@ -1,0 +1,104 @@
+/* Ledger tokens as plain CSS variables — for non-StyleX consumers
+ * (desktop uses Tailwind v4 @theme; reference these vars there).
+ * Source of truth: tokens.stylex.ts. Keep values in sync manually for now. */
+
+:root {
+	--ak-bg: #fafaf6;
+	--ak-surface: #ffffff;
+	--ak-surface-raised: #ffffff;
+	--ak-border: #e3e0d5;
+	--ak-border-strong: #c8c3b4;
+	--ak-text: #23211d;
+	--ak-text-muted: #777165;
+	--ak-text-faint: #9c958a;
+	--ak-accent: #23705a;
+	--ak-accent-text: #fcfcf9;
+	--ak-accent-subtle: #e7f0eb;
+	--ak-danger: #b3402e;
+	--ak-danger-subtle: #f7e7e3;
+	--ak-success: #23705a;
+	--ak-success-subtle: #e7f0eb;
+	--ak-warning: #9a6a1b;
+	--ak-warning-subtle: #f5ebd9;
+	--ak-focus-ring: #23705a;
+	--ak-bone: #ece9df;
+	--ak-sheen: #f6f4ec;
+	--ak-success-hl: #c6e0c6;
+	--ak-danger-hl: #efcec3;
+
+	--ak-shadow-popover: 0 8px 24px rgba(35, 33, 29, 0.1);
+	--ak-shadow-raised: 0 1px 2px rgba(35, 33, 29, 0.08);
+
+	--ak-font-display: "Newsreader Variable", Georgia, "Times New Roman", serif;
+	--ak-font-body: "Geist Variable", system-ui, sans-serif;
+	--ak-font-mono: "Geist Mono Variable", ui-monospace, monospace;
+
+	--ak-radius-sm: 0.375rem;
+	--ak-radius-md: 0.5rem;
+	--ak-radius-lg: 0.75rem;
+	--ak-radius-xl: 1rem;
+
+	--ak-motion-fast: 120ms;
+	--ak-motion-normal: 200ms;
+	--ak-motion-slow: 400ms;
+	--ak-motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+	--ak-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--ak-motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--ak-bg: #181613;
+		--ak-surface: #201d18;
+		--ak-surface-raised: #282420;
+		--ak-border: #35302a;
+		--ak-border-strong: #4a443c;
+		--ak-text: #eae6dc;
+		--ak-text-muted: #a59b8c;
+		--ak-text-faint: #736a5d;
+		--ak-accent: #4fa184;
+		--ak-accent-text: #14120f;
+		--ak-accent-subtle: #22352e;
+		--ak-danger: #dd7059;
+		--ak-danger-subtle: #3d231e;
+		--ak-success: #4fa184;
+		--ak-success-subtle: #22352e;
+		--ak-warning: #d9a254;
+		--ak-warning-subtle: #3a2f1d;
+		--ak-focus-ring: #4fa184;
+		--ak-bone: #2a2620;
+		--ak-sheen: #35302a;
+		--ak-success-hl: #2f4a2e;
+		--ak-danger-hl: #573328;
+
+		--ak-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.4);
+		--ak-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+}
+
+[data-theme="dark"] {
+	--ak-bone: #2a2620;
+	--ak-sheen: #35302a;
+	--ak-success-hl: #2f4a2e;
+	--ak-danger-hl: #573328;
+	--ak-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.4);
+	--ak-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--ak-bg: #181613;
+	--ak-surface: #201d18;
+	--ak-surface-raised: #282420;
+	--ak-border: #35302a;
+	--ak-border-strong: #4a443c;
+	--ak-text: #eae6dc;
+	--ak-text-muted: #a59b8c;
+	--ak-text-faint: #736a5d;
+	--ak-accent: #4fa184;
+	--ak-accent-text: #14120f;
+	--ak-accent-subtle: #22352e;
+	--ak-danger: #dd7059;
+	--ak-danger-subtle: #3d231e;
+	--ak-success: #4fa184;
+	--ak-success-subtle: #22352e;
+	--ak-warning: #d9a254;
+	--ak-warning-subtle: #3a2f1d;
+	--ak-focus-ring: #4fa184;
+}

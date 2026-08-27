@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>progress — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--track:#ECE9DF;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--track:#2A2620;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.8rem;width:min(26rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+p.hint{font-size:.8rem;color:var(--muted);margin:0}
+.row{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap}
+.mono{font:500 .75rem/1 "Geist Mono",ui-monospace,monospace;color:var(--muted);font-variant-numeric:tabular-nums}
+svg{display:block}
+/* weave:鬆散纖維在進度前緣後方收緊成 braided cable */
+.weave{width:100%;height:auto}
+.weave path{fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round}
+/* yarn spinner:一根繩自己打架 */
+.knot path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:72 28}
+/* yarn determinate:毛線球式纏繞(束狀弧線一組一組上,無預繪路徑) */
+.ball path{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
+/* tidy:整理記憶 = 織布。—、|、/、\ 一層層往復堆疊到 100% 滿 */
+.loom-wrap{position:relative;border:1px solid var(--border);border-radius:.75rem;overflow:hidden;background:var(--surface)}
+.loom{width:100%;height:5.5rem;display:block}
+.loom path{fill:none;stroke:var(--accent);stroke-width:1.3;stroke-opacity:.38;stroke-dasharray:100;stroke-dashoffset:100}
+.stage{position:absolute;inset:0;margin:auto;width:fit-content;height:fit-content;padding:.34rem .85rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.12);font:500 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* ring:精確,不玩比喻 */
+.ring{rotate:-90deg}
+.ring .rtrack{stroke:var(--track)}
+.ring .rfill{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:100;transition:stroke-dashoffset 200ms ease}
+.ringwrap{position:relative;display:inline-grid;place-items:center}
+.ringwrap .mono{position:absolute}
+@media(prefers-reduced-motion:reduce){
+  .tidy path{transition:none}
+  .ring .rfill{transition:none}
+}
+</style>
+<h1>Progress</h1>
+
+<section>
+  <h2>weave · determinate(鬆散纖維收緊成 braided cable)</h2>
+  <svg class="weave" id="weave" viewBox="0 0 400 26" role="progressbar" aria-label="同步 thread" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></svg>
+  <span class="mono" id="weave-label">0%</span>
+  <p class="hint">前緣之後是緊密規律的編織;前緣之前還是各自鬆散的訊息線。100% = 整條紮實固定。</p>
+</section>
+
+<section>
+  <h2>yarn spinner · indeterminate(一根繩打架)· sm / md / lg</h2>
+  <div class="row" role="status" aria-label="載入中">
+    <svg class="knot" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path/></svg>
+    <svg class="knot" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path/></svg>
+    <svg class="knot" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path/></svg>
+  </div>
+</section>
+
+<section>
+  <h2>yarn · determinate(毛線球捆法:一束繞完換方向再繞)</h2>
+  <div class="row">
+    <svg class="ball" id="ball" width="48" height="48" viewBox="0 0 24 24" role="progressbar" aria-label="下載模型" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></svg>
+    <span class="mono" id="ball-label">0%</span>
+  </div>
+</section>
+
+<section>
+  <h2>tidy · 整理記憶(織布:—、|、/、\ 往復堆疊到 100%)</h2>
+  <div class="loom-wrap" role="progressbar" aria-label="整理記憶" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loom-wrap">
+    <svg class="loom" id="loom" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <span class="stage" id="stage">掃描對話 · 0%</span>
+  </div>
+  <p class="hint">每個階段鋪一個方向的線,鋪滿換方向,往復兩輪織成整塊布;階段 label 是浮在布上的 chip。</p>
+</section>
+
+<section>
+  <h2>ring · context 用量 42%(精確,不玩比喻)</h2>
+  <div class="ringwrap" role="progressbar" aria-label="context 用量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42" aria-valuetext="128k context 已用 42%">
+    <svg class="ring" width="56" height="56" viewBox="0 0 36 36" fill="none" stroke-width="3.5" aria-hidden="true">
+      <circle class="rtrack" cx="18" cy="18" r="15.9"/>
+      <circle class="rfill" cx="18" cy="18" r="15.9" pathLength="100" stroke-dashoffset="58"/>
+    </svg>
+    <span class="mono">42%</span>
+  </div>
+</section>
+
+<script>
+const NS = "http://www.w3.org/2000/svg"
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches
+const rand = (seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647)(42)
+const TAU = Math.PI * 2
+
+/* ---- weave:y 值在「鬆散」與「緊編」之間依前緣位置混合 ---- */
+const weave = document.getElementById("weave")
+const F = Array.from({ length: 5 }, (_, i) => ({
+  phase: (i / 5) * TAU,                 // 緊編時的規律相位(交錯成辮)
+  looseLen: 100 + rand() * 80,          // 鬆散時各走各的
+  looseAmp: 4.5 + rand() * 3.5,
+  loosePh: rand() * TAU,
+  wobPh: rand() * TAU,
+  op: 1 - i * 0.15,
+  el: null,
+}))
+for (const f of F) {
+  f.el = document.createElementNS(NS, "path")
+  f.el.style.strokeOpacity = f.op
+  weave.append(f.el)
+}
+const smooth = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t) }
+function setWeave(p) {
+  const front = (p / 100) * 470 // 超掃 70px,100% 時全寬都達緊編
+  for (const f of F) {
+    let d = ""
+    for (let x = 0; x <= 400; x += 6) {
+      const yLoose = 13 + f.looseAmp * Math.sin((x / f.looseLen) * TAU + f.loosePh)
+        + 2.6 * Math.sin((x / 53) * TAU + f.wobPh)
+      const yTight = 13 + 6.4 * Math.sin((x / 26) * TAU + f.phase)
+      const s = smooth((front - x) / 70)
+      const y = yLoose + (yTight - yLoose) * s
+      d += (x ? "L" : "M") + x + "," + y.toFixed(1)
+    }
+    f.el.setAttribute("d", d)
+  }
+  weave.setAttribute("aria-valuenow", Math.round(p))
+  document.getElementById("weave-label").textContent = Math.round(p) + "% · 3 則訊息交接中"
+}
+
+/* ---- ball:照真實毛線球的捆法——一束平行弧線繞完,轉個方向再繞下一束,
+   球面上的線是大圓弧,投影成往外鼓的弧;最後補上輪廓圓 = 繞滿 ---- */
+const ball = document.getElementById("ball")
+const R = 9.3, C = 12
+const families = [25, 70, 115, 160].map(deg => (deg * Math.PI) / 180)
+const offsets = [-6.6, -3.4, -0.8, 1.8, 4.4, 7]
+const strands = []
+for (const th of families) {
+  const n = [Math.cos(th), Math.sin(th)], dvec = [-Math.sin(th), Math.cos(th)]
+  for (const o of offsets) {
+    const half = Math.sqrt(R * R - o * o)
+    const mx = C + n[0] * o, my = C + n[1] * o
+    const bulge = o * 0.62 // 大圓投影:越靠中軸越直,穿過球心,不留洞
+    const cx = mx + n[0] * bulge, cy = my + n[1] * bulge
+    strands.push(`M${(mx - dvec[0] * half).toFixed(2)},${(my - dvec[1] * half).toFixed(2)} Q${cx.toFixed(2)},${cy.toFixed(2)} ${(mx + dvec[0] * half).toFixed(2)},${(my + dvec[1] * half).toFixed(2)}`)
+  }
+}
+strands.push(`M${C},${C - R} A${R},${R} 0 1 1 ${C - 0.01},${C - R}`) // 輪廓圓收尾
+for (const d of strands) {
+  const p = document.createElementNS(NS, "path")
+  p.setAttribute("d", d)
+  p.setAttribute("pathLength", "100")
+  ball.append(p)
+}
+const ballFibers = ball.querySelectorAll("path")
+function setBall(p) {
+  const N = ballFibers.length
+  ballFibers.forEach((el, i) => {
+    el.style.strokeDashoffset = 100 - Math.max(0, Math.min(100, (p * N) - i * 100))
+  })
+  ball.setAttribute("aria-valuenow", Math.round(p))
+  document.getElementById("ball-label").textContent = Math.round(p) + "%"
+}
+
+/* ---- knot spinner:lissajous 亂結,相位各速漂移 = 繩子跟自己打架 ---- */
+const knots = [...document.querySelectorAll(".knot path")]
+function knotPath(t) {
+  let d = ""
+  for (let a = 0; a <= TAU + 0.001; a += 0.14) {
+    const x = 12 + 6.3 * Math.sin(2 * a + t * 0.9) + 2.9 * Math.sin(5 * a + t * 1.7)
+    const y = 12 + 6.3 * Math.cos(3 * a + t * 1.3) + 2.9 * Math.cos(2 * a + t * 0.6)
+    d += (d ? "L" : "M") + x.toFixed(2) + "," + y.toFixed(2)
+  }
+  return d
+}
+function drawKnots(t) {
+  const d = knotPath(t)
+  for (const k of knots) { k.setAttribute("d", d); k.style.strokeDashoffset = -t * 14 }
+}
+
+/* ---- tidy:織布。—、|、/、\ 一層一層鋪,鋪滿換方向,往復兩輪到 100% ---- */
+const loom = document.getElementById("loom")
+const loomWrap = document.getElementById("loom-wrap")
+const stageEl = document.getElementById("stage")
+const STAGES = ["掃描對話", "挑出耐久事實", "合併重複", "落盤固定"]
+const DIR = [
+  () => { // — 一律由左而右,由上往下鋪
+    let d = ""
+    for (let y = 6; y <= 84; y += 8) d += `M0,${y} L400,${y} `
+    return d
+  },
+  () => { // | 一律由上而下,由左往右鋪
+    let d = ""
+    for (let x = 6; x <= 394; x += 11) d += `M${x},0 L${x},90 `
+    return d
+  },
+  () => { // / 一律左下→右上,由左往右鋪
+    let d = ""
+    for (let c = -84; c <= 396; c += 15) d += `M${c},90 L${c + 90},0 `
+    return d
+  },
+  () => { // \ 一律左上→右下,由左往右鋪
+    let d = ""
+    for (let c = -84; c <= 396; c += 15) d += `M${c},0 L${c + 90},90 `
+    return d
+  },
+]
+const LAYERS = 8 // 兩輪
+const loomLayers = Array.from({ length: LAYERS }, (_, i) => {
+  const p = document.createElementNS(NS, "path")
+  p.setAttribute("d", DIR[i % 4]())
+  p.setAttribute("pathLength", "100")
+  loom.append(p)
+  return p
+})
+function setLoom(p) {
+  loomLayers.forEach((el, i) => {
+    el.style.strokeDashoffset = 100 - Math.max(0, Math.min(100, (p / 12.5 - i) * 100))
+  })
+  const idx = Math.min(LAYERS - 1, Math.floor(p / 12.5))
+  stageEl.textContent = `${STAGES[idx % 4]} · ${Math.round(p)}%`
+  loomWrap.setAttribute("aria-valuenow", Math.round(p))
+}
+
+/* ---- demo loop ---- */
+if (reduced) { setWeave(64); setBall(64); setLoom(64); drawKnots(1.7) }
+else {
+  let t0 = performance.now(), tL = t0
+  requestAnimationFrame(function tick(now) {
+    const p = Math.min(100, (now - t0) / 90)
+    setWeave(p); setBall(p)
+    if (p >= 100) t0 = now + 1600
+    // 織布走自己的慢時鐘:每條線都要看得到梭子在走,不是閃現
+    const pl = Math.min(100, (now - tL) / 300)
+    setLoom(pl)
+    if (pl >= 100) tL = now + 2200
+    drawKnots(now / 400)
+    requestAnimationFrame(tick)
+  })
+}
+</script>
+</html>

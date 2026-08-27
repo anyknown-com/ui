@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>voice-indicator — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(24rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+p.hint{font-size:.8rem;color:var(--muted);margin:0}
+
+/* 語音是「一條 thread 在說話」:四態都是同一條纖維的不同狀態 */
+.voice{display:flex;align-items:center;gap:.7rem;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;padding:.65rem .85rem}
+.viz{width:3rem;height:1.5rem;flex:none;overflow:visible}
+.viz path{fill:none;stroke:var(--faint);stroke-width:1.6;stroke-linecap:round}
+[data-state="listening"] .viz path,[data-state="thinking"] .viz path,[data-state="speaking"] .viz path{stroke:var(--accent)}
+.label{font-size:.85rem;color:var(--muted)}
+.label b{font-weight:500;color:var(--text)}
+.motion-label{display:none;font:600 .62rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+@media(prefers-reduced-motion:reduce){
+  [data-state]:not([data-state="idle"]) .motion-label{display:inline}
+}
+
+.btn{font:500 .85rem/1 "Geist";border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:.45rem;padding:.5rem .85rem;cursor:pointer;justify-self:start;transition:border-color 120ms}
+.btn:hover{border-color:var(--border-strong)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+</style>
+<h1>Voice Indicator</h1>
+<p class="hint">同一條纖維的四種狀態:idle 平直待命、聆聽時隨音量振動、思考時繞成一串電話線小圈沿線滾動、說話時波沿線傳播。</p>
+
+<section>
+  <h2>demo — 點按鈕輪流換狀態</h2>
+  <div class="voice" data-state="idle" id="demo">
+    <svg class="viz" viewBox="0 0 48 24" aria-hidden="true"><path/></svg>
+    <span class="label" role="status">通話待命 · <b data-text>閒置</b></span>
+    <span class="motion-label" data-motion></span>
+  </div>
+  <button class="btn" id="cycle">切換狀態</button>
+</section>
+
+<section>
+  <h2>idle — 平直待命</h2>
+  <div class="voice" data-state="idle"><svg class="viz" viewBox="0 0 48 24" aria-hidden="true"><path/></svg><span class="label">通話待命 · <b>閒置</b></span></div>
+</section>
+
+<section>
+  <h2>listening — 纖維隨音量振動(scribe_v2_realtime 收音中)</h2>
+  <div class="voice" data-state="listening"><svg class="viz" viewBox="0 0 48 24" aria-hidden="true"><path/></svg><span class="label"><b>聆聽中</b>…說完就送</span><span class="motion-label">聆聽中</span></div>
+</section>
+
+<section>
+  <h2>thinking — 電話線繞圈(runtime 回覆中)</h2>
+  <div class="voice" data-state="thinking"><svg class="viz" viewBox="0 0 48 24" aria-hidden="true"><path/></svg><span class="label"><b>思考中</b></span><span class="motion-label">思考中</span></div>
+</section>
+
+<section>
+  <h2>speaking — 波沿線傳播(TTS 播放中,可插話打斷)</h2>
+  <div class="voice" data-state="speaking"><svg class="viz" viewBox="0 0 48 24" aria-hidden="true"><path/></svg><span class="label"><b>說話中</b>…插話會打斷</span><span class="motion-label">說話中</span></div>
+</section>
+
+<script>
+const TAU = Math.PI * 2
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches
+
+// 收音音量模擬:平滑亂數包絡
+let vol = 0.4, volTarget = 0.4
+setInterval(() => { volTarget = 0.15 + Math.random() * 0.85 }, 260)
+
+const gen = {
+  idle: () => "M2,12 L46,12",                             // 通話待命:平直
+  listening: t => {
+    vol += (volTarget - vol) * 0.12
+    return sample(x => {
+      const env = Math.sin((x / 48) * Math.PI)            // 兩端收攏
+      return 12 + 8.5 * vol * env * Math.sin(x / 2.6 + t * 7)
+    })
+  },
+  thinking: t => { // 電話線:同一條線繞出一串小圈,圈圈沿線滾動(prolate cycloid)
+    let d = ""
+    const loops = 3, span = 36
+    for (let a = -0.6; a <= loops * TAU + 0.6; a += 0.12) {
+      const b = 4 + 0.5 * Math.sin(t * 1.8)                // 圈圈輕輕呼吸
+      const x = 6 + (span * a) / (loops * TAU) - b * 0.55 * Math.sin(a + t * 2)
+      const y = 13.5 - b * 0.75 * Math.cos(a + t * 2)
+      d += (d ? "L" : "M") + x.toFixed(2) + "," + y.toFixed(2)
+    }
+    return d
+  },
+  speaking: t => sample(x => {
+    const env = Math.sin((x / 48) * Math.PI)
+    return 12 + 5.5 * env * Math.sin((x / 7.5) * TAU - t * 5)  // 波往前跑
+  }),
+}
+function sample(fn) {
+  let d = ""
+  for (let x = 2; x <= 46; x += 1.5) d += (d ? "L" : "M") + x + "," + fn(x).toFixed(1)
+  return d
+}
+
+const vizzes = [...document.querySelectorAll(".voice")].map(v => ({ v, path: v.querySelector(".viz path") }))
+function draw(t) {
+  for (const { v, path } of vizzes) path.setAttribute("d", gen[v.dataset.state](t))
+}
+if (reduced) draw(1.2)
+else requestAnimationFrame(function tick(now) { draw(now / 1000); requestAnimationFrame(tick) })
+
+const states = [["idle", "閒置"], ["listening", "聆聽中"], ["thinking", "思考中"], ["speaking", "說話中"]]
+const demo = document.getElementById("demo")
+let i = 0
+document.getElementById("cycle").addEventListener("click", () => {
+  i = (i + 1) % states.length
+  const [state, text] = states[i]
+  demo.dataset.state = state
+  demo.querySelector("[data-text]").textContent = text
+  demo.querySelector("[data-motion]").textContent = state === "idle" ? "" : text
+  if (reduced) draw(1.2)
+})
+</script>
+</html>

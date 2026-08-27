@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>tabs — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.2rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.8rem;width:min(28rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+[role=tablist]{display:flex;gap:.25rem;position:relative}
+[role=tab]{background:none;border:0;font:500 .875rem/1.3 "Geist",system-ui,sans-serif;color:var(--muted);padding:.45rem .7rem;border-radius:.4rem;cursor:pointer;transition:color 120ms}
+[role=tab]:hover{color:var(--text)}
+[role=tab][aria-selected=true]{color:var(--text)}
+[role=tab]:disabled{opacity:.4;cursor:not-allowed}
+[role=tab]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+[role=tabpanel]{font-size:.875rem;color:var(--muted);padding:.6rem .2rem 0}
+[role=tabpanel]:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:.3rem}
+/* underline variant */
+.underline[role=tablist]{border-bottom:1px solid var(--border)}
+.underline .indicator{position:absolute;bottom:-1px;height:2px;background:var(--accent);transition:left 260ms cubic-bezier(.3,1.35,.45,1),width 260ms cubic-bezier(.3,1.35,.45,1)}
+.underline [role=tab][aria-selected=true]{color:var(--accent)}
+/* pills variant */
+.pills[role=tablist]{background:var(--surface);border:1px solid var(--border);border-radius:.55rem;padding:.2rem;gap:.15rem}
+.pills [role=tab][aria-selected=true]{background:var(--accent-subtle);color:var(--accent)}
+@media(prefers-reduced-motion:reduce){.underline .indicator,[role=tab]{transition:none}}
+</style>
+<h1>Tabs</h1>
+
+<section>
+  <h2>underline(預設)· 底線滑動 · 方向鍵</h2>
+  <div class="underline" role="tablist" aria-label="Thread 檢視">
+    <button role="tab" id="t1" aria-selected="true" aria-controls="p1">對話</button>
+    <button role="tab" id="t2" aria-selected="false" aria-controls="p2" tabindex="-1">記憶</button>
+    <button role="tab" id="t3" aria-selected="false" aria-controls="p3" tabindex="-1">換班紀錄</button>
+    <button role="tab" id="t4" aria-selected="false" aria-controls="p4" tabindex="-1" disabled>檔案</button>
+    <span class="indicator" aria-hidden="true"></span>
+  </div>
+  <div role="tabpanel" id="p1" aria-labelledby="t1" tabindex="0">這個 thread 目前有 12 則訊息。</div>
+  <div role="tabpanel" id="p2" aria-labelledby="t2" tabindex="0" hidden>本次工作區共留下 7 條記憶。</div>
+  <div role="tabpanel" id="p3" aria-labelledby="t3" tabindex="0" hidden>昨天 18:00 由 Fable 交接給 Opus。</div>
+  <div role="tabpanel" id="p4" aria-labelledby="t4" tabindex="0" hidden>尚未開放。</div>
+</section>
+
+<section>
+  <h2>pills</h2>
+  <div class="pills" role="tablist" aria-label="時間範圍">
+    <button role="tab" id="q1" aria-selected="true" aria-controls="r1">今天</button>
+    <button role="tab" id="q2" aria-selected="false" aria-controls="r2" tabindex="-1">本週</button>
+    <button role="tab" id="q3" aria-selected="false" aria-controls="r3" tabindex="-1">全部</button>
+  </div>
+  <div role="tabpanel" id="r1" aria-labelledby="q1" tabindex="0">今天有 3 個 thread 更新。</div>
+  <div role="tabpanel" id="r2" aria-labelledby="q2" tabindex="0" hidden>本週累積 18 個 thread。</div>
+  <div role="tabpanel" id="r3" aria-labelledby="q3" tabindex="0" hidden>工作區共 142 個 thread。</div>
+</section>
+
+<script>
+document.querySelectorAll("[role=tablist]").forEach(list=>{
+  const tabs=[...list.querySelectorAll("[role=tab]")];
+  const indicator=list.querySelector(".indicator");
+  const select=tab=>{
+    tabs.forEach(t=>{
+      const on=t===tab;
+      t.setAttribute("aria-selected",on);
+      t.tabIndex=on?0:-1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden=!on;
+    });
+    if(indicator){indicator.style.left=tab.offsetLeft+"px";indicator.style.width=tab.offsetWidth+"px"}
+  };
+  tabs.forEach(tab=>{
+    tab.addEventListener("click",()=>!tab.disabled&&select(tab));
+    tab.addEventListener("keydown",e=>{
+      if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+      e.preventDefault();
+      const enabled=tabs.filter(t=>!t.disabled);
+      let i=enabled.indexOf(tab)+(e.key==="ArrowRight"?1:-1);
+      const next=enabled[(i+enabled.length)%enabled.length];
+      next.focus();select(next);
+    });
+  });
+  if(indicator)select(tabs.find(t=>t.getAttribute("aria-selected")==="true"));
+});
+</script>
+</html>

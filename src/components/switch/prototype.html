@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>switch — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.2rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.9rem;width:min(24rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:24rem}
+
+/* off:空心線頭 + 預繪的灰色路徑(toggle 是固定、單向、確定的移動)
+   on:thumb 滑到底,軌道織成 fabric 藥丸 */
+.sw{display:flex;gap:.75rem;align-items:flex-start;cursor:pointer;justify-content:space-between}
+.sw input{position:absolute;opacity:0;width:2.75rem;height:1.4rem;margin:0;cursor:pointer}
+.track{flex:none;width:2.75rem;height:1.4rem;margin-top:.1rem}
+.track svg{width:100%;height:100%;display:block;overflow:visible}
+.guide{stroke:var(--border-strong);stroke-width:1.5;stroke-linecap:round;fill:none}
+/* 開:布從左織進來(width 推進);關:整塊布 scale 到 0 收掉,width/opacity 等 scale 跑完才歸零 */
+.pill{fill:url(#fabric);stroke:var(--accent);stroke-width:1.3;width:0;opacity:0;scale:0;transform-box:fill-box;transform-origin:center;transition:scale 200ms ease-in,width 0s 200ms,opacity 0s 200ms}
+.sw input:checked~.track .pill{opacity:1;scale:1;transition:width 240ms cubic-bezier(.32,.85,.45,1),scale 0s,opacity 0s}
+.thumb{fill:var(--bg);stroke:var(--border-strong);stroke-width:1.6;transition:translate 250ms cubic-bezier(.34,1.45,.6,1) 20ms,stroke 200ms,fill 200ms}
+.sw input:checked~.track .pill{width:42px}
+.sw input:checked~.track .thumb{translate:22px 0;fill:var(--surface);stroke:var(--accent)}
+.sw input:focus-visible~.track{outline:2px solid var(--focus);outline-offset:3px;border-radius:999px}
+.sw:has(input:disabled){opacity:.5;cursor:not-allowed}
+.sw b{font-weight:500;font-size:.9rem;display:block}
+.sw small{font-size:.8rem;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.pill,.thumb{transition:none}}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <pattern id="fabric" width="5" height="5" patternUnits="userSpaceOnUse">
+    <rect width="5" height="5" style="fill:var(--accent-subtle)"/>
+    <path d="M0,5 L5,0 M-1.2,1.2 L1.2,-1.2 M3.8,6.2 L6.2,3.8" style="stroke:var(--accent);stroke-width:.9" opacity=".8"/>
+    <path d="M0,0 L5,5 M3.8,-1.2 L6.2,1.2 M-1.2,3.8 L1.2,6.2" style="stroke:var(--accent);stroke-width:.7" opacity=".45"/>
+  </pattern>
+</defs></svg>
+<h1>Switch</h1>
+<p class="hint">關 = 一顆空心線頭停在預繪的灰色路徑起點;開 = 線頭沿固定路徑滑到底,軌道織成一塊 fabric 藥丸。</p>
+
+<section>
+  <h2>基本</h2>
+  <label class="sw"><span><b>語音喚醒</b><small>說「Anyknown」開始對話。</small></span><input type="checkbox" role="switch" checked><span class="track"><svg viewBox="0 0 44 22" aria-hidden="true"><path class="guide" d="M11,11 H33"/><rect class="pill" x="1" y="1" width="42" height="20" rx="10"/><circle class="thumb" cx="11" cy="11" r="8.4"/></svg></span></label>
+  <label class="sw"><span><b>開機自動啟動</b></span><input type="checkbox" role="switch"><span class="track"><svg viewBox="0 0 44 22" aria-hidden="true"><path class="guide" d="M11,11 H33"/><rect class="pill" x="1" y="1" width="42" height="20" rx="10"/><circle class="thumb" cx="11" cy="11" r="8.4"/></svg></span></label>
+</section>
+
+<section>
+  <h2>disabled</h2>
+  <label class="sw"><span><b>本地儲存</b><small>永遠開啟,資料不離開這台電腦。</small></span><input type="checkbox" role="switch" checked disabled><span class="track"><svg viewBox="0 0 44 22" aria-hidden="true"><path class="guide" d="M11,11 H33"/><rect class="pill" x="1" y="1" width="42" height="20" rx="10"/><circle class="thumb" cx="11" cy="11" r="8.4"/></svg></span></label>
+</section>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>radio — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#C8C3B4;--border-soft:#E3E0D5;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-subtle:#E7F0EB;--focus:#23705A}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#4A443C;--border-soft:#35302A;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-subtle:#22352E;--focus:#4FA184}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem;display:grid;gap:2.2rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.7rem;width:min(26rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:.7rem}
+legend{font:500 .875rem/1.3 "Geist";padding:0;margin-bottom:.2rem}
+.radio{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.radio input{position:absolute;opacity:0;width:1.05rem;height:1.05rem;margin:0;cursor:pointer}
+.dot{flex:none;width:1.05rem;height:1.05rem;margin-top:.16rem;border:1px solid var(--border);border-radius:999px;background:var(--surface);transition:border-color 120ms}
+.dot svg{display:block;width:100%;height:100%}
+/* 選中 = 線在圓心繞成一顆小線圈(stroke-draw),不是 scale 進場 */
+.coil{fill:none;stroke:var(--accent);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 320ms ease-out}
+.radio input:checked+.dot{border-color:var(--accent)}
+.radio input:checked+.dot .coil{stroke-dashoffset:0}
+.radio input:focus-visible+.dot{outline:2px solid var(--focus);outline-offset:2px}
+.radio:has(input:disabled){opacity:.5;cursor:not-allowed}
+.radio b{font-weight:500;font-size:.9rem;display:block}
+.radio small{font-size:.8rem;color:var(--muted)}
+.cards .radio{border:1px solid var(--border-soft);border-radius:.5rem;padding:.75rem .9rem;transition:border-color 120ms,background 120ms}
+.cards .radio:has(input:checked){border-color:var(--accent);background:var(--accent-subtle)}
+@media(prefers-reduced-motion:reduce){.dot,.coil{transition:none}}
+</style>
+<h1>Radio</h1>
+
+<section>
+  <fieldset>
+    <legend>換班門檻</legend>
+    <label class="radio"><input type="radio" name="a" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>50%(建議)</b><small>context 用到一半就交接,品質最穩。</small></span></label>
+    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>75%</b></span></label>
+    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>90%</b><small>接近上限才交接,單一 session 最長。</small></span></label>
+  </fieldset>
+</section>
+
+<section class="cards">
+  <h2>card 樣式(選中整張亮起)</h2>
+  <fieldset>
+    <legend>訂閱來源</legend>
+    <label class="radio"><input type="radio" name="b" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>Claude</b><small>用你現有的 Claude 訂閱。</small></span></label>
+    <label class="radio"><input type="radio" name="b"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>ChatGPT</b><small>用你現有的 ChatGPT 訂閱。</small></span></label>
+  </fieldset>
+</section>
+
+<section>
+  <h2>disabled 選項</h2>
+  <fieldset>
+    <legend>資料位置</legend>
+    <label class="radio"><input type="radio" name="c" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>這台電腦</b></span></label>
+    <label class="radio"><input type="radio" name="c" disabled><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>雲端同步</b><small>roadmap 中,尚未開放。</small></span></label>
+  </fieldset>
+</section>
+<script>
+// 線圈 dot:2.3 圈由內往外的螺旋
+let d = ""
+const turns = 2.3, TAU = Math.PI * 2
+for (let a = 0; a <= turns * TAU; a += 0.22) {
+  const r = 1 + (a / (turns * TAU)) * 5.4
+  d += (d ? "L" : "M") + (12 + r * Math.cos(a)).toFixed(1) + "," + (12 + r * Math.sin(a)).toFixed(1)
+}
+for (const c of document.querySelectorAll(".coil")) { c.setAttribute("d", d); c.setAttribute("pathLength", "100") }
+</script>
+</html>

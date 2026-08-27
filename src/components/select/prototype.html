@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>select — @anyknown/ui prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+:root{--bg:#FAFAF6;--surface:#FFF;--border:#E3E0D5;--border-strong:#C8C3B4;--text:#23211D;--muted:#777165;--faint:#9C958A;--accent:#23705A;--accent-text:#FCFCF9;--accent-subtle:#E7F0EB;--focus:#23705A;--shadow:0 8px 24px rgba(35,33,29,.1)}
+@media(prefers-color-scheme:dark){:root{--bg:#181613;--surface:#201D18;--border:#35302A;--border-strong:#4A443C;--text:#EAE6DC;--muted:#A59B8C;--faint:#736A5D;--accent:#4FA184;--accent-text:#14120F;--accent-subtle:#22352E;--focus:#4FA184;--shadow:0 8px 24px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 "Geist",system-ui,sans-serif;margin:0;padding:3rem 1.5rem 14rem;display:grid;gap:2.4rem;justify-content:center}
+h1{font:500 1.6rem/1.2 "Newsreader",Georgia,serif;margin:0}
+section{display:grid;gap:.5rem;width:min(24rem,100%)}
+h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .3rem}
+.select{position:relative}
+.trigger{width:100%;min-height:2.25rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:.5rem;padding:.35rem .65rem;font:inherit;font-size:.9rem;color:var(--text);cursor:pointer;text-align:left;transition:border-color 120ms}
+.trigger:hover{border-color:var(--border-strong)}
+.trigger:focus-visible{outline:2px solid var(--focus);outline-offset:-1px}
+.trigger .placeholder{color:var(--faint)}
+.trigger .caret{margin-left:auto;color:var(--faint);flex:none}
+.chip{display:inline-flex;align-items:center;gap:.3rem;background:var(--accent-subtle);color:var(--text);border-radius:.35rem;padding:.1rem .45rem;font-size:.78rem}
+.chip button{all:unset;cursor:pointer;color:var(--muted);line-height:1}
+.pop{position:absolute;z-index:10;top:calc(100% + 6px);left:0;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;box-shadow:var(--shadow);overflow:hidden;transform-origin:top;animation:in 140ms ease-out}
+@keyframes in{from{opacity:0;scale:1 .97}}
+.pop[hidden]{display:none}
+.search{display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);padding:.5rem .75rem}
+.search svg{color:var(--faint);flex:none}
+.search input{all:unset;flex:1;font-size:.85rem}
+.search input::placeholder{color:var(--faint)}
+.list{max-height:14rem;overflow-y:auto;padding:.3rem;margin:0;list-style:none}
+.group-label{font:600 .65rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:.55rem .6rem .35rem}
+.opt{display:flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.42rem .6rem;font-size:.85rem;cursor:pointer}
+.opt[data-active]{background:var(--accent-subtle)}
+.opt .tick{margin-left:auto;color:var(--accent);visibility:hidden}
+.opt[aria-selected="true"] .tick{visibility:visible}
+.opt small{color:var(--faint);font-size:.72rem}
+.empty{padding:1rem .75rem;font-size:.82rem;color:var(--muted);text-align:center}
+@media(prefers-reduced-motion:reduce){.pop{animation:none}}
+</style>
+<h1>Select / Combobox</h1>
+
+<section>
+  <h2>single + text filter + grouping</h2>
+  <div class="select" data-select>
+    <button class="trigger" aria-haspopup="listbox" aria-expanded="false"><span class="placeholder" data-value-label>選擇模型…</span><svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="pop" hidden>
+      <div class="search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="搜尋模型…" aria-label="搜尋選項"></div>
+      <ul class="list" role="listbox">
+        <li class="group-label">Anthropic</li>
+        <li class="opt" role="option" data-value="fable-5">Fable 5<small>最強</small><span class="tick">✓</span></li>
+        <li class="opt" role="option" data-value="opus-5">Opus 5<span class="tick">✓</span></li>
+        <li class="opt" role="option" data-value="sonnet-5">Sonnet 5<small>快</small><span class="tick">✓</span></li>
+        <li class="group-label">OpenAI</li>
+        <li class="opt" role="option" data-value="gpt-5.4">GPT-5.4<span class="tick">✓</span></li>
+        <li class="opt" role="option" data-value="gpt-5.4-mini">GPT-5.4 mini<span class="tick">✓</span></li>
+      </ul>
+      <div class="empty" hidden>找不到「<b data-q></b>」。</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>multiple(chips)+ filter + grouping</h2>
+  <div class="select" data-select data-multiple>
+    <button class="trigger" aria-haspopup="listbox" aria-expanded="false"><span class="placeholder" data-value-label>選擇要帶進交接的記憶…</span><svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="pop" hidden>
+      <div class="search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="搜尋記憶…" aria-label="搜尋選項"></div>
+      <ul class="list" role="listbox" aria-multiselectable="true">
+        <li class="group-label">偏好</li>
+        <li class="opt" role="option" data-value="pnpm">偏好 pnpm<span class="tick">✓</span></li>
+        <li class="opt" role="option" data-value="no-comment">少寫註解<span class="tick">✓</span></li>
+        <li class="group-label">專案</li>
+        <li class="opt" role="option" data-value="cf">部署走 Cloudflare<span class="tick">✓</span></li>
+        <li class="opt" role="option" data-value="desktop-first">先出 desktop<span class="tick">✓</span></li>
+      </ul>
+      <div class="empty" hidden>找不到「<b data-q></b>」。</div>
+    </div>
+  </div>
+</section>
+
+<script>
+for (const root of document.querySelectorAll("[data-select]")) initSelect(root)
+
+function initSelect(root) {
+  const multi = root.hasAttribute("data-multiple")
+  const trigger = root.querySelector(".trigger")
+  const pop = root.querySelector(".pop")
+  const search = pop.querySelector("input")
+  const list = pop.querySelector(".list")
+  const empty = pop.querySelector(".empty")
+  const valueLabel = trigger.querySelector("[data-value-label]")
+  const placeholder = valueLabel.textContent
+  const opts = () => [...list.querySelectorAll(".opt:not([hidden])")]
+
+  const open = () => { pop.hidden = false; trigger.setAttribute("aria-expanded", "true"); search.value = ""; filter(); search.focus() }
+  const close = () => { pop.hidden = true; trigger.setAttribute("aria-expanded", "false") }
+
+  trigger.addEventListener("click", e => { if (e.target.closest(".chip")) return; pop.hidden ? open() : close() })
+  document.addEventListener("click", e => { if (!root.contains(e.target)) close() })
+
+  function filter() {
+    const q = search.value.trim().toLowerCase()
+    let any = false
+    for (const li of list.querySelectorAll(".opt")) {
+      const hit = !q || li.textContent.toLowerCase().includes(q)
+      li.hidden = !hit; if (hit) any = true
+    }
+    for (const g of list.querySelectorAll(".group-label")) {
+      let sib = g.nextElementSibling, has = false
+      while (sib && !sib.classList.contains("group-label")) { if (!sib.hidden) has = true; sib = sib.nextElementSibling }
+      g.hidden = !has
+    }
+    empty.hidden = any; empty.querySelector("[data-q]").textContent = q
+    setActive(opts()[0])
+  }
+  search.addEventListener("input", filter)
+
+  let active = null
+  function setActive(li) { active?.removeAttribute("data-active"); active = li; li?.setAttribute("data-active", "") }
+
+  function choose(li) {
+    if (!li) return
+    if (multi) {
+      li.setAttribute("aria-selected", li.getAttribute("aria-selected") !== "true")
+      renderChips()
+    } else {
+      list.querySelectorAll(".opt").forEach(o => o.setAttribute("aria-selected", "false"))
+      li.setAttribute("aria-selected", "true")
+      valueLabel.textContent = li.childNodes[0].textContent
+      valueLabel.classList.remove("placeholder")
+      close(); trigger.focus()
+    }
+  }
+  list.addEventListener("click", e => choose(e.target.closest(".opt")))
+  list.addEventListener("mousemove", e => { const li = e.target.closest(".opt"); if (li) setActive(li) })
+
+  function renderChips() {
+    trigger.querySelectorAll(".chip").forEach(c => c.remove())
+    const sel = [...list.querySelectorAll('[aria-selected="true"]')]
+    valueLabel.hidden = sel.length > 0
+    for (const li of sel) {
+      const chip = document.createElement("span")
+      chip.className = "chip"
+      chip.innerHTML = `${li.childNodes[0].textContent}<button aria-label="移除">✕</button>`
+      chip.querySelector("button").onclick = () => { li.setAttribute("aria-selected", "false"); renderChips() }
+      valueLabel.before(chip)
+    }
+  }
+
+  search.addEventListener("keydown", e => {
+    const o = opts(), i = o.indexOf(active)
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive(o[Math.min(i + 1, o.length - 1)]); active?.scrollIntoView({ block: "nearest" }) }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive(o[Math.max(i - 1, 0)]); active?.scrollIntoView({ block: "nearest" }) }
+    else if (e.key === "Enter") { e.preventDefault(); choose(active) }
+    else if (e.key === "Escape") { close(); trigger.focus() }
+  })
+}
+</script>
+</html>
