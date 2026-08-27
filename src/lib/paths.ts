@@ -9,3 +9,13 @@ function buildCoil(turns = 2.3, cx = 12, cy = 12, maxRadius = 6.4) {
 	}
 	return d
 }
+
+export const UNWEAVE_PATH = buildUnweave()
+
+function buildUnweave(width = 320, amplitude = 1.4, period = 34, mid = 3, step = 10) {
+	let d = ""
+	for (let x = 0; x <= width; x += step) {
+		d += `${d ? "L" : "M"}${x},${(mid + amplitude * Math.sin(x / period)).toFixed(1)}`
+	}
+	return d
+}

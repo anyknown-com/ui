@@ -1,9 +1,24 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { Toaster } from "@anyknown/ui"
+import { BasicsDemos } from "./demos/basics"
 import { FormsDemos } from "./demos/forms"
 
 const GROUPS: Record<string, string[]> = {
 	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "select", "dropdown"],
+	基礎: [
+		"dialog",
+		"toast",
+		"tooltip",
+		"popover",
+		"tabs",
+		"badge",
+		"kbd",
+		"skeleton",
+		"progress",
+		"empty-state",
+		"scrollbar",
+	],
 }
 
 const styles = stylex.create({
@@ -60,7 +75,9 @@ export function App() {
 			</nav>
 			<main {...stylex.props(styles.main)}>
 				<FormsDemos />
+				<BasicsDemos />
 			</main>
+			<Toaster />
 		</div>
 	)
 }
