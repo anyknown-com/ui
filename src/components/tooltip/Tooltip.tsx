@@ -1,6 +1,7 @@
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip"
 import * as stylex from "@stylexjs/stylex"
-import { type ReactElement, type ReactNode, useId } from "react"
+import { type ReactElement, type ReactNode, useId, useState } from "react"
+import { usePrefersReducedMotion } from "../../lib/motion"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { KbdToneContext } from "../kbd/Kbd"
 
@@ -51,11 +52,17 @@ export function Tooltip({
 	children,
 }: TooltipProps) {
 	const id = useId()
+	const reduced = usePrefersReducedMotion()
+	const [open, setOpen] = useState(false)
 
 	if (disabled) return children
 	return (
-		<BaseTooltip.Root>
-			<BaseTooltip.Trigger delay={delay} aria-describedby={id} render={children} />
+		<BaseTooltip.Root open={open} onOpenChange={setOpen}>
+			<BaseTooltip.Trigger
+				delay={reduced ? 0 : delay}
+				aria-describedby={open ? id : undefined}
+				render={children}
+			/>
 			<BaseTooltip.Portal>
 				<BaseTooltip.Positioner side={side} align={align} sideOffset={6} {...stylex.props(styles.positioner)}>
 					<BaseTooltip.Popup id={id} role="tooltip" {...stylex.props(styles.bubble)}>

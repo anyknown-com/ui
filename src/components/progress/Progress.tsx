@@ -14,6 +14,7 @@ import {
 	loomStageIndex,
 	weaveFibres,
 } from "../../lib/progress"
+import { styled } from "../../lib/styled"
 import { useAnimationFrame } from "../../lib/useAnimationFrame"
 import { color, font, motion, radius, shadow, space } from "../../tokens.stylex"
 
@@ -24,13 +25,8 @@ const styles = stylex.create({
 	svg: { display: "block" },
 	weave: { width: "100%", height: "auto" },
 	fibre: { fill: "none", stroke: color.accent, strokeWidth: 1.7, strokeLinecap: "round" },
-	knot: {
-		fill: "none",
-		stroke: color.accent,
-		strokeWidth: 1.6,
-		strokeLinecap: "round",
-		strokeDasharray: "72 28",
-	},
+	knot: { fill: "none", stroke: color.accent, strokeWidth: 1.6, strokeLinecap: "round" },
+	knotDashed: { strokeDasharray: "72 28" },
 	strand: {
 		fill: "none",
 		stroke: color.accent,
@@ -89,6 +85,18 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.ease,
 	},
+	statusHost: { display: "inline-flex" },
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 	value: {
 		position: "absolute",
 		fontFamily: font.mono,
@@ -111,32 +119,36 @@ export type SpinnerProps = {
 
 export function Spinner({ size = "md", label = "載入中" }: SpinnerProps) {
 	const reduced = usePrefersReducedMotion()
-	const [t, setT] = useState(1.7)
-	useAnimationFrame(!reduced, (elapsed) => setT(elapsed / 400))
+	const [frame, setFrame] = useState(0)
+	useAnimationFrame(!reduced, (elapsed) => setFrame(elapsed / 400))
+	const t = reduced ? 1.7 : frame
 	const px = SPINNER_SIZES[size]
 
 	return (
-		<span role="status" aria-label={label}>
+		<span role="status" aria-label={label} {...stylex.props(styles.statusHost)}>
 			<svg width={px} height={px} viewBox="0 0 24 24" aria-hidden="true" {...stylex.props(styles.svg)}>
 				<path
 					d={knotPath(t)}
-					style={{ strokeDashoffset: reduced ? 0 : -t * 14 }}
-					{...stylex.props(styles.knot)}
+					style={reduced ? undefined : { strokeDashoffset: -t * 14 }}
+					{...stylex.props(styles.knot, !reduced && styles.knotDashed)}
 				/>
 			</svg>
+			<span {...stylex.props(styles.srOnly)}>{label}</span>
 		</span>
 	)
 }
 
 export type ProgressProps = {
 	value?: number
-	valueText?: string
+	/** Human-readable reading, e.g. "3 則訊息交接中 · 64%". Required by NOTES for determinate progress. */
+	valueText: string
 	stages?: string[]
+	className?: string
 	"aria-label": string
 }
 
 export function Progress({ value, valueText, stages = STAGES, ...rest }: ProgressProps) {
-	if (value == null) return <ProgressTidy stages={stages} {...rest} />
+	if (value == null) return <ProgressTidy stages={stages} valueText={valueText} {...rest} />
 	const percent = clampPercent(value)
 	return (
 		<svg
@@ -147,24 +159,43 @@ export function Progress({ value, valueText, stages = STAGES, ...rest }: Progres
 			aria-valuenow={Math.round(percent)}
 			aria-valuetext={valueText}
 			{...rest}
-			{...stylex.props(styles.svg, styles.weave)}
+			{...styled(rest, styles.svg, styles.weave)}
 		>
 			{weaveFibres(percent).map((fibre, index) => (
-				<path key={index} d={fibre.d} style={{ strokeOpacity: fibre.opacity }} {...stylex.props(styles.fibre)} />
+				<path
+					key={index}
+					d={fibre.d}
+					style={{ strokeOpacity: fibre.opacity }}
+					{...stylex.props(styles.fibre)}
+				/>
 			))}
 		</svg>
 	)
 }
 
-function ProgressTidy({ stages, ...rest }: { stages: string[]; "aria-label": string }) {
-	const reduced = usePrefersReducedMotion()
-	const [percent, setPercent] = useState(reduced ? 100 : 0)
-	useAnimationFrame(!reduced, (elapsed) => setPercent(((elapsed / 300) % 130) > 100 ? 100 : (elapsed / 300) % 130))
+type ProgressTidyProps = { stages: string[]; valueText: string; className?: string; "aria-label": string }
 
+// The loom is a waiting texture, not a reading: it has no real progress to
+// report, so it renders no percentage and claims no aria-valuenow.
+function ProgressTidy({ stages, valueText, ...rest }: ProgressTidyProps) {
+	const reduced = usePrefersReducedMotion()
+	const [woven, setWoven] = useState(0)
+	useAnimationFrame(!reduced, (elapsed) =>
+		setWoven((elapsed / 300) % 130 > 100 ? 100 : (elapsed / 300) % 130),
+	)
+
+	const percent = reduced ? 100 : woven
 	const stage = stages[loomStageIndex(percent) % stages.length]
 
 	return (
-		<div role="progressbar" aria-valuemin={0} aria-valuemax={100} {...rest} {...stylex.props(styles.loomWrap)}>
+		<div
+			role="progressbar"
+			aria-valuemin={0}
+			aria-valuemax={100}
+			aria-valuetext={valueText}
+			{...rest}
+			{...styled(rest, styles.loomWrap)}
+		>
 			<svg
 				viewBox={`0 0 ${LOOM_WIDTH} ${LOOM_HEIGHT}`}
 				preserveAspectRatio="none"
@@ -181,7 +212,7 @@ function ProgressTidy({ stages, ...rest }: { stages: string[]; "aria-label": str
 					/>
 				))}
 			</svg>
-			<span {...stylex.props(styles.stage)}>{`${stage} · ${Math.round(percent)}%`}</span>
+			<span {...stylex.props(styles.stage)}>{stage}</span>
 		</div>
 	)
 }
@@ -189,7 +220,8 @@ function ProgressTidy({ stages, ...rest }: { stages: string[]; "aria-label": str
 export type ProgressBallProps = {
 	value: number
 	size?: number
-	valueText?: string
+	valueText: string
+	className?: string
 	"aria-label": string
 }
 
@@ -206,7 +238,7 @@ export function ProgressBall({ value, size = 48, valueText, ...rest }: ProgressB
 			aria-valuenow={Math.round(percent)}
 			aria-valuetext={valueText}
 			{...rest}
-			{...stylex.props(styles.svg)}
+			{...styled(rest, styles.svg)}
 		>
 			{BALL_STRANDS.map((d, index) => (
 				<path
@@ -224,7 +256,8 @@ export function ProgressBall({ value, size = 48, valueText, ...rest }: ProgressB
 export type ProgressRingProps = {
 	value: number
 	size?: number
-	valueText?: string
+	valueText: string
+	className?: string
 	"aria-label": string
 }
 
@@ -238,7 +271,7 @@ export function ProgressRing({ value, size = 56, valueText, ...rest }: ProgressR
 			aria-valuenow={Math.round(percent)}
 			aria-valuetext={valueText}
 			{...rest}
-			{...stylex.props(styles.ringWrap)}
+			{...styled(rest, styles.ringWrap)}
 		>
 			<svg
 				width={size}

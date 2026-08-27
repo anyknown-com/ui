@@ -31,6 +31,11 @@ a11y review 量測 `tokens.css` 兩個主題後發現三處低於 WCAG 門檻。
 | `textFaint` on `surface` | 2.97:1(light)/ 3.16:1(dark) | 4.5:1(小字) | input placeholder、select 群組標題與 hint、dropdown 快捷鍵、label 的「選填」 |
 | `borderStrong` on `surface` | 1.76:1(light) | 3:1(UI 邊界) | checkbox / radio 未勾邊框、switch 關閉時的軌道 |
 | checkbox / radio 命中區 | 16.8px;switch 高 22.4px | 24px | 只在省略 `label` 時會踩到(有 label 時整條 label 是命中區) |
+| `accent` on `accentSubtle`(dark) | 4.18:1 | 4.5:1 | Badge `variant="accent"` |
+| `danger` on `dangerSubtle`(dark) | 4.48:1 | 4.5:1 | Badge `variant="danger"` |
+| weave 第 3–5 條纖維 | 3.10 / 2.35 / 1.82:1 | 3:1(圖形) | `Progress` 的深度層次;讀數由最前面那條線與 `aria-valuetext` 承載 |
+| tidy 織布線 | 1.78:1 | 3:1(圖形) | `Progress`(indeterminate);布是裝飾,階段名是文字 |
+| scrollbar thumb 可見寬 | 4px(10px 減 3px 透明邊距) | — | scrollbar/NOTES 明訂的設計,只是很細 |
 
 建議修法(擇一):把帶語意的 faint 文字改用 `textMuted`(已達 4.5:1),或把 `textFaint` / `borderStrong` 各壓深一階。
 

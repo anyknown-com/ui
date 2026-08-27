@@ -30,7 +30,7 @@ const WEAVE_FIBRES = (() => {
 export type WeaveFibre = { d: string; opacity: number }
 
 export function weaveFibres(percent: number): WeaveFibre[] {
-	const front = (clamp01(percent / 100) * (WEAVE_WIDTH + 70))
+	const front = clamp01(percent / 100) * (WEAVE_WIDTH + 70)
 	return WEAVE_FIBRES.map((fibre) => {
 		let d = ""
 		for (let x = 0; x <= WEAVE_WIDTH; x += 6) {

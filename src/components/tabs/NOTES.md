@@ -17,8 +17,8 @@
 
 ## 行為
 
-- 點擊即切換(activation on focus 亦可,Base UI 預設 automatic);disabled tab 不可選、方向鍵跳過
-- underline indicator 用絕對定位 + left/width transition(180ms)滑到 active tab;reduced-motion 關閉
+- **已實作**。點擊即切換;Base UI 1.7 走 **manual activation**(方向鍵移動焦點,Enter/Space 才切換),disabled tab 保持可聚焦(`aria-disabled`)不會被方向鍵跳過 —— 這是 APG 預設,實作沿用並補上可見的 disabled 樣式(`state.disabled`,原本寫的 `:disabled` 永遠不會命中)
+- underline indicator 用 Base UI `Tabs.Indicator` 的 `--active-tab-left/width`,transition 260ms(對齊 prototype 的 `cubic-bezier(.3,1.35,.45,1)` 彈性曲線,比草案的 180ms 長);reduced-motion 關閉
 - 方向鍵 ←/→ 在 tab 間循環移動並同步切換(roving tabindex:active tab tabIndex=0,其餘 -1)
 
 ## a11y

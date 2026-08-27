@@ -69,3 +69,13 @@ describe("Tabs", () => {
 		expect(screen.getByRole("tab", { name: "對話" })).toHaveAttribute("aria-selected", "true")
 	})
 })
+
+describe("Tabs regressions", () => {
+	test("a disabled tab is visually distinct, not only aria-disabled", () => {
+		render(<ThreadTabs />)
+		const enabled = screen.getByRole("tab", { name: "記憶" })
+		const disabled = screen.getByRole("tab", { name: "換班紀錄" })
+		expect(disabled).toHaveAttribute("aria-disabled", "true")
+		expect(disabled.className).not.toBe(enabled.className)
+	})
+})

@@ -46,7 +46,13 @@ const styles = stylex.create({
 		transitionTimingFunction: "cubic-bezier(0.32, 0.85, 0.45, 1)",
 	},
 	weaveOn: { width: 24 },
-	mark: { stroke: color.accent, strokeWidth: 3, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" },
+	mark: {
+		stroke: color.accent,
+		strokeWidth: 3,
+		fill: "none",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+	},
 	check: {
 		strokeDasharray: 24,
 		strokeDashoffset: 24,
@@ -131,15 +137,16 @@ export function Checkbox({
 				/>
 				<svg viewBox="0 0 24 24" aria-hidden="true" {...stylex.props(styles.svg)}>
 					<FabricPattern id={patternId} />
-					<rect rx="3" fill={`url(#${patternId})`} {...stylex.props(styles.weave, filled && styles.weaveOn)} />
+					<rect
+						rx="3"
+						fill={`url(#${patternId})`}
+						{...stylex.props(styles.weave, filled && styles.weaveOn)}
+					/>
 					<g transform="translate(4.2 4.2) scale(.65)" {...stylex.props(styles.mark)}>
 						{indeterminate ? (
 							<path d="M3.5 12h17" {...stylex.props(styles.dash, styles.drawn)} />
 						) : (
-							<path
-								d="M2.5 12.5 9 19 21.5 4.5"
-								{...stylex.props(styles.check, isChecked && styles.drawn)}
-							/>
+							<path d="M2.5 12.5 9 19 21.5 4.5" {...stylex.props(styles.check, isChecked && styles.drawn)} />
 						)}
 					</g>
 				</svg>

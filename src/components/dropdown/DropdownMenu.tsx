@@ -64,7 +64,15 @@ const styles = stylex.create({
 
 function ChevronRight() {
 	return (
-		<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+		<svg
+			width="11"
+			height="11"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			aria-hidden="true"
+		>
 			<path d="m9 6 6 6-6 6" />
 		</svg>
 	)
@@ -72,20 +80,27 @@ function ChevronRight() {
 
 function Tick() {
 	return (
-		<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+		<svg
+			width="12"
+			height="12"
+			viewBox="0 0 16 16"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			aria-hidden="true"
+		>
 			<path d="m2.5 8.5 4 4 7-9" />
 		</svg>
 	)
 }
 
-const itemClassName =
-	(variant?: "danger") => (state: { highlighted: boolean; disabled: boolean }) =>
-		stylex.props(
-			styles.item,
-			variant === "danger" && styles.danger,
-			state.highlighted && styles.highlighted,
-			state.disabled && styles.disabled,
-		).className ?? ""
+const itemClassName = (variant?: "danger") => (state: { highlighted: boolean; disabled: boolean }) =>
+	stylex.props(
+		styles.item,
+		variant === "danger" && styles.danger,
+		state.highlighted && styles.highlighted,
+		state.disabled && styles.disabled,
+	).className ?? ""
 
 export type DropdownItemProps = {
 	icon?: ReactNode
@@ -99,12 +114,7 @@ export type DropdownItemProps = {
 
 export function DropdownItem({ icon, shortcut, variant, onSelect, children, ...rest }: DropdownItemProps) {
 	return (
-		<Menu.Item
-			{...rest}
-			aria-keyshortcuts={shortcut}
-			onClick={onSelect}
-			className={itemClassName(variant)}
-		>
+		<Menu.Item {...rest} aria-keyshortcuts={shortcut} onClick={onSelect} className={itemClassName(variant)}>
 			{icon != null && (
 				<span aria-hidden="true" {...stylex.props(styles.icon)}>
 					{icon}

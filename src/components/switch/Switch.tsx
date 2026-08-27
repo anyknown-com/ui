@@ -119,6 +119,7 @@ export function Switch({
 					aria-labelledby={label != null ? labelId : undefined}
 					aria-describedby={describedBy || undefined}
 					checked={isOn}
+					aria-checked={isOn}
 					onChange={(event) => {
 						setOn(event.currentTarget.checked)
 						onChange?.(event)

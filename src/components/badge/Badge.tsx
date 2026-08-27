@@ -31,7 +31,13 @@ const styles = stylex.create({
 		color: color.textMuted,
 		letterSpacing: "0.02em",
 	},
-	dot: { width: "0.4rem", height: "0.4rem", borderRadius: radius.full, backgroundColor: "currentColor", flex: "none" },
+	dot: {
+		width: "0.4rem",
+		height: "0.4rem",
+		borderRadius: radius.full,
+		backgroundColor: "currentColor",
+		flex: "none",
+	},
 	dotAccent: { color: color.accent },
 	dotFaint: { color: color.textFaint },
 	dotDanger: { color: color.danger },
@@ -47,8 +53,11 @@ const styles = stylex.create({
 		borderRadius: radius.full,
 		cursor: "pointer",
 		color: "inherit",
-		opacity: { default: 0.6, ":hover": 1, ":focus-visible": 1 },
-		backgroundColor: { default: "transparent", ":hover": "color-mix(in srgb, currentColor 12%, transparent)" },
+		opacity: { default: 0.85, ":hover": 1, ":focus-visible": 1 },
+		backgroundColor: {
+			default: "transparent",
+			":hover": "color-mix(in srgb, currentColor 12%, transparent)",
+		},
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 1,
 	},
@@ -94,4 +103,3 @@ export function Chip({ onRemove, removeLabel, variant = "outline", children, ...
 		</Badge>
 	)
 }
-

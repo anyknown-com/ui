@@ -32,7 +32,14 @@ export {
 	type DropdownSubProps,
 } from "./components/dropdown/DropdownMenu"
 
-export { Dialog, DialogTrigger, DialogContent, DialogActions, DialogClose, ConfirmDialog } from "./components/dialog/Dialog"
+export {
+	Dialog,
+	DialogTrigger,
+	DialogContent,
+	DialogActions,
+	DialogClose,
+	ConfirmDialog,
+} from "./components/dialog/Dialog"
 export type { DialogProps, DialogContentProps, ConfirmDialogProps } from "./components/dialog/Dialog"
 export { Toaster, toast, useToast, toastManager } from "./components/toast/Toast"
 export type { ToasterProps, ToastOptions } from "./components/toast/Toast"
@@ -53,5 +60,60 @@ export { Kbd, KbdGroup, KbdToneContext, type KbdProps, type KbdGroupProps } from
 export { Skeleton, SkeletonGroup, ThreadSkeleton } from "./components/skeleton/Skeleton"
 export type { SkeletonProps, SkeletonGroupProps, ThreadSkeletonProps } from "./components/skeleton/Skeleton"
 export { Spinner, Progress, ProgressBall, ProgressRing } from "./components/progress/Progress"
-export type { SpinnerProps, ProgressProps, ProgressBallProps, ProgressRingProps } from "./components/progress/Progress"
+export type {
+	SpinnerProps,
+	ProgressProps,
+	ProgressBallProps,
+	ProgressRingProps,
+} from "./components/progress/Progress"
 export { EmptyState, type EmptyStateProps } from "./components/empty-state/EmptyState"
+
+export { Thread, UserMessage, AssistantMessage, TextPart, useMessageBody } from "./components/message/Message"
+export type {
+	ThreadProps,
+	UserMessageProps,
+	AssistantMessageProps,
+	TextPartProps,
+} from "./components/message/Message"
+export {
+	ToolCard,
+	ToolInput,
+	ToolOutput,
+	ToolError,
+	SubagentLine,
+	SubagentSummary,
+	SubagentThread,
+	SubagentText,
+} from "./components/tool-card/ToolCard"
+export type {
+	ToolCardProps,
+	ToolState,
+	ToolRetry,
+	ToolErrorProps,
+	SubagentLineProps,
+} from "./components/tool-card/ToolCard"
+export { ReasoningFold, type ReasoningFoldProps } from "./components/reasoning-fold/ReasoningFold"
+export { ActionBar } from "./components/action-bar/ActionBar"
+export type {
+	ActionBarProps,
+	ActionBarButtonProps,
+	CopyActionProps,
+	RegenerateActionProps,
+} from "./components/action-bar/ActionBar"
+export { CodeBlock, InlineCode, type CodeBlockProps } from "./components/code-block/CodeBlock"
+export { PermissionCard, DecisionCard } from "./components/interaction-card/InteractionCard"
+export type {
+	PermissionCardProps,
+	PermissionReply,
+	PermissionReceipt,
+	DecisionCardProps,
+	DecisionBlock,
+	DecisionOption,
+	DecisionAnswer,
+} from "./components/interaction-card/InteractionCard"
+export { HandoffReceipt } from "./components/handoff-receipt/HandoffReceipt"
+export type { HandoffReceiptProps, HandoffReason } from "./components/handoff-receipt/HandoffReceipt"
+export { Composer } from "./components/composer/Composer"
+export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
+export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
+export type { VoiceState } from "./lib/voice"

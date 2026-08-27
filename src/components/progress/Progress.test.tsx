@@ -41,15 +41,17 @@ describe("Progress", () => {
 	})
 
 	test("clamps out-of-range values", () => {
-		render(<Progress value={140} aria-label="同步" />)
+		render(<Progress value={140} valueText="同步中 100%" aria-label="同步" />)
 		expect(screen.getByRole("progressbar", { name: "同步" })).toHaveAttribute("aria-valuenow", "100")
 	})
 
 	test("without a value it renders the tidy loom and sets no valuenow", () => {
-		render(<Progress aria-label="整理記憶" />)
+		render(<Progress valueText="整理記憶中" aria-label="整理記憶" />)
 		const bar = screen.getByRole("progressbar", { name: "整理記憶" })
 		expect(bar).not.toHaveAttribute("aria-valuenow")
+		expect(bar).toHaveAttribute("aria-valuetext", "整理記憶中")
 		expect(bar).toHaveTextContent("掃描對話")
+		expect(bar).not.toHaveTextContent("%")
 	})
 })
 
@@ -67,7 +69,7 @@ describe("Spinner", () => {
 
 describe("ProgressBall", () => {
 	test("exposes determinate semantics and one path per strand", () => {
-		const { container } = render(<ProgressBall value={64} aria-label="下載模型" />)
+		const { container } = render(<ProgressBall value={64} valueText="下載模型 64%" aria-label="下載模型" />)
 		expect(screen.getByRole("progressbar", { name: "下載模型" })).toHaveAttribute("aria-valuenow", "64")
 		expect(container.querySelectorAll("path")).toHaveLength(BALL_STRANDS.length)
 	})
@@ -82,8 +84,15 @@ describe("ProgressRing", () => {
 	})
 
 	test("the fill arc is offset by the remaining percentage", () => {
-		const { container } = render(<ProgressRing value={42} aria-label="context 用量" />)
+		const { container } = render(<ProgressRing value={42} valueText="128k context 已用 42%" aria-label="context 用量" />)
 		const circles = container.querySelectorAll("circle")
 		expect(circles[1]).toHaveAttribute("stroke-dashoffset", "58")
+	})
+})
+
+describe("Progress regressions", () => {
+	test("the spinner's label is inside its live region, not only its name", () => {
+		render(<Spinner label="載入中" />)
+		expect(screen.getByRole("status", { name: "載入中" })).toHaveTextContent("載入中")
 	})
 })

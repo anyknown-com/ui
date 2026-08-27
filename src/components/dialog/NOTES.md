@@ -33,7 +33,7 @@
 
 ## a11y
 
-- 用原生 `<dialog>` + `showModal()`:focus trap、inert 背景、Esc 都是原生行為
+- **實作走 Base UI 的 `Dialog`/`AlertDialog`**(不是原生 `<dialog>`):focus trap、背景 `inert`、Esc、回焦 trigger 都由 primitive 提供,`ConfirmDialog` 另外禁止 backdrop 關閉
 - `aria-labelledby` 指向標題;描述可加 `aria-describedby`
 - danger confirm 開啟時初始 focus 落在「取消」(避免誤按),實作時用 `initialFocus`
 

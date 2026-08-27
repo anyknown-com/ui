@@ -72,7 +72,9 @@ describe("Checkbox description", () => {
 		render(<Checkbox label="換班時通知我" description="每次 handoff 都會收到桌面通知。" />)
 		const box = screen.getByRole("checkbox", { name: "換班時通知我" })
 		const describedBy = box.getAttribute("aria-describedby")
-		expect(document.getElementById(describedBy as string)).toHaveTextContent("每次 handoff 都會收到桌面通知。")
+		expect(document.getElementById(describedBy as string)).toHaveTextContent(
+			"每次 handoff 都會收到桌面通知。",
+		)
 	})
 
 	test("clears the mixed state once the user toggles", async () => {

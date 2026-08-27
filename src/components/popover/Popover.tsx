@@ -2,6 +2,7 @@ import { Popover as BasePopover } from "@base-ui/react/popover"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactElement, ReactNode } from "react"
 import { popupStyles } from "../../lib/popup"
+import { styled } from "../../lib/styled"
 import { color, font, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -51,21 +52,26 @@ export const PopoverClose = ({ children }: { children: ReactElement }) => (
 	<BasePopover.Close render={children} />
 )
 
-export type PopoverContentProps = {
+type PopoverContentBase = {
 	side?: "top" | "bottom" | "left" | "right"
 	align?: "start" | "center" | "end"
 	sideOffset?: number
-	"aria-label"?: string
+	className?: string
 	children: ReactNode
 }
+
+/** role="dialog" needs a name: pass `aria-label`, or render a `PopoverTitle` inside. */
+export type PopoverContentProps = PopoverContentBase &
+	({ "aria-label": string; titled?: never } | { "aria-label"?: never; titled: true })
 
 export function PopoverContent({
 	side = "bottom",
 	align = "center",
 	sideOffset = 8,
 	children,
-	...rest
+	...props
 }: PopoverContentProps) {
+	const { titled: _titled, ...rest } = props as PopoverContentBase & { titled?: true }
 	return (
 		<BasePopover.Portal>
 			<BasePopover.Positioner
@@ -74,7 +80,7 @@ export function PopoverContent({
 				sideOffset={sideOffset}
 				{...stylex.props(popupStyles.positioner)}
 			>
-				<BasePopover.Popup {...rest} {...stylex.props(popupStyles.surface, styles.panel)}>
+				<BasePopover.Popup {...rest} {...styled(rest, popupStyles.surface, styles.panel)}>
 					{children}
 				</BasePopover.Popup>
 			</BasePopover.Positioner>

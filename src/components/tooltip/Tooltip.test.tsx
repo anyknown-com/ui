@@ -63,3 +63,22 @@ describe("Tooltip", () => {
 		expect(screen.getByRole("button", { name: "單獨按鈕" })).toBeInTheDocument()
 	})
 })
+
+describe("Tooltip regressions", () => {
+	test("aria-describedby only points at a bubble that exists", async () => {
+		render(
+			<Tooltip content="產生交接摘要" delay={0}>
+				<Button>開始換班</Button>
+			</Tooltip>,
+		)
+		const trigger = screen.getByRole("button", { name: "開始換班" })
+		expect(trigger).not.toHaveAttribute("aria-describedby")
+		await userEvent.hover(trigger)
+		await screen.findByRole("tooltip")
+		await waitFor(() => {
+			const id = trigger.getAttribute("aria-describedby")
+			expect(id).not.toBeNull()
+			expect(document.getElementById(id as string)).not.toBeNull()
+		})
+	})
+})

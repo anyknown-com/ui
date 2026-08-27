@@ -20,9 +20,7 @@ describe("EmptyState", () => {
 
 	test("the action is a real button reachable by keyboard", async () => {
 		const onClick = vi.fn()
-		render(
-			<EmptyState title="還沒有記憶" action={<Button onClick={onClick}>開始第一個 thread</Button>} />,
-		)
+		render(<EmptyState title="還沒有記憶" action={<Button onClick={onClick}>開始第一個 thread</Button>} />)
 		await userEvent.tab()
 		expect(screen.getByRole("button", { name: "開始第一個 thread" })).toHaveFocus()
 		await userEvent.keyboard("{Enter}")

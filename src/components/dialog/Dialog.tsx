@@ -44,7 +44,8 @@ const styles = stylex.create({
 		animationName: { default: grow, [REDUCED]: "none" },
 		animationDuration: "160ms",
 		animationTimingFunction: "ease-out",
-		outline: "none",
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: -2,
 	},
 	title: {
 		fontFamily: font.display,

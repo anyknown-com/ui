@@ -26,7 +26,17 @@ const styles = stylex.create({
 	note: { fontFamily: font.body, fontSize: text.xs, color: color.textMuted, margin: 0 },
 })
 
-export function Demo({ id, title, note, children }: { id: string; title: string; note?: string; children: ReactNode }) {
+export function Demo({
+	id,
+	title,
+	note,
+	children,
+}: {
+	id: string
+	title: string
+	note?: string
+	children: ReactNode
+}) {
 	return (
 		<section id={id} {...stylex.props(styles.section)}>
 			<h2 {...stylex.props(styles.heading)}>{title}</h2>

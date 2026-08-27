@@ -6,7 +6,7 @@
 
 1. **weave(linear determinate)** — 鬆散 → 紮實。5 條纖維全寬可見:進度前緣之後的區段收緊成規律交錯的 braid(λ26 / 相位均分,Apple 編織線材的密度),前緣之前仍是各走各的鬆散線;y 值以 smoothstep(70px 過渡帶)在鬆/緊之間混合,前緣超掃 70px 讓 100% 時全寬都達緊編。終點 = 整條固定的辮線。
 2. **yarn spinner(indeterminate)** — 一根繩打架:單一 lissajous 亂結路徑,各項相位以不同速率漂移(rAF 逐幀重算 d)+ dash 段沿線行進。sm 18 / md 28 / lg 40。
-3. **yarn determinate** — 照真實毛線球(🧶)的捆法:3 個方向 × 每方向 5 條平行弧的束,一束繞完換方向再繞下一束;弧線是球面大圓的投影(quadratic 往外鼓,離中軸越近鼓越多),最後補上輪廓圓收尾 = 繞滿的紮實球。無預繪灰色路徑,線是逐條出現的。
+3. **yarn determinate**(已實作 4 個方向 × 每方向 6 條 = 24 弧 + 1 輪廓圓 = 25 條;草案寫 3×5,實作採 prototype 的實際值)— 照真實毛線球(🧶)的捆法:4 個方向 × 每方向 6 條平行弧的束,一束繞完換方向再繞下一束;弧線是球面大圓的投影(quadratic 往外鼓,離中軸越近鼓越多),最後補上輪廓圓收尾 = 繞滿的紮實球。無預繪灰色路徑,線是逐條出現的。
 4. **tidy(整理記憶)** — 織布:—、|、/、\ 四個方向的線層往復堆疊(兩輪共 8 層,每層 12.5%),鋪滿換方向,100% = 整塊布織滿。階段 label(掃描對話 → 挑出耐久事實 → 合併重複 → 落盤固定)放浮在布上的 rounded chip(surface 底 + 淺影)。每層一條蛇行 path + `pathLength=100` dashoffset 逐線顯現。
 5. **ring(context 用量)** — `pathLength="100"`、dashoffset = `100 - value`、12 點起點;精確數字置中,tabular-nums。不玩比喻。
 
@@ -21,8 +21,8 @@
 
 ## 行為 / a11y
 
-- determinate:`role=progressbar` + `aria-valuemin/max/now` + 人話 `aria-valuetext`;indeterminate 不設 valuenow;spinner 用 `role=status`
-- 纖維透明度遞減(1 → .3)做深度;全部只用 `accent` 一色,不引入新色
+- determinate:`role=progressbar` + `aria-valuemin/max/now` + 人話 `aria-valuetext`(**實作把 `valueText` 設為必填**);indeterminate(tidy)不設 valuenow、也不顯示任何百分比 —— 它沒有真實進度可報,只顯示階段名;spinner 用 `role=status`,label 以視覺隱藏文字放進 live region(`role=status` 不從內容取名,所以 `aria-label` 與內文兩者都要)
+- 纖維透明度遞減(1 → .4,同 prototype;草案寫 .3)做深度;全部只用 `accent` 一色,不引入新色。**注意**:第 3–5 條纖維與底色對比低於 WCAG 1.4.11 的 3:1,讀數靠 `aria-valuetext` 與最前面那條線承載,見 components/README 的對比表
 - reduced-motion:spinner/tidy 動畫關閉(毛球顯示靜態滿線、tidy 直接平整),determinate 保留(進度本身是資訊)
 - 百分比 Geist Mono + tabular-nums;數字外必附文字說明(「3 則訊息交接中」)
 

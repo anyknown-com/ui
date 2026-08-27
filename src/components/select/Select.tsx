@@ -169,12 +169,26 @@ const styles = stylex.create({
 	optionDisabled: { opacity: 0.5, cursor: "not-allowed" },
 	hint: { color: color.textFaint, fontSize: "0.72rem" },
 	tick: { marginInlineStart: "auto", color: color.accent, display: "flex" },
-	empty: { paddingBlock: space.md, paddingInline: space.sm, fontSize: text.xs, color: color.textMuted, textAlign: "center" },
+	empty: {
+		paddingBlock: space.md,
+		paddingInline: space.sm,
+		fontSize: text.xs,
+		color: color.textMuted,
+		textAlign: "center",
+	},
 })
 
 function CaretIcon() {
 	return (
-		<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+		<svg
+			width="12"
+			height="12"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			aria-hidden="true"
+		>
 			<path d="m6 9 6 6 6-6" />
 		</svg>
 	)
@@ -182,7 +196,15 @@ function CaretIcon() {
 
 function SearchIcon() {
 	return (
-		<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+		<svg
+			width="13"
+			height="13"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			aria-hidden="true"
+		>
 			<circle cx="11" cy="11" r="7" />
 			<path d="m20 20-3.5-3.5" />
 		</svg>
@@ -191,7 +213,15 @@ function SearchIcon() {
 
 function TickIcon() {
 	return (
-		<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+		<svg
+			width="13"
+			height="13"
+			viewBox="0 0 16 16"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			aria-hidden="true"
+		>
 			<path d="m2.5 8.5 4 4 7-9" />
 		</svg>
 	)
@@ -264,7 +294,10 @@ export function Select({
 	const [internal, setInternal] = useState<string | string[]>(defaultValue ?? (multiple ? [] : ""))
 	const current = isControlled ? value : internal
 	const selectedList = useMemo(
-		() => (Array.isArray(current) ? current : []).map((v) => byValue.get(v)).filter((o): o is Option => o != null),
+		() =>
+			(Array.isArray(current) ? current : [])
+				.map((v) => byValue.get(v))
+				.filter((o): o is Option => o != null),
 		[current, byValue],
 	)
 	const selectedOne = typeof current === "string" && current !== "" ? (byValue.get(current) ?? null) : null

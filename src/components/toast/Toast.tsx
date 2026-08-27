@@ -1,6 +1,6 @@
 import { Toast as BaseToast } from "@base-ui/react/toast"
 import * as stylex from "@stylexjs/stylex"
-import { useState } from "react"
+import { createContext, useContext, useRef, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { UNWEAVE_PATH } from "../../lib/paths"
 import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
@@ -23,10 +23,11 @@ const styles = stylex.create({
 		position: "fixed",
 		zIndex: 80,
 		display: "flex",
-		flexDirection: "column",
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
 	},
+	fromBottom: { flexDirection: "column-reverse" },
+	fromTop: { flexDirection: "column" },
 	bottomRight: { bottom: space.md, insetInlineEnd: space.md },
 	bottomLeft: { bottom: space.md, insetInlineStart: space.md },
 	topRight: { top: space.md, insetInlineEnd: space.md },
@@ -48,6 +49,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: text.sm,
 		color: color.text,
+		opacity: { default: 1, ":is([data-limited])": 0 },
 		animationName: { default: slideIn, [REDUCED]: "none" },
 		animationDuration: "180ms",
 		animationTimingFunction: "ease-out",
@@ -65,7 +67,10 @@ const styles = stylex.create({
 	lineDefault: { stroke: color.textFaint },
 	lineSuccess: { stroke: color.accent },
 	lineDanger: { stroke: color.danger },
-	duration: (ms: number) => ({ animationDuration: `${ms}ms` }),
+	running: (ms: number, paused: boolean) => ({
+		animationDuration: `${ms}ms`,
+		animationPlayState: paused ? "paused" : "running",
+	}),
 	dot: { flex: "none", width: "0.5rem", height: "0.5rem", borderRadius: radius.full },
 	dotDefault: { backgroundColor: color.textFaint },
 	dotSuccess: { backgroundColor: color.accent },
@@ -90,17 +95,26 @@ const styles = stylex.create({
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
+	srOnly: {
+		position: "absolute",
+		width: 1,
+		height: 1,
+		padding: 0,
+		margin: -1,
+		overflow: "hidden",
+		clipPath: "inset(50%)",
+		whiteSpace: "nowrap",
+		borderWidth: 0,
+	},
 })
 
 const TONE = {
-	success: { dot: styles.dotSuccess, line: styles.lineSuccess },
-	danger: { dot: styles.dotDanger, line: styles.lineDanger },
-	default: { dot: styles.dotDefault, line: styles.lineDefault },
+	success: { dot: styles.dotSuccess, line: styles.lineSuccess, word: "成功:" },
+	danger: { dot: styles.dotDanger, line: styles.lineDanger, word: "錯誤:" },
+	default: { dot: styles.dotDefault, line: styles.lineDefault, word: "" },
 } as const
 
 type Tone = keyof typeof TONE
-
-export const toastManager = BaseToast.createToastManager()
 
 export type ToastOptions = {
 	description?: string
@@ -108,36 +122,53 @@ export type ToastOptions = {
 	timeout?: number
 }
 
-function add(tone: Tone, title: string, options: ToastOptions = {}) {
-	const action = options.action
-	let id = ""
-	id = toastManager.add({
-		title,
-		type: tone,
-		description: options.description,
-		timeout: options.timeout,
-		priority: tone === "danger" ? "high" : "low",
-		actionProps: action
-			? {
-					children: action.label,
-					onClick: () => {
-						action.onClick()
-						toastManager.close(id)
-					},
-				}
-			: undefined,
+type Manager = ReturnType<typeof BaseToast.createToastManager>
+
+function makeApi(getManager: () => Manager) {
+	function add(tone: Tone, title: string, options: ToastOptions = {}) {
+		const manager = getManager()
+		const action = options.action
+		let id = ""
+		id = manager.add({
+			title,
+			type: tone,
+			description: options.description,
+			timeout: options.timeout,
+			priority: tone === "danger" ? "high" : "low",
+			actionProps: action
+				? {
+						children: action.label,
+						onClick: () => {
+							action.onClick()
+							manager.close(id)
+						},
+					}
+				: undefined,
+		})
+		return id
+	}
+
+	return Object.assign((title: string, options?: ToastOptions) => add("default", title, options), {
+		success: (title: string, options?: ToastOptions) => add("success", title, options),
+		danger: (title: string, options?: ToastOptions) => add("danger", title, options),
+		close: (id: string) => getManager().close(id),
 	})
-	return id
 }
 
-export const toast = Object.assign((title: string, options?: ToastOptions) => add("default", title, options), {
-	success: (title: string, options?: ToastOptions) => add("success", title, options),
-	danger: (title: string, options?: ToastOptions) => add("danger", title, options),
-	close: (id: string) => toastManager.close(id),
-})
+/**
+ * Fallback manager for apps with a single <Toaster/>: importing `toast` works
+ * without threading context. A Toaster mounted with its own manager registers
+ * itself here so the module-level `toast` keeps reaching the live viewport.
+ */
+export const toastManager = BaseToast.createToastManager()
+
+const ToastApiContext = createContext<ReturnType<typeof makeApi> | null>(null)
+
+export const toast = makeApi(() => toastManager)
 
 export function useToast() {
-	return { toast }
+	const scoped = useContext(ToastApiContext)
+	return { toast: scoped ?? toast }
 }
 
 const POSITIONS = {
@@ -151,45 +182,66 @@ export type ToasterProps = {
 	position?: keyof typeof POSITIONS
 	timeout?: number
 	limit?: number
+	/** Pass a manager from `createToastManager()` to scope this viewport. */
+	manager?: Manager
 }
 
-export function Toaster({ position = "bottom-right", timeout = DEFAULT_TIMEOUT, limit = 3 }: ToasterProps) {
+export function Toaster({
+	position = "bottom-right",
+	timeout = DEFAULT_TIMEOUT,
+	limit = 3,
+	manager,
+}: ToasterProps) {
+	const own = useRef(manager ?? toastManager)
+	const api = useRef<ReturnType<typeof makeApi>>(undefined)
+	api.current ??= makeApi(() => own.current)
+
+	const [paused, setPaused] = useState(false)
+	const fromBottom = position.startsWith("bottom")
+
 	return (
-		<BaseToast.Provider toastManager={toastManager} timeout={timeout} limit={limit}>
-			<BaseToast.Portal>
-				<BaseToast.Viewport {...stylex.props(styles.viewport, POSITIONS[position])}>
-					<ToastList fallbackTimeout={timeout} />
-				</BaseToast.Viewport>
-			</BaseToast.Portal>
-		</BaseToast.Provider>
+		<ToastApiContext value={api.current}>
+			<BaseToast.Provider toastManager={own.current} timeout={timeout} limit={limit}>
+				<BaseToast.Portal>
+					<BaseToast.Viewport
+						onMouseEnter={() => setPaused(true)}
+						onMouseLeave={() => setPaused(false)}
+						onFocus={() => setPaused(true)}
+						onBlur={() => setPaused(false)}
+						{...stylex.props(
+							styles.viewport,
+							fromBottom ? styles.fromBottom : styles.fromTop,
+							POSITIONS[position],
+						)}
+					>
+						<ToastList fallbackTimeout={timeout} paused={paused} />
+					</BaseToast.Viewport>
+				</BaseToast.Portal>
+			</BaseToast.Provider>
+		</ToastApiContext>
 	)
 }
 
-function ToastList({ fallbackTimeout }: { fallbackTimeout: number }) {
+function ToastList({ fallbackTimeout, paused }: { fallbackTimeout: number; paused: boolean }) {
 	const { toasts } = BaseToast.useToastManager()
-	return toasts.map((item) => <ToastItem key={item.id} toast={item} fallbackTimeout={fallbackTimeout} />)
+	return toasts.map((item) => (
+		<ToastItem key={item.id} toast={item} fallbackTimeout={fallbackTimeout} paused={paused} />
+	))
 }
 
 type ToastItemProps = {
 	toast: BaseToast.Root.ToastObject
 	fallbackTimeout: number
+	paused: boolean
 }
 
-function ToastItem({ toast: item, fallbackTimeout }: ToastItemProps) {
+function ToastItem({ toast: item, fallbackTimeout, paused }: ToastItemProps) {
 	const reduced = usePrefersReducedMotion()
-	const [paused, setPaused] = useState(false)
 	const tone = TONE[(item.type as Tone) in TONE ? (item.type as Tone) : "default"]
 	const duration = item.timeout ?? fallbackTimeout
 
 	return (
-		<BaseToast.Root
-			toast={item}
-			onMouseEnter={() => setPaused(true)}
-			onMouseLeave={() => setPaused(false)}
-			onFocus={() => setPaused(true)}
-			onBlur={() => setPaused(false)}
-			{...stylex.props(styles.toast)}
-		>
+		<BaseToast.Root toast={item} {...stylex.props(styles.toast)}>
 			{!reduced && duration > 0 && (
 				<svg
 					viewBox="0 0 320 6"
@@ -200,13 +252,13 @@ function ToastItem({ toast: item, fallbackTimeout }: ToastItemProps) {
 					<path
 						d={UNWEAVE_PATH}
 						pathLength="100"
-						style={{ animationPlayState: paused ? "paused" : "running" }}
-						{...stylex.props(styles.countLine, tone.line, styles.duration(duration))}
+						{...stylex.props(styles.countLine, tone.line, styles.running(duration, paused))}
 					/>
 				</svg>
 			)}
 			<span aria-hidden="true" {...stylex.props(styles.dot, tone.dot)} />
 			<BaseToast.Content {...stylex.props(styles.content)}>
+				{tone.word !== "" && <span {...stylex.props(styles.srOnly)}>{tone.word}</span>}
 				<BaseToast.Title {...stylex.props(styles.title)} />
 				{item.description != null && <BaseToast.Description {...stylex.props(styles.description)} />}
 			</BaseToast.Content>

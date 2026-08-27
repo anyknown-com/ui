@@ -73,7 +73,7 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 	const base = useId()
 	const labelId = `${base}label`
 	const descriptionId = `${base}description`
-	const { invalid, id: _fieldId, ...field } = useFieldControl(props)
+	const { invalid: _invalid, id: _fieldId, ...field } = useFieldControl(props)
 	const checked = group.value === value
 	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
 		.filter(Boolean)
@@ -95,7 +95,6 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 					name={group.name}
 					value={value}
 					checked={checked}
-					aria-invalid={invalid || undefined}
 					aria-labelledby={label != null ? labelId : undefined}
 					aria-describedby={describedBy || undefined}
 					disabled={disabled ?? field.disabled ?? group.disabled}

@@ -14,12 +14,12 @@
 ## 行為
 
 - shimmer:linear-gradient 掃過(background-position 動畫,1.6s linear infinite),只動 background,不觸發 layout
-- `prefers-reduced-motion`:改為 opacity 脈動(2.4s ease);若要完全靜態,拿掉 pulse 即可,骨架本身已可辨識
+- `prefers-reduced-motion`:**完全靜態**(骨架本身已可辨識)。草案原本提的 opacity 脈動仍是動畫,與「所有動畫包 reduced-motion」的硬性規則衝突,所以採 NOTES 自己給的第二個選項
 - 骨架顏色用專屬 `bone`/`sheen` token(比 border 淺、比 surface 深),light/dark 各一組
 
 ## a11y
 
-- 骨架區塊本身 `aria-hidden`,外層容器 `role=status` + `aria-label="…載入中"`,只報一次,不逐塊報
+- 骨架區塊本身 `aria-hidden`,外層容器 `role=status` + `aria-label` **並在容器內放一段視覺隱藏的同文字**(`role=status` 不從內容取名,live region 又需要有內容才會播報,兩者缺一不可),只報一次,不逐塊報
 - 內容到達後整組替換,不留殘骸;避免 aria-live 對骨架本身開火
 
 ## 實作建議

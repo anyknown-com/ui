@@ -64,7 +64,15 @@ const styles = stylex.create({
 
 function MemoryIcon() {
 	return (
-		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+		<svg
+			width="18"
+			height="18"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+		>
 			<path d="M11 12a1.5 1.5 0 1 0 1.5-1.5A4 4 0 1 0 16.5 15 6.5 6.5 0 1 1 10 5.6" />
 			<path d="M10 5.6C7.5 5 5.5 5.8 4 7.5" />
 			<path d="M16.5 15c1.8.3 3.3 1.5 4.5 3.5" />
@@ -110,7 +118,9 @@ export function BasicsDemos() {
 						description="「部署走 Cloudflare」會從工作區移除,此動作無法復原。"
 						danger
 						confirmLabel="刪除"
-						onConfirm={() => toast("已刪除「部署走 Cloudflare」", { action: { label: "復原", onClick: () => {} } })}
+						onConfirm={() =>
+							toast("已刪除「部署走 Cloudflare」", { action: { label: "復原", onClick: () => {} } })
+						}
 					/>
 				</Row>
 			</Demo>
@@ -167,7 +177,7 @@ export function BasicsDemos() {
 						<PopoverTrigger>
 							<Button variant="secondary">部署走 Cloudflare</Button>
 						</PopoverTrigger>
-						<PopoverContent side="bottom">
+						<PopoverContent side="bottom" titled>
 							<PopoverTitle>部署走 Cloudflare</PopoverTitle>
 							<PopoverDescription>
 								2026/08/12 由換班交接寫入。之後的 thread 會自動帶上這條。

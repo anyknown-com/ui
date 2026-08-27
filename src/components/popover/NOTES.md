@@ -22,7 +22,7 @@
 
 ## a11y
 
-- trigger `aria-expanded` + `aria-haspopup`;富內容 popover 用 `role="dialog"` + `aria-labelledby`
+- trigger `aria-expanded` + `aria-haspopup`;富內容 popover 用 `role="dialog"` + `aria-labelledby`。**`PopoverContent` 的型別強制二選一**:給 `aria-label`,或標記 `titled` 並在內容裡放 `PopoverTitle` —— 沒有名字的 dialog 過不了 4.1.2
 - 開啟後 focus 移入內容第一個可聚焦元素;關閉回焦 trigger(prototype 只做 Esc 回焦)
 - 與 tooltip 分工:有互動內容就是 popover,純文字提示才用 tooltip
 

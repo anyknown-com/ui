@@ -10,7 +10,7 @@ function MemoryPopover() {
 			<PopoverTrigger>
 				<Button variant="secondary">部署走 Cloudflare</Button>
 			</PopoverTrigger>
-			<PopoverContent side="bottom">
+			<PopoverContent side="bottom" titled>
 				<PopoverTitle>部署走 Cloudflare</PopoverTitle>
 				<PopoverDescription>2026/08/12 由換班交接寫入。</PopoverDescription>
 				<Button variant="ghost">編輯</Button>

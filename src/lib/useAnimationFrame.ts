@@ -2,7 +2,10 @@ import { useEffect, useRef } from "react"
 
 export function useAnimationFrame(active: boolean, onFrame: (elapsedMs: number) => void) {
 	const callback = useRef(onFrame)
-	callback.current = onFrame
+
+	useEffect(() => {
+		callback.current = onFrame
+	})
 
 	useEffect(() => {
 		if (!active) return

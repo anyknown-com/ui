@@ -36,13 +36,13 @@ const styles = stylex.create({
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		borderRadius: radius.sm,
-		cursor: { default: "pointer", ":disabled": "not-allowed" },
-		opacity: { default: 1, ":disabled": 0.4 },
+		cursor: "pointer",
 		transitionProperty: "color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
+	tabDisabled: { opacity: 0.4, cursor: "not-allowed", color: color.textFaint },
 	tabSelectedUnderline: { color: color.accent },
 	tabSelectedPills: { backgroundColor: color.accentSubtle, color: color.accent },
 	indicator: {
@@ -73,27 +73,28 @@ export type TabsProps = {
 	defaultValue?: string
 	onValueChange?: (value: string) => void
 	variant?: "underline" | "pills"
+	className?: string
 	children: ReactNode
 }
 
 export function Tabs({ variant = "underline", children, ...props }: TabsProps) {
 	return (
 		<VariantContext value={variant}>
-			<BaseTabs.Root {...props} {...stylex.props(styles.root)}>
+			<BaseTabs.Root {...props} {...styled(props, styles.root)}>
 				{children}
 			</BaseTabs.Root>
 		</VariantContext>
 	)
 }
 
-export type TabsListProps = { "aria-label": string; children: ReactNode }
+export type TabsListProps = { "aria-label": string; className?: string; children: ReactNode }
 
 export function TabsList({ children, ...rest }: TabsListProps) {
 	const variant = useContext(VariantContext)
 	return (
 		<BaseTabs.List
 			{...rest}
-			{...stylex.props(styles.list, variant === "underline" ? styles.underlineList : styles.pillsList)}
+			{...styled(rest, styles.list, variant === "underline" ? styles.underlineList : styles.pillsList)}
 		>
 			{children}
 			{variant === "underline" && <BaseTabs.Indicator {...stylex.props(styles.indicator)} />}
@@ -111,8 +112,8 @@ export function TabsTab({ children, ...rest }: TabsTabProps) {
 			className={(state) =>
 				stylex.props(
 					styles.tab,
-					state.active &&
-						(variant === "underline" ? styles.tabSelectedUnderline : styles.tabSelectedPills),
+					state.disabled && styles.tabDisabled,
+					state.active && (variant === "underline" ? styles.tabSelectedUnderline : styles.tabSelectedPills),
 				).className ?? ""
 			}
 		>

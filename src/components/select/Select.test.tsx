@@ -12,10 +12,12 @@ function Models({ onValueChange }: { onValueChange?: (v: string) => void }) {
 			value={value}
 			placeholder="選擇模型…"
 			searchPlaceholder="搜尋模型…"
-			onValueChange={((v: string) => {
-				setValue(v)
-				onValueChange?.(v)
-			}) as never}
+			onValueChange={
+				((v: string) => {
+					setValue(v)
+					onValueChange?.(v)
+				}) as never
+			}
 		>
 			<SelectGroup label="Anthropic">
 				<SelectItem value="fable-5" hint="最強">
@@ -38,10 +40,12 @@ function Memories({ onValueChange }: { onValueChange?: (v: string[]) => void }) 
 			multiple
 			value={value}
 			placeholder="選擇要帶進交接的記憶…"
-			onValueChange={((v: string[]) => {
-				setValue(v)
-				onValueChange?.(v)
-			}) as never}
+			onValueChange={
+				((v: string[]) => {
+					setValue(v)
+					onValueChange?.(v)
+				}) as never
+			}
 		>
 			<SelectItem value="pnpm">偏好 pnpm</SelectItem>
 			<SelectItem value="cf">部署走 Cloudflare</SelectItem>

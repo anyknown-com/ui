@@ -12,7 +12,9 @@ function Harness({ onUndo }: { onUndo?: () => void }) {
 			<Button onClick={() => toast.success("換班完成", { description: "3 則記憶已帶進新 thread" })}>
 				success
 			</Button>
-			<Button onClick={() => toast.danger("無法連到 vault", { description: "稍後會自動重試" })}>danger</Button>
+			<Button onClick={() => toast.danger("無法連到 vault", { description: "稍後會自動重試" })}>
+				danger
+			</Button>
 			<Button
 				onClick={() =>
 					toast("已刪除「偏好 pnpm」", { action: { label: "復原", onClick: onUndo ?? (() => {}) } })
@@ -62,5 +64,32 @@ describe("Toast", () => {
 		expect(titles.some((el) => el.closest("[data-type='danger']") != null)).toBe(true)
 		// high-priority toasts are mirrored into a live region for urgent announcement
 		expect(titles.length).toBeGreaterThan(1)
+	})
+})
+
+describe("Toast regressions", () => {
+	test("the countdown line pauses when the viewport is hovered", async () => {
+		render(<Harness />)
+		await userEvent.click(screen.getByRole("button", { name: "default" }))
+		await screen.findByText("交接摘要已複製")
+		const line = document.querySelector("svg path") as SVGPathElement
+		expect(line.getAttribute("style")).toContain("running")
+		await userEvent.hover(document.querySelector("[aria-live]") as HTMLElement)
+		await waitFor(() => expect(line.getAttribute("style")).toContain("paused"))
+	})
+
+	test("toasts past the limit are hidden, not just stacked", async () => {
+		render(<Harness />)
+		const button = screen.getByRole("button", { name: "default" })
+		for (let i = 0; i < 5; i += 1) await userEvent.click(button)
+		const viewport = document.querySelector("[aria-live]") as HTMLElement
+		expect(viewport.querySelectorAll("[data-limited]").length).toBeGreaterThan(0)
+	})
+
+	test("a success toast says so in words, not only in colour", async () => {
+		render(<Harness />)
+		await userEvent.click(screen.getByRole("button", { name: "success" }))
+		const title = await screen.findByText("換班完成")
+		expect(title.closest("div")).toHaveTextContent("成功:")
 	})
 })

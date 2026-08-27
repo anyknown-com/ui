@@ -26,7 +26,6 @@ describe("useControllableState", () => {
 		expect(screen.getByRole("button")).toHaveTextContent("2")
 		expect(onChange).toHaveBeenNthCalledWith(2, 2)
 	})
-
 })
 
 describe("styled", () => {

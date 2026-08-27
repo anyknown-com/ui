@@ -1,6 +1,23 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"plugins": ["react", "typescript", "unicorn", "jsx-a11y"],
-	"categories": { "correctness": "error", "suspicious": "warn" },
-	"ignorePatterns": ["dist", "node_modules", "playground/dist"]
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn"
+	},
+	"ignorePatterns": ["dist", "node_modules", "playground/dist"],
+	"rules": {
+		"react/react-in-jsx-scope": "off",
+		"jsx-a11y/prefer-tag-over-role": "off",
+		"jsx-a11y/no-noninteractive-element-to-interactive-role": "off",
+		"jsx-a11y/no-noninteractive-tabindex": "off"
+	},
+	"overrides": [
+		{
+			"files": ["src/lib/useControllableState.ts"],
+			"rules": {
+				"react/refs": "off"
+			}
+		}
+	]
 }

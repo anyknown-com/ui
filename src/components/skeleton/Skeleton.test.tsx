@@ -17,6 +17,7 @@ describe("Skeleton", () => {
 		)
 		const status = screen.getByRole("status", { name: "thread 載入中" })
 		expect(status.querySelectorAll("[role='status']")).toHaveLength(0)
+		expect(status).toHaveTextContent("thread 載入中")
 	})
 
 	// StyleX dynamic styles land as CSS custom properties on the element.
@@ -29,6 +30,7 @@ describe("Skeleton", () => {
 	test("the thread preset renders one group with the requested number of turns", () => {
 		render(<ThreadSkeleton messages={3} />)
 		const status = screen.getByRole("status", { name: "thread 載入中" })
-		expect(status.children).toHaveLength(3)
+		// first child is the visually-hidden label the live region announces
+		expect(status.children).toHaveLength(4)
 	})
 })

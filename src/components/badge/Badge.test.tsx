@@ -12,7 +12,11 @@ describe("Badge", () => {
 	})
 
 	test("renders a count", () => {
-		render(<Badge variant="accent" count={3}>等你 · </Badge>)
+		render(
+			<Badge variant="accent" count={3}>
+				等你 ·{" "}
+			</Badge>,
+		)
 		expect(screen.getByText("3")).toBeInTheDocument()
 	})
 
