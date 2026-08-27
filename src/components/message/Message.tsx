@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import { Children, type ReactNode, createContext, useContext, useRef } from "react"
+import type { CSSProperties } from "react"
+import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
 import { styled } from "../../lib/styled"
 import { color, radius, space, text } from "../../tokens.stylex"
 
@@ -81,7 +82,12 @@ export function useMessageBody() {
 	return useContext(MessageBodyContext)
 }
 
-export type ThreadProps = { children: ReactNode; className?: string }
+export type ThreadProps = {
+	children: ReactNode
+	className?: string
+	style?: CSSProperties
+	ref?: Ref<HTMLDivElement>
+}
 
 export function Thread({ children, ...rest }: ThreadProps) {
 	return (
@@ -119,7 +125,10 @@ export function AssistantMessage({
 }: AssistantMessageProps) {
 	const body = useRef<HTMLDivElement>(null)
 	const parts = Children.toArray(children)
-	const last = parts.length - 1
+	const lastText = parts.reduce(
+		(found, part, index) => (isValidElement(part) && part.type === TextPart ? index : found),
+		-1,
+	)
 
 	return (
 		<MessageBodyContext value={body}>
@@ -132,7 +141,10 @@ export function AssistantMessage({
 					</span>
 				) : (
 					parts.map((part, index) => (
-						<StreamingContext key={index} value={streaming && index === last}>
+						<StreamingContext
+							key={isValidElement(part) && part.key != null ? part.key : index}
+							value={streaming && index === lastText}
+						>
 							{part}
 						</StreamingContext>
 					))
@@ -147,7 +159,7 @@ export type TextPartProps = { children: ReactNode }
 export function TextPart({ children }: TextPartProps) {
 	const streaming = useContext(StreamingContext)
 	return (
-		<p {...stylex.props(styles.part)}>
+		<p data-ak-message-text="" {...stylex.props(styles.part)}>
 			{children}
 			{streaming && <span aria-hidden="true" {...stylex.props(styles.cursor)} />}
 		</p>

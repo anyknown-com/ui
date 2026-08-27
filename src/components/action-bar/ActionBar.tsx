@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
+import { styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, motion, radius, space, text } from "../../tokens.stylex"
 import { useMessageBody } from "../message/Message"
@@ -100,7 +101,7 @@ export type ActionBarButtonProps = ComponentProps<"button"> & { icon?: ReactNode
 
 function ActionBarButton({ icon, children, ...props }: ActionBarButtonProps) {
 	return (
-		<button type="button" {...props} {...stylex.props(styles.button)}>
+		<button type="button" {...props} {...styled(props, styles.button)}>
 			{icon}
 			{children}
 		</button>
@@ -116,10 +117,18 @@ export type CopyActionProps = {
 function CopyAction({ text: value, label = "複製", copiedLabel = "已複製 ✓" }: CopyActionProps) {
 	const body = useMessageBody()
 	const { copied, copy } = useCopy()
+
+	// The turn also holds a hidden author label, the reasoning fold and this bar
+	// itself, so copy only the text parts.
+	function messageText() {
+		const parts = body?.current?.querySelectorAll("[data-ak-message-text]") ?? []
+		return Array.from(parts, (part) => part.textContent ?? "").join("\n\n")
+	}
+
 	return (
 		<button
 			type="button"
-			onClick={() => copy(value ?? body?.current?.textContent ?? "")}
+			onClick={() => copy(value ?? messageText())}
 			{...stylex.props(styles.button, copied && styles.done)}
 		>
 			{!copied && <CopyIcon />}

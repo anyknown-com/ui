@@ -73,3 +73,23 @@ describe("ActionBar", () => {
 		await waitFor(() => expect(screen.getByRole("button", { name: "複製" })).toHaveFocus())
 	})
 })
+
+describe("ActionBar regressions", () => {
+	test("copy takes only the message's text parts, not the hidden label or the bar", async () => {
+		const spy = vi.fn().mockResolvedValue(undefined)
+		writeText(spy)
+		render(
+			<Thread>
+				<AssistantMessage>
+					<TextPart>第一段</TextPart>
+					<TextPart>第二段</TextPart>
+					<ActionBar>
+						<ActionBar.Copy />
+					</ActionBar>
+				</AssistantMessage>
+			</Thread>,
+		)
+		await userEvent.click(screen.getByRole("button", { name: "複製" }))
+		expect(spy).toHaveBeenCalledWith("第一段\n\n第二段")
+	})
+})

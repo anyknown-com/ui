@@ -301,6 +301,14 @@ export function ToolCard({
 }: ToolCardProps) {
 	const detailId = useId()
 	const [open, setOpen] = useState(defaultOpen ?? (state === "error" || DEFAULT_OPEN_TOOLS.has(tool)))
+	const [wasState, setWasState] = useState(state)
+
+	// A tool usually mounts as `running` and only later fails; NOTES says any
+	// error is expanded, so react to the transition, not just the initial state.
+	if (wasState !== state) {
+		setWasState(state)
+		if (state === "error" && defaultOpen == null) setOpen(true)
+	}
 	const STATE_LABELS = { running: runningLabel, completed: completedLabel, error: errorLabel }
 	const retryText =
 		retry != null ? `重試中(第 ${retry.attempt} 次,${Math.round(retry.delayMs / 1000)} 秒後)…` : ""

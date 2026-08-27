@@ -110,3 +110,12 @@ describe("ToolCard regressions", () => {
 		expect(screen.getByText("secret")).not.toBeVisible()
 	})
 })
+
+describe("ToolCard state transitions", () => {
+	test("a card that starts running and later errors opens itself", () => {
+		const { rerender } = render(<ToolCard tool="read" state="running" subtitle="a.ts" />)
+		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "false")
+		rerender(<ToolCard tool="read" state="error" subtitle="a.ts" />)
+		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true")
+	})
+})

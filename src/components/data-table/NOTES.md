@@ -36,7 +36,7 @@
 
 ## 實作建議
 
-- headless 層用 **TanStack Table**(sorting / filtering / row selection 模型都有,headless 無樣式負擔),StyleX 上皮;虛擬化大字典時配 `@tanstack/react-virtual` —— 但虛擬化會逼走真 `<table>` 語意(i18n 的 `grid.tsx` 就是為此改用 ARIA grid),所以 DataTable 保持真 table,列數大到要虛擬化的場景交給 grid 型元件,不硬塞進同一個 API
+- **實作沒有用 TanStack Table**:API 草案把排序/過濾/選取全部設成 controlled,元件不擁有資料,headless 層就沒有狀態可管了 —— 只會多一個 runtime 依賴換不到東西。排序/過濾由使用端算好再傳 `rows`,元件只負責 `aria-sort`、`indeterminate`、inline edit 與 sticky header。將來若要把排序邏輯收進元件,再引 TanStack 不遲。虛擬化的判斷維持原案:DataTable 保持真 table,列數大到要虛擬化的場景交給 grid 型元件
 - inline edit 的 commit 走 optimistic:先改 UI,失敗 revert + toast(i18n `cell.tsx` 現行模式)
 
 ## a11y

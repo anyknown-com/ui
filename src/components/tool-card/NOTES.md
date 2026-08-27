@@ -24,7 +24,7 @@
 
 - 列與展開內容全走 token:列 `text-meta`、輸入/輸出 `text-code` mono、內距 `--card-pad`(10px 12px)、耗時 `tabular-nums`。
 - 狀態 icon:running = spinner、completed = ✓ success、error = ✗ destructive。
-- 預設收合;例外預設展開:`shell`、`edit`/`write`、任何 error。
+- 預設收合;例外預設展開:`shell`、`edit`/`write`、任何 error —— error 是**在 render 期間看 state 轉換**判斷的,因為工具通常先 running 後失敗,只看初始 state 會讓錯誤留在收合狀態。
 - error:destructive 底的錯誤區 + 「複製錯誤」;卡底 `retry-line` 顯示「重試中(第 2 次,3 秒後)… 重試 2/3」,warning 色 + `role="status"`。
 - subagent 變體(plan 28):標題「委派 + title」;第二行永遠存在 = model chip(mono 小框,未指定不顯示)+ running 時 now line(子 session 此刻的工具,shimmer)/ 其他狀態「N 工具」;completed 收合時多一段摘要 `line-clamp-3`;展開 = 子 thread `nested` 變體(左 2px border + 12px 縮排、task 全文是引文塊不是氣泡、字級全降到 meta/code)。
 - shimmer 與 spinner 包 `prefers-reduced-motion`(shimmer 關閉、spinner **放慢不關閉**)。spinner 是「還在跑」的唯一即時訊號,屬 WCAG 2.3.3 的必要動效,所以照 NOTES 減速而非移除;骨架的 shimmer 是裝飾,那邊就整個關掉。

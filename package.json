@@ -35,7 +35,8 @@
 		"check": "pnpm typecheck && pnpm lint && pnpm fmt --check",
 		"test": "vitest run",
 		"playground": "vite --config playground/vite.config.ts",
-		"prepublishOnly": "pnpm check && pnpm test && pnpm build"
+		"prepublishOnly": "pnpm check && pnpm test && pnpm verify:pack",
+		"verify:pack": "pnpm build && node scripts/verify-pack.mjs"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.7.0",

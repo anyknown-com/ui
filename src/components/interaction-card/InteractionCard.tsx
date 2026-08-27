@@ -431,11 +431,20 @@ export function DecisionCard({
 		return value == null || value.length === 0
 	})
 
-	const recommended = blocks.flatMap((block) =>
-		block.kind === "options"
-			? block.options.filter((option) => option.recommended).map((option) => ({ block, option }))
-			: [],
-	)
+	const recommended: DecisionAnswer = {}
+	for (const block of blocks) {
+		if (block.kind !== "options") continue
+		const picks = block.options.filter((option) => option.recommended).map((option) => option.value)
+		if (picks.length === 0) continue
+		recommended[block.id] = block.multiple ? picks : picks[0]
+	}
+	const hasRecommendation = Object.keys(recommended).length > 0
+	const merged = { ...answer, ...recommended }
+	const recommendationMissing = blocks.some((block) => {
+		if (block.kind === "markdown" || !block.required) return false
+		const value = merged[block.id]
+		return value == null || value.length === 0
+	})
 
 	function set(id: string, value: string | string[]) {
 		setAnswer((current) => ({ ...current, [id]: value }))
@@ -551,14 +560,11 @@ export function DecisionCard({
 						>
 							{submitLabel}
 						</button>
-						{recommended.length > 0 && (
+						{hasRecommendation && (
 							<button
 								type="button"
-								onClick={() =>
-									onAnswer?.(
-										Object.fromEntries(recommended.map(({ block, option }) => [block.id, option.value])),
-									)
-								}
+								disabled={recommendationMissing}
+								onClick={() => onAnswer?.(merged)}
 								{...stylex.props(styles.button)}
 							>
 								{recommendedLabel}

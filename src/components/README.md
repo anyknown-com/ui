@@ -1,8 +1,14 @@
 # Components 規劃
 
-已實作:`Button.tsx`、`Card.tsx`、`Text.tsx`(flat 檔案,實作新元件時一併搬進各自 folder)。
+**狀態:34 個元件全部已實作。** 每個 folder 現在含 `<Name>.tsx`(StyleX 實作)、`<Name>.test.tsx`(vitest + testing-library)、原本的 `prototype.html` 與 `NOTES.md`。`Button` / `Card` / `Text` 已搬進 `button/` `card/` `text/`。`scrollbar` 沒有元件檔,它就是 `src/scrollbar.css`。
 
-規劃中的元件(33 個 folder),每個 folder 含:
+`playground/`(不進發佈產物)import **打包後的 `dist/`** 渲染全部元件,section id 與 `prototypes.html` 一致,可以左右對照:
+
+```bash
+pnpm playground   # http://localhost:5199
+```
+
+每個 folder 原本含:
 
 - `prototype.html` — 用 Ledger token 直接渲染的視覺/行為規格,瀏覽器直接開,行為性元件可實際操作
 - `NOTES.md` — API 草案、行為細節、a11y、參考來源

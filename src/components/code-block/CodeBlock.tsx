@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
+import { styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -157,5 +158,5 @@ export function CodeBlock({
 }
 
 export function InlineCode(props: ComponentProps<"code">) {
-	return <code {...props} {...stylex.props(styles.inline)} />
+	return <code {...props} {...styled(props, styles.inline)} />
 }

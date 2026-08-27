@@ -21,7 +21,7 @@
 
 - 狀態來源 = server `call.*` 事件:mic 收音(Scribe realtime WS partial)→ listening;committed 送 LLM → thinking;TTS stream-input 播放 → speaking
 - barge-in:speaking 期間偵測到用戶語音 → 停播放、flush TTS、轉 listening——指示器只反映狀態,不管音訊
-- 動畫全 CSS(vol/pulse/wave 三組 keyframes,per-bar delay),無 JS timer;實作可選擇以 `level` 驅動真實高度
+- **實作走 rAF 逐幀重算 path**(同 prototype):四態是同一條線的不同函數,thinking 的電話線是 prolate cycloid、listening 的振幅由 `level` 驅動,CSS keyframes 表達不了。草案寫「全 CSS、無 JS timer」是在 prototype 定案前寫的。reduced-motion 下不啟動 rAF,線停在 t=1.2 的靜態姿勢
 
 ## A11y
 

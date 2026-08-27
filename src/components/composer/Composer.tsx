@@ -1,5 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
-import { type KeyboardEvent, type ReactNode, useEffect, useId, useRef, useState } from "react"
+import {
+	type KeyboardEvent,
+	type ReactNode,
+	useEffect,
+	useId,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react"
 import { popupStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -251,7 +259,18 @@ export function Composer({
 	const [items, setItems] = useState<SourceRef[]>([])
 	const [rawActive, setActive] = useState(0)
 	const [picked, setPicked] = useState<SourceRef[]>([])
-	const [dismissed, setDismissed] = useState("")
+	const [dismissed, setDismissed] = useState(false)
+	const pendingCaret = useRef<number | null>(null)
+	const latestSources = useRef(sources)
+	latestSources.current = sources
+
+	// The caret lives in state so the @/-slash mode can be derived from it, but
+	// the DOM caret has to be moved explicitly or the browser parks it at the end.
+	useLayoutEffect(() => {
+		if (pendingCaret.current == null) return
+		textarea.current?.setSelectionRange(pendingCaret.current, pendingCaret.current)
+		pendingCaret.current = null
+	})
 
 	const before = value.slice(0, caret)
 	const atMatch = AT_PATTERN.exec(before)
@@ -260,18 +279,23 @@ export function Composer({
 	const query = atMatch?.[2] ?? slashMatch?.[1] ?? ""
 
 	useEffect(() => {
-		if (mode !== "sources" || !sources) return
+		if (mode !== "sources" || latestSources.current == null) return
 		let cancelled = false
-		sources(query).then((result) => {
-			if (!cancelled) {
-				setItems(result)
-				setActive(0)
-			}
-		})
+		latestSources
+			.current(query)
+			.then((result) => {
+				if (!cancelled) {
+					setItems(result)
+					setActive(0)
+				}
+			})
+			.catch(() => {
+				if (!cancelled) setItems([])
+			})
 		return () => {
 			cancelled = true
 		}
-	}, [mode, query, sources])
+	}, [mode, query])
 
 	const options: SourceRef[] =
 		mode === "commands"
@@ -282,32 +306,44 @@ export function Composer({
 				? items
 				: []
 
-	const token = `${mode ?? ""}:${query}`
-	const open = mode != null && options.length > 0 && dismissed !== token
+	const open = mode != null && options.length > 0 && !dismissed
 	const active = options.length === 0 ? 0 : Math.min(rawActive, options.length - 1)
 	const canSend = value.trim().length > 0
 
+	function moveCaret(next: string, position: number) {
+		setValue(next)
+		setCaret(position)
+		pendingCaret.current = position
+	}
+
 	function complete(option: SourceRef) {
 		const tail = value.slice(caret)
+		// Function replacers: a label containing $&, $1 … must go in literally.
 		const head =
 			mode === "commands"
-				? before.replace(SLASH_PATTERN, `/${option.label} `)
+				? before.replace(SLASH_PATTERN, () => `/${option.label} `)
 				: before.replace(AT_PATTERN, (_, lead: string) => `${lead}@${option.label} `)
-		setValue(head + tail)
-		setCaret(head.length)
+		moveCaret(head + tail, head.length)
 		if (mode === "sources") setPicked((refs) => [...refs, option])
 		textarea.current?.focus()
 	}
 
 	function submit() {
 		if (!canSend) return
-		onSubmit(value, picked)
+		// A ref the user deleted again is not a ref any more.
+		onSubmit(
+			value,
+			picked.filter((ref) => value.includes(`@${ref.label}`)),
+		)
 		setValue("")
 		setPicked([])
 		setCaret(0)
+		setDismissed(false)
 	}
 
 	function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+		// Enter while an IME candidate is open commits the candidate, not the message.
+		if (event.nativeEvent.isComposing) return
 		if (open && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
 			event.preventDefault()
 			setActive((index) => (index + (event.key === "ArrowDown" ? 1 : options.length - 1)) % options.length)
@@ -325,7 +361,7 @@ export function Composer({
 		}
 		if (event.key === "Escape" && open) {
 			event.preventDefault()
-			setDismissed(token)
+			setDismissed(true)
 		}
 	}
 
@@ -333,8 +369,8 @@ export function Composer({
 		const position = textarea.current?.selectionStart ?? value.length
 		const lead = position > 0 && !/\s$/.test(value.slice(0, position)) ? " " : ""
 		const next = `${value.slice(0, position)}${lead}${marker}${value.slice(position)}`
-		setValue(next)
-		setCaret(position + lead.length + marker.length)
+		setDismissed(false)
+		moveCaret(next, position + lead.length + marker.length)
 		textarea.current?.focus()
 	}
 
@@ -383,6 +419,7 @@ export function Composer({
 				onChange={(event) => {
 					setValue(event.currentTarget.value)
 					setCaret(event.currentTarget.selectionStart ?? event.currentTarget.value.length)
+					setDismissed(false)
 				}}
 				onKeyUp={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}
 				onClick={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}

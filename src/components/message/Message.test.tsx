@@ -66,3 +66,31 @@ describe("Message", () => {
 		expect(container.querySelector("p [aria-hidden='true']")).toBeNull()
 	})
 })
+
+describe("Message regressions", () => {
+	test("the cursor lands on the last text part even with a trailing action bar", () => {
+		render(
+			<Thread>
+				<AssistantMessage streaming>
+					<TextPart>正文</TextPart>
+					<div data-testid="bar">動作列</div>
+				</AssistantMessage>
+			</Thread>,
+		)
+		expect(screen.getByText("正文").querySelector("[aria-hidden='true']")).not.toBeNull()
+	})
+
+	test("a caller's ref reaches the thread element", () => {
+		let node: HTMLDivElement | null = null
+		render(
+			<Thread
+				ref={(element) => {
+					node = element
+				}}
+			>
+				<UserMessage>問題</UserMessage>
+			</Thread>,
+		)
+		expect(node).not.toBeNull()
+	})
+})

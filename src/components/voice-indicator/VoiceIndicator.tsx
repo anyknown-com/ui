@@ -73,7 +73,7 @@ export function VoiceIndicator({ state, level = 0.4, statusLabel }: VoiceIndicat
 			</span>
 			{state !== "idle" && (
 				<span aria-hidden="true" {...stylex.props(styles.motionLabel)}>
-					{copy.strong}
+					{statusLabel ?? copy.strong}
 				</span>
 			)}
 		</div>

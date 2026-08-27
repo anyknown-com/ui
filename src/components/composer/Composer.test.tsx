@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { Composer, type SourceRef } from "./Composer"
@@ -139,6 +139,68 @@ describe("Composer", () => {
 		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "@")
 		await screen.findByRole("listbox")
 		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+	})
+})
+
+describe("Composer regressions", () => {
+	test("inserting @ mid-text leaves the DOM caret where the state caret is", async () => {
+		render(<Composer onSubmit={() => {}} sources={sources} />)
+		const box = screen.getByRole("combobox", { name: "訊息" }) as HTMLTextAreaElement
+		await userEvent.type(box, "前段後段")
+		box.setSelectionRange(2, 2)
+		await userEvent.click(screen.getByRole("button", { name: "加入來源(@)" }))
+		await waitFor(() => expect(box.selectionStart).toBe(box.value.indexOf("@") + 1))
+	})
+
+	test("a label containing $& is inserted literally", async () => {
+		render(<Composer onSubmit={() => {}} commands={[{ id: "c", label: "a$&b" }]} />)
+		const box = screen.getByRole("combobox", { name: "訊息" })
+		await userEvent.type(box, "/a")
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{Enter}")
+		expect(box).toHaveValue("/a$&b ")
+	})
+
+	test("Enter during IME composition does not submit", async () => {
+		const onSubmit = vi.fn()
+		render(<Composer onSubmit={onSubmit} />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		await userEvent.type(box, "ㄋㄧ")
+		fireEvent.keyDown(box, { key: "Enter", isComposing: true })
+		expect(onSubmit).not.toHaveBeenCalled()
+		fireEvent.keyDown(box, { key: "Enter" })
+		expect(onSubmit).toHaveBeenCalledTimes(1)
+	})
+
+	test("a source the user deleted again is not reported as a ref", async () => {
+		const onSubmit = vi.fn()
+		render(<Composer onSubmit={onSubmit} sources={sources} />)
+		const box = screen.getByRole("combobox", { name: "訊息" })
+		await userEvent.type(box, "@config")
+		await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(1))
+		await userEvent.keyboard("{Enter}")
+		await userEvent.clear(box)
+		await userEvent.type(box, "無關{Enter}")
+		expect(onSubmit).toHaveBeenCalledWith("無關", [])
+	})
+
+	test("Escape dismisses once; typing more re-opens the popup", async () => {
+		render(<Composer onSubmit={() => {}} commands={[{ id: "c1", label: "handoff" }]} />)
+		const box = screen.getByRole("combobox", { name: "訊息" })
+		await userEvent.type(box, "/ha")
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+		await userEvent.type(box, "n")
+		expect(await screen.findByRole("listbox")).toBeInTheDocument()
+		await userEvent.keyboard("{Backspace}")
+		expect(await screen.findByRole("listbox")).toBeInTheDocument()
+	})
+
+	test("a rejecting sources function does not leave a stale list", async () => {
+		render(<Composer onSubmit={() => {}} sources={async () => Promise.reject(new Error("offline"))} />)
+		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "@x")
 		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
 	})
 })

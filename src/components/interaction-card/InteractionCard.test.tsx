@@ -157,3 +157,46 @@ describe("DecisionCard regressions", () => {
 		expect(screen.getByRole("group", { name: "先出哪一版?" })).toHaveAttribute("aria-required", "true")
 	})
 })
+
+describe("DecisionCard 照建議", () => {
+	test("merges the recommendation into what the user already typed", async () => {
+		const onAnswer = vi.fn()
+		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} onAnswer={onAnswer} />)
+		await userEvent.type(screen.getByRole("textbox", { name: "補充" }), "先看轉換")
+		await userEvent.click(screen.getByRole("button", { name: "照建議" }))
+		expect(onAnswer).toHaveBeenCalledWith({ variant: "three", note: "先看轉換" })
+	})
+
+	test("keeps the array shape for a multi-select block", async () => {
+		const onAnswer = vi.fn()
+		render(
+			<DecisionCard
+				title="帶哪些記憶?"
+				blocks={[
+					{
+						kind: "options",
+						id: "memories",
+						multiple: true,
+						options: [
+							{ value: "pnpm", label: "偏好 pnpm", recommended: true },
+							{ value: "cf", label: "部署走 Cloudflare", recommended: true },
+						],
+					},
+				]}
+				onAnswer={onAnswer}
+			/>,
+		)
+		await userEvent.click(screen.getByRole("button", { name: "照建議" }))
+		expect(onAnswer).toHaveBeenCalledWith({ memories: ["pnpm", "cf"] })
+	})
+
+	test("stays disabled while a required block the recommendation does not cover is empty", () => {
+		render(
+			<DecisionCard
+				title="先出哪一版?"
+				blocks={[...BLOCKS, { kind: "text", id: "why", label: "理由", required: true }]}
+			/>,
+		)
+		expect(screen.getByRole("button", { name: "照建議" })).toBeDisabled()
+	})
+})
