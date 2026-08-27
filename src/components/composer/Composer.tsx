@@ -262,7 +262,13 @@ export function Composer({
 	const [dismissed, setDismissed] = useState(false)
 	const pendingCaret = useRef<number | null>(null)
 	const latestSources = useRef(sources)
-	latestSources.current = sources
+
+	// Held in a ref so an inline `sources` prop doesn't refetch on every parent
+	// render; assigned in an effect that is declared before the fetch below, so
+	// it is already current when that one runs.
+	useEffect(() => {
+		latestSources.current = sources
+	})
 
 	// The caret lives in state so the @/-slash mode can be derived from it, but
 	// the DOM caret has to be moved explicitly or the browser parks it at the end.
