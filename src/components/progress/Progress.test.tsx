@@ -84,7 +84,9 @@ describe("ProgressRing", () => {
 	})
 
 	test("the fill arc is offset by the remaining percentage", () => {
-		const { container } = render(<ProgressRing value={42} valueText="128k context 已用 42%" aria-label="context 用量" />)
+		const { container } = render(
+			<ProgressRing value={42} valueText="128k context 已用 42%" aria-label="context 用量" />,
+		)
 		const circles = container.querySelectorAll("circle")
 		expect(circles[1]).toHaveAttribute("stroke-dashoffset", "58")
 	})

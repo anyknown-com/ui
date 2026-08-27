@@ -1,6 +1,6 @@
 import { Toast as BaseToast } from "@base-ui/react/toast"
 import * as stylex from "@stylexjs/stylex"
-import { createContext, useContext, useRef, useState } from "react"
+import { createContext, useContext, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { UNWEAVE_PATH } from "../../lib/paths"
 import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
@@ -192,16 +192,14 @@ export function Toaster({
 	limit = 3,
 	manager,
 }: ToasterProps) {
-	const own = useRef(manager ?? toastManager)
-	const api = useRef<ReturnType<typeof makeApi>>(undefined)
-	api.current ??= makeApi(() => own.current)
-
+	const [own] = useState(() => manager ?? toastManager)
+	const [api] = useState(() => makeApi(() => own))
 	const [paused, setPaused] = useState(false)
 	const fromBottom = position.startsWith("bottom")
 
 	return (
-		<ToastApiContext value={api.current}>
-			<BaseToast.Provider toastManager={own.current} timeout={timeout} limit={limit}>
+		<ToastApiContext value={api}>
+			<BaseToast.Provider toastManager={own} timeout={timeout} limit={limit}>
 				<BaseToast.Portal>
 					<BaseToast.Viewport
 						onMouseEnter={() => setPaused(true)}

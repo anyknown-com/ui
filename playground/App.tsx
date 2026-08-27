@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import { Toaster } from "@anyknown/ui"
 import { BasicsDemos } from "./demos/basics"
+import { DesktopDemos } from "./demos/desktop"
 import { FormsDemos } from "./demos/forms"
 
 const GROUPS: Record<string, string[]> = {
@@ -18,6 +19,17 @@ const GROUPS: Record<string, string[]> = {
 		"progress",
 		"empty-state",
 		"scrollbar",
+	],
+	"Desktop AI": [
+		"message",
+		"tool-card",
+		"reasoning-fold",
+		"action-bar",
+		"code-block",
+		"interaction-card",
+		"handoff-receipt",
+		"composer",
+		"voice-indicator",
 	],
 }
 
@@ -76,6 +88,7 @@ export function App() {
 			<main {...stylex.props(styles.main)}>
 				<FormsDemos />
 				<BasicsDemos />
+				<DesktopDemos />
 			</main>
 			<Toaster />
 		</div>
