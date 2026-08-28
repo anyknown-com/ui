@@ -137,6 +137,7 @@ y(x) = yarn.y
 | 張力 tension | target = pressed && pointer在內 ? 1 : 0 | 0.07 | 0.16 | 緩成形緩回彈 |
 | release 過衝 | tenV −= 0.035 | — | — | 只在有效觸發時 |
 | 指尖柔化 gx/gy | lerp | 0.25 | — | |
+| 窩拖動 pressX/Y | 按住時 lerp 追 gx/gy | 0.18 | — | 比游標慢半拍=壓著布拖的阻尼感 |
 | 光澤帶 bx | lerp | 0.16 | — | 延遲=撫摸感 |
 | 光澤帶 opacity | lerp | 0.15 | — | |
 

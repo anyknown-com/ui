@@ -296,6 +296,14 @@ class SilkBody {
 			this.gy += (p.y - this.gy) * 0.25
 			p.speed *= 0.92
 		}
+		// 按住拖動:窩跟著游標走,比游標再慢半拍 — 壓著布拖的阻尼感
+		let pressDrift = false
+		if (this.pressed && p != null) {
+			const dx = this.gx - this.pressX, dyP = this.gy - this.pressY
+			this.pressX += dx * 0.18
+			this.pressY += dyP * 0.18
+			pressDrift = Math.abs(dx) + Math.abs(dyP) > 0.05
+		}
 		// 帶動:只有指尖掃過的紗(y 距離高斯)被垂直速度帶動,彈簧回正
 		let moving = false
 		const vy = p != null && !this.pressed ? Math.max(-1.8, Math.min(1.8, (p.vy ?? 0) * 0.28)) : 0
@@ -310,7 +318,7 @@ class SilkBody {
 		// 按住時拖出按鈕 → 窩先鬆開(對齊原生 :active 的行為),拖回來再回窩
 		this.tenV += ((this.pressed && p != null ? 1 : 0) - this.tension) * 0.07 - this.tenV * 0.16
 		this.tension += this.tenV
-		const tensionActive = Math.abs(this.tension) > 1e-3 || Math.abs(this.tenV) > 1e-3
+		const tensionActive = Math.abs(this.tension) > 1e-3 || Math.abs(this.tenV) > 1e-3 || pressDrift
 		if (moving || tensionActive) {
 			for (const yarn of this.live) yarn.node.setAttribute("d", this.liveD(yarn))
 			for (const s of this.sheen) s.node.setAttribute("d", this.liveD(s.src))
