@@ -15,41 +15,41 @@ h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;te
 p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 .row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
 
-/* 織體按鈕:沒有 background — 按鈕的「實心」是幾十條線堆疊出來的。
-   陰影線墊底、本體線交疊、亮線挑面,邊角留線頭。線層純裝飾,語意仍是 <button>。 */
+/* 織體按鈕:沒有 background — 底層粗暗紗保證無洞,面上細紗跟著共享波場
+   起伏、交疊成緻密的布面。線層純裝飾,語意仍是 <button>。 */
 .fiber{position:relative;display:inline-flex;align-items:center;justify-content:center;
   min-height:2.4rem;padding:.45rem 1.1rem;border-radius:.5rem;border:none;background:none;
   font:500 .875rem/1.25 "Geist",system-ui,sans-serif;cursor:pointer}
 .fiber:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-.fiber svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.fiber svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
 .fiber path{fill:none;stroke-linecap:round}
 .fiber .lbl{position:relative}
 
-/* 每個 variant 一組紗線色:sh 陰影紗、0–4 本體紗(深→淺)、hi 挑面亮紗 */
+/* 每個 variant 一組紗線色:un 底紗、sh 縫隙陰影、0–4 本體(深→淺)、hi 挑面亮紗 */
 .fiber.primary{color:var(--accent-text);
-  --y-sh:#123C31;--y0:#1B5A49;--y1:#20684F;--y2:#23705A;--y3:#2A7E64;--y4:#37906F;--y-hi:#67B392;
+  --y-un:#194F40;--y-sh:#123C31;--y0:#1E6250;--y1:#216A55;--y2:#23705A;--y3:#28795F;--y4:#2E8266;--y-hi:#5CAA89;
   filter:drop-shadow(0 1px 1.5px rgba(18,60,49,.30))}
 @media(prefers-color-scheme:dark){.fiber.primary{
-  --y-sh:#0E241D;--y0:#2E6B56;--y1:#3B8069;--y2:#4FA184;--y3:#58AB8D;--y4:#66B698;--y-hi:#8FD2B4;
+  --y-un:#316B57;--y-sh:#1B4437;--y0:#3F8A70;--y1:#47957A;--y2:#4FA184;--y3:#56A98B;--y4:#5EB193;--y-hi:#8FD2B4;
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}}
 .fiber.secondary{color:var(--text);
-  --y-sh:#C9C4B4;--y0:#DFDBCD;--y1:#E7E3D6;--y2:#EDEAE0;--y3:#F3F0E8;--y4:#F8F6F0;--y-hi:#FFFFFF;
+  --y-un:#DBD7C8;--y-sh:#C9C4B4;--y0:#E4E0D3;--y1:#E8E5D9;--y2:#EDEAE0;--y3:#F1EEE6;--y4:#F5F3EC;--y-hi:#FFFFFF;
   filter:drop-shadow(0 1px 1.5px rgba(80,74,60,.22))}
 @media(prefers-color-scheme:dark){.fiber.secondary{
-  --y-sh:#12100D;--y0:#242019;--y1:#2B261F;--y2:#322D25;--y3:#3A342B;--y4:#443D33;--y-hi:#5E5546;
+  --y-un:#221E18;--y-sh:#15120E;--y0:#2B2620;--y1:#2F2A23;--y2:#332E26;--y3:#38322A;--y4:#3D372E;--y-hi:#5E5546;
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}}
 .fiber.ghost{color:var(--text);
-  --y-sh:transparent;--y0:#D9D5C7;--y1:#DFDBCD;--y2:#E3E0D5;--y3:#E9E6DA;--y4:#EFECE1;--y-hi:#C8C3B4}
+  --y-un:transparent;--y-sh:transparent;--y0:#DCD8CA;--y1:#DFDBCE;--y2:#E3E0D5;--y3:#E7E4D9;--y4:#EBE8DE;--y-hi:#C8C3B4}
 @media(prefers-color-scheme:dark){.fiber.ghost{
-  --y-sh:transparent;--y0:#28241E;--y1:#2D2822;--y2:#35302A;--y3:#3B352E;--y4:#423B33;--y-hi:#57503F}}
+  --y-un:transparent;--y-sh:transparent;--y0:#2A251F;--y1:#2F2A23;--y2:#35302A;--y3:#39342D;--y4:#3E3830;--y-hi:#57503F}}
 
 @media(prefers-reduced-motion:reduce){.fiber{transition:none}}
 </style>
 
 <h1>Button — 織成的實心</h1>
-<p class="hint">沒有 background。按鈕的實心是<b>線自己堆出來的</b>:每條紗的波形、粗細、深淺、
-走向都不一樣(長波 + 短顫 + 漂移,不是等距正弦),陰影紗墊在底下、亮紗挑在面上,
-交疊出布的厚度;左右各留一兩根鬆脫的線頭。hover 時一團光沿著紗線游走,摸得快就亮。</p>
+<p class="hint">沒有 background,按鈕是線織出來的。底層粗暗紗鋪滿(保證不透底),
+面上的細紗(0.5–1.5px)跟著一片<b>共享的波場</b>起伏 — 相鄰紗一起走,像布的垂墜,
+每條再帶自己的小顫和深淺差。細、密、完全覆蓋,但沒有一條線是直的。</p>
 
 <section>
   <h2>hover — 三個 variant</h2>
@@ -58,8 +58,7 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
     <button class="fiber secondary" data-press="dent"><span class="lbl">取消</span></button>
     <button class="fiber ghost" data-press="dent"><span class="lbl">稍後再說</span></button>
   </div>
-  <p class="hint">ghost 織得最疏(看得見底),secondary 是淺色布,primary 是染透的 accent 紗。
-  每次重新整理,布都重織一次 — 每顆按鈕的紗路都是獨一無二的。</p>
+  <p class="hint">hover 一團柔光沿紗線游走;每次重新整理布都重織,紗路獨一無二。</p>
 </section>
 
 <section>
@@ -77,47 +76,23 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
     <button class="fiber primary" data-press="bloom"><span class="lbl">送出</span></button>
     <button class="fiber secondary" data-press="bloom"><span class="lbl">複製連結</span></button>
   </div>
-  <p class="hint">放開時一圈細光沿著紗線暈開(SVG <code>&lt;animate&gt;</code>),照亮織理、不改變它。</p>
+  <p class="hint">放開時一圈細光沿著紗線暈開(SVG <code>&lt;animate&gt;</code>)。</p>
 </section>
 
 <script>
-// 布是「堆」出來的:陰影紗 → 本體紗(y 越深挑越暗的紗)→ 挑面亮紗,
-// 全部 clip 進圓角矩形;另外兩根線頭故意留在 clip 外。
-// 生命力來自每條紗自己的參數:兩個不可通約的波長 + 慢漂移 + 錨點抖動。
+// 覆蓋靠兩件事保證:底層粗紗鋪滿 + 面紗用共享波場(相鄰紗同進退,
+// divergence 不會超過線寬,不露縫)。生命力靠:波場本身是兩個不可通約
+// 頻率的干涉、隨 y 緩慢換相,每條紗再疊自己的小顫、粗細與深淺個體差。
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches
 const NS = "http://www.w3.org/2000/svg"
 let uid = 0
 const rand = (a, b) => a + Math.random() * (b - a)
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 function el(name, attrs, parent) {
 	const node = document.createElementNS(NS, name)
 	for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
 	parent?.append(node)
 	return node
-}
-
-// 一條紗:長波(鬆)+ 短顫(纖維感)+ 整條的慢漂移,兩端不齊
-function yarnPath(w, y0) {
-	const a1 = rand(0.8, 2.2), w1 = rand(46, 130), p1 = rand(0, 6.28)
-	const a2 = rand(0.25, 0.8), w2 = rand(9, 23), p2 = rand(0, 6.28)
-	const drift = rand(-1.6, 1.6)
-	const x0 = rand(-6, -1), x1 = w + rand(1, 6)
-	let d = ""
-	for (let x = x0; x <= x1; x += 3.5) {
-		const t = (x - x0) / (x1 - x0)
-		const y = y0 + drift * (t - 0.5) * 2 +
-			a1 * Math.sin((x / w1) * 6.283 + p1) +
-			a2 * Math.sin((x / w2) * 6.283 + p2)
-		d += `${d ? "L" : "M"}${x.toFixed(1)},${y.toFixed(2)}`
-	}
-	return d
-}
-
-// 線頭:從邊緣鬆脫出來的一小段捲曲
-function threadEnd(x, y, dir) {
-	const c = dir * rand(3, 5)
-	return `M${x},${y} q${dir * 3},${rand(-1, 1)} ${dir * 5},${rand(-2.5, 0.5)} q${c},${rand(-3, -1)} ${dir * 2.5},${rand(-4.5, -2.5)}`
 }
 
 class WovenBody {
@@ -150,10 +125,33 @@ class WovenBody {
 		btn.addEventListener("keyup", () => this.release())
 	}
 
+	// 共享波場:整塊布一起呼吸的起伏。兩個頻率干涉,相位隨 y 緩慢滑移
+	//(所以起伏斜斜地掃過布面,不是每一行都一樣)。
+	makeField() {
+		const A1 = rand(0.8, 1.3), W1 = rand(64, 118), P1 = rand(0, 6.28), K1 = rand(0.06, 0.14)
+		const A2 = rand(0.35, 0.6), W2 = rand(24, 42), P2 = rand(0, 6.28), K2 = rand(0.16, 0.3)
+		return (x, y) =>
+			A1 * Math.sin((x / W1) * 6.283 + P1 + y * K1) +
+			A2 * Math.sin((x / W2) * 6.283 + P2 + y * K2)
+	}
+
+	// 一條紗 = 波場 + 自己的小顫(短波長、小振幅);全部收在按鈕範圍內
+	yarn(y0, own) {
+		const a = rand(0.1, own), wl = rand(6.5, 15), ph = rand(0, 6.28)
+		const x0 = 0, x1 = this.w
+		let d = ""
+		for (let x = x0; x <= x1; x += 2.5) {
+			const y = y0 + this.field(x, y0) + a * Math.sin((x / wl) * 6.283 + ph)
+			d += `${d ? "L" : "M"}${x.toFixed(1)},${y.toFixed(2)}`
+		}
+		return d
+	}
+
 	build() {
 		const w = this.btn.clientWidth, h = this.btn.clientHeight
 		if (w === 0 || (this.built && w === this.w && h === this.h)) return
 		this.w = w; this.h = h; this.built = true
+		this.field = this.makeField()
 		this.svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
 		this.svg.replaceChildren()
 		const defs = el("defs", {}, this.svg)
@@ -181,43 +179,44 @@ class WovenBody {
 		const ghost = this.btn.classList.contains("ghost")
 		const clip = { "clip-path": `url(#${this.id}-clip)` }
 		const body = el("g", clip, this.svg)
-		const yarns = []   // {d, width} 給光澤/壓痕層重繪用
+		const yarns = []
 
-		// 1. 陰影紗:粗、暗、往下沉半格 — 紗與紗之間的縫是暗的,布才有厚度
+		// 1. 底紗:粗、暗、密 — 先把布鋪滿,任何縫隙透出來的都是紗影不是底色
 		if (!ghost) {
-			const shade = el("g", { stroke: "var(--y-sh)", opacity: ".55" }, body)
-			for (let y = 2; y < h + 2; y += rand(2.2, 3.4))
-				el("path", { d: yarnPath(w, y + 0.9), "stroke-width": rand(2.2, 3.2).toFixed(1) }, shade)
+			const under = el("g", { stroke: "var(--y-un)" }, body)
+			for (let y = 0; y < h + 2; y += 1.8)
+				el("path", { d: this.yarn(y, 0.25), "stroke-width": "2.6" }, under)
 		}
-		// 2. 本體紗:密到互相交疊成實心;y 越往下挑越暗的紗(光從上面來)
-		const rows = ghost ? 2.9 : 2.0
-		for (let y = 1; y < h + 1.5; y += rand(rows, rows + 1.1)) {
+		// 2. 縫隙陰影:細暗紗夾在面紗之間,織紋的凹處
+		if (!ghost) {
+			const seams = el("g", { stroke: "var(--y-sh)", opacity: ".5" }, body)
+			for (let y = 1.6; y < h + 1; y += 2.4)
+				el("path", { d: this.yarn(y, 0.3), "stroke-width": rand(0.5, 0.8).toFixed(2) }, seams)
+		}
+		// 3. 面紗:細(0.6–1.4px)、密(≈1.2px 行距),跟著波場走;
+		//    深度 + 個體差挑色,上淺下深的光感
+		const pitch = ghost ? 2.1 : 1.2
+		for (let y = 0.6; y < h + 1; y += pitch + rand(-0.15, 0.15)) {
 			const depth = y / h
-			const bucket = Math.min(4, Math.max(0, Math.round(4.4 - depth * 3.2 + rand(-1.4, 1.4))))
-			const d = yarnPath(w, y)
-			const width = rand(1.5, ghost ? 2.0 : 2.7)
+			const bucket = Math.min(4, Math.max(0, Math.round(4.2 - depth * 3 + rand(-0.9, 0.9))))
+			const d = this.yarn(y, 0.4)
+			const width = rand(0.6, ghost ? 1.0 : 1.4)
 			yarns.push({ d, width })
-			el("path", { d, "stroke-width": width.toFixed(1), stroke: `var(--y${bucket})`,
-				opacity: ghost ? ".8" : rand(0.86, 1).toFixed(2) }, body)
+			el("path", { d, "stroke-width": width.toFixed(2), stroke: `var(--y${bucket})` }, body)
 		}
-		// 3. 挑面亮紗:幾根細的浮在面上,布的高光
-		const hiG = el("g", { stroke: "var(--y-hi)", opacity: ".5" }, body)
-		for (let i = 0; i < (ghost ? 2 : 4); i++)
-			el("path", { d: yarnPath(w, rand(3, h * 0.55)), "stroke-width": rand(0.7, 1.1).toFixed(1) }, hiG)
+		// 4. 挑面亮紗:極細,布的高光絲
+		const hiG = el("g", { stroke: "var(--y-hi)", opacity: ".45" }, body)
+		for (let i = 0; i < (ghost ? 2 : 5); i++)
+			el("path", { d: this.yarn(rand(2, h * 0.6), 0.3), "stroke-width": rand(0.4, 0.7).toFixed(2) }, hiG)
 
-		// 4. 線頭:clip 外面,左右各留一點鬆脫的纖維
-		const stray = el("g", { stroke: "var(--y2)", "stroke-width": "1.2", opacity: ".9" }, this.svg)
-		el("path", { d: threadEnd(w - 1, rand(6, h - 6), 1) }, stray)
-		el("path", { d: threadEnd(1, rand(6, h - 6), -1) }, stray)
-
-		// 光澤/壓痕/光環:抽本體紗的一部分重繪,mask 顯形
-		const sample = yarns.filter((_, i) => i % 2 === 0)
+		// 光澤/壓痕/光環:抽 1/3 面紗重繪,mask 顯形
+		const sample = yarns.filter((_, i) => i % 3 === 0)
 		this.dentG = el("g", { ...clip, stroke: "var(--y-sh)", mask: `url(#${this.id}-dentm)`, opacity: 0 }, this.svg)
-		for (const yarn of sample) el("path", { d: yarn.d, "stroke-width": yarn.width }, this.dentG)
+		for (const yn of sample) el("path", { d: yn.d, "stroke-width": yn.width + 0.3 }, this.dentG)
 		this.sheenG = el("g", { ...clip, stroke: "var(--y-hi)", mask: `url(#${this.id}-glow)`, opacity: 0 }, this.svg)
-		for (const yarn of sample) el("path", { d: yarn.d, "stroke-width": yarn.width * 0.75, "stroke-opacity": ".55" }, this.sheenG)
+		for (const yn of sample) el("path", { d: yn.d, "stroke-width": yn.width * 0.8, "stroke-opacity": ".55" }, this.sheenG)
 		this.ringG = el("g", { ...clip, stroke: "var(--y-hi)", mask: `url(#${this.id}-ringm)`, opacity: 0 }, this.svg)
-		for (const yarn of sample) el("path", { d: yarn.d, "stroke-width": yarn.width * 0.7, "stroke-opacity": ".65" }, this.ringG)
+		for (const yn of sample) el("path", { d: yn.d, "stroke-width": yn.width * 0.7, "stroke-opacity": ".65" }, this.ringG)
 	}
 
 	track(e, enter) {
@@ -272,7 +271,7 @@ class WovenBody {
 		this.raf = active ? requestAnimationFrame((n) => this.tick(n)) : 0
 	}
 
-	wake() { if (!this.raf && !REDUCED) this.raf = requestAnimationFrame((n) => this.tick(n)) }
+	wake() { if (!this.raf && !REDUCED && this.built) this.raf = requestAnimationFrame((n) => this.tick(n)) }
 }
 
 for (const btn of document.querySelectorAll(".fiber")) new WovenBody(btn)
