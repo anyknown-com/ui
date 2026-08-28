@@ -13,6 +13,9 @@ pnpm playground   # http://localhost:5199
 - `prototype.html` — 用 Ledger token 直接渲染的視覺/行為規格,瀏覽器直接開,行為性元件可實際操作
 - `NOTES.md` — API 草案、行為細節、a11y、參考來源
 
+織物設計語言(線織成的實心、觸點驅動動態)的完整規格與適配指引見
+[TEXTURE-GUIDE.md](./TEXTURE-GUIDE.md) — 適配其他元件前必讀,參數照抄不要重 tune。
+
 分批清單與依據見 [ROADMAP.md](./ROADMAP.md):
 
 - 表單:`input` `textarea` `label` `checkbox` `radio` `switch` `select` `dropdown`
