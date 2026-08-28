@@ -11,6 +11,7 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 - `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx` + `prototype.html` + `NOTES.md`)。清單與共同決策見 [components/README.md](./src/components/README.md)。
 - `src/lib/` — 共用 hooks 與生成邏輯(reduced-motion、controllable state、clipboard、weave/yarn/loom 的 SVG path 生成、diff)。
 - `playground/` — demo app,**不進發佈產物**。
+- `site/` — 文檔網站(全部示範 + 每個元件的 NOTES + 指南),部署到 Cloudflare Workers,**不進發佈產物**。
 
 ## 開發
 
@@ -20,6 +21,9 @@ pnpm check        # typecheck + lint + fmt --check
 pnpm build        # dist:ESM + d.ts + tokens.css + scrollbar.css
 pnpm verify:pack  # build 後打包,從套件外部解析 exports map 每個入口
 pnpm playground   # http://localhost:5199,用打包後的 dist 渲染全部元件
+pnpm site         # http://localhost:5200,文檔網站(示範 + NOTES 文檔)
+pnpm site:test    # 文檔網站的 jsdom 冒煙測試
+pnpm site:deploy  # build 後 wrangler deploy 到 Cloudflare Workers(需先 wrangler login)
 ```
 
 playground 的 section id 與 `prototypes.html` 一致,可以並排對照實作與原型。

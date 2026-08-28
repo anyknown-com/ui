@@ -1,5 +1,7 @@
 node_modules
 dist
 playground/dist
+site/dist
+.wrangler
 .DS_Store
 *.tsbuildinfo
