@@ -1,4 +1,5 @@
 import { Toaster } from "@anyknown/ui"
+import { dark, light } from "@anyknown/ui/themes.stylex"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { marked } from "marked"
@@ -83,19 +84,103 @@ function useRoute(): Route {
 	return route
 }
 
+type ThemeMode = "system" | "light" | "dark"
+const THEME_KEY = "ak-site-theme"
+const THEMES = { light, dark }
+const MODES: { mode: ThemeMode; label: string }[] = [
+	{ mode: "system", label: "系統" },
+	{ mode: "light", label: "亮" },
+	{ mode: "dark", label: "暗" },
+]
+
+function loadTheme(): ThemeMode {
+	try {
+		const saved = localStorage.getItem(THEME_KEY)
+		if (saved === "light" || saved === "dark") return saved
+	} catch {
+		/* private mode 等情況拿不到就用系統 */
+	}
+	return "system"
+}
+
+// Dialog/toast 會 portal 到 body,theme class 要掛在 <html> 才蓋得到全部;
+// data-theme 給 tokens.css 的 CSS-var 消費端(body、.prose、scrollbar)。
+function useTheme() {
+	const [mode, setMode] = useState<ThemeMode>(loadTheme)
+	useEffect(() => {
+		const root = document.documentElement
+		if (mode === "system") delete root.dataset.theme
+		else root.dataset.theme = mode
+		const cls = mode === "system" ? [] : (stylex.props(THEMES[mode]).className?.split(" ") ?? [])
+		root.classList.add(...cls)
+		try {
+			if (mode === "system") localStorage.removeItem(THEME_KEY)
+			else localStorage.setItem(THEME_KEY, mode)
+		} catch {
+			/* 存不進去就只在這次生效 */
+		}
+		return () => root.classList.remove(...cls)
+	}, [mode])
+	return { mode, setMode }
+}
+
+const MOBILE = "@media (max-width: 880px)"
+
 const styles = stylex.create({
-	page: { display: "grid", gridTemplateColumns: "13rem 1fr", minHeight: "100vh" },
+	page: {
+		display: "grid",
+		gridTemplateColumns: { default: "14rem minmax(0, 1fr)", [MOBILE]: "minmax(0, 1fr)" },
+		minHeight: "100vh",
+	},
 	nav: {
-		position: "sticky",
+		position: { default: "sticky", [MOBILE]: "static" },
 		top: 0,
-		height: "100vh",
-		overflowY: "auto",
-		borderRightWidth: 1,
+		height: { default: "100vh", [MOBILE]: "auto" },
+		overflowY: { default: "auto", [MOBILE]: "visible" },
+		borderRightWidth: { default: 1, [MOBILE]: 0 },
 		borderRightStyle: "solid",
 		borderRightColor: color.border,
+		borderBottomWidth: { default: 0, [MOBILE]: 1 },
+		borderBottomStyle: "solid",
+		borderBottomColor: color.border,
 		padding: space.md,
 	},
-	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 500, margin: 0, marginBottom: space.md },
+	navHead: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
+		gap: space.sm,
+		marginBottom: space.md,
+	},
+	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 500, margin: 0 },
+	themeGroup: {
+		display: "flex",
+		gap: 2,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: color.border,
+		borderRadius: radius.md,
+		padding: 2,
+	},
+	themeBtn: {
+		fontFamily: font.mono,
+		fontSize: "0.62rem",
+		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: "transparent",
+		borderWidth: 0,
+		borderRadius: radius.sm,
+		paddingBlock: "0.15rem",
+		paddingInline: "0.4rem",
+		cursor: "pointer",
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+	},
+	themeBtnActive: { color: color.text, backgroundColor: color.accentSubtle },
+	group: {
+		display: { default: "block", [MOBILE]: "flex" },
+		flexWrap: "wrap",
+		alignItems: "baseline",
+		columnGap: space.xs,
+	},
 	groupName: {
 		display: "block",
 		fontFamily: font.mono,
@@ -105,9 +190,10 @@ const styles = stylex.create({
 		textTransform: "uppercase",
 		color: color.textFaint,
 		marginBlock: space.sm,
+		flexBasis: { default: "auto", [MOBILE]: "100%" },
 	},
 	link: {
-		display: "block",
+		display: { default: "block", [MOBILE]: "inline-block" },
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		textDecoration: "none",
@@ -117,7 +203,8 @@ const styles = stylex.create({
 		borderRadius: radius.sm,
 	},
 	active: { color: color.text, backgroundColor: color.accentSubtle },
-	main: { padding: space.lg, minWidth: 0 },
+	main: { padding: { default: space.lg, [MOBILE]: space.md }, minWidth: 0 },
+	content: { maxWidth: "56rem", marginInline: "auto" },
 	docHeader: { display: "flex", alignItems: "baseline", gap: space.sm, marginBottom: space.md },
 	demoLink: { fontSize: text.xs, color: color.accentText },
 })
@@ -173,21 +260,39 @@ function GuidePage({ guide }: { guide: string }) {
 
 export function Site() {
 	const route = useRoute()
+	const { mode, setMode } = useTheme()
 	return (
 		<div {...stylex.props(styles.page)}>
 			<nav {...stylex.props(styles.nav)}>
-				<h1 {...stylex.props(styles.title)}>@anyknown/ui</h1>
-				<b {...stylex.props(styles.groupName)}>指南</b>
-				{Object.entries(GUIDES).map(([key, guide]) => (
-					<NavLink key={key} href={`#/guide/${key}`} current={route.page === "guide" && route.key === key}>
-						{guide.title}
+				<div {...stylex.props(styles.navHead)}>
+					<h1 {...stylex.props(styles.title)}>@anyknown/ui</h1>
+					<div role="group" aria-label="主題" {...stylex.props(styles.themeGroup)}>
+						{MODES.map((option) => (
+							<button
+								key={option.mode}
+								type="button"
+								aria-pressed={mode === option.mode}
+								onClick={() => setMode(option.mode)}
+								{...stylex.props(styles.themeBtn, mode === option.mode && styles.themeBtnActive)}
+							>
+								{option.label}
+							</button>
+						))}
+					</div>
+				</div>
+				<div {...stylex.props(styles.group)}>
+					<b {...stylex.props(styles.groupName)}>指南</b>
+					{Object.entries(GUIDES).map(([key, guide]) => (
+						<NavLink key={key} href={`#/guide/${key}`} current={route.page === "guide" && route.key === key}>
+							{guide.title}
+						</NavLink>
+					))}
+					<NavLink href="#/demo" current={route.page === "demo"}>
+						全部示範
 					</NavLink>
-				))}
-				<NavLink href="#/demo" current={route.page === "demo"}>
-					全部示範
-				</NavLink>
+				</div>
 				{Object.entries(GROUPS).map(([group, names]) => (
-					<div key={group}>
+					<div key={group} {...stylex.props(styles.group)}>
 						<b {...stylex.props(styles.groupName)}>{group}</b>
 						{names.map((name) => (
 							<NavLink
@@ -202,13 +307,15 @@ export function Site() {
 				))}
 			</nav>
 			<main {...stylex.props(styles.main)}>
-				{route.page === "demo" ? (
-					<DemoPage anchor={route.anchor} />
-				) : route.page === "docs" ? (
-					<DocsPage name={route.name} />
-				) : (
-					<GuidePage guide={route.key} />
-				)}
+				<div {...stylex.props(styles.content)}>
+					{route.page === "demo" ? (
+						<DemoPage anchor={route.anchor} />
+					) : route.page === "docs" ? (
+						<DocsPage name={route.name} />
+					) : (
+						<GuidePage guide={route.key} />
+					)}
+				</div>
 			</main>
 			<Toaster />
 		</div>

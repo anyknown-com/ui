@@ -3,6 +3,20 @@
 @import "@anyknown/ui/tokens.css";
 @import "@anyknown/ui/scrollbar.css";
 
+:root {
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+	}
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+}
+
 body {
 	margin: 0;
 	background: var(--ak-bg);
