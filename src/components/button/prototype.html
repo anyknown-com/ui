@@ -255,7 +255,7 @@ class SilkBody {
 	release() {
 		if (!this.pressed) return
 		this.pressed = false
-		this.tenV -= 0.06
+		this.tenV -= 0.035
 		if (!REDUCED) this.sweep = { from: this.pressX, dir: (this.pointer?.vx ?? 1) >= 0 ? 1 : -1, t0: performance.now() }
 		this.wake()
 	}
@@ -272,13 +272,13 @@ class SilkBody {
 		const vy = p != null && !this.pressed ? Math.max(-1.8, Math.min(1.8, (p.vy ?? 0) * 0.28)) : 0
 		for (const yarn of this.live) {
 			const target = p != null ? vy * Math.exp(-((yarn.y - this.gy) ** 2) / (2 * 10 ** 2)) : 0
-			yarn.vel += (target - yarn.disp) * 0.18 - yarn.vel * 0.3
+			yarn.vel += (target - yarn.disp) * 0.13 - yarn.vel * 0.24
 			yarn.disp += yarn.vel
 			if (Math.abs(yarn.disp) > 1e-3 || Math.abs(yarn.vel) > 1e-3) moving = true
 		}
 		if (p != null) { p.vy = 0 }   // 帶動量已消費,停手就不再注入
-		// 繃緊彈簧(中心 = pressX)
-		this.tenV += ((this.pressed ? 1 : 0) - this.tension) * 0.16 - this.tenV * 0.26
+		// 繃緊彈簧(中心 = pressX):k 放軟 — 觸發即時,但窩緩緩成形、緩緩回彈
+		this.tenV += ((this.pressed ? 1 : 0) - this.tension) * 0.07 - this.tenV * 0.16
 		this.tension += this.tenV
 		const tensionActive = Math.abs(this.tension) > 1e-3 || Math.abs(this.tenV) > 1e-3
 		if (moving || tensionActive) {
@@ -288,7 +288,7 @@ class SilkBody {
 		// 光澤帶
 		let bandT = 0
 		if (this.sweep != null) {
-			const t = (now - this.sweep.t0) / 460
+			const t = (now - this.sweep.t0) / 640
 			if (t >= 1) this.sweep = null
 			else {
 				const ease = 1 - (1 - t) ** 3
