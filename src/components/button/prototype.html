@@ -103,10 +103,10 @@ const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches
 const NS = "http://www.w3.org/2000/svg"
 const STEP = 4
 let uid = 0
-// 織法種子:預設 7,可由 #seed=N 帶入;「重織」工具會改它並重建所有按鈕
+// 織法種子:定稿 10075(設計者選定),可由 #seed=N 帶入試其他分佈
 let SEED = (() => {
 	const m = location.hash.match(/seed=(\d+)/)
-	return m ? parseInt(m[1], 10) : 7
+	return m ? parseInt(m[1], 10) : 10075
 })()
 
 // mulberry32:固定種子,布每次都織成同一塊
