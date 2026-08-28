@@ -138,7 +138,8 @@ class SilkBody {
 				this.pressed = true; this.wake()
 			}
 		})
-		btn.addEventListener("keyup", () => this.release())
+		btn.addEventListener("keyup", () => { this.release(); this.pointer = null })
+		btn.addEventListener("blur", () => { this.pointer = null; this.wake() })
 	}
 
 	build() {
@@ -255,8 +256,11 @@ class SilkBody {
 	release() {
 		if (!this.pressed) return
 		this.pressed = false
+		// 指標已拖出按鈕 → 這次放開不會觸發 click,視覺也只安靜鬆開,
+		// 不播回彈過衝與掃光(那兩個是「確認觸發」的語言)
+		if (this.pointer == null) { this.wake(); return }
 		this.tenV -= 0.035
-		if (!REDUCED) this.sweep = { from: this.pressX, dir: (this.pointer?.vx ?? 1) >= 0 ? 1 : -1, t0: performance.now() }
+		if (!REDUCED) this.sweep = { from: this.pressX, dir: (this.pointer.vx ?? 1) >= 0 ? 1 : -1, t0: performance.now() }
 		this.wake()
 	}
 
@@ -277,8 +281,9 @@ class SilkBody {
 			if (Math.abs(yarn.disp) > 1e-3 || Math.abs(yarn.vel) > 1e-3) moving = true
 		}
 		if (p != null) { p.vy = 0 }   // 帶動量已消費,停手就不再注入
-		// 繃緊彈簧(中心 = pressX):k 放軟 — 觸發即時,但窩緩緩成形、緩緩回彈
-		this.tenV += ((this.pressed ? 1 : 0) - this.tension) * 0.07 - this.tenV * 0.16
+		// 繃緊彈簧(中心 = pressX):k 放軟 — 觸發即時,但窩緩緩成形、緩緩回彈。
+		// 按住時拖出按鈕 → 窩先鬆開(對齊原生 :active 的行為),拖回來再回窩
+		this.tenV += ((this.pressed && p != null ? 1 : 0) - this.tension) * 0.07 - this.tenV * 0.16
 		this.tension += this.tenV
 		const tensionActive = Math.abs(this.tension) > 1e-3 || Math.abs(this.tenV) > 1e-3
 		if (moving || tensionActive) {
