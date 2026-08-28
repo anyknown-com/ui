@@ -15,191 +15,203 @@ h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;te
 p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 .row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
 
-/* 纖維按鈕:label 底下鋪一層水平線,hover 時線被指尖「揉開」。
-   線是裝飾,pointer-events 全關;語意上仍是一顆普通 <button>。 */
+/* 絨面纖維按鈕:canvas 畫一層緊密的短纖維(織物的絨毛),
+   hover 時纖維順著指尖倒伏、亮起一道光澤軌跡再慢慢消退。
+   纖維層純裝飾,pointer-events 關;語意仍是普通 <button>。 */
 .fiber{position:relative;display:inline-flex;align-items:center;justify-content:center;
   min-height:2.4rem;padding:.45rem 1.1rem;border-radius:.5rem;border:1px solid;
   font:500 .875rem/1.25 "Geist",system-ui,sans-serif;cursor:pointer;overflow:hidden;
   transition:border-color 120ms ease}
 .fiber:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.fiber svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.fiber path{fill:none;stroke-width:1;stroke-linecap:round}
+.fiber canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .fiber .lbl{position:relative}
 
-.fiber.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
-.fiber.primary path{stroke:var(--accent-text);opacity:.22}
-.fiber.secondary{background:var(--surface);border-color:var(--border);color:var(--text)}
+.fiber.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);--fiber:255,255,255;--fiber-a:.10}
+@media(prefers-color-scheme:dark){.fiber.primary{--fiber:0,0,0;--fiber-a:.14}}
+.fiber.secondary{background:var(--surface);border-color:var(--border);color:var(--text);--fiber:35,112,90;--fiber-a:.12}
+@media(prefers-color-scheme:dark){.fiber.secondary{--fiber:79,161,132;--fiber-a:.14}}
 .fiber.secondary:hover{border-color:var(--border-strong)}
-.fiber.secondary path{stroke:var(--accent);opacity:.3}
-.fiber.ghost{background:transparent;border-color:transparent;color:var(--text)}
-.fiber.ghost path{stroke:var(--border-strong);opacity:.55}
+.fiber.ghost{background:transparent;border-color:transparent;color:var(--text);--fiber:120,110,95;--fiber-a:.14}
 
 @media(prefers-reduced-motion:reduce){.fiber{transition:none}}
 </style>
 
-<h1>Button — 纖維撫摸</h1>
-<p class="hint">不做 MUI 那種圓形漣漪。按鈕底下是一層水平纖維;滑鼠滑過去,線像被手指揉過一樣
-讓開、再彈回來(彈簧有一點殘留晃動,是布料的手感)。移動越快,揉得越深。</p>
+<h1>Button — 絨面纖維</h1>
+<p class="hint">不是弦,是<b>布</b>:一層緊密的短纖維(絨毛),靜止時幾乎看不見、只是安靜的質地。
+手指滑過去,纖維順著移動方向<b>倒伏</b>,倒伏的地方泛起一道光澤,像絨布被摸過的痕跡,
+然後慢慢立回來、光澤消退。摸得越快,痕跡越亮。</p>
 
 <section>
   <h2>hover — 三個 variant</h2>
   <div class="row">
-    <button class="fiber primary" data-press="pinch"><span class="lbl">開始上傳</span></button>
-    <button class="fiber secondary" data-press="pinch"><span class="lbl">取消</span></button>
-    <button class="fiber ghost" data-press="pinch"><span class="lbl">稍後再說</span></button>
+    <button class="fiber primary" data-press="dent"><span class="lbl">開始上傳</span></button>
+    <button class="fiber secondary" data-press="dent"><span class="lbl">取消</span></button>
+    <button class="fiber ghost" data-press="dent"><span class="lbl">稍後再說</span></button>
   </div>
-  <p class="hint">primary 的線用文字色壓低透明度,secondary/ghost 用 accent/邊線色 — 數據可讀性優先,線永遠在 label 之下。</p>
+  <p class="hint">纖維在靜止時透明度只有 10–14%,是質地不是圖案;光澤靠 hover 才浮現。</p>
 </section>
 
 <section>
-  <h2>press 方案 A — 捏聚(這排按鈕按按看)</h2>
+  <h2>press 方案 A — 壓痕(這排按按看)</h2>
   <div class="row">
-    <button class="fiber primary" data-press="pinch"><span class="lbl">刪除記憶</span></button>
-    <button class="fiber secondary" data-press="pinch"><span class="lbl">重新生成</span></button>
+    <button class="fiber primary" data-press="dent"><span class="lbl">刪除記憶</span></button>
+    <button class="fiber secondary" data-press="dent"><span class="lbl">重新生成</span></button>
   </div>
-  <p class="hint">按下 = 指尖把那一撮線<b>捏起來</b>(線往按點聚攏);放開 = 鬆手,線彈散回原位,
-  帶一點 overshoot。隱喻:按下是抓住一撮纖維,確認動作像捏緊再放。</p>
+  <p class="hint">按下 = 拇指壓進布裡:按點周圍的絨毛被<b>壓平、壓暗</b>(一塊指印);
+  放開 = 絨毛立回來,壓痕在半秒內消失。像壓了一下沙發布面。</p>
 </section>
 
 <section>
-  <h2>press 方案 B — 繃緊 → 行進波(這排按按看)</h2>
+  <h2>press 方案 B — 熨平 → 光澤暈開(這排按按看)</h2>
   <div class="row">
-    <button class="fiber primary" data-press="pluck"><span class="lbl">送出</span></button>
-    <button class="fiber secondary" data-press="pluck"><span class="lbl">複製連結</span></button>
+    <button class="fiber primary" data-press="bloom"><span class="lbl">送出</span></button>
+    <button class="fiber secondary" data-press="bloom"><span class="lbl">複製連結</span></button>
   </div>
-  <p class="hint">按下 = 整塊布<b>繃緊</b>(所有起伏瞬間拉平,線是直的、有張力);放開 = 像撥了一下琴弦,
-  一個小波從按點沿著線往兩邊跑出去、邊跑邊衰減。這是「一維的漣漪」— 沿線傳播,不是圓形擴散,跟品牌的「線」一致。</p>
+  <p class="hint">按下 = 整塊布被<b>熨平</b>:所有倒伏歸零、光澤收掉,布面繃出一種安靜的張力;
+  放開 = 一圈柔和的光澤從按點<b>暈開</b>、邊走邊淡,像放開手之後布面回彈時掃過的光。
+  始終是亮度在動,纖維本身幾乎不動 — 緊緻的布只會這樣回應。</p>
 </section>
 
 <script>
-// 每條線取樣成點,每個點是一顆小彈簧:pos 追 target,帶阻尼,
-// 所以指尖離開後線會「彈回來、晃一下、停」— 揉過布料的殘留感。
+// 每顆按鈕一片纖維場:3px 網格 + 抖動,每根纖維是 3–4.5px 的短線,
+// 狀態只有兩個:tilt(倒伏角,彈簧回正)和 sheen(光澤,慢慢衰減)。
+// 緊緻布料的關鍵:位移極小,視覺反應主要靠「亮度」而不是「形變」。
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches
-const STEP = 6        // 取樣間距 px
-const GAP = 5         // 線距 px
-const AMP = 3.2       // 基礎揉開深度 px
-const SIGMA_X = 16    // 指尖影響半徑(水平)
-const SIGMA_Y = 11    // 指尖影響半徑(垂直)
+const PITCH = 3        // 纖維網格間距 px
+const SIGMA = 13       // 指尖影響半徑
+const PRESS_R = 15     // 壓痕半徑
 
-class FiberField {
+class NapField {
 	constructor(btn) {
 		this.btn = btn
 		this.mode = btn.dataset.press
-		this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-		btn.prepend(this.svg)
-		this.pointer = null   // {x, y, speed}
+		this.canvas = document.createElement("canvas")
+		btn.prepend(this.canvas)
+		this.ctx = this.canvas.getContext("2d")
+		this.pointer = null   // {x, y, vx, vy, speed}
 		this.pressed = false
-		this.pulse = null     // {x, t0} 方案 B 的行進波
+		this.press = 0        // 壓痕強度(壓下去慢慢到 1,放開回 0)
+		this.bloom = null     // {x, y, t0} 方案 B 的光澤暈
 		this.raf = 0
 		this.build()
 		new ResizeObserver(() => this.build()).observe(btn)
 		btn.addEventListener("pointerenter", (e) => this.track(e))
 		btn.addEventListener("pointermove", (e) => this.track(e))
 		btn.addEventListener("pointerleave", () => { this.pointer = null; this.wake() })
-		btn.addEventListener("pointerdown", (e) => { this.pressed = true; this.track(e) })
+		btn.addEventListener("pointerdown", (e) => { this.pressed = true; this.track(e); this.wake() })
 		window.addEventListener("pointerup", () => this.release())
 		btn.addEventListener("keydown", (e) => {
-			if (e.key === " " || e.key === "Enter") { this.pressed = true; this.centerPointer(); this.wake() }
+			if (e.key === " " || e.key === "Enter") {
+				this.pointer = { x: this.w / 2, y: this.h / 2, vx: 0, vy: 0, speed: 0 }
+				this.pressed = true; this.wake()
+			}
 		})
 		btn.addEventListener("keyup", () => this.release())
 	}
 
 	build() {
 		const w = this.btn.clientWidth, h = this.btn.clientHeight
-		if (w === 0) return
+		if (w === 0 || !this.ctx) return
 		this.w = w; this.h = h
-		this.svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
-		this.svg.replaceChildren()
-		this.lines = []
-		const cols = Math.ceil(w / STEP) + 1
-		for (let y = GAP + 2; y <= h - GAP - 1; y += GAP) {
-			const el = document.createElementNS("http://www.w3.org/2000/svg", "path")
-			this.svg.append(el)
-			this.lines.push({ y, el, pos: new Float32Array(cols), vel: new Float32Array(cols) })
-		}
-		this.cols = cols
+		const dpr = window.devicePixelRatio || 1
+		this.canvas.width = w * dpr
+		this.canvas.height = h * dpr
+		this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+		const cs = getComputedStyle(this.btn)
+		this.rgb = cs.getPropertyValue("--fiber").trim() || "120,110,95"
+		this.baseA = parseFloat(cs.getPropertyValue("--fiber-a")) || 0.12
+		this.fibers = []
+		// 3px 網格 + 抖動:夠密才是布;每根帶一點個體差,不然像印刷網點
+		for (let gy = 2; gy < h - 1; gy += PITCH)
+			for (let gx = 1; gx < w - 1; gx += PITCH)
+				this.fibers.push({
+					x: gx + (Math.random() - 0.5) * 2, y: gy + (Math.random() - 0.5) * 2,
+					a0: (Math.random() - 0.5) * 0.35,            // 靜止角(近水平,微亂)
+					len: 3 + Math.random() * 1.5,
+					shade: 0.75 + Math.random() * 0.5,           // 個體明暗差
+					tilt: 0, tiltV: 0, sheen: 0,
+				})
 		this.draw()
 	}
 
 	track(e) {
 		const r = this.btn.getBoundingClientRect()
 		const x = e.clientX - r.left, y = e.clientY - r.top
-		const prev = this.pointer
-		const speed = prev ? Math.hypot(x - prev.x, y - prev.y) : 0
-		this.pointer = { x, y, speed: prev ? prev.speed * 0.7 + speed * 0.3 : 0 }
+		const p = this.pointer
+		const vx = p ? x - p.x : 0, vy = p ? y - p.y : 0
+		const speed = Math.hypot(vx, vy)
+		this.pointer = { x, y, vx, vy, speed: p ? p.speed * 0.6 + speed * 0.4 : 0 }
 		this.wake()
 	}
-
-	centerPointer() { this.pointer = { x: this.w / 2, y: this.h / 2, speed: 0 } }
 
 	release() {
 		if (!this.pressed) return
 		this.pressed = false
-		if (this.mode === "pluck" && this.pointer) this.pulse = { x: this.pointer.x, t0: performance.now() }
-		if (this.mode === "pinch") {
-			// 鬆手:把捏聚的位移轉成向外的初速,線彈散回去
-			for (const line of this.lines)
-				for (let i = 0; i < this.cols; i++) line.vel[i] += line.pos[i] * -0.35
-		}
+		if (this.mode === "bloom" && this.pointer)
+			this.bloom = { x: this.pointer.x, y: this.pointer.y, t0: performance.now() }
 		this.wake()
 	}
 
-	target(line, i, now) {
-		const x = i * STEP
-		let t = 0
-		const p = this.pointer
-		if (p != null) {
-			const gx = Math.exp(-((x - p.x) ** 2) / (2 * SIGMA_X ** 2))
-			const gy = Math.exp(-Math.abs(line.y - p.y) / SIGMA_Y)
-			const depth = AMP * (0.6 + Math.min(1.2, p.speed / 6))
-			if (this.pressed && this.mode === "pinch") {
-				// 捏聚:線往指尖靠(方向反過來),抓得更緊
-				t = (p.y - line.y) * 0.32 * gx * Math.exp(-Math.abs(line.y - p.y) / (SIGMA_Y * 2.2))
-			} else if (this.pressed && this.mode === "pluck") {
-				t = 0 // 繃緊:全部拉平
-			} else {
-				t = Math.sign(line.y - p.y || 1) * depth * gx * gy
-			}
-		}
-		if (this.pulse != null) {
-			// 行進波:一個高斯波包從按點往兩邊跑,c=0.28px/ms,約 600ms 衰減完
-			const age = now - this.pulse.t0
-			const dist = Math.abs(x - this.pulse.x)
-			const front = age * 0.28
-			const decay = Math.exp(-age / 260)
-			t += Math.sin((line.y / this.h) * Math.PI) * 2.6 * decay * Math.exp(-((dist - front) ** 2) / (2 * 10 ** 2))
-			if (age > 900) this.pulse = null
-		}
-		return t
-	}
-
 	tick(now) {
-		let energy = 0
-		for (const line of this.lines) {
-			for (let i = 0; i < this.cols; i++) {
-				const t = this.target(line, i, now)
-				line.vel[i] += (t - line.pos[i]) * 0.16 - line.vel[i] * 0.22
-				line.pos[i] += line.vel[i]
-				energy += Math.abs(line.vel[i]) + Math.abs(line.pos[i] - t)
+		const p = this.pointer
+		const ironed = this.pressed && this.mode === "bloom"
+		this.press += ((this.pressed && this.mode === "dent" ? 1 : 0) - this.press) * 0.25
+		let energy = this.press
+		for (const f of this.fibers) {
+			let tiltTarget = 0
+			if (p != null && !ironed) {
+				const g = Math.exp(-((f.x - p.x) ** 2 + (f.y - p.y) ** 2) / (2 * SIGMA ** 2))
+				// 倒伏方向跟著指尖走向;摸得快痕跡亮
+				tiltTarget = Math.max(-0.9, Math.min(0.9, p.vx * 0.06 + p.vy * 0.03)) * g
+				f.sheen = Math.min(1, f.sheen + g * Math.min(1, p.speed / 4) * 0.5)
 			}
+			if (this.bloom != null) {
+				// 光澤暈:亮度的圓環從按點暈開,c≈0.09px/ms,約 500ms 淡完
+				const age = now - this.bloom.t0
+				const d = Math.hypot(f.x - this.bloom.x, f.y - this.bloom.y)
+				const ring = Math.exp(-((d - age * 0.09) ** 2) / (2 * 7 ** 2))
+				f.sheen = Math.min(1, f.sheen + ring * Math.exp(-age / 220) * 0.7)
+			}
+			f.tiltV += (tiltTarget - f.tilt) * 0.2 - f.tiltV * 0.35
+			f.tilt += ironed ? (0 - f.tilt) * 0.4 : f.tiltV
+			f.sheen *= ironed ? 0.8 : 0.955   // 熨平時光澤快速收掉;平時慢慢消退
+			energy += Math.abs(f.tiltV) + f.sheen
 		}
+		if (this.bloom != null && now - this.bloom.t0 > 700) this.bloom = null
 		this.draw()
-		const active = this.pointer != null || this.pulse != null || energy > 0.5
+		const active = p != null || this.bloom != null || this.pressed || energy > 0.7
 		this.raf = active ? requestAnimationFrame((n) => this.tick(n)) : 0
 	}
 
 	draw() {
-		for (const line of this.lines) {
-			let d = ""
-			for (let i = 0; i < this.cols; i++)
-				d += `${i === 0 ? "M" : "L"}${i * STEP},${(line.y + line.pos[i]).toFixed(1)}`
-			line.el.setAttribute("d", d)
+		const ctx = this.ctx
+		if (!ctx) return
+		ctx.clearRect(0, 0, this.w, this.h)
+		ctx.lineCap = "round"
+		ctx.lineWidth = 1
+		const p = this.pointer
+		for (const f of this.fibers) {
+			let press = 0
+			if (this.press > 0.01 && p != null) {
+				const d = Math.hypot(f.x - p.x, f.y - p.y)
+				press = this.press * Math.exp(-(d ** 2) / (2 * PRESS_R ** 2))
+			}
+			// 壓痕:絨毛壓平(變短)、壓暗;光澤:變亮。都是亮度語言,形變很小。
+			const alpha = this.baseA * f.shade * (1 + f.sheen * 1.6 - press * 0.55)
+			const len = f.len * (1 - press * 0.45)
+			const a = f.a0 + f.tilt
+			const dx = Math.cos(a) * len / 2, dy = Math.sin(a) * len / 2
+			ctx.strokeStyle = `rgba(${this.rgb},${Math.max(0, alpha).toFixed(3)})`
+			ctx.beginPath()
+			ctx.moveTo(f.x - dx, f.y - dy)
+			ctx.lineTo(f.x + dx, f.y + dy)
+			ctx.stroke()
 		}
 	}
 
-	wake() { if (!this.raf && !REDUCED) this.raf = requestAnimationFrame((n) => this.tick(n)) }
+	wake() { if (!this.raf && !REDUCED && this.ctx) this.raf = requestAnimationFrame((n) => this.tick(n)) }
 }
 
-for (const btn of document.querySelectorAll(".fiber")) new FiberField(btn)
+for (const btn of document.querySelectorAll(".fiber")) new NapField(btn)
 </script>
 </html>

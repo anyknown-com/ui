@@ -1,37 +1,37 @@
-# Button — 纖維撫摸(探索中)
+# Button — 絨面纖維(探索中)
 
-**狀態:hover 方向已有原型,press/release 兩案待定。** `prototype.html` 瀏覽器直接開,可實際操作。
+**狀態:第二版原型(絨面),press 兩案待定。** `prototype.html` 瀏覽器直接開,可實際操作。
 `Button.tsx` 是已出貨的安靜版本,本探索**尚未**進實作。
 
 ## 概念
 
-不做 MUI 的圓形漣漪。按鈕底下鋪一層水平纖維(貼合「訊息是纖維、thread 是線」),
-滑鼠滑過去時,線像被手指揉過:讓開、彈回、殘留一點晃動。移動越快揉得越深。
+不做 MUI 的圓形漣漪。第一版把纖維畫成稀疏的水平線 + 大位移,回饋是「像吉他弦」——
+布料的緊緻感不對。第二版改成**絨面**:canvas 鋪一層 3px 網格的短纖維(600 根上下,
+靜止透明度 10–14%,是質地不是圖案),緊緻布料被摸的視覺反應是**亮度**,不是形變:
 
-## 原型的物理
-
-- 每條線取樣成點(6px 一點),每點一顆彈簧(`pos += vel; vel += (target-pos)*k - vel*damping`)
-- hover target:高斯波包,水平 σ≈16px、垂直指數衰減,方向是「從指尖讓開」
-- 指尖速度放大深度(0.6x–1.8x),快速掃過像用力揉
-- idle 時能量趨零就停 rAF;`prefers-reduced-motion` 直接不啟動,線是靜態裝飾
+- hover:纖維順著指尖走向**倒伏**(±0.9rad 內,彈簧回正),倒伏處泛起光澤軌跡,
+  慢慢消退(×0.955/frame)。摸得快痕跡亮。
+- 位移極小、光澤為主 — 這是絨布與弦的差別。
 
 ## press/release 兩案(prototype 可並排試)
 
-- **A 捏聚**:按下線往按點聚攏(像捏起一撮纖維),放開彈散 + overshoot。
-  隱喻強、跟 switch 的「fabric 推線頭」同族;但視覺動得比較大,危險動作按鈕上可能太鬧。
-- **B 繃緊 → 行進波**:按下全部拉平(布繃緊、有張力),放開從按點沿線跑出一個一維波,
-  600ms 內衰減。是「線的漣漪」而不是圓形漣漪,安靜、跟 handoff-receipt 的線語言最一致。
+- **A 壓痕(dent)**:按下,按點周圍絨毛壓平壓暗(一塊指印,σ≈15px);放開半秒內立回。
+  像壓沙發布面,隱喻直觀。
+- **B 熨平 → 光澤暈開(bloom)**:按下,全部倒伏歸零、光澤收掉(布繃出張力);
+  放開,一圈柔和亮度從按點暈開(c≈0.09px/ms,約 500ms 淡完)。
+  對 MUI 漣漪的回答:我們的漣漪是布面回彈掃過的光,不是水波。
 
 ## 待決
 
-1. A 還是 B(或 primary 用 B、危險動作乾脆不動)?
-2. 線的密度/透明度:primary 上用 accentText @ .22 夠隱形嗎?
-3. 進 `Button.tsx` 時的成本:每顆按鈕一個 rAF 彈簧場,列表裡大量按鈕要 lazy(hover 才建 SVG)
-4. texture 準則說 texture 用在「等待、過渡、儀式」— button hover 算不算儀式時刻,還是應該只給
-   primary/CTA 級按鈕,secondary/ghost 保持安靜?
+1. A 還是 B(或 primary 用 B、危險動作不動)?
+2. 密度/透明度手感:PITCH 3px、baseA .10–.14 在 retina 與一般螢幕上是否都夠細?
+3. 進 `Button.tsx` 的成本:canvas + rAF 纖維場要 lazy(首次 hover 才建),
+   列表大量按鈕時共享一個 ticker;SSR 無副作用(canvas 只在 client 建)。
+4. texture 準則說 texture 用在「等待、過渡、儀式」— 是否只給 primary/CTA,
+   secondary/ghost 保持安靜?
 
 ## a11y
 
-- 纖維層 `pointer-events: none`、純裝飾,不進 accessibility tree(SVG 無 role/label)
-- 鍵盤 Space/Enter 等同 press(原型已接),focus ring 不變
-- reduced-motion:完全靜態
+- 纖維層是 canvas、`pointer-events: none`、純裝飾,不進 accessibility tree
+- 鍵盤 Space/Enter 等同 press(原型已接,指針視為按鈕中心),focus ring 不變
+- reduced-motion:rAF 不啟動,完全靜態
