@@ -1,37 +1,41 @@
-# Button — 絨面纖維(探索中)
+# Button — 織面光澤(探索中)
 
-**狀態:第二版原型(絨面),press 兩案待定。** `prototype.html` 瀏覽器直接開,可實際操作。
+**狀態:第三版原型(織面 + SVG 動畫),press 兩案待定。** `prototype.html` 瀏覽器直接開。
 `Button.tsx` 是已出貨的安靜版本,本探索**尚未**進實作。
 
-## 概念
+## 走過的路
 
-不做 MUI 的圓形漣漪。第一版把纖維畫成稀疏的水平線 + 大位移,回饋是「像吉他弦」——
-布料的緊緻感不對。第二版改成**絨面**:canvas 鋪一層 3px 網格的短纖維(600 根上下,
-靜止透明度 10–14%,是質地不是圖案),緊緻布料被摸的視覺反應是**亮度**,不是形變:
+1. 稀疏水平線 + 大位移 → 「像吉他弦」,不是緊緻衣料。
+2. canvas 隨機短絨 → 散亂的點狀質地「像皮膚炎」,不精緻。
+3. **現版:織出來的線。** 精緻感來自「有序」:連續、平行、帶織理節奏,層層交疊。
 
-- hover:纖維順著指尖走向**倒伏**(±0.9rad 內,彈簧回正),倒伏處泛起光澤軌跡,
-  慢慢消退(×0.955/frame)。摸得快痕跡亮。
-- 位移極小、光澤為主 — 這是絨布與弦的差別。
+## 現版做法(SVG)
+
+- **三層織理**,靜止時是安靜的質地:
+  - 緯線主層:2.6px 間距、0.7px 振幅正弦,相鄰線相位相反(線與線微靠攏又分開 = 織的節奏),op .13
+  - 緯線副層:錯半格、不同波長(34 vs 26),op .07 — 兩層干涉出布的深度
+  - 經線:7px 間距、微彎,op .05,只是提示
+- **hover = 光,不是形變**:同一套織線幾何再畫一份亮的,用柔邊 radialGradient mask 顯形;
+  柔光圓 lerp 追指尖(延遲就是撫摸感),移動快光亮到 1、停下沉回 .5,離開淡出。
+- 逐幀只改 4 個 attribute(圓心 ×2、兩個 group opacity),沒有逐點物理,便宜。
 
 ## press/release 兩案(prototype 可並排試)
 
-- **A 壓痕(dent)**:按下,按點周圍絨毛壓平壓暗(一塊指印,σ≈15px);放開半秒內立回。
-  像壓沙發布面,隱喻直觀。
-- **B 熨平 → 光澤暈開(bloom)**:按下,全部倒伏歸零、光澤收掉(布繃出張力);
-  放開,一圈柔和亮度從按點暈開(c≈0.09px/ms,約 500ms 淡完)。
-  對 MUI 漣漪的回答:我們的漣漪是布面回彈掃過的光,不是水波。
+- **A 壓痕(dent)**:按下光收掉、按點織線沉暗成指印(第三份幾何,暗色 + 小 mask 圓);
+  放開指印淡出、光回來。按鈕安靜地「陷下去再浮起來」。
+- **B 光環暈開(bloom)**:按下光收攏成小粒;放開一圈細光環沿織線暈開
+  (ring-shaped radialGradient mask + SMIL `<animate>` r 6→0.75w,480ms,同步淡出)。
+  漣漪只照亮織理、不改變它。
 
 ## 待決
 
 1. A 還是 B(或 primary 用 B、危險動作不動)?
-2. 密度/透明度手感:PITCH 3px、baseA .10–.14 在 retina 與一般螢幕上是否都夠細?
-3. 進 `Button.tsx` 的成本:canvas + rAF 纖維場要 lazy(首次 hover 才建),
-   列表大量按鈕時共享一個 ticker;SSR 無副作用(canvas 只在 client 建)。
-4. texture 準則說 texture 用在「等待、過渡、儀式」— 是否只給 primary/CTA,
-   secondary/ghost 保持安靜?
+2. 織理密度/波長/透明度的手感微調;secondary 淺色底上 sheen 是否夠明顯?
+3. 進 `Button.tsx`:幾何 build 一次 + ResizeObserver;rAF 只在互動時跑;SSR 安全。
+4. texture 準則 — 是否只給 primary/CTA,secondary/ghost 保持安靜?
 
 ## a11y
 
-- 纖維層是 canvas、`pointer-events: none`、純裝飾,不進 accessibility tree
-- 鍵盤 Space/Enter 等同 press(原型已接,指針視為按鈕中心),focus ring 不變
-- reduced-motion:rAF 不啟動,完全靜態
+- 織線層 SVG、`pointer-events: none`、純裝飾(無 role/label,不進 a11y tree)
+- 鍵盤 Space/Enter 等同 press(指針視為按鈕中心),focus ring 不變
+- reduced-motion:rAF 與 SMIL 都不啟動,靜態織理

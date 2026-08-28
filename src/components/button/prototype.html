@@ -15,31 +15,44 @@ h2{font:600 .72rem/1 "Geist Mono",ui-monospace,monospace;letter-spacing:.08em;te
 p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 .row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
 
-/* 絨面纖維按鈕:canvas 畫一層緊密的短纖維(織物的絨毛),
-   hover 時纖維順著指尖倒伏、亮起一道光澤軌跡再慢慢消退。
-   纖維層純裝飾,pointer-events 關;語意仍是普通 <button>。 */
+/* 織面按鈕:SVG 三層連續織線(兩層緯線相位交錯 + 一層極淡經線),
+   靜止時是安靜的織理;hover 是一團柔光沿著織線浮現、跟著指尖游走。
+   織線層純裝飾,pointer-events 關;語意仍是普通 <button>。 */
 .fiber{position:relative;display:inline-flex;align-items:center;justify-content:center;
   min-height:2.4rem;padding:.45rem 1.1rem;border-radius:.5rem;border:1px solid;
   font:500 .875rem/1.25 "Geist",system-ui,sans-serif;cursor:pointer;overflow:hidden;
   transition:border-color 120ms ease}
 .fiber:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.fiber canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fiber svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fiber path{fill:none;stroke-linecap:round}
 .fiber .lbl{position:relative}
 
-.fiber.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);--fiber:255,255,255;--fiber-a:.10}
-@media(prefers-color-scheme:dark){.fiber.primary{--fiber:0,0,0;--fiber-a:.14}}
-.fiber.secondary{background:var(--surface);border-color:var(--border);color:var(--text);--fiber:35,112,90;--fiber-a:.12}
-@media(prefers-color-scheme:dark){.fiber.secondary{--fiber:79,161,132;--fiber-a:.14}}
+/* 三層織理:緯線主層/緯線副層(不同波長,交疊出布的深度)/經線提示 */
+.fiber .weft1{stroke:rgba(var(--fiber),.13);stroke-width:1}
+.fiber .weft2{stroke:rgba(var(--fiber),.07);stroke-width:1}
+.fiber .warp{stroke:rgba(var(--fiber),.05);stroke-width:1}
+/* 光澤與壓痕:同一套織線幾何,亮/暗兩份,由柔邊圓形 mask 顯形 */
+.fiber .sheen path{stroke:rgba(var(--sheen),1);stroke-width:1}
+.fiber .dent path{stroke:rgba(var(--dent),1);stroke-width:1}
+
+.fiber.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);
+  --fiber:255,255,255;--sheen:255,255,255;--dent:0,0,0}
+@media(prefers-color-scheme:dark){.fiber.primary{--fiber:0,0,0;--dent:0,0,0}}
+.fiber.secondary{background:var(--surface);border-color:var(--border);color:var(--text);
+  --fiber:35,112,90;--sheen:35,112,90;--dent:35,50,44}
+@media(prefers-color-scheme:dark){.fiber.secondary{--fiber:79,161,132;--sheen:120,200,170;--dent:0,0,0}}
 .fiber.secondary:hover{border-color:var(--border-strong)}
-.fiber.ghost{background:transparent;border-color:transparent;color:var(--text);--fiber:120,110,95;--fiber-a:.14}
+.fiber.ghost{background:transparent;border-color:transparent;color:var(--text);
+  --fiber:120,110,95;--sheen:120,110,95;--dent:60,54,45}
+@media(prefers-color-scheme:dark){.fiber.ghost{--fiber:150,140,122;--sheen:190,178,158;--dent:0,0,0}}
 
 @media(prefers-reduced-motion:reduce){.fiber{transition:none}}
 </style>
 
-<h1>Button — 絨面纖維</h1>
-<p class="hint">不是弦,是<b>布</b>:一層緊密的短纖維(絨毛),靜止時幾乎看不見、只是安靜的質地。
-手指滑過去,纖維順著移動方向<b>倒伏</b>,倒伏的地方泛起一道光澤,像絨布被摸過的痕跡,
-然後慢慢立回來、光澤消退。摸得越快,痕跡越亮。</p>
+<h1>Button — 織面光澤</h1>
+<p class="hint">纖維不是散的絨毛,是<b>織出來的</b>:三層連續細線,兩層緯線用不同波長交疊出深度,
+加一層幾乎看不見的經線。手指滑過去,一團柔光沿著織線浮現、跟著指尖游走 —
+被照亮的是織理本身,線不亂動。摸得快,光亮一點;停下來,光慢慢沉回布裡。</p>
 
 <section>
   <h2>hover — 三個 variant</h2>
@@ -48,7 +61,7 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
     <button class="fiber secondary" data-press="dent"><span class="lbl">取消</span></button>
     <button class="fiber ghost" data-press="dent"><span class="lbl">稍後再說</span></button>
   </div>
-  <p class="hint">纖維在靜止時透明度只有 10–14%,是質地不是圖案;光澤靠 hover 才浮現。</p>
+  <p class="hint">光跟指尖之間有一點延遲(lerp),像光澤追著手 — 那個「追」就是撫摸感。</p>
 </section>
 
 <section>
@@ -57,52 +70,66 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
     <button class="fiber primary" data-press="dent"><span class="lbl">刪除記憶</span></button>
     <button class="fiber secondary" data-press="dent"><span class="lbl">重新生成</span></button>
   </div>
-  <p class="hint">按下 = 拇指壓進布裡:按點周圍的絨毛被<b>壓平、壓暗</b>(一塊指印);
-  放開 = 絨毛立回來,壓痕在半秒內消失。像壓了一下沙發布面。</p>
+  <p class="hint">按下 = 光收掉,按點的織線<b>沉暗</b>成一塊指印(布被壓住,光到不了);
+  放開 = 指印淡出、光澤回來。整顆按鈕安靜地「陷下去再浮起來」。</p>
 </section>
 
 <section>
-  <h2>press 方案 B — 熨平 → 光澤暈開(這排按按看)</h2>
+  <h2>press 方案 B — 光環暈開(這排按按看)</h2>
   <div class="row">
     <button class="fiber primary" data-press="bloom"><span class="lbl">送出</span></button>
     <button class="fiber secondary" data-press="bloom"><span class="lbl">複製連結</span></button>
   </div>
-  <p class="hint">按下 = 整塊布被<b>熨平</b>:所有倒伏歸零、光澤收掉,布面繃出一種安靜的張力;
-  放開 = 一圈柔和的光澤從按點<b>暈開</b>、邊走邊淡,像放開手之後布面回彈時掃過的光。
-  始終是亮度在動,纖維本身幾乎不動 — 緊緻的布只會這樣回應。</p>
+  <p class="hint">按下 = 光收攏成按點上的一小粒;放開 = 一圈細光環沿著織線<b>暈開</b>、邊走邊淡
+  (SVG <code>&lt;animate&gt;</code>)。漣漪只照亮織理,不改變它 — 布的漣漪是光,不是水波。</p>
 </section>
 
 <script>
-// 每顆按鈕一片纖維場:3px 網格 + 抖動,每根纖維是 3–4.5px 的短線,
-// 狀態只有兩個:tilt(倒伏角,彈簧回正)和 sheen(光澤,慢慢衰減)。
-// 緊緻布料的關鍵:位移極小,視覺反應主要靠「亮度」而不是「形變」。
+// 織線幾何一次生成,之後只動三樣東西:柔光圓的位置(lerp 追指尖)、
+// 光澤/壓痕兩個 group 的 opacity、放開時的 SMIL 光環。沒有逐點物理。
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches
-const PITCH = 3        // 纖維網格間距 px
-const SIGMA = 13       // 指尖影響半徑
-const PRESS_R = 15     // 壓痕半徑
+const NS = "http://www.w3.org/2000/svg"
+let uid = 0
 
-class NapField {
+function el(name, attrs, parent) {
+	const node = document.createElementNS(NS, name)
+	for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
+	parent?.append(node)
+	return node
+}
+
+// 一條緯線:小振幅正弦,相鄰線相位相反 → 線與線微微靠攏又分開,是織的節奏
+function weftPath(w, y, amp, wl, phase) {
+	let d = ""
+	for (let x = 0; x <= w + 4; x += 4)
+		d += `${d ? "L" : "M"}${x},${(y + amp * Math.sin(x / wl * Math.PI * 2 + phase)).toFixed(2)}`
+	return d
+}
+
+class WovenGlow {
 	constructor(btn) {
 		this.btn = btn
 		this.mode = btn.dataset.press
-		this.canvas = document.createElement("canvas")
-		btn.prepend(this.canvas)
-		this.ctx = this.canvas.getContext("2d")
-		this.pointer = null   // {x, y, vx, vy, speed}
+		this.id = `wg${uid++}`
+		this.svg = el("svg", {}, null)
+		btn.prepend(this.svg)
+		this.pointer = null
 		this.pressed = false
-		this.press = 0        // 壓痕強度(壓下去慢慢到 1,放開回 0)
-		this.bloom = null     // {x, y, t0} 方案 B 的光澤暈
+		this.gx = 0; this.gy = 0        // 柔光圓現在的位置(lerp 追 pointer)
+		this.glow = 0                    // 光澤 group opacity
+		this.dent = 0                    // 壓痕 group opacity
 		this.raf = 0
 		this.build()
 		new ResizeObserver(() => this.build()).observe(btn)
-		btn.addEventListener("pointerenter", (e) => this.track(e))
+		btn.addEventListener("pointerenter", (e) => this.track(e, true))
 		btn.addEventListener("pointermove", (e) => this.track(e))
 		btn.addEventListener("pointerleave", () => { this.pointer = null; this.wake() })
 		btn.addEventListener("pointerdown", (e) => { this.pressed = true; this.track(e); this.wake() })
 		window.addEventListener("pointerup", () => this.release())
 		btn.addEventListener("keydown", (e) => {
 			if (e.key === " " || e.key === "Enter") {
-				this.pointer = { x: this.w / 2, y: this.h / 2, vx: 0, vy: 0, speed: 0 }
+				this.pointer = { x: this.w / 2, y: this.h / 2, speed: 0 }
+				this.gx = this.w / 2; this.gy = this.h / 2
 				this.pressed = true; this.wake()
 			}
 		})
@@ -111,107 +138,123 @@ class NapField {
 
 	build() {
 		const w = this.btn.clientWidth, h = this.btn.clientHeight
-		if (w === 0 || !this.ctx) return
+		if (w === 0) return
 		this.w = w; this.h = h
-		const dpr = window.devicePixelRatio || 1
-		this.canvas.width = w * dpr
-		this.canvas.height = h * dpr
-		this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-		const cs = getComputedStyle(this.btn)
-		this.rgb = cs.getPropertyValue("--fiber").trim() || "120,110,95"
-		this.baseA = parseFloat(cs.getPropertyValue("--fiber-a")) || 0.12
-		this.fibers = []
-		// 3px 網格 + 抖動:夠密才是布;每根帶一點個體差,不然像印刷網點
-		for (let gy = 2; gy < h - 1; gy += PITCH)
-			for (let gx = 1; gx < w - 1; gx += PITCH)
-				this.fibers.push({
-					x: gx + (Math.random() - 0.5) * 2, y: gy + (Math.random() - 0.5) * 2,
-					a0: (Math.random() - 0.5) * 0.35,            // 靜止角(近水平,微亂)
-					len: 3 + Math.random() * 1.5,
-					shade: 0.75 + Math.random() * 0.5,           // 個體明暗差
-					tilt: 0, tiltV: 0, sheen: 0,
-				})
-		this.draw()
+		this.svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
+		this.svg.replaceChildren()
+		const defs = el("defs", {}, this.svg)
+		// 柔光圓:光澤/壓痕共用的柔邊 mask
+		const soft = el("radialGradient", { id: `${this.id}-soft` }, defs)
+		el("stop", { offset: "0", "stop-color": "#fff", "stop-opacity": ".85" }, soft)
+		el("stop", { offset: ".55", "stop-color": "#fff", "stop-opacity": ".4" }, soft)
+		el("stop", { offset: "1", "stop-color": "#fff", "stop-opacity": "0" }, soft)
+		// 光環:亮度集中在圓周的一圈細環(方案 B 放開時暈開)
+		const ring = el("radialGradient", { id: `${this.id}-ring` }, defs)
+		el("stop", { offset: ".62", "stop-color": "#fff", "stop-opacity": "0" }, ring)
+		el("stop", { offset: ".8", "stop-color": "#fff", "stop-opacity": ".7" }, ring)
+		el("stop", { offset: "1", "stop-color": "#fff", "stop-opacity": "0" }, ring)
+
+		const glowMask = el("mask", { id: `${this.id}-glow` }, defs)
+		this.glowDot = el("circle", { r: 30, fill: `url(#${this.id}-soft)` }, glowMask)
+		const dentMask = el("mask", { id: `${this.id}-dent` }, defs)
+		this.dentDot = el("circle", { r: 17, fill: `url(#${this.id}-soft)` }, dentMask)
+		const ringMask = el("mask", { id: `${this.id}-ring-m` }, defs)
+		this.ringDot = el("circle", { r: 0, fill: `url(#${this.id}-ring)` }, ringMask)
+		this.ringAnim = el("animate", {
+			attributeName: "r", from: "6", to: String(w * 0.75), dur: "480ms",
+			begin: "indefinite", fill: "freeze", calcMode: "spline",
+			keySplines: "0.2 0.6 0.4 1", keyTimes: "0;1", values: `6;${w * 0.75}`,
+		}, this.ringDot)
+
+		// 三層織理 + 亮/暗兩份顯形層(幾何相同,重繪成不同亮度)
+		const weft1 = [], weft2 = []
+		const g1 = el("g", { class: "weft1" }, this.svg)
+		for (let i = 0, y = 2.4; y < h - 1; y += 2.6, i++) {
+			const d = weftPath(w, y, 0.7, 26, i % 2 ? 0 : Math.PI)
+			weft1.push(d)
+			el("path", { d }, g1)
+		}
+		const g2 = el("g", { class: "weft2" }, this.svg)
+		for (let i = 0, y = 3.7; y < h - 1; y += 2.6, i++) {
+			const d = weftPath(w, y, 0.55, 34, i % 2 ? Math.PI / 2 : -Math.PI / 2)
+			weft2.push(d)
+			el("path", { d }, g2)
+		}
+		const g3 = el("g", { class: "warp" }, this.svg)
+		for (let x = 3; x < w - 1; x += 7) {
+			let d = ""
+			for (let y = 0; y <= h; y += 4)
+				d += `${d ? "L" : "M"}${(x + 0.5 * Math.sin(y / 15 + x)).toFixed(2)},${y}`
+			el("path", { d }, g3)
+		}
+
+		this.dentG = el("g", { class: "dent", mask: `url(#${this.id}-dent)`, opacity: 0 }, this.svg)
+		for (const d of weft1) el("path", { d }, this.dentG)
+		this.sheenG = el("g", { class: "sheen", mask: `url(#${this.id}-glow)`, opacity: 0 }, this.svg)
+		for (const d of weft1) el("path", { d, "stroke-opacity": ".5" }, this.sheenG)
+		for (const d of weft2) el("path", { d, "stroke-opacity": ".3" }, this.sheenG)
+		this.ringG = el("g", { class: "sheen", mask: `url(#${this.id}-ring-m)`, opacity: 0 }, this.svg)
+		for (const d of weft1) el("path", { d, "stroke-opacity": ".6" }, this.ringG)
 	}
 
-	track(e) {
+	track(e, enter) {
 		const r = this.btn.getBoundingClientRect()
 		const x = e.clientX - r.left, y = e.clientY - r.top
 		const p = this.pointer
-		const vx = p ? x - p.x : 0, vy = p ? y - p.y : 0
-		const speed = Math.hypot(vx, vy)
-		this.pointer = { x, y, vx, vy, speed: p ? p.speed * 0.6 + speed * 0.4 : 0 }
+		const speed = p ? Math.hypot(x - p.x, y - p.y) : 0
+		this.pointer = { x, y, speed: p ? p.speed * 0.6 + speed * 0.4 : 0 }
+		if (enter) { this.gx = x; this.gy = y }   // 進場時光直接在指尖,不從舊位置飛過來
 		this.wake()
 	}
 
 	release() {
 		if (!this.pressed) return
 		this.pressed = false
-		if (this.mode === "bloom" && this.pointer)
-			this.bloom = { x: this.pointer.x, y: this.pointer.y, t0: performance.now() }
+		if (this.mode === "bloom" && this.pointer != null && !REDUCED) {
+			this.ringDot.setAttribute("cx", this.gx)
+			this.ringDot.setAttribute("cy", this.gy)
+			this.ringG.setAttribute("opacity", "1")
+			this.ringStart = performance.now()
+			this.ringAnim.beginElement()
+		}
 		this.wake()
 	}
 
 	tick(now) {
 		const p = this.pointer
-		const ironed = this.pressed && this.mode === "bloom"
-		this.press += ((this.pressed && this.mode === "dent" ? 1 : 0) - this.press) * 0.25
-		let energy = this.press
-		for (const f of this.fibers) {
-			let tiltTarget = 0
-			if (p != null && !ironed) {
-				const g = Math.exp(-((f.x - p.x) ** 2 + (f.y - p.y) ** 2) / (2 * SIGMA ** 2))
-				// 倒伏方向跟著指尖走向;摸得快痕跡亮
-				tiltTarget = Math.max(-0.9, Math.min(0.9, p.vx * 0.06 + p.vy * 0.03)) * g
-				f.sheen = Math.min(1, f.sheen + g * Math.min(1, p.speed / 4) * 0.5)
-			}
-			if (this.bloom != null) {
-				// 光澤暈:亮度的圓環從按點暈開,c≈0.09px/ms,約 500ms 淡完
-				const age = now - this.bloom.t0
-				const d = Math.hypot(f.x - this.bloom.x, f.y - this.bloom.y)
-				const ring = Math.exp(-((d - age * 0.09) ** 2) / (2 * 7 ** 2))
-				f.sheen = Math.min(1, f.sheen + ring * Math.exp(-age / 220) * 0.7)
-			}
-			f.tiltV += (tiltTarget - f.tilt) * 0.2 - f.tiltV * 0.35
-			f.tilt += ironed ? (0 - f.tilt) * 0.4 : f.tiltV
-			f.sheen *= ironed ? 0.8 : 0.955   // 熨平時光澤快速收掉;平時慢慢消退
-			energy += Math.abs(f.tiltV) + f.sheen
+		// 光追指尖:lerp 的延遲就是「光澤追著手」的撫摸感
+		if (p != null) {
+			this.gx += (p.x - this.gx) * 0.22
+			this.gy += (p.y - this.gy) * 0.22
+			p.speed *= 0.92
 		}
-		if (this.bloom != null && now - this.bloom.t0 > 700) this.bloom = null
-		this.draw()
-		const active = p != null || this.bloom != null || this.pressed || energy > 0.7
+		const pressDent = this.pressed && this.mode === "dent"
+		const pressBloom = this.pressed && this.mode === "bloom"
+		// 目標亮度:hover 基礎 .5,摸得快到 1;按下時 dent 收光、bloom 收攏成小粒
+		let glowT = 0
+		if (p != null && !pressDent) glowT = Math.min(1, 0.5 + p.speed / 5)
+		this.glow += (glowT - this.glow) * 0.14
+		this.dent += ((pressDent ? 1 : 0) - this.dent) * 0.22
+		this.glowDot.setAttribute("cx", this.gx.toFixed(1))
+		this.glowDot.setAttribute("cy", this.gy.toFixed(1))
+		this.glowDot.setAttribute("r", pressBloom ? 10 : 30)
+		this.dentDot.setAttribute("cx", this.gx.toFixed(1))
+		this.dentDot.setAttribute("cy", this.gy.toFixed(1))
+		this.sheenG.setAttribute("opacity", this.glow.toFixed(3))
+		this.dentG.setAttribute("opacity", (this.dent * 0.85).toFixed(3))
+		if (this.ringStart != null) {
+			const age = now - this.ringStart
+			this.ringG.setAttribute("opacity", Math.max(0, 1 - age / 480).toFixed(3))
+			if (age > 500) { this.ringStart = null; this.ringG.setAttribute("opacity", "0") }
+		}
+		const active = p != null || this.pressed || this.ringStart != null ||
+			this.glow > 0.005 || this.dent > 0.005
 		this.raf = active ? requestAnimationFrame((n) => this.tick(n)) : 0
 	}
 
-	draw() {
-		const ctx = this.ctx
-		if (!ctx) return
-		ctx.clearRect(0, 0, this.w, this.h)
-		ctx.lineCap = "round"
-		ctx.lineWidth = 1
-		const p = this.pointer
-		for (const f of this.fibers) {
-			let press = 0
-			if (this.press > 0.01 && p != null) {
-				const d = Math.hypot(f.x - p.x, f.y - p.y)
-				press = this.press * Math.exp(-(d ** 2) / (2 * PRESS_R ** 2))
-			}
-			// 壓痕:絨毛壓平(變短)、壓暗;光澤:變亮。都是亮度語言,形變很小。
-			const alpha = this.baseA * f.shade * (1 + f.sheen * 1.6 - press * 0.55)
-			const len = f.len * (1 - press * 0.45)
-			const a = f.a0 + f.tilt
-			const dx = Math.cos(a) * len / 2, dy = Math.sin(a) * len / 2
-			ctx.strokeStyle = `rgba(${this.rgb},${Math.max(0, alpha).toFixed(3)})`
-			ctx.beginPath()
-			ctx.moveTo(f.x - dx, f.y - dy)
-			ctx.lineTo(f.x + dx, f.y + dy)
-			ctx.stroke()
-		}
-	}
-
-	wake() { if (!this.raf && !REDUCED && this.ctx) this.raf = requestAnimationFrame((n) => this.tick(n)) }
+	wake() { if (!this.raf && !REDUCED) this.raf = requestAnimationFrame((n) => this.tick(n)) }
 }
 
-for (const btn of document.querySelectorAll(".fiber")) new NapField(btn)
+for (const btn of document.querySelectorAll(".fiber")) new WovenGlow(btn)
 </script>
 </html>
