@@ -70,7 +70,8 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
     <button class="fiber secondary"><span class="lbl">重新生成</span></button>
     <button class="fiber primary"><span class="lbl">刪除記憶</span></button>
   </div>
-  <p class="hint">按左邊和按右邊,繃緊的中心不一樣;放開時光澤帶沿你最後移動的方向從按點掃出。</p>
+  <p class="hint">按下時周圍的紗朝按點收攏,<b>點擊點是凹陷的最低點</b>(指尖把布壓出一個窩),
+  外圍再帶一點繃緊;放開時窩彈回、微微外鼓,光澤帶沿你最後移動的方向從按點掃出。</p>
 </section>
 
 <script>
@@ -113,7 +114,7 @@ class SilkBody {
 		this.pressed = false
 		this.gx = 0; this.gy = 0
 		this.tension = 0; this.tenV = 0
-		this.pressX = 0
+		this.pressX = 0; this.pressY = 0
 		this.bx = 0; this.bandOp = 0
 		this.sweep = null
 		this.raf = 0
@@ -124,13 +125,16 @@ class SilkBody {
 		btn.addEventListener("pointermove", (e) => this.track(e))
 		btn.addEventListener("pointerleave", () => { this.pointer = null; this.wake() })
 		btn.addEventListener("pointerdown", (e) => {
-			this.pressed = true; this.track(e); this.pressX = this.gx; this.wake()
+			this.pressed = true; this.track(e)
+			this.pressX = this.gx; this.pressY = this.gy
+			this.wake()
 		})
 		window.addEventListener("pointerup", () => this.release())
 		btn.addEventListener("keydown", (e) => {
 			if (e.key === " " || e.key === "Enter") {
 				this.pointer = { x: this.w / 2, y: this.h / 2, vx: 0, vy: 0, speed: 0 }
-				this.gx = this.bx = this.pressX = this.w / 2; this.gy = this.h / 2
+				this.gx = this.bx = this.pressX = this.w / 2
+				this.gy = this.pressY = this.h / 2
 				this.pressed = true; this.wake()
 			}
 		})
@@ -216,14 +220,22 @@ class SilkBody {
 		}
 	}
 
-	// 一條紗當下的 d:靜態 base × 繃緊包絡(以按點為中心)+ 帶動位移 × 指尖 x 包絡
+	// 一條紗當下的 d:
+	// 靜態 base × 局部繃緊 + 凹陷(紗朝按點收攏,點擊點是最低點)+ 帶動位移
 	liveD(yarn) {
-		const sT = 2 * (this.w * 0.5) ** 2
-		const sX = 2 * (this.w * 0.2) ** 2
+		const sT = 2 * (this.w * 0.35) ** 2       // 繃緊的 x 包絡
+		const sD = 2 * (this.w * 0.22) ** 2       // 凹陷的 x 包絡
+		const sX = 2 * (this.w * 0.2) ** 2        // 帶動的 x 包絡
+		const ten = Math.max(-0.4, this.tension)
+		// 凹陷深度(每條紗一個值):朝按點的方向,|Δy|≈13px 處最深,按點本身為極值中心
+		const dy = this.pressY - yarn.y
+		const funnel = ten * dy * 0.5 * Math.exp(-(dy ** 2) / 338)
 		let d = ""
 		for (let i = 0, x = 0; x <= this.w; x += STEP, i++) {
-			const ampl = 1 - 0.88 * Math.max(-0.4, this.tension) * Math.exp(-((x - this.pressX) ** 2) / sT)
-			const y = yarn.y + yarn.base[i] * ampl + yarn.disp * Math.exp(-((x - this.gx) ** 2) / sX)
+			const ampl = 1 - 0.5 * ten * Math.exp(-((x - this.pressX) ** 2) / sT)
+			const y = yarn.y + yarn.base[i] * ampl +
+				funnel * Math.exp(-((x - this.pressX) ** 2) / sD) +
+				yarn.disp * Math.exp(-((x - this.gx) ** 2) / sX)
 			d += `${d ? "L" : "M"}${x},${y.toFixed(2)}`
 		}
 		return d
