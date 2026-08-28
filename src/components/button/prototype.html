@@ -27,16 +27,16 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 
 /* 每個 variant 一組紗線色:un 底紗、sh 縫隙陰影、0–4 本體(深→淺)、hi 挑面亮紗 */
 .fiber.primary{color:var(--accent-text);
-  --y-un:#194F40;--y-sh:#123C31;--y0:#1E6250;--y1:#216A55;--y2:#23705A;--y3:#28795F;--y4:#2E8266;--y-hi:#5CAA89;
+  --y-un:#11362C;--y-sh:#123C31;--y0:#1E6250;--y1:#216A55;--y2:#23705A;--y3:#28795F;--y4:#2E8266;--y-hi:#5CAA89;
   filter:drop-shadow(0 1px 1.5px rgba(18,60,49,.30))}
 @media(prefers-color-scheme:dark){.fiber.primary{
-  --y-un:#316B57;--y-sh:#1B4437;--y0:#3F8A70;--y1:#47957A;--y2:#4FA184;--y3:#56A98B;--y4:#5EB193;--y-hi:#8FD2B4;
+  --y-un:#173629;--y-sh:#1B4437;--y0:#3F8A70;--y1:#47957A;--y2:#4FA184;--y3:#56A98B;--y4:#5EB193;--y-hi:#8FD2B4;
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}}
 .fiber.secondary{color:var(--text);
-  --y-un:#DBD7C8;--y-sh:#C9C4B4;--y0:#E4E0D3;--y1:#E8E5D9;--y2:#EDEAE0;--y3:#F1EEE6;--y4:#F5F3EC;--y-hi:#FFFFFF;
+  --y-un:#CBC5B4;--y-sh:#C9C4B4;--y0:#E4E0D3;--y1:#E8E5D9;--y2:#EDEAE0;--y3:#F1EEE6;--y4:#F5F3EC;--y-hi:#FFFFFF;
   filter:drop-shadow(0 1px 1.5px rgba(80,74,60,.22))}
 @media(prefers-color-scheme:dark){.fiber.secondary{
-  --y-un:#221E18;--y-sh:#15120E;--y0:#2B2620;--y1:#2F2A23;--y2:#332E26;--y3:#38322A;--y4:#3D372E;--y-hi:#5E5546;
+  --y-un:#0E0C09;--y-sh:#15120E;--y0:#2B2620;--y1:#2F2A23;--y2:#332E26;--y3:#38322A;--y4:#3D372E;--y-hi:#5E5546;
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}}
 .fiber.ghost{color:var(--text);
   --y-un:transparent;--y-sh:transparent;--y0:#DCD8CA;--y1:#DFDBCE;--y2:#E3E0D5;--y3:#E7E4D9;--y4:#EBE8DE;--y-hi:#C8C3B4}
@@ -47,9 +47,10 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 </style>
 
 <h1>Button — 織成的實心</h1>
-<p class="hint">沒有 background,按鈕是線織出來的。底層粗暗紗鋪滿(保證不透底),
-面上的細紗(0.5–1.5px)跟著一片<b>共享的波場</b>起伏 — 相鄰紗一起走,像布的垂墜,
-每條再帶自己的小顫和深淺差。細、密、完全覆蓋,但沒有一條線是直的。</p>
+<p class="hint">沒有 background,按鈕是線織出來的。最底下是一層<b>靜態的深色打底紗</b>
+(3.4px 粗、1.5px 距,不參與任何動態,數學上保證無縫)— 面紗之間的縫隙透出來的
+是它的深色,讀作布的深度。面上的細紗(0.6–1.4px)跟著共享波場起伏,
+每條再帶自己的小顫和深淺差。</p>
 
 <section>
   <h2>hover — 三個 variant</h2>
@@ -181,11 +182,13 @@ class WovenBody {
 		const body = el("g", clip, this.svg)
 		const yarns = []
 
-		// 1. 底紗:粗、暗、密 — 先把布鋪滿,任何縫隙透出來的都是紗影不是底色
+		// 1. 底紗:靜態打底層,不參與任何動態。粗 3.4px、距 1.5px,
+		//    相鄰紗同走波場 → 重疊量恆 > 1.5px,數學上保證無縫;
+		//    面紗之間的縫隙透出來的永遠是這層的深色 = 布的深度,不是漏底
 		if (!ghost) {
 			const under = el("g", { stroke: "var(--y-un)" }, body)
-			for (let y = 0; y < h + 2; y += 1.8)
-				el("path", { d: this.yarn(y, 0.25), "stroke-width": "2.6" }, under)
+			for (let y = -0.8; y < h + 2.6; y += 1.5)
+				el("path", { d: this.yarn(y, 0.2), "stroke-width": "3.4" }, under)
 		}
 		// 2. 縫隙陰影:細暗紗夾在面紗之間,織紋的凹處
 		if (!ghost) {
