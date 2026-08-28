@@ -49,8 +49,8 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 <h1>Button — 織成的實心</h1>
 <p class="hint">沒有 background,按鈕是線織出來的。最底下是一層<b>靜態的深色打底紗</b>
 (3.4px 粗、1.5px 距,不參與任何動態,數學上保證無縫)— 面紗之間的縫隙透出來的
-是它的深色,讀作布的深度。面上的細紗(0.6–1.4px)跟著共享波場起伏,
-每條再帶自己的小顫和深淺差。</p>
+是它的深色,讀作布的深度。面上的細紗(0.6–1.4px)是<b>順滑的長曲線</b> —
+波長比按鈕還寬,每條線至多緩緩彎一兩次,像緞面;個體差只來自粗細與深淺。</p>
 
 <section>
   <h2>hover — 三個 variant</h2>
@@ -81,9 +81,9 @@ p.hint{font-size:.8rem;color:var(--muted);margin:0;max-width:30rem}
 </section>
 
 <script>
-// 覆蓋靠兩件事保證:底層粗紗鋪滿 + 面紗用共享波場(相鄰紗同進退,
-// divergence 不會超過線寬,不露縫)。生命力靠:波場本身是兩個不可通約
-// 頻率的干涉、隨 y 緩慢換相,每條紗再疊自己的小顫、粗細與深淺個體差。
+// 覆蓋靠兩件事保證:底層粗紗鋪滿 + 所有紗共用一片波場(相鄰紗同進退,
+// divergence 不會超過線寬,不露縫)。質感靠順滑:波場只有長波、沒有高頻,
+// 每條紗都是流過去的緞面曲線;個體差只來自粗細與深淺。
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches
 const NS = "http://www.w3.org/2000/svg"
 let uid = 0
@@ -126,23 +126,24 @@ class WovenBody {
 		btn.addEventListener("keyup", () => this.release())
 	}
 
-	// 共享波場:整塊布一起呼吸的起伏。兩個頻率干涉,相位隨 y 緩慢滑移
-	//(所以起伏斜斜地掃過布面,不是每一行都一樣)。
+	// 共享波場:只有長波,沒有高頻 — 每條線在按鈕裡至多緩緩彎一兩次。
+	// 波長比按鈕寬(以及一支更長的副波),相位隨 y 緩慢滑移,
+	// 整塊布像緞面一樣流過去;線的個體差只來自粗細與深淺,不來自抖動。
 	makeField() {
-		const A1 = rand(0.8, 1.3), W1 = rand(64, 118), P1 = rand(0, 6.28), K1 = rand(0.06, 0.14)
-		const A2 = rand(0.35, 0.6), W2 = rand(24, 42), P2 = rand(0, 6.28), K2 = rand(0.16, 0.3)
+		const W1 = rand(Math.max(120, this.w * 0.9), this.w * 1.8)
+		const A1 = rand(1.0, 1.8), P1 = rand(0, 6.28), K1 = rand(0.05, 0.11)
+		const W2 = rand(this.w * 1.6, this.w * 3)
+		const A2 = rand(0.5, 0.9), P2 = rand(0, 6.28), K2 = rand(0.03, 0.07)
 		return (x, y) =>
 			A1 * Math.sin((x / W1) * 6.283 + P1 + y * K1) +
 			A2 * Math.sin((x / W2) * 6.283 + P2 + y * K2)
 	}
 
-	// 一條紗 = 波場 + 自己的小顫(短波長、小振幅);全部收在按鈕範圍內
-	yarn(y0, own) {
-		const a = rand(0.1, own), wl = rand(6.5, 15), ph = rand(0, 6.28)
-		const x0 = 0, x1 = this.w
+	// 一條紗 = 純粹的波場曲線,順滑無顫;全部收在按鈕範圍內
+	yarn(y0) {
 		let d = ""
-		for (let x = x0; x <= x1; x += 2.5) {
-			const y = y0 + this.field(x, y0) + a * Math.sin((x / wl) * 6.283 + ph)
+		for (let x = 0; x <= this.w; x += 3) {
+			const y = y0 + this.field(x, y0)
 			d += `${d ? "L" : "M"}${x.toFixed(1)},${y.toFixed(2)}`
 		}
 		return d
@@ -188,13 +189,13 @@ class WovenBody {
 		if (!ghost) {
 			const under = el("g", { stroke: "var(--y-un)" }, body)
 			for (let y = -0.8; y < h + 2.6; y += 1.5)
-				el("path", { d: this.yarn(y, 0.2), "stroke-width": "3.4" }, under)
+				el("path", { d: this.yarn(y), "stroke-width": "3.4" }, under)
 		}
 		// 2. 縫隙陰影:細暗紗夾在面紗之間,織紋的凹處
 		if (!ghost) {
 			const seams = el("g", { stroke: "var(--y-sh)", opacity: ".5" }, body)
 			for (let y = 1.6; y < h + 1; y += 2.4)
-				el("path", { d: this.yarn(y, 0.3), "stroke-width": rand(0.5, 0.8).toFixed(2) }, seams)
+				el("path", { d: this.yarn(y), "stroke-width": rand(0.5, 0.8).toFixed(2) }, seams)
 		}
 		// 3. 面紗:細(0.6–1.4px)、密(≈1.2px 行距),跟著波場走;
 		//    深度 + 個體差挑色,上淺下深的光感
@@ -202,7 +203,7 @@ class WovenBody {
 		for (let y = 0.6; y < h + 1; y += pitch + rand(-0.15, 0.15)) {
 			const depth = y / h
 			const bucket = Math.min(4, Math.max(0, Math.round(4.2 - depth * 3 + rand(-0.9, 0.9))))
-			const d = this.yarn(y, 0.4)
+			const d = this.yarn(y)
 			const width = rand(0.6, ghost ? 1.0 : 1.4)
 			yarns.push({ d, width })
 			el("path", { d, "stroke-width": width.toFixed(2), stroke: `var(--y${bucket})` }, body)
@@ -210,7 +211,7 @@ class WovenBody {
 		// 4. 挑面亮紗:極細,布的高光絲
 		const hiG = el("g", { stroke: "var(--y-hi)", opacity: ".45" }, body)
 		for (let i = 0; i < (ghost ? 2 : 5); i++)
-			el("path", { d: this.yarn(rand(2, h * 0.6), 0.3), "stroke-width": rand(0.4, 0.7).toFixed(2) }, hiG)
+			el("path", { d: this.yarn(rand(2, h * 0.6)), "stroke-width": rand(0.4, 0.7).toFixed(2) }, hiG)
 
 		// 光澤/壓痕/光環:抽 1/3 面紗重繪,mask 顯形
 		const sample = yarns.filter((_, i) => i % 3 === 0)
