@@ -1,6 +1,7 @@
 import { Combobox } from "@base-ui/react/combobox"
 import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
+import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -64,6 +65,8 @@ const styles = stylex.create({
 	trigger: {
 		width: "100%",
 		minHeight: "2.25rem",
+		// multiple 的 trigger 是 div(不是原生 button,拿不到 UA 的 border-box)
+		boxSizing: "border-box",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xxs,
@@ -99,7 +102,6 @@ const styles = stylex.create({
 		fontSize: text.xs,
 	},
 	chipRemove: {
-		all: "unset",
 		cursor: "pointer",
 		color: color.textMuted,
 		lineHeight: 1,
@@ -119,7 +121,6 @@ const styles = stylex.create({
 	},
 	searchIcon: { color: color.textFaint, flex: "none" },
 	searchInput: {
-		all: "unset",
 		flex: 1,
 		fontFamily: font.body,
 		fontSize: text.sm,
@@ -356,7 +357,7 @@ export function Select({
 										event.stopPropagation()
 										emit(selectedList.filter((o) => o.value !== option.value).map((o) => o.value))
 									}}
-									{...stylex.props(styles.chipRemove)}
+									{...stylex.props(reset.control, styles.chipRemove)}
 								>
 									×
 								</button>
@@ -389,7 +390,7 @@ export function Select({
 								<Combobox.Input
 									placeholder={searchPlaceholder}
 									aria-label={searchLabel}
-									{...stylex.props(styles.searchInput)}
+									{...stylex.props(reset.control, styles.searchInput)}
 								/>
 							</div>
 						) : (

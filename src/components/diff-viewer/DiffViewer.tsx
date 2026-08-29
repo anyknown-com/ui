@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, useId, useMemo, useState } from "react"
+import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -70,7 +71,6 @@ const styles = stylex.create({
 	markAdd: { backgroundColor: color.successHl },
 	markDel: { backgroundColor: color.dangerHl },
 	fold: {
-		all: "unset",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
@@ -174,7 +174,7 @@ function Fold({ rows, label }: { rows: DiffRow[]; label: string }) {
 				aria-expanded={open}
 				aria-controls={id}
 				onClick={() => setOpen((value) => !value)}
-				{...stylex.props(styles.fold)}
+				{...stylex.props(reset.control, styles.fold)}
 			>
 				<svg
 					width="10"

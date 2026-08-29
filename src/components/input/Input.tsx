@@ -7,6 +7,9 @@ import { useFieldControl } from "../label/fieldContext"
 export const controlStyles = stylex.create({
 	base: {
 		width: "100%",
+		// 沒有 border-box,minHeight 2.25rem 是「內容」36px,再加 padding+border → 54px;
+		// 元件不能靠 app 端有沒有 `*{box-sizing:border-box}` reset
+		boxSizing: "border-box",
 		backgroundColor: color.surface,
 		borderWidth: 1,
 		borderStyle: "solid",
@@ -19,7 +22,9 @@ export const controlStyles = stylex.create({
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: text.sm,
-		lineHeight: text.leadingNormal,
+		// 單行控件的行高只要裝得下字:1.5 會把 md 撐到 39px,跟 button/select 的
+		// 2.25rem 對不齊(Textarea 自己蓋回 leadingRelaxed,多行照樣好讀)
+		lineHeight: text.leadingTight,
 		transitionProperty: "border-color",
 		transitionDuration: { default: motion.fast, "@media (prefers-reduced-motion: reduce)": "0s" },
 		transitionTimingFunction: motion.ease,

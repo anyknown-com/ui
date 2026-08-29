@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
+import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
 import { color, font, radius, space, text } from "../../tokens.stylex"
 
@@ -67,7 +68,6 @@ const styles = stylex.create({
 		opacity: { default: "var(--ak-row-affordance, 0)", ":focus-within": 1 },
 	},
 	action: {
-		all: "unset",
 		cursor: "pointer",
 		width: "1.6rem",
 		height: "1.6rem",
@@ -292,7 +292,7 @@ export function FileRow({
 							event.stopPropagation()
 							action.onAction()
 						}}
-						{...stylex.props(styles.action)}
+						{...stylex.props(reset.control, styles.action)}
 					>
 						{action.icon}
 					</button>

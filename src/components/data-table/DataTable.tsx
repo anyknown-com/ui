@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { reset } from "../../lib/styled"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -63,7 +64,6 @@ const styles = stylex.create({
 	},
 	thCheck: { width: "2rem", paddingBlock: space.xxs, paddingInline: space.xs },
 	sort: {
-		all: "unset",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xxs,
@@ -114,7 +114,6 @@ const styles = stylex.create({
 	editable: { cursor: "text" },
 	empty: { color: color.textFaint },
 	cellInput: {
-		all: "unset",
 		width: "100%",
 		fontFamily: font.body,
 		fontSize: text.sm,
@@ -143,7 +142,6 @@ const styles = stylex.create({
 		borderTopColor: color.border,
 	},
 	clear: {
-		all: "unset",
 		color: color.accent,
 		cursor: "pointer",
 		textDecorationLine: "underline",
@@ -346,7 +344,11 @@ export function DataTable<Row>({
 									{...stylex.props(styles.th)}
 								>
 									{column.sortable ? (
-										<button type="button" onClick={() => toggleSort(column)} {...stylex.props(styles.sort)}>
+										<button
+											type="button"
+											onClick={() => toggleSort(column)}
+											{...stylex.props(reset.control, styles.sort)}
+										>
 											{column.header}
 											{sort?.col === column.id && (
 												<span aria-hidden="true" {...stylex.props(styles.arrow)}>
@@ -369,7 +371,11 @@ export function DataTable<Row>({
 									{onClearFilter != null && (
 										<>
 											{" "}
-											<button type="button" onClick={onClearFilter} {...stylex.props(styles.clear)}>
+											<button
+												type="button"
+												onClick={onClearFilter}
+												{...stylex.props(reset.control, styles.clear)}
+											>
 												{clearLabel}
 											</button>
 										</>
@@ -440,7 +446,7 @@ export function DataTable<Row>({
 																	leaveEdit(cell)
 																}
 															}}
-															{...stylex.props(styles.cellInput)}
+															{...stylex.props(reset.control, styles.cellInput)}
 														/>
 													) : (
 														(column.cell?.(row) ??

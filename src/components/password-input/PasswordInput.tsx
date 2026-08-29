@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, useId, useState } from "react"
-import { styled } from "../../lib/styled"
+import { reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, font, radius, space, text } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
@@ -12,7 +12,6 @@ const styles = stylex.create({
 	field: { position: "relative" },
 	input: { paddingInlineEnd: "2.4rem" },
 	toggle: {
-		all: "unset",
 		position: "absolute",
 		insetInlineEnd: space.xxs,
 		insetBlockStart: "50%",
@@ -243,7 +242,7 @@ export function PasswordInput({
 						setRevealed((shown) => !shown)
 						event.currentTarget.parentElement?.querySelector("input")?.focus()
 					}}
-					{...stylex.props(styles.toggle)}
+					{...stylex.props(reset.control, styles.toggle)}
 				>
 					<EyeIcon off={revealed} />
 				</button>

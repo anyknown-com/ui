@@ -1,6 +1,7 @@
 import { Toast as BaseToast } from "@base-ui/react/toast"
 import * as stylex from "@stylexjs/stylex"
 import { createContext, useContext, useState } from "react"
+import { reset } from "../../lib/styled"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { UNWEAVE_PATH } from "../../lib/paths"
 import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
@@ -79,7 +80,6 @@ const styles = stylex.create({
 	title: { margin: 0, fontSize: text.sm, color: color.text },
 	description: { margin: 0, fontSize: "0.78rem", color: color.textMuted },
 	action: {
-		all: "unset",
 		fontFamily: font.body,
 		fontSize: "0.8rem",
 		fontWeight: 500,
@@ -260,7 +260,7 @@ function ToastItem({ toast: item, fallbackTimeout, paused }: ToastItemProps) {
 				<BaseToast.Title {...stylex.props(styles.title)} />
 				{item.description != null && <BaseToast.Description {...stylex.props(styles.description)} />}
 			</BaseToast.Content>
-			{item.actionProps != null && <BaseToast.Action {...stylex.props(styles.action)} />}
+			{item.actionProps != null && <BaseToast.Action {...stylex.props(reset.control, styles.action)} />}
 		</BaseToast.Root>
 	)
 }

@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react"
+import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -31,7 +32,6 @@ const styles = stylex.create({
 		outlineOffset: -1,
 	},
 	textarea: {
-		all: "unset",
 		width: "100%",
 		boxSizing: "border-box",
 		fontFamily: font.body,
@@ -50,7 +50,6 @@ const styles = stylex.create({
 	},
 	bar: { display: "flex", alignItems: "center", gap: space.xxs },
 	iconButton: {
-		all: "unset",
 		display: "grid",
 		placeItems: "center",
 		width: "1.9rem",
@@ -86,7 +85,6 @@ const styles = stylex.create({
 		outlineOffset: -1,
 	},
 	send: {
-		all: "unset",
 		display: "grid",
 		placeItems: "center",
 		width: "1.9rem",
@@ -430,7 +428,7 @@ export function Composer({
 				onKeyUp={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}
 				onClick={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}
 				onKeyDown={onKeyDown}
-				{...stylex.props(styles.textarea)}
+				{...stylex.props(reset.control, styles.textarea)}
 			/>
 			<div {...stylex.props(styles.bar)}>
 				<button
@@ -438,7 +436,7 @@ export function Composer({
 					aria-label={`加入來源(@)`}
 					aria-expanded={mode === "sources" && open}
 					onClick={() => insertMarker("@")}
-					{...stylex.props(styles.iconButton)}
+					{...stylex.props(reset.control, styles.iconButton)}
 				>
 					<AtIcon />
 				</button>
@@ -447,7 +445,7 @@ export function Composer({
 					aria-label="指令(/)"
 					aria-expanded={mode === "commands" && open}
 					onClick={() => insertMarker("/")}
-					{...stylex.props(styles.iconButton)}
+					{...stylex.props(reset.control, styles.iconButton)}
 				>
 					<SlashIcon />
 				</button>
@@ -472,7 +470,7 @@ export function Composer({
 						aria-label="語音輸入"
 						aria-pressed={micActive}
 						onClick={onMicToggle}
-						{...stylex.props(styles.iconButton, micActive && styles.iconButtonOn)}
+						{...stylex.props(reset.control, styles.iconButton, micActive && styles.iconButtonOn)}
 					>
 						<MicIcon />
 					</button>
@@ -482,7 +480,7 @@ export function Composer({
 					aria-label="送出"
 					disabled={!canSend}
 					onClick={submit}
-					{...stylex.props(styles.send)}
+					{...stylex.props(reset.control, styles.send)}
 				>
 					<SendIcon />
 				</button>

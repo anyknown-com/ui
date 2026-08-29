@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { styled } from "../../lib/styled"
+import { reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -37,7 +37,6 @@ const styles = stylex.create({
 		color: color.textFaint,
 	},
 	copy: {
-		all: "unset",
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
@@ -136,7 +135,7 @@ export function CodeBlock({
 				<button
 					type="button"
 					onClick={() => copy(code)}
-					{...stylex.props(styles.copy, copied && styles.copied)}
+					{...stylex.props(reset.control, styles.copy, copied && styles.copied)}
 				>
 					{!copied && <CopyIcon />}
 					{copied ? copiedLabel : copyLabel}

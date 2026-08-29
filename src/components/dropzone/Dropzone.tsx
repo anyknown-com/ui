@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
+import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
@@ -116,7 +117,6 @@ const styles = stylex.create({
 	jobError: { backgroundColor: color.dangerSubtle },
 	name: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	cancel: {
-		all: "unset",
 		cursor: "pointer",
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
@@ -343,7 +343,7 @@ export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: Upl
 								type="button"
 								aria-label={`取消上傳 ${job.name}`}
 								onClick={() => onCancel(job.id)}
-								{...stylex.props(styles.cancel)}
+								{...stylex.props(reset.control, styles.cancel)}
 							>
 								✕
 							</button>

@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId, useState } from "react"
+import { reset } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
 import { color, font, radius, space, text } from "../../tokens.stylex"
@@ -20,7 +21,6 @@ const styles = stylex.create({
 	},
 	cardError: { borderColor: `color-mix(in srgb, ${color.danger} 45%, ${color.border})` },
 	row: {
-		all: "unset",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
@@ -121,7 +121,6 @@ const styles = stylex.create({
 		whiteSpace: "pre-wrap",
 	},
 	copyError: {
-		all: "unset",
 		fontFamily: font.body,
 		fontSize: text.xs,
 		color: color.danger,
@@ -320,7 +319,7 @@ export function ToolCard({
 				aria-expanded={open}
 				aria-controls={detailId}
 				onClick={() => setOpen((value) => !value)}
-				{...stylex.props(styles.row)}
+				{...stylex.props(reset.control, styles.row)}
 			>
 				{state === "running" && <span aria-hidden="true" {...stylex.props(styles.spinner)} />}
 				{state === "completed" && (
@@ -403,7 +402,7 @@ export function ToolError({
 			<pre tabIndex={0} role="group" aria-label={label} {...stylex.props(styles.io, styles.ioError)}>
 				{value}
 			</pre>
-			<button type="button" onClick={() => copy(value)} {...stylex.props(styles.copyError)}>
+			<button type="button" onClick={() => copy(value)} {...stylex.props(reset.control, styles.copyError)}>
 				{copied ? copiedLabel : copyLabel}
 			</button>
 		</>

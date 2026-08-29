@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { styled } from "../../lib/styled"
+import { reset, styled } from "../../lib/styled"
 import { color, font, radius, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -44,22 +44,26 @@ const styles = stylex.create({
 	dotWarning: { color: color.warning },
 	count: { fontFamily: font.mono, fontSize: "0.7rem", fontWeight: 600, lineHeight: 1 },
 	remove: {
-		all: "unset",
+		position: "relative",
 		display: "grid",
 		placeItems: "center",
 		width: "1rem",
 		height: "1rem",
+		// 圓鈕比字高:負的 block margin 讓它不撐高 chip(跟其他 badge 等高)
+		marginBlock: "-0.2rem",
 		marginInlineEnd: "-0.2rem",
 		borderRadius: radius.full,
 		cursor: "pointer",
 		color: "inherit",
-		opacity: { default: 0.85, ":hover": 1, ":focus-visible": 1 },
+		opacity: { default: 0.7, ":hover": 1, ":focus-visible": 1 },
 		backgroundColor: {
 			default: "transparent",
-			":hover": "color-mix(in srgb, currentColor 12%, transparent)",
+			":hover": "color-mix(in srgb, currentColor 14%, transparent)",
 		},
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 1,
+		// 看起來 16px、可點 24px(WCAG 2.2 target size),不影響版面
+		"::after": { content: '""', position: "absolute", inset: "-0.25rem" },
 	},
 })
 
@@ -96,8 +100,24 @@ export function Chip({ onRemove, removeLabel, variant = "outline", children, ...
 		<Badge variant={variant} {...props}>
 			{children}
 			{onRemove != null && (
-				<button type="button" aria-label={removeLabel} onClick={onRemove} {...stylex.props(styles.remove)}>
-					×
+				<button
+					type="button"
+					aria-label={removeLabel}
+					onClick={onRemove}
+					{...stylex.props(reset.control, styles.remove)}
+				>
+					<svg
+						width="8"
+						height="8"
+						viewBox="0 0 8 8"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.5"
+						strokeLinecap="round"
+						aria-hidden="true"
+					>
+						<path d="m1 1 6 6M7 1 1 7" />
+					</svg>
 				</button>
 			)}
 		</Badge>

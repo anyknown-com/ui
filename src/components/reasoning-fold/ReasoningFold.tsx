@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useEffect, useId, useRef, useState } from "react"
+import { reset } from "../../lib/styled"
 import { color, radius, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -10,7 +11,6 @@ const shimmer = stylex.keyframes({ to: { backgroundPosition: "-200% 0" } })
 const styles = stylex.create({
 	fold: { display: "grid" },
 	row: {
-		all: "unset",
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
@@ -136,7 +136,7 @@ export function ReasoningFold({
 					setOpen((value) => !value)
 					onToggle?.(!open)
 				}}
-				{...stylex.props(styles.row)}
+				{...stylex.props(reset.control, styles.row)}
 			>
 				<Chevron open={open} />
 				{label}
