@@ -5,3 +5,5 @@ site/dist
 .wrangler
 .DS_Store
 *.tsbuildinfo
+.turbo
+.env

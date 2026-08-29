@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      # Node 22 ships npm 10.x; trusted publishing needs >= 11.5.1.
+      - run: npm install --global npm@latest
+      - run: pnpm install --frozen-lockfile
+
+      # The tag names the release. Refuse to publish if package.json disagrees,
+      # otherwise the tag and the published version drift apart silently.
+      - name: tag matches package.json version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(node -p "require('./package.json').version")
+          test "$tag" = "$pkg" || { echo "tag v$tag != package.json $pkg"; exit 1; }
+
+      - run: pnpm turbo run typecheck lint fmt:check test site:test
+      - run: pnpm verify:pack
+
+      # verify:pack already built dist and packed it; prepublishOnly would only
+      # repeat the steps above. pnpm publish is skipped here because its OIDC
+      # support is still open (pnpm/pnpm#9812).
+      - run: npm publish --ignore-scripts

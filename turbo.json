@@ -1,0 +1,68 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"remoteCache": {
+		"apiUrl": "https://turbo.anyknown.com",
+		"teamSlug": "anyknown-ui"
+	},
+	"tasks": {
+		"build": {
+			"inputs": [
+				"src/**",
+				"!src/test/**",
+				"!src/**/*.test.tsx",
+				"!src/**/*.md",
+				"!src/**/*.html",
+				"tsconfig.json",
+				"tsconfig.build.json",
+				"scripts/esm-extensions.mjs"
+			],
+			"outputs": ["dist/**"]
+		},
+		"typecheck": {
+			"inputs": [
+				"src/**",
+				"!src/**/*.md",
+				"!src/**/*.html",
+				"tsconfig.json",
+				"stylex.vite.ts",
+				"vitest.config.ts"
+			]
+		},
+		"lint": {
+			"inputs": ["src/**", "!src/**/*.md", "!src/**/*.html", ".oxlintrc.json"]
+		},
+		"fmt:check": {
+			"inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.html"]
+		},
+		"test": {
+			"inputs": [
+				"src/**",
+				"!src/**/*.md",
+				"!src/**/*.html",
+				"tsconfig.json",
+				"stylex.vite.ts",
+				"vitest.config.ts"
+			]
+		},
+		"site:build": {
+			"outputs": ["site/dist/**"]
+		},
+		"site:test": {
+			"dependsOn": ["build"]
+		},
+		"verify:pack": {
+			"cache": false
+		},
+		"site:deploy": {
+			"cache": false
+		},
+		"playground": {
+			"cache": false,
+			"persistent": true
+		},
+		"site": {
+			"cache": false,
+			"persistent": true
+		}
+	}
+}

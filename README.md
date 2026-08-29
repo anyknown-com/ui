@@ -17,7 +17,7 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 
 ```bash
 pnpm test         # vitest(jsdom + testing-library)
-pnpm check        # typecheck + lint + fmt --check
+pnpm check        # turbo run typecheck lint fmt:check(平行 + 快取)
 pnpm build        # dist:ESM + d.ts + tokens.css + scrollbar.css
 pnpm verify:pack  # build 後打包,從套件外部解析 exports map 每個入口
 pnpm playground   # http://localhost:5199,用打包後的 dist 渲染全部元件
@@ -28,20 +28,54 @@ pnpm site:deploy  # build 後 wrangler deploy 到 Cloudflare Workers(需先 wran
 
 playground 的 section id 與 `prototypes.html` 一致,可以並排對照實作與原型。
 
+`check` / `test` / `build` 等都由 [turborepo](https://turborepo.dev) 驅動(single-package 模式,設定在 `turbo.json`),快取推到自架的 remote cache `https://turbo.anyknown.com`(team `anyknown`)。要吃到遠端快取就 export token:
+
+```bash
+export TURBO_TOKEN=<token>   # 見 turbo-cache-worker/GITHUB-SECRETS.md
+```
+
+沒設也不會壞,只是退回本機快取。`turbo.json` 裡 `build` / `lint` / `typecheck` / `test` 的 inputs 刻意排除了 `*.md` 與 `*.html`,所以改 NOTES 或 prototype 不會讓這些 task 重跑;`site:build` / `site:test` 用預設 inputs,因為文檔網站確實會讀 NOTES。
+
 ## 發佈
 
-發佈的是 ESM + d.ts,**StyleX 呼叫保留在產物中**,由使用端的 bundler compile(StyleX library 標準做法)。`prepublishOnly` 會跑 `check → test → verify:pack`。
+發佈的是 ESM + d.ts,**StyleX 呼叫保留在產物中**,由使用端的 bundler compile(StyleX library 標準做法)。
 
-### publish 前 checklist
+版本由 **git tag 決定**。推一個 `v*` tag 上去,`.github/workflows/release.yml` 跑完整條 gate 再 publish;tag 與 `package.json` 的 `version` 對不上會直接失敗,不會發出去。
 
-1. `pnpm check` — typecheck、oxlint、oxfmt 全過。
-2. `pnpm test` — vitest 全綠。
-3. `pnpm verify:pack` — build + 打包,五個 exports 入口(`.`、`./tokens.stylex`、`./themes.stylex`、`./tokens.css`、`./scrollbar.css`)與 types 入口都能從套件外部解析。
-4. `pnpm playground` 開一輪,對照 `prototypes.html` 看視覺與動效沒跑掉;順手開 macOS 的「減少動態效果」再看一次。
-5. `npm pack --dry-run` 確認 tarball 只有 `dist/`(`files` 欄位限定),沒有夾帶 `playground/`、`src/` 或測試。
-6. `package.json` 的 `version` 依 semver 調整;元件 API 有 breaking change 時同步更新該元件的 `NOTES.md`。
-7. `git status` 乾淨、已 commit。
-8. `pnpm publish`(需先 `npm login`)。
+```bash
+# 1. 改 package.json 的 version(semver;元件 API 有 breaking change 時同步更新該元件的 NOTES.md)
+# 2. commit + 打 tag + 推
+git commit -am "release: v0.2.0"
+git tag v0.2.0
+git push origin main --tags
+```
+
+CI 跑的是 `typecheck / lint / fmt:check / test / site:test` → `verify:pack` → `npm publish`。前五項走 turbo remote cache,PR 上跑過的多半直接命中;`verify:pack` 不快取,它就是要每次重打一次 tarball、從套件外部解析 exports map。
+
+publish 走 **npm trusted publishing (OIDC)**,repo 裡不存 `NPM_TOKEN`。CI 用的是 `npm publish` 而不是 `pnpm publish` — pnpm 的 OIDC 支援還沒好([pnpm#9812](https://github.com/pnpm/pnpm/issues/9812))。
+
+CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪,對照 `prototypes.html` 看視覺與動效沒跑掉,順手開 macOS 的「減少動態效果」再看一次。
+
+### 一次性設定
+
+repo 現在還沒有 git remote、也沒發過 npm。以下每項只做一次。
+
+1. **建 GitHub repo 並推上去**
+
+   ```bash
+   gh repo create anyknown-com/ui --private --source=. --remote=origin --push
+   ```
+
+2. **設 `TURBO_TOKEN` secret**(repo → Settings → Secrets and variables → Actions),值見 `turbo-cache-worker/GITHUB-SECRETS.md`。`apiUrl` 與 `teamSlug` 已經寫死在 `turbo.json`,不用另外設 variable。
+
+3. **第一版從本機手動發佈**。npm 規定套件要先存在才能綁 trusted publisher,所以 v0.1.0 繞不掉:
+
+   ```bash
+   npm login
+   pnpm publish   # 會跑 prepublishOnly:check → test → verify:pack
+   ```
+
+4. **在 npmjs.com 綁 trusted publisher**:package 頁 → Settings → Trusted publisher,填 organization `anyknown-com`、repository `ui`、workflow filename `release.yml`。綁完之後一律走 tag 觸發,本機不再需要 `npm login`。
 
 ## 在各 app 使用(Vite)
 
