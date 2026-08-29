@@ -299,11 +299,7 @@ export function Site() {
 			</nav>
 			<main {...stylex.props(styles.main)}>
 				<div {...stylex.props(styles.content)}>
-					{route.page === "demo" ? (
-						<DemoPage anchor={route.anchor} />
-					) : (
-						<GuidePage guide={route.key} />
-					)}
+					{route.page === "demo" ? <DemoPage anchor={route.anchor} /> : <GuidePage guide={route.key} />}
 				</div>
 			</main>
 			<Toaster />
