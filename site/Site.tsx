@@ -118,7 +118,7 @@ function useTheme() {
 		const root = document.documentElement
 		if (mode === "system") delete root.dataset.theme
 		else root.dataset.theme = mode
-		const cls = mode === "system" ? [] : (stylex.props(THEMES[mode]).className?.split(" ") ?? [])
+		const cls = mode === "system" ? [] : (stylex.props(...THEMES[mode]).className?.split(" ") ?? [])
 		root.classList.add(...cls)
 		try {
 			if (mode === "system") localStorage.removeItem(THEME_KEY)

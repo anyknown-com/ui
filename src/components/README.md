@@ -49,6 +49,10 @@ playground 與文檔站用同一組 section id。
    編不出任何 CSS,原生控件的 UA 外觀會留在畫面上。用 `lib/styled.ts` 的
    `reset.control`,放在 `stylex.props` 的第一個參數
 9. **尺寸類元件自己寫 `boxSizing: border-box`**,不要靠 app 端有沒有 reset
+10. **theme 要整組套**。`themes.stylex.ts` 的 `light` / `dark` 是一組 theme(color +
+    五組 yarn + shadow),用 `stylex.props(...light)` 展開。只套其中一個 var group 會讓
+    布停在另一個主題 —— 深色布配深色字,secondary / ghost 的標籤整個看不見。
+    那個檔由 `pnpm gen:themes` 從 tokens 生成,不要手改
 
 ## Field 的使用範圍
 
