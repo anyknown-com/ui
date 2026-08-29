@@ -4,7 +4,7 @@
 
 純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,反色小氣泡,只放一行文字(可附 Kbd 快捷鍵),絕不放互動內容。
 
-## API 草案
+## API
 
 ```tsx
 <Tooltip content="產生交接摘要" shortcut="⌘⇧H" side="top">
@@ -12,7 +12,7 @@
 </Tooltip>
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 顯示:`:hover` 或 `:has(:focus-visible)`,`transition-delay: 400ms` 做開啟延遲;離開立即淡出(120ms)
 - prototype 為純 CSS;四個 `side`(top/bottom/left/right)各自絕對定位 + 置中

@@ -4,7 +4,7 @@
 
 多行輸入。與 Input 共用 border/focus/error 樣式語言。
 
-## API 草案
+## API
 
 ```tsx
 <Textarea autoGrow maxRows invalid ... /* ComponentProps<"textarea"> */ />

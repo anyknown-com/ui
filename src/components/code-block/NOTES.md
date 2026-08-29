@@ -4,7 +4,7 @@
 
 markdown 裡的程式碼區塊:header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體,超寬只在 block 內橫向捲動。
 
-## API 草案
+## API
 
 ```tsx
 <CodeBlock lang="ts" code={code} streaming={false} />
@@ -13,7 +13,7 @@ markdown 裡的程式碼區塊:header(語言小寫標籤 + 複製鈕)+ `text-cod
 
 實作走 streamdown + `@streamdown/code`:marked 分塊 memo(串流只重渲染變動 block)、remend 自癒未閉合 fence、shiki 雙主題(`github-light` / `github-dark`,跟 `.dark` class 切)。prototype 的 token 色只是示意。
 
-## 行為(prototype 已示範)
+## 行為
 
 - header:語言 label 小寫 mono faint;複製鈕點擊 → 寫入 clipboard、變「已複製 ✓」(accent)2 秒後還原。
 - 本體:`text-code` 13/1.5 mono;`overflow-x: auto` 在 `pre` 上,頁面不橫向捲動;表格同理。

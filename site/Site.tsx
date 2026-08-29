@@ -9,7 +9,8 @@ import { DesktopDemos } from "../playground/demos/desktop"
 import { FormsDemos } from "../playground/demos/forms"
 import { StorageDemos } from "../playground/demos/storage"
 import componentsReadme from "../src/components/README.md?raw"
-import roadmap from "../src/components/ROADMAP.md?raw"
+import textureGuide from "../src/components/TEXTURE-GUIDE.md?raw"
+import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
 import readme from "../README.md?raw"
 
 const GROUPS: Record<string, string[]> = {
@@ -42,10 +43,16 @@ const GROUPS: Record<string, string[]> = {
 	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
 }
 
+// NOTES 裡指向姊妹文件的相對連結,在站上改指到對應的 guide 頁。
+const guideLinks = (body: string) =>
+	body
+		.replace(/\(\.\.\/TEXTURE-GUIDE\.md\)/g, "(#/guide/texture)")
+		.replace(/\(\.\.\/A11Y-DEBT\.md\)/g, "(#/guide/a11y)")
+
 const NOTES = Object.fromEntries(
 	Object.entries(
 		import.meta.glob("../src/components/*/NOTES.md", { query: "?raw", import: "default", eager: true }),
-	).map(([path, raw]) => [path.split("/").at(-2)!, raw as string]),
+	).map(([path, raw]) => [path.split("/").at(-2)!, guideLinks(raw as string)]),
 )
 
 // Repo 內的相對連結改指到站內對應頁。
@@ -54,13 +61,19 @@ const GUIDES: Record<string, { title: string; body: string }> = {
 		title: "開始使用",
 		body: readme
 			.replace("(./src/components/README.md)", "(#/guide/components)")
-			.replace("(./ROADMAP.md)", "(#/guide/roadmap)"),
+			.replace("(./src/components/TEXTURE-GUIDE.md)", "(#/guide/texture)"),
 	},
 	components: {
-		title: "元件規劃",
-		body: componentsReadme.replace("(./ROADMAP.md)", "(#/guide/roadmap)"),
+		title: "元件總覽",
+		body: componentsReadme
+			.replace("(./TEXTURE-GUIDE.md)", "(#/guide/texture)")
+			.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
 	},
-	roadmap: { title: "Roadmap", body: roadmap },
+	texture: {
+		title: "織物設計語言",
+		body: textureGuide.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
+	},
+	a11y: { title: "a11y 偏差", body: a11yDebt },
 }
 
 type Route =

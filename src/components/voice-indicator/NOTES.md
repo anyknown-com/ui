@@ -4,13 +4,13 @@
 
 語音通話的狀態顯示:一眼看出 agent 現在是在聽你、在想、還是在說——對應 STT → runtime LLM → TTS pipeline 的三個活動段。
 
-## 需求(定案)
+## 定案
 
 - 四態:`idle`(靜態灰 bar)/ `listening`(5 條音量 bar 起伏,accent)/ `thinking`(單點脈動)/ `speaking`(波形依序起伏)
 - 視覺化區固定寬高,換態不跳版;文案標明可插話(「說話中…插話會打斷」= barge-in)
 - `prefers-reduced-motion: reduce`:全部動畫關閉,bar 停在中段靜態高度,改顯示 mono uppercase 靜態文字標(聆聽中/思考中/說話中)
 
-## API 草案
+## API
 
 ```tsx
 <VoiceIndicator
@@ -25,7 +25,7 @@
 - barge-in:speaking 期間偵測到用戶語音 → 停播放、flush TTS、轉 listening——指示器只反映狀態,不管音訊
 - **實作走 rAF 逐幀重算 path**(同 prototype):四態是同一條線的不同函數,thinking 的電話線是 prolate cycloid、listening 的振幅由 `level` 驅動,CSS keyframes 表達不了。草案寫「全 CSS、無 JS timer」是在 prototype 定案前寫的。reduced-motion 下不啟動 rAF,線停在 t=1.2 的靜態姿勢
 
-## A11y
+## a11y
 
 - 視覺化區 `aria-hidden`;文字 label 帶 `role="status"`(polite)播報狀態變化
 - reduced-motion 下資訊不減:動畫換成靜態標籤,狀態仍可讀

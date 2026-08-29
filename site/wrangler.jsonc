@@ -5,4 +5,8 @@
 	"assets": {
 		"directory": "./dist",
 	},
+	// 文檔站掛 ui.anyknown.com;wrangler 會自己建 DNS 記錄。
+	// 指定了 routes 之後 workers_dev 預設關閉,舊的 *.workers.dev 網址會 404 —— 這是刻意的,
+	// 只留一個正式網址。要留預覽網址就明寫 "workers_dev": true。
+	"routes": [{ "pattern": "ui.anyknown.com", "custom_domain": true }],
 }

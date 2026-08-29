@@ -4,7 +4,7 @@
 
 過去區的訊息節奏:user 右對齊氣泡、assistant 全寬純文字,turn 24px / part 8px,字級只走 plan 24 的三個 token。
 
-## API 草案
+## API
 
 ```tsx
 <Thread>
@@ -19,7 +19,7 @@
 - `streaming`:最後一個 text part 尾端接閃爍 cursor。
 - `pending`:還沒任何 part 時渲染脈動點 + `aria-label="回覆中"`。
 
-## 行為(prototype 已示範)
+## 行為
 
 - user:`bg-muted rounded-2xl rounded-br-md px-3.5 py-2`,max-w 85%,靠右。
 - assistant:全寬、無頭像無氣泡;段落間距 = part gap。

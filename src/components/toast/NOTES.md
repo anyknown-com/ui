@@ -4,7 +4,7 @@
 
 非阻斷通知:疊在右下角、slide+fade 進場、5 秒後自動消失(hover 暫停);danger/success 用色點區分,可帶一個動作按鈕(「已刪除 · 復原」)。
 
-## API 草案
+## API
 
 ```tsx
 const { toast } = useToast()
@@ -18,7 +18,7 @@ toast("已刪除「偏好 pnpm」", { action: { label: "復原", onClick: undo }
 <Toaster position="bottom-right" />
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 疊放:新 toast 最靠近角落(Base UI 的 store 是 newest-first,所以 bottom-* 用 `column-reverse`);寬 `min(20rem, vw - 2.5rem)`;超過 `limit` 的 toast 由 `data-limited` 隱藏
 - 進場:`translate 1rem → 0` + fade,180ms;reduced-motion 全關(直接移除)。**離場動畫未實作**:StyleX 無法選 `[data-ending-style]`,所以退場是瞬時的

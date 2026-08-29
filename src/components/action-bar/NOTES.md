@@ -4,7 +4,7 @@
 
 assistant 訊息底部的 hover 動作列:高度永遠保留(pb + 負 mb 技法),hover 只切 opacity,turn 節奏零跳動。
 
-## API 草案
+## API
 
 ```tsx
 <AssistantMessage isLast={isLast}>
@@ -16,7 +16,7 @@ assistant 訊息底部的 hover 動作列:高度永遠保留(pb + 負 mb 技法)
 </AssistantMessage>
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 防跳動:訊息容器 `padding-bottom: var(--bar-h)` + `margin-bottom: calc(var(--bar-h) * -1)`(assistant-ui 的 `-mb-7.5 pb-7.5` 技法);bar 絕對定位在保留區,`opacity 0 → 1`(120ms)。turn gap 維持 24px 不變。
 - 顯示條件:`.assistant:hover` 或 `:focus-within`(鍵盤 tab 進按鈕也會現形)。

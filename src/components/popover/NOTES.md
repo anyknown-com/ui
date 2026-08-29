@@ -4,7 +4,7 @@
 
 定位浮層基礎件:trigger 錨定的 surface 卡片,select/dropdown/combobox 都疊在它上面;也直接承載富內容(記憶詳情、成員卡片)。
 
-## API 草案
+## API
 
 ```tsx
 <Popover open onOpenChange>
@@ -15,7 +15,7 @@
 </Popover>
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 開合:trigger click toggle、點外側關閉、Esc 關閉並回焦 trigger
 - 進場:`scale .96 → 1` + fade,140ms ease-out;`transform-origin` 依 side(top→bottom、bottom→top、left→right、right→left),讓浮層「從 trigger 長出來」;reduced-motion 關閉

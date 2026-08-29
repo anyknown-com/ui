@@ -4,7 +4,7 @@
 
 復原金鑰展示卡:建立 vault 或重發金鑰時顯示一次。分段 mono(4 字一組)、預設模糊遮罩(hover/focus/點擊才顯示)、一鍵複製(變 ✓)、下載 .txt、警告卡、「我已抄下」checkbox gate 住主要按鈕。prototype 全部可操作。
 
-## API 草案
+## API
 
 ```tsx
 <RecoveryKey

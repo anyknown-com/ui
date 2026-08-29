@@ -4,7 +4,7 @@
 
 小型狀態與計數標示:badge 是唯讀語意標籤,chip 是可互動(可移除)的篩選單位,同一家族收斂。
 
-## API 草案
+## API
 
 ```tsx
 <Badge variant="accent">進行中</Badge>
@@ -26,7 +26,7 @@
 - dot 為純裝飾(`aria-hidden` 或空 span),狀態語意必須同時出現在文字裡
 - 不用 badge 傳達唯一資訊來源的顏色語意(色盲不可辨),文案先行
 
-## 實作建議
+## 實作
 
 原生元素即可,不需 primitive。顏色對照 `tokens.stylex.ts` 的 semantic 色;`danger-subtle` 若 tokens 尚無需補一個。
 

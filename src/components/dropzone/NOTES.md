@@ -4,7 +4,7 @@
 
 拖放上傳區:虛線框 idle、dragover 高亮(accent 邊框 + accentSubtle 底)、選檔按鈕 fallback、上傳中列表(檔名 + 進度條 + 取消)、超限錯誤列。prototype 的 dragover、選檔、模擬進度、取消都可操作。
 
-## API 草案
+## API
 
 ```tsx
 <Dropzone

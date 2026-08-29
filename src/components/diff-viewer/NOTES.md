@@ -4,7 +4,7 @@
 
 行級 unified diff + 行內字級 highlight。給 plan 審查 takeover(changeset 的 before/after)與 i18n 譯文修改對照用;prototype 的收合區段可實際展開/收合。
 
-## 需求(定案)
+## 定案
 
 - 行級增刪:`+` 綠 / `−` 紅,用 success/danger 的 **subtle 底**(不是飽和色),sign 與 stat 用對應 text 色
 - 行內 highlight:同一行內只標變動的字(`<mark>`,比行底再深一階的 hl 色)
@@ -13,7 +13,7 @@
 - 檔案標題列:kind 色點(modified 黃 / added 綠 / deleted 紅,對應 plan 26 的 changeset kind)+ path(mono)+ `+N −N` 統計
 - added = 只有 after(全 `+`);deleted = 只有 before(全 `−`)
 
-## API 草案
+## API
 
 ```tsx
 <DiffViewer

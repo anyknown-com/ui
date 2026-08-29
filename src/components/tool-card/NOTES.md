@@ -4,7 +4,7 @@
 
 工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,展開看輸入/輸出;subagent 是它的變體,不是新元件家族。
 
-## API 草案
+## API
 
 ```tsx
 <ToolCard
@@ -22,7 +22,7 @@
 <SubagentCard callID={part.callID} />  // tool === "subagent" 時由 ToolPart 分流
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 列與展開內容全走 token:列 `text-meta`、輸入/輸出 `text-code` mono、內距 `--card-pad`(10px 12px)、耗時 `tabular-nums`。
 - 狀態 icon:running = spinner、completed = ✓ success、error = ✗ destructive。

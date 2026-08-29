@@ -4,12 +4,12 @@
 
 動作選單(相對於 Select 的「選值」)。prototype 可操作:群組、分隔線、checkbox item、快捷鍵欄、兩層 submenu(hover/focus 展開)。
 
-## 需求(定案)
+## 定案
 
 - multi-layer submenu(巢狀不限一層;prototype 示範兩層)
 - group label / separator / checkbox item / 快捷鍵提示 / danger item
 
-## API 草案
+## API
 
 ```tsx
 <DropdownMenu trigger={<Button>Thread 動作</Button>}>
@@ -26,12 +26,12 @@
 </DropdownMenu>
 ```
 
-## 實作建議
+## 實作
 
 用 **Base UI 的 Menu**(https://base-ui.com/react/components/menu)做 headless 層:
 submenu(SubmenuTrigger,含 hover intent / safe polygon)、CheckboxItem、RadioItem、typeahead、完整鍵盤(方向鍵、→ 進子選單、← 退回)全部內建。prototype 的鍵盤只做了 Esc,完整行為交給 primitive,不要手刻。
 
-## 行為細節(prototype 已示範)
+## 行為
 
 - 進場 `scale .97 → 1` + fade 140ms,transform-origin 依開啟方向;子選單 120ms;reduced-motion 關閉
 - submenu 靠右展開、頂部對齊觸發項(-0.35rem 對齊 padding);碰到視窗邊界時實作要 flip 到左側

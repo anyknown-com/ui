@@ -4,7 +4,7 @@
 
 載入骨架:占位形狀 + shimmer,形狀對齊實際內容的排版(thread 骨架就長得像 thread),避免載入完成時跳版。
 
-## API 草案
+## API
 
 ```tsx
 <Skeleton width="70%" height={14} />
@@ -24,7 +24,7 @@
 - 骨架區塊本身 `aria-hidden`,外層容器 `role=status` + `aria-label` **並在容器內放一段視覺隱藏的同文字**(`role=status` 不從內容取名,live region 又需要有內容才會播報,兩者缺一不可),只報一次,不逐塊報
 - 內容到達後整組替換,不留殘骸;避免 aria-live 對骨架本身開火
 
-## 實作建議
+## 實作
 
 原生 div + StyleX keyframes,不需 primitive。`bone`/`sheen` 需補進 `tokens.stylex.ts`。
 

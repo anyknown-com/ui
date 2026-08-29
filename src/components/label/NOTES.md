@@ -4,7 +4,7 @@
 
 表單標籤,含 required / optional 標記。實作上建議連同 `Field`(label + control + help/error 的組合容器)一起做,自動接好 `for`/`aria-describedby`。
 
-## API 草案
+## API
 
 ```tsx
 <Label htmlFor required optional>顯示名稱</Label>

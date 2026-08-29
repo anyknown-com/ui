@@ -4,7 +4,7 @@
 
 空狀態 = 行動邀請:icon + 一句說明 + 主要動作,文案永遠說「下一步做什麼」,不只陳述「沒有東西」。
 
-## API 草案
+## API
 
 ```tsx
 <EmptyState
@@ -27,7 +27,7 @@
 - 搜尋無果時若動態出現,外層列表容器用 `aria-live=polite` 報一次結果數,空狀態本身不再重複
 - 動作是真按鈕/連結,可 Tab 到;沒有動作可做的空狀態(唯讀檢視)允許省略 action
 
-## 實作建議
+## 實作
 
 原生元素 + StyleX,不需 primitive;icon/title/description/action 四個 slot 即可,不做 variant prop。
 

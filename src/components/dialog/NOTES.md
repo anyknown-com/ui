@@ -4,7 +4,7 @@
 
 模態對話框:半透明 blur backdrop、scale+fade 進場、Esc/backdrop 關閉;danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 
-## API 草案
+## API
 
 ```tsx
 <Dialog open onOpenChange>
@@ -26,7 +26,7 @@
 />
 ```
 
-## 行為(prototype 已示範)
+## 行為
 
 - 進場:`scale .96 → 1` + fade,160ms ease-out;reduced-motion 關閉
 - backdrop:`rgba(bg, .35)` + `backdrop-filter: blur(2px)`

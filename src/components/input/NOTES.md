@@ -4,7 +4,7 @@
 
 單行文字輸入。`prototype.html` 為視覺與狀態規格。
 
-## API 草案
+## API
 
 ```tsx
 <Input size="sm" | "md" invalid leadingIcon={<Search />} ... /* ComponentProps<"input"> */ />
@@ -25,16 +25,17 @@
 - 錯誤訊息用 `aria-describedby` 連結
 - font-size ≥ 16px 於 mobile 可免 iOS 自動 zoom(md=0.9rem 需確認 desktop-only 或調整)
 
-## 尺寸(2026-08-29 修)
+## 尺寸
 
-- 控件一律 `box-sizing: border-box`:原本沒寫,`<input>`/`<textarea>` 拿的是瀏覽器
-  預設的 content-box,`minHeight: 2.25rem` 變成「內容」36px 再加 padding+border,
-  md 實際長到 54px(還會因為 width:100% 超出容器 26px)。元件不能靠 app 端剛好有
-  `*{box-sizing:border-box}` 這條 reset。同一個坑修了 Select 的 multiple trigger
+md / sm / button / select 分別是 36 / 28 / 36 / 36px,textarea 72px。兩個踩過的坑:
+
+- **控件自己要寫 `box-sizing: border-box`**。`<input>` / `<textarea>` 拿的是瀏覽器
+  預設的 content-box,`minHeight: 2.25rem` 會變成「內容」36px 再加 padding + border,
+  md 實際長到 54px(還會因為 `width: 100%` 超出容器 26px)。不能靠 app 端剛好有
+  `*{box-sizing:border-box}` 這條 reset。同一個坑也修了 Select 的 multiple trigger
   (那顆是 div 不是原生 button,拿不到 UA 的 border-box)
-- 單行控件行高改 `leadingTight`:1.5 會把 md 撐到 39px,和 button/select 的 2.25rem
-  差 3px。Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
-- 現在 md / sm / button / select 分別是 36 / 28 / 36 / 36px,textarea 72px
+- **單行控件行高用 `leadingTight`**。1.5 會把 md 撐到 39px,和 button / select 的
+  2.25rem 差 3px。Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
 
 ## References
 

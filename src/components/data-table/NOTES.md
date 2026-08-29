@@ -4,7 +4,7 @@
 
 排序、過濾、選取、inline edit 的資料表。第一個消費者是 i18n 字典編輯(key / zh-TW / en / 狀態);prototype 全部互動可實際操作。
 
-## 需求(定案)
+## 定案
 
 - 欄頭點擊排序:asc → desc 切換,`aria-sort` + accent 箭頭指示;一次只排一欄
 - 頂部 filter 輸入框:即時過濾(key 與各 locale 譯文都比對),右側 `N / M keys` 計數(mono、`aria-live`)
@@ -15,7 +15,7 @@
 - 空結果:置中訊息帶查詢字 + 「清除過濾」動作
 - 狀態 badge:已翻譯(accent-subtle)/ 缺譯(danger-subtle)/ 待審(warning-subtle)
 
-## API 草案
+## API
 
 ```tsx
 <DataTable
@@ -36,7 +36,7 @@
 
 排序/過濾/選取全部 controlled;元件不擁有資料。
 
-## 實作建議
+## 實作
 
 - **實作沒有用 TanStack Table**:API 草案把排序/過濾/選取全部設成 controlled,元件不擁有資料,headless 層就沒有狀態可管了 —— 只會多一個 runtime 依賴換不到東西。排序/過濾由使用端算好再傳 `rows`,元件只負責 `aria-sort`、`indeterminate`、inline edit 與 sticky header。將來若要把排序邏輯收進元件,再引 TanStack 不遲。虛擬化的判斷維持原案:DataTable 保持真 table,列數大到要虛擬化的場景交給 grid 型元件
 - inline edit 的 commit 走 optimistic:先改 UI,失敗 revert + toast(i18n `cell.tsx` 現行模式)

@@ -5,7 +5,7 @@
 要偏離前先讀「否決紀錄」,那些路已經走過而且被打回票。
 
 參考實作:`src/components/button/prototype.html`(唯一真相,瀏覽器直接開可操作)。
-品牌上位準則見 `ROADMAP.md` 的「Texture 設計準則」。
+用在哪些元件見 §5。
 
 ---
 
@@ -170,14 +170,32 @@ y(x) = yarn.y
 
 ## 5. 適配到其他元件
 
-### 哪些元件該用(對齊 ROADMAP texture 準則)
+### 哪些元件該用
 
-- **可用織體**(等待/過渡/儀式 + 主要互動面):button(primary/CTA)、
-  interaction-card 的確認鈕、dialog 的 danger confirm、handoff-receipt 卡面、
-  progress 軌道、dropzone 面(蟻行縫線可與織體並存)。
-- **維持安靜,不要織**:輸入類表單控件、data-table、diff-viewer、recovery-key、
-  scrollbar、skeleton(準則明文排除)。
-- secondary/ghost 按鈕:織但無光澤帶亮度上限調低(0.5),或僅 hover 光不做窩。
+品牌準則:織體用在**等待、過渡、儀式**的時刻,以及**主要互動面**。不是所有東西都要是布。
+
+**已經是布**:
+
+| 元件 | 用法 |
+| --- | --- |
+| button | 四個 variant 全織,press 全套(帶動 + 窩 + 掃光) |
+| checkbox / switch | 勾選底 / 開啟軌道是布,織入動畫 = clipPath width 推進 |
+| radio | 布在後面,圓形是取景框(鏡頭) |
+| tabs pills | 布織滿 tablist,選取高亮是取景窗 |
+| progress bar / ring / spinner | 容器裡長出一塊布;環形與 spinner 是取景框 |
+| handoff-receipt | 卡面,hover 子集(帶動 + 光澤帶,無窩無掃光) |
+| interaction-card | 三顆回覆鈕(走共用 Button) |
+| dialog 的 danger confirm | 走共用 Button 的 `danger` |
+
+**刻意不織**:輸入類表單控件、data-table、diff-viewer、recovery-key、context 用量環的
+讀數、scrollbar(全域基礎設施要隱形)、skeleton(載入骨架要低調不搶戲)。
+數據與金鑰要安靜可判讀。
+
+**刻意的例外**:ProgressBall 留在毛線球的線語言 —— 它畫的是「一個東西被一圈一圈繞滿」,
+不是「一塊布長出來」。先問這個形態在講什麼,再決定用哪套語言。
+
+**份量分級**:secondary / ghost 織但光澤帶亮度上限調低(0.5),ghost 無底紗不落影;
+選取類控件(checkbox / switch / radio)保持安靜 —— 靜態織紋、無 rAF、不做窩與掃光。
 
 ### 適配步驟(給新 session 的 checklist)
 
@@ -198,63 +216,49 @@ y(x) = yarn.y
 
 ---
 
-## 6. 落地狀態(2026-08-29,給接手 session)
+## 6. 工程約束
 
-規則:React 禁用 useEffect(ref callback + cleanup 取代);動畫不回彈
-(滑動類定案 240ms cubic-bezier(.16,1,.3,1),寬度變化不得前衝、任何邊不得倒退)。
+適配新元件時,除了上面的幾何與動態參數,這幾條也一起照做。
 
-已落地(.tsx,check/test 全綠,playground 實機驗過):
+### 共用模組
 
-- lib/weave.ts — 靜態幾何 builder(小控件 module scope 預織)+ buildThread 縫線
-- lib/silk.ts — 動態引擎(press 全套 / hover 僅展示子集),幾何與 weave.ts 同源
-- tokens.stylex.ts — yarn / yarnSecondary / yarnGhost / yarnDanger / yarnSubtle;
-  每組多一個 shadow = §3.3 的落影(掛在元件的 CSS filter 上,ghost 為 none)
-- Checkbox / Switch / Radio — 定案設計照 prototype
-- Button — 四 variant 織體 + press 全套 + 落影;playground `#button` 有完整展示
-- Tabs pills — buildWeave 織滿 tablist;Base UI 的 Indicator 只當 `--active-tab-*`
-  的載體(絕對定位鋪滿整條 list、自己不動),取景窗是 clipPath 裡的 rect,
-  x/y/width/height 直接吃那些變數,x 與 width 同一條 240ms expo。
-  窗動、布不動:切 tab 前後紗的 d 逐字相同
-- HandoffReceipt — 卡面 SilkBody hover 模式 + yarnSecondary + fixedHeight 480;
-  展開 0fr→1fr(240ms expo)+ 內容 opacity 200ms;收合狀態改用 inert 離開 a11y tree
-  (不能再用 hidden,否則沒得動畫);html{scrollbar-gutter:stable} 已進 tokens.css
-- InteractionCard — 三顆回覆鈕與送出/照建議改用共用 Button
-  (允許一次 primary、總是允許 secondary、拒絕 ghost:拒絕不給 danger 織體,
-  一整塊紅布會蓋過 primary 的份量);options 改用 RadioGroup variant=card 與 Checkbox
-- Dialog 的 ConfirmDialog 免費繼承 Button(Base UI 的 render prop 會把 children 併進來)
+| 模組 | 內容 |
+| --- | --- |
+| `lib/weave.ts` | 靜態幾何 builder(純函式無 DOM,小控件可在 module scope 預織,SSR 安全)+ `buildThread` 縫線 |
+| `lib/silk.ts` | 動態引擎,`mode: "press"`(全套)或 `"hover"`(僅展示面子集),幾何與 weave.ts 同源 |
+| `tokens.stylex.ts` | `yarn` / `yarnSecondary` / `yarnGhost` / `yarnDanger` / `yarnSubtle`,每組多一個 `shadow` = §3.3 的落影,掛在元件的 CSS `filter` 上(ghost 為 `none`) |
 
-實機驗收(headless Chrome 走 §5 清單):
+不要自己再寫一份織法。
 
-- 重整三次,button / pills / receipt / checkbox 的織法 hash 完全相同
-- 沒碰過的頁面 SilkBody 一次 rAF 都沒排;hover 後回到靜止也回到 0,d 不再變
-- 按住 → 光澤帶壓到 0.15、紗收成窩;放開 → 0.72 掃光
-- 按住拖出元件外放開 → 光澤帶維持 0.000,不播過衝也不播掃光
-- reduced-motion:rAF 全程 0、織紋不動,pills / receipt / underline 的 transition 都是 0s
+### React
 
-踩到的坑(接手前先讀):
+- **禁用 `useEffect`**:用 ref callback + cleanup(React 19)。量尺寸一律
+  ref callback + `ResizeObserver`
+- **動畫不回彈**:滑動類 240ms `cubic-bezier(.16,1,.3,1)`,進度類 120ms linear;
+  寬度變化不得前衝、任何邊不得倒退。唯一的例外是 §4.2 那個 release 過衝,那是織體
+  自己的語意
+- 布只織一次:高度變化用固定尺寸的長布 + `overflow` 裁形,不要重織(換一塊布會閃);
+  只有寬度變了才重織
 
-- StyleX 0.19 會靜默丟掉 `all: unset`、`border: 0`、`background: none` 這類簡寫 —
-  編不出任何 CSS,原生 button 的 buttonface 底色與 outset 邊框、fieldset 的 groove
-  邊框就留在畫面上,直接蓋掉底下的布(chip 的 × 是最明顯的災情)。
-  已全部清掉:`lib/styled.ts` 出了一個 `reset.control`(appearance / margin / padding /
-  borderWidth / backgroundColor / font / color / textAlign 逐項重設),12 個元件的
-  19 處 `all: "unset"` 都改成把它放在 `stylex.props` 的第一個參數。新元件照做。
-- `box-sizing` 同理:`<input>`/`<textarea>` 是 content-box,`minHeight: 2.25rem` 會變成
-  「內容」36px 再加 padding+border(md 長到 54px)。元件自己要寫 `boxSizing: border-box`,
-  不能靠 app 端有沒有 reset。
-- 這一輪定的(2026-08-29):
-  - interaction-card 的「拒絕」= 新的 `dangerGhost` variant:織體層級走 ghost 疏織
-    (不與 primary 打架),標籤色走 `color.danger` —— 就是原本「白底紅字」的織體版。
-    依據是同一個檔案自己的 token 語彙:收據列 rejected 的 ✓ 早就是 `color.danger`
-    (`InteractionCard.tsx:157`),danger 在這個元件裡本來就是「拒絕」的顏色。
-    順帶把這顆的對比從 ghost textMuted 的 3.67:1 拉到 4.31:1(布上)/ 5.44:1(頁面底)。
-  - ProgressBall 維持毛球的線語言,是刻意的例外(理由與並排比較見 progress/NOTES.md)。
-  - progress/prototype.html 已重寫成定案設計,與 Progress.tsx 同源。
+### StyleX 0.19 的兩個坑
 
-- 一處對比沒到 §3.4 的 4.5:1,是照 prototype 搬的結果,palette 沒動,等設計者定奪:
-  receipt 收合列的 textMuted 落在淺色布上 4.03–4.36:1(原本在 surface 上是 4.58:1);
-  最小的修法是把 textMuted 調深一階(light #777165 → #67614F、dark #A59B8C → #B0A697),
-  布上 4.68–5.56:1 全部過,頁面底色上也從 4.63 變 5.90 —— 但那是全域 palette 動刀,
-  34 個元件的 muted 文字都會跟著變重,所以沒有自己動。
-  dark 的 pills 選取 4.18:1 是既有值(布的 --y2 就是 accent-subtle,和先前的實心底同色),
-  不是織體造成的;ghost 按鈕原本的 3.67:1 已由上面的 dangerGhost 一併處理。
+- **簡寫會被靜默丟掉**:`all: unset`、`border: 0`、`background: none` 這類編不出任何
+  CSS,原生 button 的 buttonface 底色與 outset 邊框、fieldset 的 groove 邊框就留在
+  畫面上,**直接蓋掉底下的布**(chip 的 `×` 是最明顯的災情)。用 `lib/styled.ts` 的
+  `reset.control`(appearance / margin / padding / borderWidth / backgroundColor /
+  font / color / textAlign 逐項重設),放在 `stylex.props` 的第一個參數
+- **`box-sizing` 要自己寫**:`<input>` / `<textarea>` 是 content-box,
+  `minHeight: 2.25rem` 會變成「內容」36px 再加 padding + border(md 長到 54px)。
+  元件自己寫 `boxSizing: border-box`,不能靠 app 端有沒有 reset
+
+### 借用別人的定位
+
+需要「窗動、布不動」時,不必自己量 offset。Base UI 的 `Tabs.Indicator` 本來就把
+`--active-tab-left/top/width/height` 寫成 inline style,拿它當變數載體(絕對定位鋪滿、
+自己不動、`pointer-events: none`),clipPath 的 rect 用 CSS 幾何屬性直接吃那些變數。
+
+### 對比
+
+label 與布的 `--y2` 對比要 ≥ 4.5:1(等同原本的實心底)。文字落在布上時,底色從單一
+`surface` 變成一段紗線階,要對**最不利的那一階**算。目前未達標的項目列在
+[A11Y-DEBT.md](./A11Y-DEBT.md) —— palette 是設計決策,實作不自行更動。

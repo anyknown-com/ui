@@ -4,7 +4,7 @@
 
 釘在現在線上的 prompt bar:說話發生在現在——送出後上方多一條收據、下方未來區當場重排。永遠可用,不被 pending 卡阻塞。
 
-## 需求(定案)
+## 定案
 
 - 多行 textarea 自動長高(max-height 後內捲);⏎ 送出、⇧⏎ 換行
 - 左側:@ 來源鈕(插入 `@` 並開建議浮層)、/ 指令鈕
@@ -12,7 +12,7 @@
 - 打 `@` 時浮層列出來源建議:檔案 / ledger 收據 / 記憶,各帶種類標;點選補全
 - focus 時整條 border 轉 accent(`:focus-within`)
 
-## API 草案
+## API
 
 ```tsx
 <Composer
@@ -32,7 +32,7 @@
 - 送出走 message route;`agenda.updated` 事件驅動未來區重排動效,composer 本身不管
 - / 指令與 @ 共用同一浮層元件,只換資料源
 
-## A11y
+## a11y
 
 - textarea 帶 `aria-label`;@ 鈕 `aria-expanded` 對應浮層;Esc 關浮層
 - 浮層是 `role="listbox"` + 方向鍵導航;有 `sources`/`commands` 時 textarea 本身升為 `role="combobox"`(`aria-expanded`/`aria-autocomplete="list"`/`aria-activedescendant`),否則浮層開了 SR 不會知道。沒給建議來源時維持單純 textbox。

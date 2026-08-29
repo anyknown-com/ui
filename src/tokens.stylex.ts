@@ -159,5 +159,7 @@ export const motion = stylex.defineVars({
 	slow: "400ms",
 	ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
 	easeOut: "cubic-bezier(0.16, 1, 0.3, 1)",
+	// 過衝曲線。全站規則是「動畫不回彈」,所以這條目前沒有任何元件在用 ——
+	// 新元件不要挑它,滑動類一律 240ms easeOut。保留只是因為它已經在發佈的 API 裡。
 	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
 })
