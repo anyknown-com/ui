@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
-      id-token: write # npm trusted publishing (OIDC)
+      id-token: write # npm trusted publishing (OIDC),見下面的 publish step
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          registry-url: https://registry.npmjs.org
       # Node 22 ships npm 10.x; trusted publishing needs >= 11.5.1.
       - run: npm install --global npm@latest
       - run: pnpm install --frozen-lockfile
@@ -39,4 +40,11 @@ jobs:
       # verify:pack already built dist and packed it; prepublishOnly would only
       # repeat the steps above. pnpm publish is skipped here because its OIDC
       # support is still open (pnpm/pnpm#9812).
+      #
+      # 認證目前走 NPM_TOKEN secret,不是 OIDC:npm 的 trusted publisher 只能綁在
+      # 已存在的套件上,而 @anyknown/ui 的第一版就是這條 workflow 發的。等 registry
+      # 上有了套件、在 npmjs.com 綁好 trusted publisher 之後,把 env 這兩行拿掉就
+      # 自動走回 OIDC(permissions 的 id-token: write 已經留著)。
       - run: npm publish --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
