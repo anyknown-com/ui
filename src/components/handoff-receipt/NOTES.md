@@ -45,9 +45,7 @@ background、實心由紗織成;border 與圓角保留,CSS `overflow` 裁形。
 
 - 整列是一顆 `<button aria-expanded>`,Enter/Space 展開;focus-visible 內縮 outline
 - 動畫與 chevron 旋轉包 `prefers-reduced-motion: reduce`(直接關閉)
-- **已知偏差**:收合列的 `textMuted` 落在淺色布上是 4.03–4.36:1,低於 4.5:1
-  (在 `surface` 上原本是 4.85:1)。照 prototype 搬的結果,palette 未動 —— 見
-  [A11Y-DEBT.md](../A11Y-DEBT.md)
+- 收合列字級小、灰字,對比 4.94:1(`textMuted` 落在 `yarnSecondary` 最深的一階)
 
 ## 走過的彎路
 

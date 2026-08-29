@@ -19,21 +19,27 @@ a11y review 量測兩個主題的 token 組合後,列出低於門檻的項目。
 建議修法(擇一):把帶語意的 faint 文字改用 `textMuted`(已達 4.5:1),或把 `textFaint`
 / `borderStrong` 各壓深一階。要動的話一次調 `tokens.stylex.ts` 與 `tokens.css` 兩邊。
 
-## 織體帶來的(2026-08-29)
+## 已修:textMuted 調深一階(2026-08-29)
 
-文字落在布上,底色從單一 `surface` 變成一段紗線階,對比要對**最不利的那一階**算。
+`textMuted` 從 light `#777165` / dark `#A59B8C` 改成 **light `#635D52` / dark `#B0A697`**。
 
-| 位置 | 實測 | 門檻 | 說明 |
-| --- | --- | --- | --- |
-| handoff-receipt 收合列的 `textMuted` on `yarnSecondary` | 4.03–4.36:1 | 4.5:1 | 在 `surface` 上原本是 4.85:1 |
-| ghost Button 的 `textMuted` on `yarnGhost` 的 `--y2` | 3.67:1 | 4.5:1 | 紗很疏,實際多半看到的是頁面底色(4.63:1) |
+起因是織體讓文字落在布上(底色從單一 `surface` 變成一段紗線階,要對**最不利的那一階**
+算),但查下去發現 muted 本來就貼著門檻 —— 它只在 `bg` 與 `surface` 上及格,落在
+`bone` / `sheen` / `accentSubtle` / `dangerSubtle` / `warningSubtle` 上全都是 3.99–4.40:1。
 
-最小的修法是把 `textMuted` 調深一階(light `#777165` → `#67614F`、dark `#A59B8C` →
-`#B0A697`):布上 4.68–5.56:1 全部過,頁面底色上也從 4.63 變 5.90。但那是全域 palette,
-34 個元件的 muted 文字都會跟著變重,**未經設計決定不自行更動**。
+| 底色 | 舊 | 新 |
+| --- | --- | --- |
+| `bg` / `surface` | 4.63 / 4.85 | 6.24 / 6.53 |
+| `bone` / `sheen` | 3.99 / 4.40 | 5.37 / 5.93 |
+| `accentSubtle` / `dangerSubtle` / `warningSubtle` | 4.17 / 4.04 / 4.10 | 5.61 / 5.44 / 5.52 |
+| `yarnSecondary` 最深的一階(receipt 收合列) | 3.67 | 4.94 |
+| `yarnGhost` 最深的一階(ghost Button) | 3.40 | 4.57 |
 
-`dangerGhost` 已經處理掉 interaction-card 拒絕鈕那一顆(改用 `color.danger` 標籤後是
-4.31:1 布上 / 5.44:1 頁面底),但一般 ghost 按鈕的偏差還在。
+順帶把三階的間距拉勻:text → muted → faint 的 L\* 間距原本是 35.0 / 14.2(muted 離
+faint 遠比離 text 近,兩階分不太開),現在是 26.9 / 22.3;dark 從 26.9 / 19.2 變成
+22.8 / 23.3。
+
+`dangerGhost` 另外處理掉 interaction-card 的拒絕鈕(標籤改用 `color.danger`)。
 
 ## 命中區
 

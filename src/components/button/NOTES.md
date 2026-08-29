@@ -48,8 +48,7 @@
   清 null,blur 也清(否則 rAF 不會停)
 - focus ring 維持原生:`focus-visible` 2px `color.focusRing`,offset 3
 - reduced-motion:rAF 完全不啟動,織紋靜態呈現(靜態本身就是完成的視覺)
-- **已知偏差**:ghost 的 `textMuted` 對 ghost 的 `--y2` 只有 3.67:1(紗很疏,實際
-  多半看到的是頁面底色 4.63:1)—— 見 [A11Y-DEBT.md](../A11Y-DEBT.md)
+- ghost 的標籤對疏織的紗是 4.57:1(最不利的一階),對頁面底色 6.24:1
 
 ## 走過的彎路
 

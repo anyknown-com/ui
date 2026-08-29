@@ -13,7 +13,7 @@ export const color = stylex.defineVars({
 	border: { default: "#E3E0D5", [DARK]: "#35302A" },
 	borderStrong: { default: "#C8C3B4", [DARK]: "#4A443C" },
 	text: { default: "#23211D", [DARK]: "#EAE6DC" },
-	textMuted: { default: "#777165", [DARK]: "#A59B8C" },
+	textMuted: { default: "#635D52", [DARK]: "#B0A697" },
 	textFaint: { default: "#9C958A", [DARK]: "#736A5D" },
 	accent: { default: "#23705A", [DARK]: "#4FA184" },
 	accentText: { default: "#FCFCF9", [DARK]: "#14120F" },
