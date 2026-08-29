@@ -28,7 +28,7 @@ pnpm site:deploy  # build 後 wrangler deploy 到 Cloudflare Workers(需先 wran
 
 playground 的 section id 與 `prototypes.html` 一致,可以並排對照實作與原型。
 
-`check` / `test` / `build` 等都由 [turborepo](https://turborepo.dev) 驅動(single-package 模式,設定在 `turbo.json`),快取推到自架的 remote cache `https://turbo.anyknown.com`(team `anyknown`)。要吃到遠端快取就 export token:
+`check` / `test` / `build` 等都由 [turborepo](https://turborepo.dev) 驅動(single-package 模式,設定在 `turbo.json`),快取推到自架的 remote cache `https://turbo.anyknown.com`(team `anyknown-ui`)。要吃到遠端快取就 export token:
 
 ```bash
 export TURBO_TOKEN=<token>   # 見 turbo-cache-worker/GITHUB-SECRETS.md
@@ -62,7 +62,24 @@ CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪,對照 `protot
 
 repo 在 <https://github.com/anyknown-com/ui>(public),npm trusted publisher 已綁,`@anyknown/ui@0.1.0` 已發佈。剩一件沒做:
 
-**設 `TURBO_TOKEN` secret**(repo → Settings → Secrets and variables → Actions → New repository secret)。`.env` 裡的 `TURBO_API_KEY` 對 `turbo.anyknown.com` 回 401(`anyknown` 與 `anyknown-ui` 兩個 slug 都試過),要先確認 cache worker 認的是哪一把。沒設也不會壞,只是 CI 每次都跑冷的。`apiUrl` 與 `teamSlug` 已經寫死在 `turbo.json`,不用另外設 variable。
+**開通 remote cache**。這個 repo 用的 team 是 `anyknown-ui`,但 cache worker(`anyknown-com/turbo-cache`)的 `wrangler.toml` 目前只註冊了 `anyknown`,所以不管帶什麼 token 都是 401。兩邊都要動:
+
+1. worker 端加 team 與對應的 secret binding:
+
+   ```toml
+   # wrangler.toml
+   [vars]
+   TURBO_TEAM_TOKEN_BINDINGS = '{"anyknown":["TURBO_TOKEN_ANYKNOWN"],"anyknown-ui":["TURBO_TOKEN_ANYKNOWN_UI"]}'
+   ```
+
+   ```bash
+   npx wrangler secret put TURBO_TOKEN_ANYKNOWN_UI   # 至少 32 字元
+   npx wrangler deploy
+   ```
+
+2. 同一個值設成這個 repo 的 `TURBO_TOKEN` secret(repo → Settings → Secrets and variables → Actions → New repository secret);本機則 `export TURBO_TOKEN=<token>`。
+
+沒設也不會壞,只是每次都跑冷的。`apiUrl` 與 `teamSlug` 已經寫死在 `turbo.json`,不用另外設 variable。
 
 ## 在各 app 使用(Vite)
 
