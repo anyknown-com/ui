@@ -39,7 +39,7 @@
 		"playground": "vite --config playground/vite.config.ts",
 		"site": "vite --config site/vite.config.ts",
 		"site:test": "vitest run --config site/smoke.config.ts",
-		"site:build": "pnpm build && vite build --config site/vite.config.ts",
+		"site:build": "pnpm build && vite build --config site/vite.config.ts && node scripts/llms-txt.mjs",
 		"site:deploy": "pnpm site:build && npx wrangler deploy --config site/wrangler.jsonc",
 		"prepublishOnly": "pnpm check && pnpm test && pnpm verify:pack",
 		"verify:pack": "pnpm build && node scripts/verify-pack.mjs"

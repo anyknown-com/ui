@@ -4,7 +4,7 @@
 **不需要重新 tune**。所有參數都是與設計者多輪迭代收斂的結果,照抄即可;
 要偏離前先讀「否決紀錄」,那些路已經走過而且被打回票。
 
-參考實作:`src/components/button/prototype.html`(唯一真相,瀏覽器直接開可操作)。
+手感的基準是實作本身:`pnpm playground` 的 `#button`,或 <https://ui.anyknown.com/#/demo/button>。
 用在哪些元件見 §5。
 
 ---
@@ -56,7 +56,7 @@ function mulberry32(seed) {
 }
 // build() 開頭:const rng = mulberry32(10075); 所有 rand 走它。
 // 種子固定用 **10075**(設計者從隨機分佈中選定的定稿織法,不要換)。
-// prototype.html 有「重織」工具可試其他分佈(#seed=N),但正式實作鎖 10075。
+// 種子鎖 10075,不要換 —— 換了整個系統的布就不是同一塊。
 ```
 
 ### 3.2 共享波場(所有紗的形狀來源)
@@ -96,7 +96,7 @@ const field = (x, y) =>
 
 ### 3.4 色票(--y-un / --y-sh / --y0..4 / --y-hi)
 
-從 Ledger token 衍生的紗線階,light / dark 各一組(prototype.html 有完整值可抄):
+從 Ledger token 衍生的紗線階,light / dark 各一組(完整值在 `tokens.stylex.ts` 的 `yarn*`):
 
 - **primary**(accent 染透):light 以 #23705A 為 --y2,向下到 --y-un #11362C,
   向上到 --y4 #2E8266,--y-hi #5CAA89;dark 以 #4FA184 為 --y2(同構)。
@@ -199,7 +199,7 @@ y(x) = yarn.y
 
 ### 適配步驟(給新 session 的 checklist)
 
-1. 讀本文件 + 開 `button/prototype.html` 感受基準手感。
+1. 讀本文件 + 開 playground 的 `#button` 感受基準手感。
 2. 抄 mulberry32 + field + 層疊參數,只換:元件尺寸、色票(§3.4 原則衍生)、
    圓角(跟該元件的 radius token)。
 3. 動態依元件語意取捨,但**參數不動**:

@@ -11,20 +11,24 @@ function goto(hash: string) {
 }
 
 describe("site smoke", () => {
-	test("demo, docs and guide pages all render", () => {
+	test("demo and guide pages all render", () => {
 		location.hash = ""
 		render(<Site />)
 		expect(screen.getByRole("heading", { name: "@anyknown/ui" })).toBeInTheDocument()
 		for (const id of ["input", "dialog", "message", "data-table"]) {
 			expect(document.getElementById(id)).not.toBeNull()
 		}
-		goto("#/docs/dialog")
-		expect(screen.getByRole("heading", { name: /Dialog \/ ConfirmDialog/ })).toBeInTheDocument()
-		expect(screen.getByRole("link", { name: "實際操作示範 →" })).toHaveAttribute("href", "#/demo/dialog")
 		goto("#/guide/readme")
 		expect(screen.getByRole("link", { name: "StyleX" })).toBeInTheDocument()
+		goto("#/guide/decisions")
+		expect(screen.getByRole("heading", { name: "元件決定紀錄" })).toBeInTheDocument()
+		goto("#/guide/texture")
+		expect(screen.getByRole("heading", { name: /織物設計語言/ })).toBeInTheDocument()
 		goto("#/demo/badge")
 		expect(document.getElementById("badge")).not.toBeNull()
+		// NOTES 刪掉之後,舊的 #/docs/<name> 連結要落到該元件的示範,不是 404
+		goto("#/docs/dialog")
+		expect(document.getElementById("dialog")).not.toBeNull()
 	})
 
 	test("theme toggle stamps html with data-theme and a theme class", async () => {

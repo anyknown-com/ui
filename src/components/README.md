@@ -4,9 +4,9 @@
 
 - `<Name>.tsx` — StyleX 實作
 - `<Name>.test.tsx` — vitest + testing-library
-- `prototype.html` — 用 Ledger token 直接渲染的視覺/行為規格,**視覺的唯一真相**,
-  瀏覽器直接開,行為性元件可實際操作
-- `NOTES.md` — 定案、API、行為、a11y、走過的彎路
+
+視覺的真相是**實作本身**:`pnpm playground` 或 <https://ui.anyknown.com> 直接操作。
+決定與理由集中在 [COMPONENTS.md](./COMPONENTS.md)。
 
 `scrollbar` 沒有元件檔,它就是 `src/scrollbar.css`。
 
@@ -14,7 +14,7 @@
 pnpm playground   # http://localhost:5199,用打包後的 dist 渲染全部元件
 ```
 
-playground 的 section id 與 prototype 一致,可以左右對照。
+playground 與文檔站用同一組 section id。
 
 ## 清單
 
@@ -25,6 +25,8 @@ playground 的 section id 與 prototype 一致,可以左右對照。
 
 ## 其他文件
 
+- [COMPONENTS.md](./COMPONENTS.md) — 34 個元件的定案理由、走過的彎路、踩過的坑。
+  改任何一個元件之前先讀它那一節,免得把已經被否決的路再走一次
 - [TEXTURE-GUIDE.md](./TEXTURE-GUIDE.md) — 織物設計語言的完整規格與適配指引。
   **適配新元件前必讀**,參數照抄不要重 tune
 - [A11Y-DEBT.md](./A11Y-DEBT.md) — 已知的對比與命中區偏差,等設計決策

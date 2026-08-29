@@ -9,6 +9,7 @@ import { DesktopDemos } from "../playground/demos/desktop"
 import { FormsDemos } from "../playground/demos/forms"
 import { StorageDemos } from "../playground/demos/storage"
 import componentsReadme from "../src/components/README.md?raw"
+import componentsDoc from "../src/components/COMPONENTS.md?raw"
 import textureGuide from "../src/components/TEXTURE-GUIDE.md?raw"
 import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
 import readme from "../README.md?raw"
@@ -43,18 +44,6 @@ const GROUPS: Record<string, string[]> = {
 	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
 }
 
-// NOTES 裡指向姊妹文件的相對連結,在站上改指到對應的 guide 頁。
-const guideLinks = (body: string) =>
-	body
-		.replace(/\(\.\.\/TEXTURE-GUIDE\.md\)/g, "(#/guide/texture)")
-		.replace(/\(\.\.\/A11Y-DEBT\.md\)/g, "(#/guide/a11y)")
-
-const NOTES = Object.fromEntries(
-	Object.entries(
-		import.meta.glob("../src/components/*/NOTES.md", { query: "?raw", import: "default", eager: true }),
-	).map(([path, raw]) => [path.split("/").at(-2)!, guideLinks(raw as string)]),
-)
-
 // Repo 內的相對連結改指到站內對應頁。
 const GUIDES: Record<string, { title: string; body: string }> = {
 	readme: {
@@ -69,6 +58,12 @@ const GUIDES: Record<string, { title: string; body: string }> = {
 			.replace("(./TEXTURE-GUIDE.md)", "(#/guide/texture)")
 			.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
 	},
+	decisions: {
+		title: "元件決定紀錄",
+		body: componentsDoc
+			.replace("(./TEXTURE-GUIDE.md)", "(#/guide/texture)")
+			.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
+	},
 	texture: {
 		title: "織物設計語言",
 		body: textureGuide.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
@@ -76,14 +71,12 @@ const GUIDES: Record<string, { title: string; body: string }> = {
 	a11y: { title: "a11y 偏差", body: a11yDebt },
 }
 
-type Route =
-	| { page: "demo"; anchor?: string }
-	| { page: "guide"; key: string }
-	| { page: "docs"; name: string }
+type Route = { page: "demo"; anchor?: string } | { page: "guide"; key: string }
 
 function parseRoute(hash: string): Route {
 	const parts = hash.replace(/^#\/?/, "").split("/")
-	if (parts[0] === "docs" && NOTES[parts[1]] != null) return { page: "docs", name: parts[1] }
+	// 舊的 #/docs/<name> 連結直接落到該元件的示範
+	if (parts[0] === "docs" && parts[1] != null) return { page: "demo", anchor: parts[1] }
 	if (parts[0] === "guide" && GUIDES[parts[1]] != null) return { page: "guide", key: parts[1] }
 	return { page: "demo", anchor: parts[0] === "demo" ? parts[1] : undefined }
 }
@@ -219,8 +212,6 @@ const styles = stylex.create({
 	active: { color: color.text, backgroundColor: color.accentSubtle },
 	main: { padding: { default: space.lg, [MOBILE]: space.md }, minWidth: 0 },
 	content: { maxWidth: "56rem", marginInline: "auto" },
-	docHeader: { display: "flex", alignItems: "baseline", gap: space.sm, marginBottom: space.md },
-	demoLink: { fontSize: text.xs, color: color.accentText },
 })
 
 function NavLink({ href, current, children }: { href: string; current: boolean; children: string }) {
@@ -249,20 +240,6 @@ function DemoPage({ anchor }: { anchor?: string }) {
 			<BasicsDemos />
 			<DesktopDemos />
 			<StorageDemos />
-		</>
-	)
-}
-
-function DocsPage({ name }: { name: string }) {
-	useEffect(() => window.scrollTo(0, 0), [name])
-	return (
-		<>
-			<div {...stylex.props(styles.docHeader)}>
-				<a href={`#/demo/${name}`} {...stylex.props(styles.demoLink)}>
-					實際操作示範 →
-				</a>
-			</div>
-			<Markdown body={NOTES[name]} />
 		</>
 	)
 }
@@ -311,8 +288,8 @@ export function Site() {
 						{names.map((name) => (
 							<NavLink
 								key={name}
-								href={`#/docs/${name}`}
-								current={route.page === "docs" && route.name === name}
+								href={`#/demo/${name}`}
+								current={route.page === "demo" && route.anchor === name}
 							>
 								{name}
 							</NavLink>
@@ -324,8 +301,6 @@ export function Site() {
 				<div {...stylex.props(styles.content)}>
 					{route.page === "demo" ? (
 						<DemoPage anchor={route.anchor} />
-					) : route.page === "docs" ? (
-						<DocsPage name={route.name} />
 					) : (
 						<GuidePage guide={route.key} />
 					)}

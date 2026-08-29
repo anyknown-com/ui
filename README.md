@@ -8,10 +8,10 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 - `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。
 - `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app(套在 root element)。
 - `src/scrollbar.css` — 客製捲軸(全域套用)。StyleX 做不了 `::-webkit-scrollbar` 偽元素,所以獨立成 css 檔。
-- `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx` + `prototype.html` + `NOTES.md`)。清單與共同決策見 [components/README.md](./src/components/README.md)。
+- `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx`)。清單與共同決策見 [components/README.md](./src/components/README.md),定案理由與走過的彎路見 [components/COMPONENTS.md](./src/components/COMPONENTS.md)。
 - `src/lib/` — 共用 hooks 與生成邏輯(reduced-motion、controllable state、clipboard、diff、`styled` 與 `reset.control`)。織體幾何在 `weave.ts`(靜態)與 `silk.ts`(動態),規格見 [components/TEXTURE-GUIDE.md](./src/components/TEXTURE-GUIDE.md)。
 - `playground/` — demo app,**不進發佈產物**。
-- `site/` — 文檔網站(全部示範 + 每個元件的 NOTES + 指南),部署到 Cloudflare Workers,**不進發佈產物**。
+- `site/` — 文檔網站(全部示範 + 四份指南),部署到 Cloudflare Workers,**不進發佈產物**。
 
 ## 開發
 
@@ -21,12 +21,12 @@ pnpm check        # turbo run typecheck lint fmt:check(平行 + 快取)
 pnpm build        # dist:ESM + d.ts + tokens.css + scrollbar.css
 pnpm verify:pack  # build 後打包,從套件外部解析 exports map 每個入口
 pnpm playground   # http://localhost:5199,用打包後的 dist 渲染全部元件
-pnpm site         # http://localhost:5200,文檔網站(示範 + NOTES 文檔)
+pnpm site         # http://localhost:5200,文檔網站(示範 + 指南)
 pnpm site:test    # 文檔網站的 jsdom 冒煙測試
 pnpm site:deploy  # build 後 deploy 到 https://ui.anyknown.com(需先 wrangler login)
 ```
 
-playground 的 section id 與 `prototypes.html` 一致,可以並排對照實作與原型。
+playground 與文檔站用同一組 section id,`#/demo/<name>` 直接跳到該元件。
 
 `check` / `test` / `build` 等都由 [turborepo](https://turborepo.dev) 驅動(single-package 模式,設定在 `turbo.json`),快取推到自架的 remote cache `https://turbo.anyknown.com`(team `anyknown-ui`)。要吃到遠端快取就 export token:
 
@@ -34,7 +34,7 @@ playground 的 section id 與 `prototypes.html` 一致,可以並排對照實作�
 export TURBO_TOKEN=<token>   # 見 turbo-cache-worker/GITHUB-SECRETS.md
 ```
 
-沒設也不會壞,只是退回本機快取。`turbo.json` 裡 `build` / `lint` / `typecheck` / `test` 的 inputs 刻意排除了 `*.md` 與 `*.html`,所以改 NOTES 或 prototype 不會讓這些 task 重跑;`site:build` / `site:test` 用預設 inputs,因為文檔網站確實會讀 NOTES。
+沒設也不會壞,只是退回本機快取。`turbo.json` 裡 `build` / `lint` / `typecheck` / `test` 的 inputs 刻意排除了 `*.md`,所以改文件不會讓這些 task 重跑;`site:build` / `site:test` 用預設 inputs,因為文檔網站會讀那些 md。
 
 ## 發佈
 
@@ -43,7 +43,7 @@ export TURBO_TOKEN=<token>   # 見 turbo-cache-worker/GITHUB-SECRETS.md
 版本由 **git tag 決定**。推一個 `v*` tag 上去,`.github/workflows/release.yml` 跑完整條 gate 再 publish;tag 與 `package.json` 的 `version` 對不上會直接失敗,不會發出去。
 
 ```bash
-# 1. 改 package.json 的 version(semver;元件 API 有 breaking change 時同步更新該元件的 NOTES.md)
+# 1. 改 package.json 的 version(semver)
 # 2. commit + 打 tag + 推
 git commit -am "release: v0.2.0"
 git tag v0.2.0
@@ -56,7 +56,7 @@ publish 走 **npm trusted publishing (OIDC)**,repo 裡不存任何 npm 憑證 �
 
 v0.1.0 是本機手動發的:npm 的 trusted publisher 只能綁在**已存在的套件**上,第一版繞不掉。之後都走 tag。
 
-CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪,對照 `prototypes.html` 看視覺與動效沒跑掉,順手開 macOS 的「減少動態效果」再看一次。
+CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪看視覺與動效沒跑掉,順手開 macOS 的「減少動態效果」再看一次。
 
 ### 基礎設施現況
 
