@@ -3,6 +3,14 @@
 	"version": "0.2.0",
 	"description": "AnyKnown design system — StyleX tokens, themes, and 34 components",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/anyknown-com/ui.git"
+	},
+	"homepage": "https://ui.anyknown.com",
+	"bugs": {
+		"url": "https://github.com/anyknown-com/ui/issues"
+	},
 	"files": [
 		"dist",
 		"LICENSE"
