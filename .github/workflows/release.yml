@@ -21,7 +21,9 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://registry.npmjs.org
+          # 不要設 registry-url:setup-node 會寫一份 .npmrc 塞
+          # `_authToken=${NODE_AUTH_TOKEN}`,沒有那個 env 就變成空 token,
+          # npm 拿空憑證去認證 → E404 "you do not have permission",OIDC 接不到手。
       # Node 22 ships npm 10.x; trusted publishing needs >= 11.5.1.
       - run: npm install --global npm@latest
       - run: pnpm install --frozen-lockfile
