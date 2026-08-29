@@ -1,7 +1,7 @@
 # Button — 織成的實心(探索中)
 
-**狀態:第四版原型(線堆成按鈕本體),press 兩案待定。** `prototype.html` 瀏覽器直接開。
-`Button.tsx` 是已出貨的安靜版本,本探索**尚未**進實作。
+狀態:已落地(2026-08-29)。`Button.tsx` 的四個 variant 都是織體,press 全套。
+`prototype.html` 仍是幾何與手感的唯一真相,瀏覽器直接開可操作。
 
 ## 走過的路
 
@@ -43,12 +43,14 @@
 - 成本:base 波場值預存,每幀只加觸點項;僅在有紗在動或張力變化時重算 d;
   底紗與縫隙紗完全靜態(覆蓋保證)。
 
-## 待決
+## 落地後的樣子
 
-1. A 還是 B(或 primary 用 B、危險動作不動)?
-2. 織理密度/波長/透明度的手感微調;secondary 淺色底上 sheen 是否夠明顯?
-3. 進 `Button.tsx`:幾何 build 一次 + ResizeObserver;rAF 只在互動時跑;SSR 安全。
-4. texture 準則 — 是否只給 primary/CTA,secondary/ghost 保持安靜?
+- 種子 10075、幾何與動態都在 `lib/silk.ts`(press 全套),Button 只挑 variant 與色票
+- 落影照 prototype 掛在按鈕的 CSS filter 上,四組色票各自帶 `shadow`(ghost 為 none)
+- children 包進 `label` span(position: relative)才會蓋在布上面;
+  用 `render={<Button/>}` 的地方(Dialog 的 confirm)照樣正常
+- 待設計者定:ghost 的 textMuted 對 ghost --y2 只有 3.67:1(紗疏,多半看到的是頁面
+  底色 4.63:1),要不要把 ghost 的字改深一階
 
 ## a11y
 

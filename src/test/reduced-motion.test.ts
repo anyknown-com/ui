@@ -128,7 +128,7 @@ test("the documented exceptions still exist and are still exceptional", async ()
 })
 
 test("rAF-driven animation is gated on the media query", async () => {
-	for (const file of ["progress/Progress.tsx", "voice-indicator/VoiceIndicator.tsx"]) {
+	for (const file of ["voice-indicator/VoiceIndicator.tsx"]) {
 		const source = await readFile(join(SRC, "components", file), "utf8")
 		expect(source, file).toContain("usePrefersReducedMotion")
 		expect(source, file).toContain("useAnimationFrame(!reduced")

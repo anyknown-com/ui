@@ -28,3 +28,16 @@
 ## References
 
 - https://ui.shadcn.com/docs/components/base/radio-group
+
+## 鏡頭取景升級(prototype 先行,2026-08-29)
+
+- 否決紀錄:
+  - 舊 coil(2.3 圈、圈距 > 線粗)—「是圈圈,不是線在圈圈區域」
+  - 實心線墊(圈距 ≈ 線粗的密繞螺旋)—「還是像蚊香」;
+    問題出在讓線侷限在圓裡自己繞成一團
+- 定案:**鏡頭**。布(button 同源的紗線堆疊,seed 10075)像背景一樣在後面延伸,
+  圓形只是取景框 — 圓形 clip 在布上開孔,選中 = 孔徑(circle r)從 0 打開,
+  布本身完全不動。幾何與 checkbox 完全同源(14.8px 顯示尺寸換算)。
+- 孔徑只開到 r 6.8(viewBox 24):維持 radio 的標準構成 —
+  外環(border accent)+ surface 空隙 + 內實心圓(= 鏡頭裡的布),不是整面填滿。
+- 已落地 `Radio.tsx`(2026-08-29,共享 lib/weave.ts;COIL_PATH 已退役刪除)

@@ -37,3 +37,28 @@ Base UI `Tabs` 有現成 primitive(含 `Tabs.Indicator` 提供 CSS 變數定位)
 
 - https://ui.shadcn.com/docs/components/base/tabs
 - https://base-ui.com/react/components/tabs
+
+## Texture(prototype 先行,2026-08-29)
+
+- 否決紀錄:底線鬆緊彈性(前緣快後緣慢的雙彈簧 + 拉伸下垂)—
+  「完全不用這麼戲劇化,underline 正常滑動就好,太誇張了」
+- 定案:underline 維持原本的 2px 滑動 indicator,不做線的動態
+- pills:布(accent-subtle 色系紗線,seed 10075)織滿整條 tablist 當背景、建一次;
+  selected highlight = 圓角取景窗(clip rect)滑到選中的 tab(x/width CSS transition,
+  跟 underline 同一條 260ms bezier)— 窗動、布不動,透出的織紋是連續的同一塊布
+  (與 radio 的鏡頭同一個邏輯);無 rAF
+- 滑動定案(underline):雙邊動畫 — indicator 用 left/right 兩個 inset,
+  行進方向前緣 240ms cubic-bezier(.16,1,.3,1)(expo)、後緣 240ms
+  cubic-bezier(.4,0,.2,1)(平滑),依方向對調;兩邊各自單調往目標走 —
+  無倒退、無過衝、寬度漸變(x+width 拆曲線的組合被否決:某些排列會衝過再收)
+- pills 取景窗:等寬情境,x/width 同曲線(240ms expo)整體平移,單調保證
+- `Tabs.tsx` 現況 translate+width 結構先用同曲線 expo(單調安全);
+  落地時改成 left/right 雙邊結構套上面的方向性曲線
+- 已落地 `Tabs.tsx`:offsetLeft/Width 不自己量 —— Base UI 的 `Tabs.Indicator` 本來就
+  把 `--active-tab-left/top/width/height` 寫成自己的 inline style,所以拿它當變數載體
+  (絕對定位鋪滿整條 list、自己不動、pointer-events none),裡面放織滿 tablist 的 SVG,
+  clipPath 的 rect 用 CSS 幾何屬性 x/y/width/height 吃那些變數,transition 只給 x 與
+  width(等寬情境同曲線,單調)。tab 用 z-index 1 疊在布上(flex item 的 z-index 不必
+  position 也生效)
+- tablist 尺寸靠 ref callback + ResizeObserver 進 state(不用 effect),量到才織;
+  jsdom 下 clientWidth 為 0 → 不渲染布,測試只驗語意

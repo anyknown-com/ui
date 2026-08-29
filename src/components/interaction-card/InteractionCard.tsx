@@ -1,6 +1,10 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { Button } from "../button/Button"
+import { Checkbox } from "../checkbox/Checkbox"
+import { Radio } from "../radio/Radio"
+import { RadioGroup } from "../radio/RadioGroup"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -58,28 +62,6 @@ const styles = stylex.create({
 		outlineOffset: -2,
 	},
 	actions: { display: "flex", gap: space.xs, flexWrap: "wrap" },
-	button: {
-		fontFamily: font.body,
-		fontSize: text.sm,
-		fontWeight: 500,
-		lineHeight: 1,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong },
-		backgroundColor: color.surface,
-		color: color.text,
-		borderRadius: radius.sm,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
-		cursor: { default: "pointer", ":disabled": "not-allowed" },
-		opacity: { default: 1, ":disabled": 0.5 },
-		transitionProperty: "border-color, background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: 1,
-	},
-	primary: { backgroundColor: color.accent, borderColor: color.accent, color: color.accentText },
-	danger: { color: color.danger },
 	shortcut: {
 		fontFamily: font.mono,
 		fontSize: "0.68rem",
@@ -127,26 +109,6 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 		borderWidth: 0,
 	},
-	option: {
-		display: "flex",
-		alignItems: "flex-start",
-		gap: space.xs,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong },
-		borderRadius: radius.sm,
-		paddingBlock: space.xs,
-		paddingInline: space.xs,
-		cursor: "pointer",
-		transitionProperty: "border-color, background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":has(input:focus-visible)": `2px solid ${color.focusRing}` },
-		outlineOffset: 1,
-	},
-	optionChecked: { borderColor: color.accent, backgroundColor: color.accentSubtle },
-	optionInput: { accentColor: color.accent, marginTop: "0.2rem" },
-	optionLabel: { fontWeight: 500, fontSize: "0.87rem", display: "block", color: color.text },
-	optionDescription: { color: color.textMuted, fontSize: "0.76rem" },
 	recommended: {
 		fontFamily: font.mono,
 		fontSize: "0.62rem",
@@ -332,41 +294,34 @@ export function PermissionCard({
 						{subject}
 					</pre>
 					<div {...stylex.props(styles.actions)}>
-						<button
-							type="button"
-							onKeyDown={onKeyDown}
-							onClick={() => onReply?.("once")}
-							{...stylex.props(styles.button, styles.primary)}
-						>
+						<Button onKeyDown={onKeyDown} onClick={() => onReply?.("once")}>
 							允許一次
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								⏎
 							</kbd>
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="secondary"
 							aria-keyshortcuts="Meta+Enter Control+Enter"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ always: scope })}
-							{...stylex.props(styles.button)}
 						>
 							總是允許
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								⌘⏎
 							</kbd>
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="dangerGhost"
 							aria-keyshortcuts="Escape"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ reject: true })}
-							{...stylex.props(styles.button, styles.danger)}
 						>
 							拒絕
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								Esc
 							</kbd>
-						</button>
+						</Button>
 					</div>
 					{policyHint != null && (
 						<p {...stylex.props(styles.policy)}>
@@ -377,6 +332,16 @@ export function PermissionCard({
 				</div>
 			)}
 		</div>
+	)
+}
+
+function optionLabel(option: DecisionOption) {
+	if (!option.recommended) return option.label
+	return (
+		<>
+			{option.label}
+			<span {...stylex.props(styles.recommended)}>建議</span>
+		</>
 	)
 }
 
@@ -498,77 +463,64 @@ export function DecisionCard({
 							)
 						}
 						const selected = answer[block.id]
-						return (
-							<fieldset
-								key={block.id}
-								aria-required={block.required || undefined}
-								{...stylex.props(styles.options)}
-							>
-								<legend {...stylex.props(block.label != null ? styles.question : styles.srOnly)}>
-									{block.label ?? title}
-								</legend>
-								{block.options.map((option) => {
-									const checked = block.multiple
-										? Array.isArray(selected) && selected.includes(option.value)
-										: selected === option.value
-									return (
-										<label
+						// label 沒給時,組名走 aria-label(視覺上不重複卡片標題)
+						const groupLabel = block.label == null ? title : undefined
+						if (block.multiple) {
+							const picks = Array.isArray(selected) ? selected : []
+							return (
+								<fieldset
+									key={block.id}
+									aria-label={groupLabel}
+									aria-required={block.required || undefined}
+									{...stylex.props(styles.options)}
+								>
+									{block.label != null && <legend {...stylex.props(styles.question)}>{block.label}</legend>}
+									{block.options.map((option) => (
+										<Checkbox
 											key={option.value}
-											{...stylex.props(styles.option, checked && styles.optionChecked)}
-										>
-											<input
-												type={block.multiple ? "checkbox" : "radio"}
-												name={`${base}${block.id}`}
-												value={option.value}
-												checked={checked}
-												onChange={(event) => {
-													if (!block.multiple) {
-														set(block.id, option.value)
-														return
-													}
-													const current = Array.isArray(selected) ? selected : []
-													set(
-														block.id,
-														event.currentTarget.checked
-															? [...current, option.value]
-															: current.filter((v) => v !== option.value),
-													)
-												}}
-												{...stylex.props(styles.optionInput)}
-											/>
-											<span>
-												<b {...stylex.props(styles.optionLabel)}>
-													{option.label}
-													{option.recommended && <span {...stylex.props(styles.recommended)}>建議</span>}
-												</b>
-												{option.description != null && (
-													<small {...stylex.props(styles.optionDescription)}>{option.description}</small>
-												)}
-											</span>
-										</label>
-									)
-								})}
-							</fieldset>
+											name={`${base}${block.id}`}
+											value={option.value}
+											checked={picks.includes(option.value)}
+											onCheckedChange={(on) =>
+												set(block.id, on ? [...picks, option.value] : picks.filter((v) => v !== option.value))
+											}
+											label={optionLabel(option)}
+											description={option.description}
+										/>
+									))}
+								</fieldset>
+							)
+						}
+						return (
+							<RadioGroup
+								key={block.id}
+								name={`${base}${block.id}`}
+								legend={block.label}
+								aria-label={groupLabel}
+								aria-required={block.required || undefined}
+								variant="card"
+								value={typeof selected === "string" ? selected : ""}
+								onValueChange={(value) => set(block.id, value)}
+							>
+								{block.options.map((option) => (
+									<Radio
+										key={option.value}
+										value={option.value}
+										label={optionLabel(option)}
+										description={option.description}
+									/>
+								))}
+							</RadioGroup>
 						)
 					})}
 					<div {...stylex.props(styles.actions)}>
-						<button
-							type="button"
-							disabled={missing}
-							onClick={() => onAnswer?.(answer)}
-							{...stylex.props(styles.button, styles.primary)}
-						>
+						<Button disabled={missing} onClick={() => onAnswer?.(answer)}>
 							{submitLabel}
-						</button>
+						</Button>
 						{hasRecommendation && (
-							<button
-								type="button"
-								disabled={recommendationMissing}
-								onClick={() => onAnswer?.(merged)}
-								{...stylex.props(styles.button)}
-							>
+							<Button variant="secondary" disabled={recommendationMissing} onClick={() => onAnswer?.(merged)}>
 								{recommendedLabel}
-							</button>
+							</Button>
 						)}
 					</div>
 				</div>

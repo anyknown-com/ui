@@ -95,6 +95,43 @@ export function BasicsDemos() {
 
 	return (
 		<>
+			<Demo
+				id="button"
+				title="button"
+				note="沒有 background:實心是紗織出來的。hover 帶動掃過的紗,按住把布壓出一個窩,放開回彈時光從按點掃出;拖出去放開 = 取消,不播觸發視覺。"
+			>
+				<Row>
+					<Button>建立 thread</Button>
+					<Button variant="secondary">重新命名</Button>
+					<Button variant="ghost">取消</Button>
+					<Button variant="dangerGhost">拒絕</Button>
+					<Button variant="danger">刪除記憶</Button>
+				</Row>
+				<Row>
+					<Button size="sm">建立 thread</Button>
+					<Button size="sm" variant="secondary">
+						重新命名
+					</Button>
+					<Button size="sm" variant="ghost">
+						取消
+					</Button>
+					<Button size="sm" variant="danger">
+						刪除記憶
+					</Button>
+				</Row>
+				<Row>
+					<Button disabled>已停用</Button>
+					<Button variant="secondary" disabled>
+						已停用
+					</Button>
+					<Button>
+						<MemoryIcon />
+						帶圖示
+					</Button>
+					<Button variant="secondary">很長的一顆按鈕,看寬布的織法有沒有接好</Button>
+				</Row>
+			</Demo>
+
 			<Demo id="dialog" title="dialog">
 				<Row>
 					<Dialog>
@@ -276,7 +313,11 @@ export function BasicsDemos() {
 				<ThreadSkeleton messages={1} />
 			</Demo>
 
-			<Demo id="progress" title="progress" note="纖維在進度前緣後方收緊成辮;毛球一束一束繞滿。">
+			<Demo
+				id="progress"
+				title="progress"
+				note="一個凹進去的容器,裡面長出一塊布 —— 就是 button 那塊,同一組紗與落影。環形同理:布在後面,弧形只是取景框。"
+			>
 				<Progress value={percent} aria-label="同步 thread" valueText={`${percent}% · 3 則訊息交接中`} />
 				<Row>
 					<Spinner size="sm" />

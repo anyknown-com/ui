@@ -26,3 +26,11 @@
 
 - https://ui.shadcn.com/docs/components/base/switch
 - transitions.dev「Toggle/Thumb slides」:double-bounce 滑動參考
+
+## Texture 升級(prototype 先行,2026-08-29)
+
+- prototype.html 已把 on-state 藥丸從 5×5 crosshatch pattern 換成 TEXTURE-GUIDE
+  的完整紗線堆疊(mulberry32(10075)、共享波場、底紗/縫隙/面紗/亮紗、primary 色票)
+- 織入動畫改為 clipPath rect 的 width 推進 — 紗固定不動,布被逐漸「織出」
+- 選取控件保持安靜:靜態織紋、無 rAF、無窩/掃光
+- 已落地 `Switch.tsx`(2026-08-29,共享 lib/weave.ts;lib/Fabric.tsx 已汰換刪除)

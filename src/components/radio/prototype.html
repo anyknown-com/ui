@@ -18,26 +18,31 @@ legend{font:500 .875rem/1.3 "Geist";padding:0;margin-bottom:.2rem}
 .radio input{position:absolute;opacity:0;width:1.05rem;height:1.05rem;margin:0;cursor:pointer}
 .dot{flex:none;width:1.05rem;height:1.05rem;margin-top:.16rem;border:1px solid var(--border);border-radius:999px;background:var(--surface);transition:border-color 120ms}
 .dot svg{display:block;width:100%;height:100%}
-/* 選中 = 線在圓心繞成一顆小線圈(stroke-draw),不是 scale 進場 */
-.coil{fill:none;stroke:var(--accent);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 320ms ease-out}
+/* 選中 = 鏡頭:布(button 同源的紗線堆疊)像背景一樣在後面延伸,
+   圓形只是取景框 — 圓形 clip 在布上開孔,孔徑從 0 打開,布本身完全不動。
+   不是把線侷限在圈圈裡繞成一團。 */
+.dot path{fill:none;stroke-linecap:round}
+.dot{--y-un:#11362C;--y-sh:#123C31;--y0:#1E6250;--y1:#216A55;--y2:#23705A;--y3:#28795F;--y4:#2E8266;--y-hi:#5CAA89}
+@media(prefers-color-scheme:dark){.dot{--y-un:#173629;--y-sh:#1B4437;--y0:#3F8A70;--y1:#47957A;--y2:#4FA184;--y3:#56A98B;--y4:#5EB193;--y-hi:#8FD2B4}}
+.lens{r:0;transition:r 200ms cubic-bezier(.32,.85,.45,1)}
 .radio input:checked+.dot{border-color:var(--accent)}
-.radio input:checked+.dot .coil{stroke-dashoffset:0}
+.radio input:checked+.dot .lens{r:6.8px}
 .radio input:focus-visible+.dot{outline:2px solid var(--focus);outline-offset:2px}
 .radio:has(input:disabled){opacity:.5;cursor:not-allowed}
 .radio b{font-weight:500;font-size:.9rem;display:block}
 .radio small{font-size:.8rem;color:var(--muted)}
 .cards .radio{border:1px solid var(--border-soft);border-radius:.5rem;padding:.75rem .9rem;transition:border-color 120ms,background 120ms}
 .cards .radio:has(input:checked){border-color:var(--accent);background:var(--accent-subtle)}
-@media(prefers-reduced-motion:reduce){.dot,.coil{transition:none}}
+@media(prefers-reduced-motion:reduce){.dot,.lens{transition:none}}
 </style>
 <h1>Radio</h1>
 
 <section>
   <fieldset>
     <legend>換班門檻</legend>
-    <label class="radio"><input type="radio" name="a" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>50%(建議)</b><small>context 用到一半就交接,品質最穩。</small></span></label>
-    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>75%</b></span></label>
-    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>90%</b><small>接近上限才交接,單一 session 最長。</small></span></label>
+    <label class="radio"><input type="radio" name="a" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>50%(建議)</b><small>context 用到一半就交接,品質最穩。</small></span></label>
+    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>75%</b></span></label>
+    <label class="radio"><input type="radio" name="a"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>90%</b><small>接近上限才交接,單一 session 最長。</small></span></label>
   </fieldset>
 </section>
 
@@ -45,8 +50,8 @@ legend{font:500 .875rem/1.3 "Geist";padding:0;margin-bottom:.2rem}
   <h2>card 樣式(選中整張亮起)</h2>
   <fieldset>
     <legend>訂閱來源</legend>
-    <label class="radio"><input type="radio" name="b" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>Claude</b><small>用你現有的 Claude 訂閱。</small></span></label>
-    <label class="radio"><input type="radio" name="b"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>ChatGPT</b><small>用你現有的 ChatGPT 訂閱。</small></span></label>
+    <label class="radio"><input type="radio" name="b" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>Claude</b><small>用你現有的 Claude 訂閱。</small></span></label>
+    <label class="radio"><input type="radio" name="b"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>ChatGPT</b><small>用你現有的 ChatGPT 訂閱。</small></span></label>
   </fieldset>
 </section>
 
@@ -54,18 +59,73 @@ legend{font:500 .875rem/1.3 "Geist";padding:0;margin-bottom:.2rem}
   <h2>disabled 選項</h2>
   <fieldset>
     <legend>資料位置</legend>
-    <label class="radio"><input type="radio" name="c" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>這台電腦</b></span></label>
-    <label class="radio"><input type="radio" name="c" disabled><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="coil"/></svg></span><span><b>雲端同步</b><small>roadmap 中,尚未開放。</small></span></label>
+    <label class="radio"><input type="radio" name="c" checked><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>這台電腦</b></span></label>
+    <label class="radio"><input type="radio" name="c" disabled><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="cloth"></g></svg></span><span><b>雲端同步</b><small>roadmap 中,尚未開放。</small></span></label>
   </fieldset>
 </section>
 <script>
-// 線圈 dot:2.3 圈由內往外的螺旋
-let d = ""
-const turns = 2.3, TAU = Math.PI * 2
-for (let a = 0; a <= turns * TAU; a += 0.22) {
-  const r = 1 + (a / (turns * TAU)) * 5.4
-  d += (d ? "L" : "M") + (12 + r * Math.cos(a)).toFixed(1) + "," + (12 + r * Math.sin(a)).toFixed(1)
+// 鏡頭 dot:幾何抄 TEXTURE-GUIDE §3(同 checkbox)。布以 CSS px 建、輸出乘 s,
+// 紗的粗細行距與 button 在螢幕上等粗;圓形 clip 是取景框,孔徑(r)由 CSS 打開。
+// 布是靜態背景,無 rAF。
+const NS = "http://www.w3.org/2000/svg"
+let uid = 0
+const SEED = 10075
+
+function mulberry32(seed) {
+	let a = seed >>> 0
+	return () => {
+		a |= 0; a = (a + 0x6D2B79F5) | 0
+		let t = Math.imul(a ^ (a >>> 15), 1 | a)
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+	}
 }
-for (const c of document.querySelectorAll(".coil")) { c.setAttribute("d", d); c.setAttribute("pathLength", "100") }
+
+function el(name, attrs, parent) {
+	const node = document.createElementNS(NS, name)
+	for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
+	parent?.append(node)
+	return node
+}
+
+function weave(cloth, w, h, s) {
+	const id = `rdc${uid++}`
+	const rng = mulberry32(SEED)
+	const rand = (a, b) => a + rng() * (b - a)
+	const W1 = rand(Math.max(120, w * 0.9), w * 1.8)
+	const A1 = rand(1.0, 1.8), P1 = rand(0, 6.28), K1 = rand(0.05, 0.11)
+	const W2 = rand(w * 1.6, w * 3)
+	const A2 = rand(0.5, 0.9), P2 = rand(0, 6.28), K2 = rand(0.03, 0.07)
+	const field = (x, y) =>
+		A1 * Math.sin((x / W1) * 6.283 + P1 + y * K1) +
+		A2 * Math.sin((x / W2) * 6.283 + P2 + y * K2)
+	const staticD = (y0) => {
+		let d = ""
+		for (let x = -4; x <= w + 4; x += 4)
+			d += `${d ? "L" : "M"}${(x * s).toFixed(2)},${((y0 + field(x, y0)) * s).toFixed(2)}`
+		return d
+	}
+	const defs = el("defs", {}, cloth)
+	el("clipPath", { id }, defs)
+		.append(el("circle", { class: "lens", cx: 12, cy: 12 }, null))
+	const body = el("g", { "clip-path": `url(#${id})` }, cloth)
+	const under = el("g", { stroke: "var(--y-un)" }, body)
+	for (let y = -0.8; y < h + 2.6; y += 1.5)
+		el("path", { d: staticD(y), "stroke-width": (3.4 * s).toFixed(2) }, under)
+	const seams = el("g", { stroke: "var(--y-sh)", opacity: ".5" }, body)
+	for (let y = 1.6; y < h + 1; y += 2.4)
+		el("path", { d: staticD(y), "stroke-width": (rand(0.5, 0.8) * s).toFixed(2) }, seams)
+	for (let y = 0.6; y < h + 1; y += 1.2 + rand(-0.15, 0.15)) {
+		const bucket = Math.min(4, Math.max(0, Math.round(4.2 - (y / h) * 3 + rand(-0.9, 0.9))))
+		el("path", { d: staticD(y), "stroke-width": (rand(0.6, 1.4) * s).toFixed(2), stroke: `var(--y${bucket})` }, body)
+	}
+	const hi = el("g", { stroke: "var(--y-hi)", opacity: ".45" }, body)
+	for (let i = 0; i < 4; i++) {
+		const y = rand(2, h * 0.6)
+		el("path", { d: staticD(y), "stroke-width": (rand(0.4, 0.7) * s).toFixed(2) }, hi)
+	}
+}
+
+for (const cloth of document.querySelectorAll(".cloth")) weave(cloth, 14.8, 14.8, 24 / 14.8)
 </script>
 </html>

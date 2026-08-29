@@ -1,14 +1,35 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ComponentProps, type ReactNode, useCallback, useEffect, useId, useRef } from "react"
-import { FabricPattern } from "../../lib/Fabric"
+import { type ComponentProps, type ReactNode, useCallback, useId } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { styled } from "../../lib/styled"
 import { useSvgId } from "../../lib/svgId"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { buildThread, buildWeave, weaveRand } from "../../lib/weave"
+import { color, font, motion, radius, space, text, yarn } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+
+// 布與縫線在 module scope 織一次(固定種子、固定尺寸 → 恆定;純幾何,SSR 安全)。
+// 格子顯示 14.8 CSS px(1.05rem − 2px border),viewBox 24 → s = 24/14.8,
+// 螢幕上紗的粗細行距與 button 等粗。勾/橫線 = 縫在布上的線,與布共用同一支 rand 序列。
+const rand = weaveRand()
+const CLOTH = buildWeave({ w: 14.8, h: 14.8, s: 24 / 14.8 }, rand)
+const CHECK_D = buildThread(
+	[
+		[5.83, 12.33],
+		[10.05, 16.55],
+		[18.18, 7.13],
+	],
+	rand,
+)
+const DASH_D = buildThread(
+	[
+		[6.48, 12],
+		[17.53, 12],
+	],
+	rand,
+)
 
 const styles = stylex.create({
 	root: {
@@ -38,6 +59,8 @@ const styles = stylex.create({
 	},
 	boxOn: { borderColor: color.accent },
 	svg: { display: "block", width: "100%", height: "100%" },
+	// 勾選 = 布織進格子:clip rect 的 width 從左往右推進,紗本身不動;
+	// 縫線掛同一個 clip — 前緣推到哪,布和勾一起被織出來
 	weave: {
 		width: 0,
 		height: 24,
@@ -46,33 +69,23 @@ const styles = stylex.create({
 		transitionTimingFunction: "cubic-bezier(0.32, 0.85, 0.45, 1)",
 	},
 	weaveOn: { width: 24 },
-	mark: {
-		stroke: color.accent,
-		strokeWidth: 3,
-		fill: "none",
-		strokeLinecap: "round",
-		strokeLinejoin: "round",
-	},
-	check: {
-		strokeDasharray: 24,
-		strokeDashoffset: 24,
-		transitionProperty: "stroke-dashoffset",
-		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
-		transitionDelay: { default: "110ms", [REDUCED]: "0s" },
-	},
-	dash: {
-		strokeDasharray: 14,
-		strokeDashoffset: 14,
-		transitionProperty: "stroke-dashoffset",
-		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
-		transitionDelay: { default: "110ms", [REDUCED]: "0s" },
-	},
-	drawn: { strokeDashoffset: 0 },
+	cloth: { fill: "none", strokeLinecap: "round" },
+	un: { stroke: yarn.un },
+	sh: { stroke: yarn.sh, opacity: 0.5 },
+	y0: { stroke: yarn.y0 },
+	y1: { stroke: yarn.y1 },
+	y2: { stroke: yarn.y2 },
+	y3: { stroke: yarn.y3 },
+	y4: { stroke: yarn.y4 },
+	hi: { stroke: yarn.hi, opacity: 0.45 },
+	mark: { fill: "none", strokeLinecap: "round", strokeLinejoin: "round" },
+	threadShadow: { stroke: "rgba(9, 20, 16, 0.32)" },
+	threadCore: { stroke: color.accentText },
 	labelText: { display: "block", fontWeight: 500, fontSize: text.sm, color: color.text },
 	description: { display: "block", fontSize: text.xs, color: color.textMuted },
 })
+
+const BUCKETS = [styles.y0, styles.y1, styles.y2, styles.y3, styles.y4] as const
 
 export type CheckboxProps = Omit<ComponentProps<"input">, "type" | "children"> & {
 	indeterminate?: boolean
@@ -92,25 +105,22 @@ export function Checkbox({
 	ref,
 	...props
 }: CheckboxProps) {
-	const patternId = useSvgId("ak-fabric")
+	const clipId = useSvgId("ak-weave")
 	const base = useId()
 	const labelId = `${base}label`
 	const descriptionId = `${base}description`
 	const { invalid, ...field } = useFieldControl(props)
 	const [isChecked, setChecked] = useControllableState(checked, defaultChecked ?? false, onCheckedChange)
 
-	const node = useRef<HTMLInputElement>(null)
+	// ref callback 管 indeterminate(不用 effect):indeterminate 變了 identity 變,
+	// React 重跑 callback 就把新值寫回原生 input
 	const setNode = useCallback(
 		(element: HTMLInputElement | null) => {
-			node.current = element
+			if (element) element.indeterminate = indeterminate
 			assignRef(ref, element)
 		},
-		[ref],
+		[ref, indeterminate],
 	)
-
-	useEffect(() => {
-		if (node.current) node.current.indeterminate = indeterminate
-	}, [indeterminate, isChecked])
 
 	const filled = isChecked || indeterminate
 	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
@@ -136,18 +146,45 @@ export function Checkbox({
 					{...styled(props, styles.input)}
 				/>
 				<svg viewBox="0 0 24 24" aria-hidden="true" {...stylex.props(styles.svg)}>
-					<FabricPattern id={patternId} />
-					<rect
-						rx="3"
-						fill={`url(#${patternId})`}
-						{...stylex.props(styles.weave, filled && styles.weaveOn)}
-					/>
-					<g transform="translate(4.2 4.2) scale(.65)" {...stylex.props(styles.mark)}>
-						{indeterminate ? (
-							<path d="M3.5 12h17" {...stylex.props(styles.dash, styles.drawn)} />
-						) : (
-							<path d="M2.5 12.5 9 19 21.5 4.5" {...stylex.props(styles.check, isChecked && styles.drawn)} />
-						)}
+					<defs>
+						<clipPath id={clipId}>
+							<rect rx="3" {...stylex.props(styles.weave, filled && styles.weaveOn)} />
+						</clipPath>
+					</defs>
+					<g clipPath={`url(#${clipId})`}>
+						<g {...stylex.props(styles.cloth)}>
+							<g {...stylex.props(styles.un)}>
+								{CLOTH.under.map((t, i) => (
+									<path key={i} d={t.d} strokeWidth={t.sw} />
+								))}
+							</g>
+							<g {...stylex.props(styles.sh)}>
+								{CLOTH.seams.map((t, i) => (
+									<path key={i} d={t.d} strokeWidth={t.sw} />
+								))}
+							</g>
+							{CLOTH.face.map((t, i) => (
+								<path key={i} d={t.d} strokeWidth={t.sw} {...stylex.props(BUCKETS[t.bucket])} />
+							))}
+							<g {...stylex.props(styles.hi)}>
+								{CLOTH.hi.map((t, i) => (
+									<path key={i} d={t.d} strokeWidth={t.sw} />
+								))}
+							</g>
+						</g>
+						<g {...stylex.props(styles.mark)}>
+							<path
+								d={indeterminate ? DASH_D : CHECK_D}
+								strokeWidth="2.1"
+								transform="translate(0.35 0.5)"
+								{...stylex.props(styles.threadShadow)}
+							/>
+							<path
+								d={indeterminate ? DASH_D : CHECK_D}
+								strokeWidth="1.95"
+								{...stylex.props(styles.threadCore)}
+							/>
+						</g>
 					</g>
 				</svg>
 			</span>

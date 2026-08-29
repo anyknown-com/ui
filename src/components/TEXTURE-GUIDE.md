@@ -195,3 +195,66 @@ y(x) = yarn.y
    - [ ] 曲線順滑(無 <w/2 波長成分、無折角)
    - [ ] 按住拖出 → 窩鬆開;外面放開 → 無過衝無掃光
    - [ ] reduced-motion 全靜態;鍵盤可觸發;label 對比 ≥ 4.5:1
+
+---
+
+## 6. 落地狀態(2026-08-29,給接手 session)
+
+規則:React 禁用 useEffect(ref callback + cleanup 取代);動畫不回彈
+(滑動類定案 240ms cubic-bezier(.16,1,.3,1),寬度變化不得前衝、任何邊不得倒退)。
+
+已落地(.tsx,check/test 全綠,playground 實機驗過):
+
+- lib/weave.ts — 靜態幾何 builder(小控件 module scope 預織)+ buildThread 縫線
+- lib/silk.ts — 動態引擎(press 全套 / hover 僅展示子集),幾何與 weave.ts 同源
+- tokens.stylex.ts — yarn / yarnSecondary / yarnGhost / yarnDanger / yarnSubtle;
+  每組多一個 shadow = §3.3 的落影(掛在元件的 CSS filter 上,ghost 為 none)
+- Checkbox / Switch / Radio — 定案設計照 prototype
+- Button — 四 variant 織體 + press 全套 + 落影;playground `#button` 有完整展示
+- Tabs pills — buildWeave 織滿 tablist;Base UI 的 Indicator 只當 `--active-tab-*`
+  的載體(絕對定位鋪滿整條 list、自己不動),取景窗是 clipPath 裡的 rect,
+  x/y/width/height 直接吃那些變數,x 與 width 同一條 240ms expo。
+  窗動、布不動:切 tab 前後紗的 d 逐字相同
+- HandoffReceipt — 卡面 SilkBody hover 模式 + yarnSecondary + fixedHeight 480;
+  展開 0fr→1fr(240ms expo)+ 內容 opacity 200ms;收合狀態改用 inert 離開 a11y tree
+  (不能再用 hidden,否則沒得動畫);html{scrollbar-gutter:stable} 已進 tokens.css
+- InteractionCard — 三顆回覆鈕與送出/照建議改用共用 Button
+  (允許一次 primary、總是允許 secondary、拒絕 ghost:拒絕不給 danger 織體,
+  一整塊紅布會蓋過 primary 的份量);options 改用 RadioGroup variant=card 與 Checkbox
+- Dialog 的 ConfirmDialog 免費繼承 Button(Base UI 的 render prop 會把 children 併進來)
+
+實機驗收(headless Chrome 走 §5 清單):
+
+- 重整三次,button / pills / receipt / checkbox 的織法 hash 完全相同
+- 沒碰過的頁面 SilkBody 一次 rAF 都沒排;hover 後回到靜止也回到 0,d 不再變
+- 按住 → 光澤帶壓到 0.15、紗收成窩;放開 → 0.72 掃光
+- 按住拖出元件外放開 → 光澤帶維持 0.000,不播過衝也不播掃光
+- reduced-motion:rAF 全程 0、織紋不動,pills / receipt / underline 的 transition 都是 0s
+
+踩到的坑(接手前先讀):
+
+- StyleX 0.19 會靜默丟掉 `all: unset`、`border: 0`、`background: none` 這類簡寫 —
+  編不出任何 CSS,原生 button 的 buttonface 底色與 outset 邊框、fieldset 的 groove
+  邊框就留在畫面上,直接蓋掉底下的布(chip 的 × 是最明顯的災情)。
+  已全部清掉:`lib/styled.ts` 出了一個 `reset.control`(appearance / margin / padding /
+  borderWidth / backgroundColor / font / color / textAlign 逐項重設),12 個元件的
+  19 處 `all: "unset"` 都改成把它放在 `stylex.props` 的第一個參數。新元件照做。
+- `box-sizing` 同理:`<input>`/`<textarea>` 是 content-box,`minHeight: 2.25rem` 會變成
+  「內容」36px 再加 padding+border(md 長到 54px)。元件自己要寫 `boxSizing: border-box`,
+  不能靠 app 端有沒有 reset。
+- 這一輪定的(2026-08-29):
+  - interaction-card 的「拒絕」= 新的 `dangerGhost` variant:織體層級走 ghost 疏織
+    (不與 primary 打架),標籤色走 `color.danger` —— 就是原本「白底紅字」的織體版。
+    依據是同一個檔案自己的 token 語彙:收據列 rejected 的 ✓ 早就是 `color.danger`
+    (`InteractionCard.tsx:157`),danger 在這個元件裡本來就是「拒絕」的顏色。
+    順帶把這顆的對比從 ghost textMuted 的 3.67:1 拉到 4.31:1(布上)/ 5.44:1(頁面底)。
+  - ProgressBall 維持毛球的線語言,是刻意的例外(理由與並排比較見 progress/NOTES.md)。
+  - progress/prototype.html 已重寫成定案設計,與 Progress.tsx 同源。
+
+- 一處對比沒到 §3.4 的 4.5:1,是照 prototype 搬的結果,palette 沒動,等設計者定奪:
+  receipt 收合列的 textMuted 落在淺色布上 4.03–4.36:1(原本在 surface 上是 4.58:1);
+  最小的修法是把 textMuted 調深一階(light #777165 → #67614F、dark #A59B8C → #B0A697),
+  布上 4.68–5.56:1 全部過,頁面底色上也從 4.63 變 5.90 —— 但那是全域 palette 動刀,
+  34 個元件的 muted 文字都會跟著變重,所以沒有自己動。
+  dark 的 pills 選取 4.18:1 是既有值(布的 --y2 就是 accent-subtle,和先前的實心底同色),
+  不是織體造成的;ghost 按鈕原本的 3.67:1 已由上面的 dangerGhost 一併處理。

@@ -81,14 +81,14 @@ export function FormsDemos() {
 				</Field>
 			</Demo>
 
-			<Demo id="checkbox" title="checkbox" note="勾選 = 布從左織進格子,推滿後一條線把勾縫上去。">
+			<Demo id="checkbox" title="checkbox" note="勾選 = 布織進格子,勾是縫在布上的線,跟布一起被前緣織出來。">
 				<Checkbox defaultChecked label="記住這台裝置" />
 				<Checkbox label="換班時通知我" description="每次 handoff 都會收到桌面通知。" />
 				<Checkbox indeterminate label="全選記憶(3 / 7)" />
 				<Checkbox defaultChecked disabled label="端對端加密" description="永遠開啟。" />
 			</Demo>
 
-			<Demo id="radio" title="radio" note="選中 = 線在圓心繞成一顆小線圈。">
+			<Demo id="radio" title="radio" note="選中 = 鏡頭:布在後面延伸,圓形取景框的孔徑打開。">
 				<RadioGroup legend="換班門檻" value={threshold} onValueChange={setThreshold}>
 					<Radio value="50" label="50%(建議)" description="context 用到一半就交接,品質最穩。" />
 					<Radio value="75" label="75%" />
@@ -100,7 +100,7 @@ export function FormsDemos() {
 				</RadioGroup>
 			</Demo>
 
-			<Demo id="switch" title="switch" note="開 = 線頭沿固定路徑滑到底,軌道織成一塊 fabric 藥丸。">
+			<Demo id="switch" title="switch" note="開 = 線頭滑到底,軌道織成一塊布(織法與 button 同源)。">
 				<Switch defaultChecked label="語音喚醒" description="說「Anyknown」開始對話。" />
 				<Switch label="開機自動啟動" />
 				<Switch defaultChecked disabled label="本地儲存" description="永遠開啟,資料不離開這台電腦。" />

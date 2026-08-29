@@ -26,3 +26,13 @@
 
 - https://ui.shadcn.com/docs/components/base/checkbox
 - transitions.dev「Checkbox check」:stroke-drawn 勾勾動畫(本 prototype 已按此做)
+
+## Texture 升級(prototype 先行,2026-08-29)
+
+- prototype.html 已把勾選底從 5×5 crosshatch pattern 換成 TEXTURE-GUIDE 的完整
+  紗線堆疊(mulberry32(10075)、primary 色票);依實際顯示尺寸(14.8px)換算比例,
+  螢幕上紗的粗細行距與 button 等粗
+- 勾改用 accent-text 縫(同 primary button label 的對比),織入動畫 = clipPath width 推進
+- 修了 check 的 stroke-dasharray 24 → 29(路徑長 ~28,24 會在 unchecked 時漏出尾巴;
+  `Checkbox.tsx` 同樣的潛在 bug 落地時一併修)
+- 已落地 `Checkbox.tsx`(2026-08-29,共享 lib/weave.ts;dasharray bug 隨縫線方案一併消失)

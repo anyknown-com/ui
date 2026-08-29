@@ -2,6 +2,11 @@
  * (desktop uses Tailwind v4 @theme; reference these vars there).
  * Source of truth: tokens.stylex.ts. Keep values in sync manually for now. */
 
+/* 展開/收合讓頁面長高時捲軸出現 → 置中內容左移;永遠留捲軸的位置。 */
+html {
+	scrollbar-gutter: stable;
+}
+
 :root {
 	--ak-bg: #fafaf6;
 	--ak-surface: #ffffff;

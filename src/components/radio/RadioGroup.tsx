@@ -21,7 +21,9 @@ export function useRadioGroup() {
 }
 
 const styles = stylex.create({
-	fieldset: { border: 0, margin: 0, padding: 0, display: "grid", gap: space.sm },
+	// borderWidth 而不是 border:0 —— StyleX 0.19 會靜默丟掉 border 簡寫,fieldset 的
+	// 原生 2px groove 邊框就留在畫面上
+	fieldset: { borderWidth: 0, margin: 0, padding: 0, display: "grid", gap: space.sm },
 	legend: {
 		padding: 0,
 		marginBottom: space.xxs,

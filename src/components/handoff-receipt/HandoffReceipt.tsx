@@ -1,25 +1,31 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useId, useState } from "react"
+import { type ReactNode, useCallback, useId, useState } from "react"
 import { KNOT_LEAD, KNOT_LOOP } from "../../lib/paths"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { type SilkPalette, SilkBody } from "../../lib/silk"
+import { color, font, motion, radius, space, text, yarnSecondary } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
-const slideIn = stylex.keyframes({
-	from: { opacity: 0, translate: "0 -3px" },
-	to: { opacity: 1, translate: "0 0" },
-})
-
+// 卡面 = 淺色布(TEXTURE-GUIDE §3、handoff-receipt/NOTES.md):沒有 background,
+// 實心由紗織成;動態取「僅展示面」子集 — hover 帶動 + 光澤帶,無窩、無掃光。
+// 布是固定高度 480 的長布,展開只是露出同一塊布更多 → 高度變化零重織、織紋恆定。
 const styles = stylex.create({
 	receipt: {
+		position: "relative",
+		overflow: "hidden",
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: color.border,
 		borderRadius: radius.md,
-		backgroundColor: color.surface,
 	},
+	face: { position: "absolute", top: 0, left: 0, pointerEvents: "none" },
 	row: {
-		all: "unset",
+		// 注意:StyleX 0.19 會靜默丟掉 `all: unset`(編不出任何規則),原生按鈕的
+		// buttonface 底色與 outset 邊框會蓋住布 —— 要逐項重設
+		appearance: "none",
+		backgroundColor: "transparent",
+		borderWidth: 0,
+		position: "relative",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
@@ -72,6 +78,17 @@ const styles = stylex.create({
 		transitionTimingFunction: "ease",
 	},
 	chevronOpen: { rotate: "180deg" },
+	// 展開 = 0fr → 1fr(雙向平滑,不是 display 硬切);內容 opacity 跟進
+	bodyWrap: {
+		position: "relative",
+		display: "grid",
+		gridTemplateRows: "0fr",
+		transitionProperty: "grid-template-rows",
+		transitionDuration: { default: "240ms", [REDUCED]: "0s" },
+		transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+	},
+	bodyWrapOpen: { gridTemplateRows: "1fr" },
+	bodyClip: { overflow: "hidden", minHeight: 0 },
 	body: {
 		borderTopWidth: 1,
 		borderTopStyle: "solid",
@@ -80,12 +97,14 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		fontFamily: font.body,
 		fontSize: text.xs,
-		display: { default: "grid", ":is([hidden])": "none" },
+		display: "grid",
 		gap: space.xxs,
-		animationName: { default: slideIn, [REDUCED]: "none" },
-		animationDuration: "160ms",
-		animationTimingFunction: "ease-out",
+		opacity: 0,
+		transitionProperty: "opacity",
+		transitionDuration: { default: "200ms", [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 	},
+	bodyOpen: { opacity: 1 },
 	check: { display: "flex", alignItems: "baseline", gap: space.xxs, margin: 0 },
 	checkIcon: { flex: "none", color: color.accent, translate: "0 2px" },
 	checkTitle: { fontWeight: 500, whiteSpace: "nowrap", color: color.text },
@@ -146,9 +165,24 @@ export function HandoffReceipt({
 }: HandoffReceiptProps) {
 	const bodyId = useId()
 	const [open, setOpen] = useState(defaultOpen)
+	// ref callback + cleanup(React 19)管動態的生命週期,不用 effect;client-only
+	const face = useCallback((node: SVGSVGElement | null) => {
+		if (!node) return
+		const silk = new SilkBody(node.parentElement as HTMLElement, node, {
+			palette: yarnSecondary as unknown as SilkPalette,
+			mode: "hover",
+			bandMax: 0.5,
+			pitch: 2,
+			hiCount: 12,
+			hiSpan: 0.95,
+			fixedHeight: 480,
+		})
+		return () => silk.destroy()
+	}, [])
 
 	return (
 		<div {...stylex.props(styles.receipt)}>
+			<svg ref={face} aria-hidden="true" {...stylex.props(styles.face)} />
 			<button
 				type="button"
 				aria-expanded={open}
@@ -194,26 +228,32 @@ export function HandoffReceipt({
 				</svg>
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 			</button>
-			<div id={bodyId} hidden={!open} {...stylex.props(styles.body)}>
-				<p {...stylex.props(styles.check)}>
-					<CheckIcon />
-					<b {...stylex.props(styles.checkTitle)}>記憶</b>
-					<span {...stylex.props(styles.checkText)}>
-						{`${memory.count} 筆耐久事實已落盤`}
-						{memory.items?.length ? `(${memory.items.join("、")})` : ""}。
-					</span>
-				</p>
-				<p {...stylex.props(styles.check)}>
-					<CheckIcon />
-					<b {...stylex.props(styles.checkTitle)}>摘要</b>
-					<span {...stylex.props(styles.checkText)}>handoff 已交給下一輪,讀後即銷毀。</span>
-				</p>
-				<p {...stylex.props(styles.check)}>
-					<CheckIcon />
-					<b {...stylex.props(styles.checkTitle)}>Ledger</b>
-					<span {...stylex.props(styles.checkText)}>{`本輪 ${ledgerCount} 條收據可查,不進新 context。`}</span>
-				</p>
-				{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
+			<div {...stylex.props(styles.bodyWrap, open && styles.bodyWrapOpen)}>
+				<div {...stylex.props(styles.bodyClip)}>
+					<div id={bodyId} inert={!open} {...stylex.props(styles.body, open && styles.bodyOpen)}>
+						<p {...stylex.props(styles.check)}>
+							<CheckIcon />
+							<b {...stylex.props(styles.checkTitle)}>記憶</b>
+							<span {...stylex.props(styles.checkText)}>
+								{`${memory.count} 筆耐久事實已落盤`}
+								{memory.items?.length ? `(${memory.items.join("、")})` : ""}。
+							</span>
+						</p>
+						<p {...stylex.props(styles.check)}>
+							<CheckIcon />
+							<b {...stylex.props(styles.checkTitle)}>摘要</b>
+							<span {...stylex.props(styles.checkText)}>handoff 已交給下一輪,讀後即銷毀。</span>
+						</p>
+						<p {...stylex.props(styles.check)}>
+							<CheckIcon />
+							<b {...stylex.props(styles.checkTitle)}>Ledger</b>
+							<span
+								{...stylex.props(styles.checkText)}
+							>{`本輪 ${ledgerCount} 條收據可查,不進新 context。`}</span>
+						</p>
+						{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
+					</div>
+				</div>
 			</div>
 		</div>
 	)

@@ -31,6 +31,78 @@ export const color = stylex.defineVars({
 	dangerHl: { default: "#EFCEC3", [DARK]: "#573328" },
 })
 
+// 織體紗線階(TEXTURE-GUIDE §3.4):un 底紗、sh 縫隙陰影、y0–y4 面紗(深→淺)、hi 挑面亮紗、
+// shadow 是整塊布的落影(§3.3「實心感落地」,掛在元件的 CSS filter 上)
+export const yarn = stylex.defineVars({
+	un: { default: "#11362C", [DARK]: "#173629" },
+	sh: { default: "#123C31", [DARK]: "#1B4437" },
+	y0: { default: "#1E6250", [DARK]: "#3F8A70" },
+	y1: { default: "#216A55", [DARK]: "#47957A" },
+	y2: { default: "#23705A", [DARK]: "#4FA184" },
+	y3: { default: "#28795F", [DARK]: "#56A98B" },
+	y4: { default: "#2E8266", [DARK]: "#5EB193" },
+	hi: { default: "#5CAA89", [DARK]: "#8FD2B4" },
+	shadow: {
+		default: "drop-shadow(0 1px 1.5px rgba(18, 60, 49, 0.3))",
+		[DARK]: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45))",
+	},
+})
+
+// secondary(淺色布)、ghost(疏織)、danger(§3.4 原則從 danger 衍生)、
+// subtle(accent-subtle 色系,tabs pills 取景窗用)
+export const yarnSecondary = stylex.defineVars({
+	un: { default: "#CBC5B4", [DARK]: "#0E0C09" },
+	sh: { default: "#C9C4B4", [DARK]: "#15120E" },
+	y0: { default: "#E4E0D3", [DARK]: "#2B2620" },
+	y1: { default: "#E8E5D9", [DARK]: "#2F2A23" },
+	y2: { default: "#EDEAE0", [DARK]: "#332E26" },
+	y3: { default: "#F1EEE6", [DARK]: "#38322A" },
+	y4: { default: "#F5F3EC", [DARK]: "#3D372E" },
+	hi: { default: "#FFFFFF", [DARK]: "#5E5546" },
+	shadow: {
+		default: "drop-shadow(0 1px 1.5px rgba(80, 74, 60, 0.22))",
+		[DARK]: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))",
+	},
+})
+
+export const yarnGhost = stylex.defineVars({
+	un: { default: "transparent", [DARK]: "transparent" },
+	sh: { default: "transparent", [DARK]: "transparent" },
+	y0: { default: "#DCD8CA", [DARK]: "#2A251F" },
+	y1: { default: "#DFDBCE", [DARK]: "#2F2A23" },
+	y2: { default: "#E3E0D5", [DARK]: "#35302A" },
+	y3: { default: "#E7E4D9", [DARK]: "#39342D" },
+	y4: { default: "#EBE8DE", [DARK]: "#3E3830" },
+	hi: { default: "#C8C3B4", [DARK]: "#57503F" },
+	shadow: { default: "none", [DARK]: "none" },
+})
+
+export const yarnDanger = stylex.defineVars({
+	un: { default: "#401209", [DARK]: "#38130B" },
+	sh: { default: "#4A170D", [DARK]: "#451A10" },
+	y0: { default: "#8F3122", [DARK]: "#C25842" },
+	y1: { default: "#A13928", [DARK]: "#D0644E" },
+	y2: { default: "#B3402E", [DARK]: "#DD7059" },
+	y3: { default: "#BC4F3C", [DARK]: "#E17E68" },
+	y4: { default: "#C55E4A", [DARK]: "#E58C77" },
+	hi: { default: "#E39781", [DARK]: "#F4BCA9" },
+	shadow: {
+		default: "drop-shadow(0 1px 1.5px rgba(74, 23, 13, 0.3))",
+		[DARK]: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45))",
+	},
+})
+
+export const yarnSubtle = stylex.defineVars({
+	un: { default: "#CFE2D9", [DARK]: "#141F1B" },
+	sh: { default: "#CBDFD5", [DARK]: "#17231E" },
+	y0: { default: "#DFEBE5", [DARK]: "#1D2E27" },
+	y1: { default: "#E3EEE8", [DARK]: "#20312B" },
+	y2: { default: "#E7F0EB", [DARK]: "#22352E" },
+	y3: { default: "#ECF3EF", [DARK]: "#263A32" },
+	y4: { default: "#F1F7F3", [DARK]: "#2A4038" },
+	hi: { default: "#FFFFFF", [DARK]: "#3E5F50" },
+})
+
 export const shadow = stylex.defineVars({
 	popover: {
 		default: "0 8px 24px rgba(35, 33, 29, 0.1)",

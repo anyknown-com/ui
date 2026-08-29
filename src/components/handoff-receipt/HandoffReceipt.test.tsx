@@ -61,11 +61,15 @@ describe("HandoffReceipt", () => {
 })
 
 describe("HandoffReceipt regressions", () => {
-	test("aria-controls resolves while collapsed, and the body is hidden", () => {
+	// 展開改成 0fr→1fr 的平滑收合後,收合狀態不再是 hidden(要能動畫),
+	// 但仍必須離開 a11y tree 與 tab 序 —— 用 inert。
+	test("aria-controls resolves while collapsed, and the body stays inert", async () => {
 		render(<HandoffReceipt {...props} />)
 		const row = screen.getByRole("button")
 		const body = document.getElementById(row.getAttribute("aria-controls") as string)
 		expect(body).not.toBeNull()
-		expect(body).not.toBeVisible()
+		expect(body).toHaveAttribute("inert")
+		await userEvent.click(row)
+		expect(document.getElementById(row.getAttribute("aria-controls") as string)).not.toHaveAttribute("inert")
 	})
 })

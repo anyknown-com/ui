@@ -9,6 +9,7 @@ import { FormsDemos } from "./demos/forms"
 const GROUPS: Record<string, string[]> = {
 	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "select", "dropdown"],
 	基礎: [
+		"button",
 		"dialog",
 		"toast",
 		"tooltip",
