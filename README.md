@@ -52,17 +52,17 @@ git push origin main --tags
 
 CI 跑的是 `typecheck / lint / fmt:check / test / site:test` → `verify:pack` → `npm publish`。前五項走 turbo remote cache,PR 上跑過的多半直接命中;`verify:pack` 不快取,它就是要每次重打一次 tarball、從套件外部解析 exports map。
 
-publish 目前用 `NPM_TOKEN` secret 認證。npm 的 trusted publisher 只能綁在**已存在的套件**上,而 @anyknown/ui 的第一版就是這條 workflow 發的,所以 OIDC 要等套件上了 registry 才啟用得了 —— 綁好之後把 `release.yml` publish step 的 `env` 兩行拿掉就自動走回 OIDC(`id-token: write` 已經留著)。CI 用的是 `npm publish` 而不是 `pnpm publish` — pnpm 的 OIDC 支援還沒好([pnpm#9812](https://github.com/pnpm/pnpm/issues/9812))。
+publish 走 **npm trusted publishing (OIDC)**,repo 裡不存任何 npm 憑證 —— trusted publisher 綁在 npmjs.com 的 `@anyknown/ui` → `anyknown-com/ui` / `release.yml`。CI 用的是 `npm publish` 而不是 `pnpm publish`,因為 pnpm 的 OIDC 支援還沒好([pnpm#9812](https://github.com/pnpm/pnpm/issues/9812))。
+
+v0.1.0 是本機手動發的:npm 的 trusted publisher 只能綁在**已存在的套件**上,第一版繞不掉。之後都走 tag。
 
 CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪,對照 `prototypes.html` 看視覺與動效沒跑掉,順手開 macOS 的「減少動態效果」再看一次。
 
 ### 一次性設定
 
-repo 已經在 <https://github.com/anyknown-com/ui>(public),`NPM_TOKEN` secret 也設好了,v0.1.0 由 `release.yml` 發出。剩下兩件還沒做:
+repo 在 <https://github.com/anyknown-com/ui>(public),npm trusted publisher 已綁,`@anyknown/ui@0.1.0` 已發佈。剩一件沒做:
 
-1. **在 npmjs.com 綁 trusted publisher**:package 頁 → Settings → Trusted publisher,填 organization `anyknown-com`、repository `ui`、workflow filename `release.yml`。綁完把 `release.yml` publish step 的 `env:` 兩行刪掉,認證就從 token 換回 OIDC,`NPM_TOKEN` secret 也可以移除。
-
-2. **設 `TURBO_TOKEN` secret**(repo → Settings → Secrets and variables → Actions)。`.env` 裡的 `TURBO_API_KEY` 對 `turbo.anyknown.com` 回 401(`anyknown` 與 `anyknown-ui` 兩個 slug 都試過),要先確認 cache worker 那邊認的是哪一把。沒設也不會壞,只是 CI 每次都跑冷的。`apiUrl` 與 `teamSlug` 已經寫死在 `turbo.json`,不用另外設 variable。
+**設 `TURBO_TOKEN` secret**(repo → Settings → Secrets and variables → Actions → New repository secret)。`.env` 裡的 `TURBO_API_KEY` 對 `turbo.anyknown.com` 回 401(`anyknown` 與 `anyknown-ui` 兩個 slug 都試過),要先確認 cache worker 認的是哪一把。沒設也不會壞,只是 CI 每次都跑冷的。`apiUrl` 與 `teamSlug` 已經寫死在 `turbo.json`,不用另外設 variable。
 
 ## 在各 app 使用(Vite)
 

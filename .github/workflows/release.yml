@@ -41,10 +41,7 @@ jobs:
       # repeat the steps above. pnpm publish is skipped here because its OIDC
       # support is still open (pnpm/pnpm#9812).
       #
-      # 認證目前走 NPM_TOKEN secret,不是 OIDC:npm 的 trusted publisher 只能綁在
-      # 已存在的套件上,而 @anyknown/ui 的第一版就是這條 workflow 發的。等 registry
-      # 上有了套件、在 npmjs.com 綁好 trusted publisher 之後,把 env 這兩行拿掉就
-      # 自動走回 OIDC(permissions 的 id-token: write 已經留著)。
+      # 認證走 OIDC:trusted publisher 綁在 npmjs.com 的 @anyknown/ui →
+      # anyknown-com/ui / release.yml,repo 裡不存任何 npm 憑證。
+      # (v0.1.0 是本機手動發的 —— npm 的 trusted publisher 只能綁在已存在的套件上。)
       - run: npm publish --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
