@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { useSvgId } from "../../lib/svgId"
 import { useControllableState } from "../../lib/useControllableState"
 import { buildWeave, weaveRand } from "../../lib/weave"
@@ -99,6 +99,7 @@ export type SwitchProps = Omit<ComponentProps<"input">, "type" | "role" | "child
 	label?: ReactNode
 	description?: ReactNode
 	onCheckedChange?: (checked: boolean) => void
+	sx?: StyleArg
 }
 
 export function Switch({
@@ -108,6 +109,7 @@ export function Switch({
 	checked,
 	defaultChecked,
 	onChange,
+	sx,
 	...props
 }: SwitchProps) {
 	const clipId = useSvgId("ak-weave")
@@ -121,7 +123,7 @@ export function Switch({
 	const [isOn, setOn] = useControllableState(checked, defaultChecked ?? false, onCheckedChange)
 
 	return (
-		<label {...stylex.props(styles.root)}>
+		<label {...stylex.props(styles.root, sx)}>
 			{(label != null || description != null) && (
 				<span>
 					{label != null && (

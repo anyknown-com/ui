@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { space, text } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
@@ -24,9 +24,10 @@ export type TextareaProps = ComponentProps<"textarea"> & {
 	autoGrow?: boolean
 	maxRows?: number
 	invalid?: boolean
+	sx?: StyleArg
 }
 
-export function Textarea({ autoGrow, maxRows, invalid, ...props }: TextareaProps) {
+export function Textarea({ autoGrow, maxRows, invalid, sx, ...props }: TextareaProps) {
 	const { invalid: fieldInvalid, ...field } = useFieldControl(props)
 	const isInvalid = invalid ?? fieldInvalid
 	return (
@@ -41,6 +42,7 @@ export function Textarea({ autoGrow, maxRows, invalid, ...props }: TextareaProps
 				autoGrow && styles.autoGrow,
 				maxRows != null && styles.maxRows(maxRows),
 				isInvalid && controlStyles.invalid,
+				sx,
 			)}
 		/>
 	)

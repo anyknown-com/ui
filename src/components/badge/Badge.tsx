@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { reset, styled } from "../../lib/styled"
+import { type StyleArg, reset, styled } from "../../lib/styled"
 import { color, font, radius, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -78,11 +78,12 @@ export type BadgeProps = Omit<ComponentProps<"span">, "color"> & {
 	variant?: "neutral" | "accent" | "success" | "danger" | "outline" | "mono"
 	dot?: keyof typeof DOT_TONES
 	count?: number
+	sx?: StyleArg
 }
 
-export function Badge({ variant = "neutral", dot, count, children, ...props }: BadgeProps) {
+export function Badge({ variant = "neutral", dot, count, children, sx, ...props }: BadgeProps) {
 	return (
-		<span {...props} {...styled(props, styles.base, styles[variant])}>
+		<span {...props} {...styled(props, styles.base, styles[variant], sx)}>
 			{dot != null && <span aria-hidden="true" {...stylex.props(styles.dot, DOT_TONES[dot])} />}
 			{children}
 			{count != null && <span {...stylex.props(styles.count)}>{count}</span>}

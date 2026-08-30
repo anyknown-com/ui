@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { color, font, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -22,11 +22,12 @@ export type LabelProps = ComponentProps<"label"> & {
 	required?: boolean
 	optional?: boolean
 	optionalLabel?: string
+	sx?: StyleArg
 }
 
-export function Label({ required, optional, optionalLabel = "選填", children, ...props }: LabelProps) {
+export function Label({ required, optional, optionalLabel = "選填", children, sx, ...props }: LabelProps) {
 	return (
-		<label {...props} {...styled(props, styles.base)}>
+		<label {...props} {...styled(props, styles.base, sx)}>
 			{children}
 			{required && (
 				<span aria-hidden="true" {...stylex.props(styles.required)}>

@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useCallback, useId } from "react"
 import { assignRef } from "../../lib/mergeRefs"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { useSvgId } from "../../lib/svgId"
 import { useControllableState } from "../../lib/useControllableState"
 import { buildThread, buildWeave, weaveRand } from "../../lib/weave"
@@ -92,6 +92,7 @@ export type CheckboxProps = Omit<ComponentProps<"input">, "type" | "children"> &
 	label?: ReactNode
 	description?: ReactNode
 	onCheckedChange?: (checked: boolean) => void
+	sx?: StyleArg
 }
 
 export function Checkbox({
@@ -103,6 +104,7 @@ export function Checkbox({
 	defaultChecked,
 	onChange,
 	ref,
+	sx,
 	...props
 }: CheckboxProps) {
 	const clipId = useSvgId("ak-weave")
@@ -128,7 +130,7 @@ export function Checkbox({
 		.join(" ")
 
 	return (
-		<label {...stylex.props(styles.root)}>
+		<label {...stylex.props(styles.root, sx)}>
 			<span {...stylex.props(styles.box, filled && styles.boxOn)}>
 				<input
 					type="checkbox"

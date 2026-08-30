@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, useCallback } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type SilkPalette, SilkBody } from "../../lib/silk"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import {
 	color,
 	font,
@@ -50,6 +50,17 @@ const styles = stylex.create({
 		minHeight: "1.75rem",
 		fontSize: text.xs,
 	},
+	xs: {
+		paddingBlock: 0,
+		paddingInline: space.xs,
+		minHeight: "1.5rem",
+		fontSize: text.xs,
+		gap: space.xxs,
+	},
+	// 圖示鈕:正方,邊長跟著該階的高,沒有左右內距
+	iconMd: { paddingInline: 0, width: "2.25rem" },
+	iconSm: { paddingInline: 0, width: "1.75rem" },
+	iconXs: { paddingInline: 0, width: "1.5rem" },
 	// filter = 整塊布的落影(§3.3);ghost 是疏織,不落影
 	primary: { color: color.accentText, filter: yarn.shadow },
 	secondary: { color: color.text, filter: yarnSecondary.shadow },
@@ -85,10 +96,23 @@ const SILK: Record<string, { palette: SilkPalette; ghost?: boolean; bandMax: num
 
 type ButtonProps = ComponentProps<"button"> & {
 	variant?: "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
-	size?: "sm" | "md"
+	size?: "xs" | "sm" | "md"
+	/** Square, no side padding — for a button whose whole label is one icon. */
+	icon?: boolean
+	sx?: StyleArg
 }
 
-export function Button({ variant = "primary", size = "md", children, ref, ...props }: ButtonProps) {
+const ICON_SIZE = { xs: "iconXs", sm: "iconSm", md: "iconMd" } as const
+
+export function Button({
+	variant = "primary",
+	size = "md",
+	icon = false,
+	children,
+	ref,
+	sx,
+	...props
+}: ButtonProps) {
 	// ref callback + cleanup(React 19)管生命週期,不用 effect;
 	// useCallback 鎖 identity,只有 variant 變了才重建織體
 	const silk = useCallback(
@@ -109,7 +133,7 @@ export function Button({ variant = "primary", size = "md", children, ref, ...pro
 			type="button"
 			{...props}
 			ref={(element) => assignRef(ref, element)}
-			{...styled(props, styles.base, styles[size], styles[variant])}
+			{...styled(props, styles.base, styles[size], icon && styles[ICON_SIZE[size]], styles[variant], sx)}
 		>
 			<svg ref={silk} aria-hidden="true" {...stylex.props(styles.silk)} />
 			<span {...stylex.props(styles.label)}>{children}</span>
