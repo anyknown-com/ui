@@ -25,6 +25,8 @@ html {
 	--ak-success-subtle: #e7f0eb;
 	--ak-warning: #9a6a1b;
 	--ak-warning-subtle: #f5ebd9;
+	--ak-info: #2c5c86;
+	--ak-info-subtle: #e4edf5;
 	--ak-focus-ring: #23705a;
 	--ak-bone: #ece9df;
 	--ak-sheen: #f6f4ec;
@@ -71,6 +73,8 @@ html {
 		--ak-success-subtle: #22352e;
 		--ak-warning: #d9a254;
 		--ak-warning-subtle: #3a2f1d;
+		--ak-info: #6fa3ce;
+		--ak-info-subtle: #1e2c38;
 		--ak-focus-ring: #4fa184;
 		--ak-bone: #2a2620;
 		--ak-sheen: #35302a;
@@ -106,5 +110,7 @@ html {
 	--ak-success-subtle: #22352e;
 	--ak-warning: #d9a254;
 	--ak-warning-subtle: #3a2f1d;
+	--ak-info: #6fa3ce;
+	--ak-info-subtle: #1e2c38;
 	--ak-focus-ring: #4fa184;
 }

@@ -24,6 +24,8 @@ export const color = stylex.defineVars({
 	successSubtle: { default: "#E7F0EB", [DARK]: "#22352E" },
 	warning: { default: "#9A6A1B", [DARK]: "#D9A254" },
 	warningSubtle: { default: "#F5EBD9", [DARK]: "#3A2F1D" },
+	info: { default: "#2C5C86", [DARK]: "#6FA3CE" },
+	infoSubtle: { default: "#E4EDF5", [DARK]: "#1E2C38" },
 	focusRing: { default: "#23705A", [DARK]: "#4FA184" },
 	bone: { default: "#ECE9DF", [DARK]: "#2A2620" },
 	sheen: { default: "#F6F4EC", [DARK]: "#35302A" },
