@@ -2,6 +2,7 @@ import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactElement, type ReactNode, useId, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
+import { layerStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 import { KbdToneContext } from "../kbd/Kbd"
 
@@ -10,7 +11,6 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const fade = stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } })
 
 const styles = stylex.create({
-	positioner: { zIndex: 60 },
 	bubble: {
 		display: "inline-flex",
 		alignItems: "center",
@@ -64,7 +64,12 @@ export function Tooltip({
 				render={children}
 			/>
 			<BaseTooltip.Portal>
-				<BaseTooltip.Positioner side={side} align={align} sideOffset={6} {...stylex.props(styles.positioner)}>
+				<BaseTooltip.Positioner
+					side={side}
+					align={align}
+					sideOffset={6}
+					{...stylex.props(layerStyles.tooltip)}
+				>
 					<BaseTooltip.Popup id={id} role="tooltip" {...stylex.props(styles.bubble)}>
 						<KbdToneContext value="inverted">
 							{content}

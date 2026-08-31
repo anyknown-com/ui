@@ -20,6 +20,8 @@ import {
 	Progress,
 	ProgressBall,
 	ProgressRing,
+	Select,
+	SelectItem,
 	Skeleton,
 	SkeletonGroup,
 	Spinner,
@@ -145,6 +147,25 @@ export function BasicsDemos() {
 								</DialogClose>
 								<DialogClose>
 									<Button>儲存</Button>
+								</DialogClose>
+							</DialogActions>
+						</DialogContent>
+					</Dialog>
+					<Dialog>
+						<DialogTrigger>
+							<Button variant="secondary">dialog 裡的浮層</Button>
+						</DialogTrigger>
+						<DialogContent title="新的執行" description="select 的選單要疊在 dialog 上面,不是被它蓋住。">
+							<Select aria-label="模型" placeholder="選擇模型…">
+								<SelectItem value="fable-5">Fable 5</SelectItem>
+								<SelectItem value="opus-5">Opus 5</SelectItem>
+							</Select>
+							<DialogActions>
+								<DialogClose>
+									<Button variant="ghost">取消</Button>
+								</DialogClose>
+								<DialogClose>
+									<Button>開始</Button>
 								</DialogClose>
 							</DialogActions>
 						</DialogContent>

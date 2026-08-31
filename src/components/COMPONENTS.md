@@ -107,6 +107,26 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 定位浮層基礎件:trigger 錨定的 surface 卡片。select / dropdown / combobox 都疊在它上面,
 也直接承載富內容(記憶詳情、成員卡片)。
 
+疊層值集中在 `lib/popup.ts` 的 `layer`,元件不自己寫 magic number —— Base UI 的浮層一律
+portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會出洞:
+
+| 層 | 值 | 為什麼在這個位置 |
+| --- | --- | --- |
+| dialog backdrop | 70 | |
+| dialog viewport | 71 | |
+| popup(select / dropdown / popover) | 75 | 浮層是當下互動的最上層,要壓過 dialog |
+| tooltip | 78 | popup 裡的元素也能有 tooltip |
+| toast | 80 | 非阻斷通知不能被 modal 蓋掉 |
+
+- 跨檔案 import 的值在 `stylex.create()` 裡不能靜態求值(只吃同檔內的常數),所以 `layer`
+  之外另配一份做好的 `layerStyles`,dialog / tooltip / toast 套樣式而不是讀數字
+- 走過的彎路:popup 曾是 40,低於 dialog 的 71 —— dialog 裡的 Select 打開後,選項其實有
+  渲染(accessibility tree 看得到、鍵盤也能操作)卻被 dialog 蓋住,對滑鼠使用者等於壞掉。
+  popup 抬到 dialog 之上對非 dialog 情境無影響:popup 是 portal 到 body 的暫態層,modal
+  打開時 Base UI 會關掉外面的 popup
+- Composer 的來源/指令浮層是 `position: absolute` 的 `zIndex: 10`,活在自己的堆疊脈絡裡,
+  不吃這張表
+
 ### tabs
 同層內容切換。underline 為預設,pills 用於篩選型切換。
 

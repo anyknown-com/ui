@@ -4,6 +4,7 @@ import { createContext, useContext, useState } from "react"
 import { reset } from "../../lib/styled"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { UNWEAVE_PATH } from "../../lib/paths"
+import { layerStyles } from "../../lib/popup"
 import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -22,7 +23,6 @@ const unweave = stylex.keyframes({
 const styles = stylex.create({
 	viewport: {
 		position: "fixed",
-		zIndex: 80,
 		display: "flex",
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
@@ -207,6 +207,7 @@ export function Toaster({
 						onFocus={() => setPaused(true)}
 						onBlur={() => setPaused(false)}
 						{...stylex.props(
+							layerStyles.toast,
 							styles.viewport,
 							fromBottom ? styles.fromBottom : styles.fromTop,
 							POSITIONS[position],

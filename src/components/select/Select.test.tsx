@@ -2,6 +2,8 @@ import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { layer } from "../../lib/popup"
+import { Dialog, DialogContent } from "../dialog/Dialog"
 import { Select, SelectGroup, SelectItem } from "./Select"
 
 function Models({ onValueChange }: { onValueChange?: (v: string) => void }) {
@@ -152,5 +154,37 @@ describe("Select accessibility", () => {
 		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
 		await userEvent.click(screen.getByRole("button", { name: "移除 偏好 pnpm" }))
 		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+	})
+})
+
+/** 元素實際落在哪一層:往上找第一個有明確 z-index 的祖先。 */
+function layerOf(el: HTMLElement) {
+	for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+		const z = Number(getComputedStyle(node).zIndex)
+		if (!Number.isNaN(z)) return z
+	}
+	return Number.NaN
+}
+
+// popup 與 dialog 都 portal 到 body,同層直接比 z-index。popup 疊層低於 dialog 時,
+// 選項照樣渲染(accessibility tree 看得到、鍵盤也能操作)卻被 dialog 蓋住 ——
+// 對滑鼠使用者等於壞掉。
+describe("Select 在 Dialog 內", () => {
+	test("選單疊在 dialog 上面", async () => {
+		render(
+			<Dialog defaultOpen>
+				<DialogContent title="新的執行">
+					<Models />
+				</DialogContent>
+			</Dialog>,
+		)
+		// 先量,因為 Select 的 popup 自己也是 role="dialog"(裡面有搜尋框)。
+		const dialogLayer = layerOf(screen.getByRole("dialog"))
+		await userEvent.click(screen.getByRole("combobox", { name: "選擇模型" }))
+		const popupLayer = layerOf(await screen.findByRole("listbox"))
+
+		expect(dialogLayer).toBe(layer.dialog)
+		expect(popupLayer).toBe(layer.popup)
+		expect(popupLayer).toBeGreaterThan(dialogLayer)
 	})
 })

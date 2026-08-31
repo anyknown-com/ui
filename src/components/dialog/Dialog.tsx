@@ -2,6 +2,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog"
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactElement, type ReactNode, useRef } from "react"
+import { layerStyles } from "../../lib/popup"
 import { color, font, radius, shadow, space, text } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 
@@ -16,14 +17,12 @@ const styles = stylex.create({
 	backdrop: {
 		position: "fixed",
 		inset: 0,
-		zIndex: 70,
 		backgroundColor: "rgba(24, 22, 19, 0.35)",
 		backdropFilter: "blur(2px)",
 	},
 	viewport: {
 		position: "fixed",
 		inset: 0,
-		zIndex: 71,
 		display: "grid",
 		placeItems: "center",
 		padding: space.md,
@@ -91,8 +90,8 @@ export type DialogContentProps = {
 export function DialogContent({ title, description, children }: DialogContentProps) {
 	return (
 		<BaseDialog.Portal>
-			<BaseDialog.Backdrop {...stylex.props(styles.backdrop)} />
-			<BaseDialog.Viewport {...stylex.props(styles.viewport)}>
+			<BaseDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
+			<BaseDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
 				<BaseDialog.Popup {...stylex.props(styles.popup)}>
 					<BaseDialog.Title {...stylex.props(styles.title)}>{title}</BaseDialog.Title>
 					{description != null && (
@@ -135,8 +134,8 @@ export function ConfirmDialog({
 		<AlertDialog.Root {...props}>
 			{trigger != null && <AlertDialog.Trigger render={trigger} />}
 			<AlertDialog.Portal>
-				<AlertDialog.Backdrop {...stylex.props(styles.backdrop)} />
-				<AlertDialog.Viewport {...stylex.props(styles.viewport)}>
+				<AlertDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
+				<AlertDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
 					<AlertDialog.Popup initialFocus={danger ? cancelRef : undefined} {...stylex.props(styles.popup)}>
 						<AlertDialog.Title {...stylex.props(styles.title)}>{title}</AlertDialog.Title>
 						{description != null && (
