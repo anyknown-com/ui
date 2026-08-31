@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ElementType } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { color, font, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -31,8 +31,9 @@ const styles = stylex.create({
 type TextProps = ComponentProps<"p"> & {
 	as?: ElementType
 	variant?: "display" | "title" | "body" | "caption" | "mono"
+	sx?: StyleArg
 }
 
-export function Text({ as: Tag = "p", variant = "body", ...props }: TextProps) {
-	return <Tag {...props} {...styled(props, styles.base, styles[variant])} />
+export function Text({ as: Tag = "p", variant = "body", sx, ...props }: TextProps) {
+	return <Tag {...props} {...styled(props, styles.base, styles[variant], sx)} />
 }

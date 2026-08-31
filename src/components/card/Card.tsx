@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { color, radius, space } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -14,6 +14,8 @@ const styles = stylex.create({
 	},
 })
 
-export function Card(props: ComponentProps<"div">) {
-	return <div {...props} {...styled(props, styles.base)} />
+type CardProps = ComponentProps<"div"> & { sx?: StyleArg }
+
+export function Card({ sx, ...props }: CardProps) {
+	return <div {...props} {...styled(props, styles.base, sx)} />
 }
