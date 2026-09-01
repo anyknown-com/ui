@@ -10,6 +10,8 @@
 //   font      非 token 字體:font-family 宣告裡沒有 var(--ak-font-*)
 //   easing    overshoot:cubic-bezier 的 y 值超出 0..1、spring / bounce / elastic、--ak-motion-spring
 //   inline    內聯 style 屬性
+//   stat      stat 濫用:一頁超過四個 ak-stat,或 ak-stat-value 的數字在下面的表格裡又出現一次
+//   table2    兩欄以下的滿版表:數字被推到最右邊,眼睛接不上(DESIGN.md §3)
 import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { cssClasses } from "./design-check.mjs"
@@ -38,16 +40,34 @@ export function lint(html) {
 	}
 	const inline = inlineStyles.length
 
+	// stat:超過四個算濫用;值跟任何 td 文字相同就是把表裡的數字再放大一次
+	const strip = (t) =>
+		t
+			.replace(/<[^>]+>/g, "")
+			.replace(/\s+/g, " ")
+			.trim()
+	const statValues = [...html.matchAll(/class="[^"]*\bak-stat-value\b[^"]*"[^>]*>([\s\S]*?)<\/\w+>/g)].map(
+		(m) => strip(m[1]),
+	)
+	const cells = new Set([...html.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => strip(m[1])))
+	const stat = Math.max(0, statValues.length - 4) + statValues.filter((v) => cells.has(v)).length
+	// table2:第一列的 th/td 數 ≤ 2
+	let table2 = 0
+	for (const t of html.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)) {
+		const firstRow = t[1].match(/<tr[^>]*>([\s\S]*?)<\/tr>/i)?.[1] ?? ""
+		if ((firstRow.match(/<t[hd]\b/gi) ?? []).length <= 2) table2++
+	}
+
 	const classes = [...html.matchAll(/\sclass\s*=\s*"([^"]*)"/gi)].flatMap((m) =>
 		m[1].split(/\s+/).filter(Boolean),
 	)
 	const foreign = classes.filter((c) => !VOCAB.has(c))
 	const cls = foreign.length
 
-	return { hex, color, class: cls, font, easing, inline, foreignClasses: [...new Set(foreign)] }
+	return { hex, color, class: cls, font, easing, inline, stat, table2, foreignClasses: [...new Set(foreign)] }
 }
 
-const KEYS = ["hex", "color", "class", "font", "easing", "inline"]
+const KEYS = ["hex", "color", "class", "font", "easing", "inline", "stat", "table2"]
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
 	const args = process.argv.slice(2)
@@ -63,12 +83,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 		console.log(JSON.stringify({ rows, total }, null, "\t"))
 	} else {
 		const pad = (s, n) => String(s).padStart(n)
-		console.log(`  ${"file".padEnd(40)}${KEYS.map((k) => pad(k, 8)).join("")}`)
+		console.log(`  ${"file".padEnd(32)}${KEYS.map((k) => pad(k, 8)).join("")}`)
 		for (const r of rows) {
-			console.log(`  ${r.file.slice(-40).padEnd(40)}${KEYS.map((k) => pad(r[k], 8)).join("")}`)
+			console.log(`  ${r.file.slice(-32).padEnd(32)}${KEYS.map((k) => pad(r[k], 8)).join("")}`)
 			if (r.foreignClasses.length > 0)
-				console.log(`  ${"".padEnd(40)}詞彙外:${r.foreignClasses.slice(0, 12).join(" ")}`)
+				console.log(`  ${"".padEnd(32)}詞彙外:${r.foreignClasses.slice(0, 12).join(" ")}`)
 		}
-		if (rows.length > 1) console.log(`  ${"total".padEnd(40)}${KEYS.map((k) => pad(total[k], 8)).join("")}`)
+		if (rows.length > 1) console.log(`  ${"total".padEnd(32)}${KEYS.map((k) => pad(total[k], 8)).join("")}`)
 	}
 }
