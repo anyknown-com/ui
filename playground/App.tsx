@@ -28,6 +28,7 @@ const GROUPS: Record<string, string[]> = {
 		"reasoning-fold",
 		"action-bar",
 		"code-block",
+		"markdown",
 		"interaction-card",
 		"handoff-receipt",
 		"composer",

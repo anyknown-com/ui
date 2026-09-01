@@ -1,6 +1,6 @@
 # 元件決定紀錄
 
-34 個元件的**定案理由、走過的彎路、踩過的坑** —— 只留程式碼與型別裡看不出來的東西。
+36 個元件的**定案理由、走過的彎路、踩過的坑** —— 只留程式碼與型別裡看不出來的東西。
 API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)。
 
 織體(線織成的實心)的完整規格在 [TEXTURE-GUIDE.md](./TEXTURE-GUIDE.md);
@@ -217,6 +217,40 @@ opacity —— turn 節奏零跳動。
 ### code-block
 header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
 超寬**只在 block 內橫向捲動**,不讓頁面橫捲。
+
+### markdown
+一則訊息裡的 markdown:GFM 表格、fenced code、TeX 數學、任務清單。
+`marked` 只用 `lexer()` 拿 token 樹,每個 token 自己轉成 React element ——
+**整個元件沒有一處走 `innerHTML`**,模型吐 `<script>` 就顯示原始碼,不會執行。
+
+- **根節點一定要自己寫 `color` / `fontSize` / `lineHeight`**。第一版漏了 `color`,
+  段落與表格就繼承宿主的 `body`,而 playground / site 的 `main.css` 把 `@stylex;`
+  擺在 `@import` 前面,postcss 丟掉 @import、`--ak-text` 是空字串 —— 深色主題下
+  變成黑字配 `rgb(32,29,24)` 的底。同一個元件裡的 CodeBlock 沒事,因為它自己寫了
+- 任務清單用 `Checkbox`,不是原生 `<input type=checkbox>`(後者用 OS 的 accent
+  color 畫自己,完全不看主題)
+- 表格**照內容寬度**,不 `minWidth: 100%`:兩欄表格拉滿訊息寬只會把字推到左右兩端。
+  外層 wrapper 才是捲動的那一層
+- `breaks: true`。這是訊息不是文件 —— 單獨一個換行是寫的人真的想換行
+- 圖表不做:mermaid 光 unpack 就 84MB,設計系統不該讓每個裝它的 app 背。
+  留 `renderBlock({lang, code})` 這個口子給 shell 自己接,沒接就退回 code block
+- 自己的 `Marked` 實例,不用 module-level 的 `marked`:`marked.use()` 是全域的,
+  會污染宿主 app 解析的其他東西
+
+### formula
+TeX → MathML,交給瀏覽器排版。**選 Temml 不選 KaTeX**:輸出 MathML 就不需要
+樣式表也不需要 web font,而 KaTeX 會逼每個消費端多引一支 CSS 加 1MB 字體。
+螢幕閱讀器拿到的也是真的數學而不是一堆定位過的 span。
+
+- Temml 是動態 import 的(~250KB,多數訊息沒有數學),還沒到之前畫面上先顯示原始 TeX,
+  所以載入失敗也不會留一塊空白
+- `temml.render(node)` 直接寫進 DOM,不經過字串 —— 這個 package 沒有一處用
+  `dangerouslySetInnerHTML`,數學不該是第一個
+- `$` 同時是錢。`$5 漲到 $10` 不是公式:開頭 `$` 後不能是空白、結尾 `$` 前不能是
+  空白且後面不能接數字
+- marked extension 的 `start()` **是 marked 下刀的位置**,不是「下一個 `$`」。
+  block 層的 hint 指到行內數學的 `$`,就會把整個句子從中間切成兩段(`breaks: true`
+  之下前半的尾隨空白還會變成 `<br>`)。所以 block 與 inline 各有各的 hint
 
 ### interaction-card
 agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)。

@@ -7,6 +7,7 @@ import {
 	DecisionCard,
 	HandoffReceipt,
 	InlineCode,
+	Markdown,
 	PermissionCard,
 	ReasoningFold,
 	SubagentLine,
@@ -25,6 +26,38 @@ import {
 } from "@anyknown/ui"
 import { useState } from "react"
 import { Demo, Row } from "../shell"
+
+const MARKDOWN = `## 這是一則訊息
+
+模型會寫 **粗體**、\`inline code\`、[連結](https://anyknown.com),還有一整段程式:
+
+\`\`\`ts
+export function pickModel(providers: ProviderConfig[]) {
+	return providers[0]?.models[0] ?? null
+}
+\`\`\`
+
+| provider | byok | platform |
+| --- | :---: | ---: |
+| anthropic | 是 | 是 |
+| baseten | 否 | 是 |
+
+- [x] 表格會自己捲,不會把訊息撐寬
+- [ ] 清單、任務清單
+- 巢狀:
+  1. 第一
+  2. 第二
+
+> 引言長這樣。
+
+行內數學 $E = mc^2$ 跟獨立成塊的:
+
+$$\\int_0^1 x^2\\,dx = \\frac{1}{3}$$
+
+價格不是數學:從 $5 漲到 $10。
+
+<script>alert("這段只會被當成文字顯示")</script>
+`
 
 const CODE = `export function useChildSession(callID: string) {
   return useThread((t) =>
@@ -151,6 +184,12 @@ export function DesktopDemos() {
 						</ActionBar>
 					</AssistantMessage>
 				</Thread>
+			</Demo>
+
+			<Demo id="markdown" title="markdown">
+				<AssistantMessage>
+					<Markdown>{MARKDOWN}</Markdown>
+				</AssistantMessage>
 			</Demo>
 
 			<Demo id="code-block" title="code-block">

@@ -128,3 +128,5 @@ export type { FileRowProps, FileListProps, FileItem, FileRowAction } from "./com
 export { DiffViewer, type DiffViewerProps, type DiffFile } from "./components/diff-viewer/DiffViewer"
 export { DataTable } from "./components/data-table/DataTable"
 export type { DataTableProps, DataTableColumn, SortState } from "./components/data-table/DataTable"
+export { Markdown, type MarkdownProps, type MarkdownBlock } from "./components/markdown/Markdown"
+export { Formula, type FormulaProps } from "./components/markdown/Formula"
