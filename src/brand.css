@@ -1,0 +1,407 @@
+/* brand.css — Ledger 的有界詞彙,給沒有 bundler 的一次性頁面。
+ *
+ * 這是原始檔。發佈版 dist/brand.css 由 scripts/brand-css.mjs 生成:
+ * Google Fonts @import、tokens.css 內聯、ak-theme-* 兩個手動主題、
+ * 織體 SVG 預渲染成 data URI 都在 build 時接進來。
+ *
+ * 每個 class 上面一行「//」註解是它的用途,design.md 的詞彙表從這裡掃出來。
+ * 詞彙刻意小,不在這裡的 class 就是不准用;要新的排版需求先回來改這份,再改 DESIGN.md。 */
+
+/* @import-fonts */
+/* @tokens */
+/* @themes */
+
+:root {
+	/* Google Fonts 的家族名沒有 Variable 後綴;兩個名字都列,fontsource 或 Google Fonts 都能接上 */
+	--ak-font-display: "Newsreader Variable", "Newsreader", Georgia, "Times New Roman", serif;
+	--ak-font-body: "Geist Variable", "Geist", system-ui, sans-serif;
+	--ak-font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, monospace;
+}
+
+body {
+	margin: 0;
+	background: var(--ak-bg);
+	color: var(--ak-text);
+	font-family: var(--ak-font-body);
+	font-size: 1rem;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* ---- 骨架 ---- */
+
+/* 頁面容器:最大寬、左右留白、紙底。一頁一個。 */
+.ak-page {
+	max-width: 64rem;
+	margin-inline: auto;
+	padding: 3rem 1.5rem;
+	background: var(--ak-bg);
+}
+
+/* 分段:上方一條髮線加留白。結論在前的頁面用它切證據段。 */
+.ak-section {
+	margin-top: 3rem;
+	padding-top: 2rem;
+	border-top: 1px solid var(--ak-border);
+}
+
+/* 兩欄網格,375 寬以下折成單欄。 */
+.ak-grid-2 {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+/* 三欄網格,375 寬以下折成單欄。stat 一排最多放這麼多再加一。 */
+.ak-grid-3 {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+@media (max-width: 40rem) {
+	.ak-page {
+		padding: 2rem 1rem;
+	}
+	.ak-grid-2,
+	.ak-grid-3 {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/* ---- 文字 ---- */
+
+/* display 級標題,serif。一頁一個。 */
+.ak-display {
+	font-family: var(--ak-font-display);
+	font-optical-sizing: auto;
+	font-size: 2.25rem;
+	font-weight: 500;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	margin: 0 0 1rem;
+	text-wrap: balance;
+}
+
+/* section 標題,serif。 */
+.ak-h1 {
+	font-family: var(--ak-font-display);
+	font-optical-sizing: auto;
+	font-size: 1.75rem;
+	font-weight: 500;
+	line-height: 1.2;
+	margin: 0 0 0.75rem;
+	text-wrap: balance;
+}
+
+/* section 內的分節標題,serif。 */
+.ak-h2 {
+	font-family: var(--ak-font-display);
+	font-optical-sizing: auto;
+	font-size: 1.375rem;
+	font-weight: 500;
+	line-height: 1.4;
+	margin: 2rem 0 0.5rem;
+	text-wrap: balance;
+}
+
+/* 正文區:p / ul / ol / a / code / pre / blockquote / h3 的階層與行長。 */
+.ak-prose {
+	max-width: 68ch;
+	font-size: 1rem;
+	line-height: 1.6;
+}
+.ak-prose p,
+.ak-prose ul,
+.ak-prose ol,
+.ak-prose pre,
+.ak-prose blockquote {
+	margin: 0 0 1rem;
+}
+.ak-prose ul,
+.ak-prose ol {
+	padding-inline-start: 1.5rem;
+}
+.ak-prose li {
+	margin-bottom: 0.25rem;
+}
+.ak-prose a {
+	color: var(--ak-accent);
+	text-decoration: underline;
+	text-decoration-color: var(--ak-border-strong);
+	text-underline-offset: 0.15em;
+}
+.ak-prose a:hover {
+	text-decoration-color: currentColor;
+}
+.ak-prose h3 {
+	font-family: var(--ak-font-body);
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.4;
+	margin: 1.5rem 0 0.5rem;
+}
+.ak-prose code {
+	font-family: var(--ak-font-mono);
+	font-size: 0.8125rem;
+	background: var(--ak-bone);
+	border-radius: 0.375rem;
+	padding: 0.1em 0.35em;
+}
+.ak-prose pre {
+	font-family: var(--ak-font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	background: var(--ak-bone);
+	border-radius: 0.5rem;
+	padding: 0.75rem 1rem;
+	overflow-x: auto;
+}
+.ak-prose pre code {
+	background: none;
+	padding: 0;
+	font-size: inherit;
+}
+.ak-prose blockquote {
+	border-inline-start: 2px solid var(--ak-border-strong);
+	padding-inline-start: 1rem;
+	color: var(--ak-text-muted);
+}
+.ak-prose hr {
+	border: 0;
+	border-top: 1px solid var(--ak-border);
+	margin: 2rem 0;
+}
+
+/* 次要說明:顏色降一階,字級不變。 */
+.ak-muted {
+	color: var(--ak-text-muted);
+}
+
+/* 等寬:數據、代碼、識別碼。不當裝飾。 */
+.ak-mono {
+	font-family: var(--ak-font-mono);
+	font-size: 0.875em;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---- 證據 ---- */
+
+/* 證據表:滿版、tabular-nums、斑馬用 bone。數字欄加 data-num 靠右。 */
+.ak-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	font-variant-numeric: tabular-nums;
+	margin: 1rem 0;
+}
+.ak-table th,
+.ak-table td {
+	text-align: start;
+	vertical-align: top;
+	padding: 0.5rem 0.75rem;
+	border-bottom: 1px solid var(--ak-border);
+}
+.ak-table th {
+	font-weight: 500;
+	color: var(--ak-text-muted);
+	border-bottom-color: var(--ak-border-strong);
+}
+.ak-table tbody tr:nth-child(even) {
+	background: var(--ak-bone);
+}
+.ak-table [data-num] {
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+}
+.ak-table caption {
+	text-align: start;
+	color: var(--ak-text-muted);
+	font-size: 0.875rem;
+	padding-bottom: 0.5rem;
+}
+@media (max-width: 40rem) {
+	.ak-table {
+		display: block;
+		overflow-x: auto;
+	}
+}
+
+/* 結論級的大數字:serif 數字加 muted 小標。一排最多四個。 */
+.ak-stat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 1rem 0;
+	border-top: 1px solid var(--ak-border);
+}
+/* ak-stat 的數字。 */
+.ak-stat-value {
+	font-family: var(--ak-font-display);
+	font-optical-sizing: auto;
+	font-size: 2.25rem;
+	font-weight: 500;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	font-variant-numeric: tabular-nums;
+}
+/* ak-stat 的小標。 */
+.ak-stat-label {
+	font-size: 0.875rem;
+	color: var(--ak-text-muted);
+}
+
+/* 提示框:左側一條色線加淡底,語意由 ak-callout-info / -warning / -danger 決定。 */
+.ak-callout {
+	border-inline-start: 2px solid var(--ak-border-strong);
+	background: var(--ak-sheen);
+	padding: 0.75rem 1rem;
+	margin: 1rem 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	border-radius: 0 0.5rem 0.5rem 0;
+}
+.ak-callout > :first-child {
+	margin-top: 0;
+}
+.ak-callout > :last-child {
+	margin-bottom: 0;
+}
+/* 說明性提示。 */
+.ak-callout-info {
+	border-color: var(--ak-info);
+	background: var(--ak-info-subtle);
+}
+/* 要注意但不擋路。 */
+.ak-callout-warning {
+	border-color: var(--ak-warning);
+	background: var(--ak-warning-subtle);
+}
+/* 會出事。 */
+.ak-callout-danger {
+	border-color: var(--ak-danger);
+	background: var(--ak-danger-subtle);
+}
+
+/* ---- 動作 ---- */
+
+/* 表單欄位:label 在上、控件在下,input / textarea / select 都給一樣的邊框與焦點環。 */
+.ak-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	max-width: 24rem;
+	margin: 0 0 1rem;
+	font-size: 0.875rem;
+}
+.ak-field > label {
+	font-weight: 500;
+}
+.ak-field input,
+.ak-field textarea,
+.ak-field select {
+	font: inherit;
+	font-family: var(--ak-font-body);
+	color: var(--ak-text);
+	background: var(--ak-surface);
+	border: 1px solid var(--ak-border-strong);
+	border-radius: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	min-height: 2.25rem;
+	box-sizing: border-box;
+	width: 100%;
+}
+.ak-field textarea {
+	min-height: 5rem;
+	resize: vertical;
+}
+.ak-field input:focus-visible,
+.ak-field textarea:focus-visible,
+.ak-field select:focus-visible {
+	outline: 2px solid var(--ak-focus-ring);
+	outline-offset: 2px;
+}
+.ak-field input::placeholder,
+.ak-field textarea::placeholder {
+	color: var(--ak-text-faint);
+}
+
+/* 主動作按鈕:viridian 織體,一頁一顆。 */
+.ak-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 2.25rem;
+	padding: 0.5rem 1rem;
+	border: 0;
+	border-radius: 0.5rem;
+	font-family: var(--ak-font-body);
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.2;
+	color: var(--ak-accent-text);
+	background-color: var(--ak-accent);
+	background-image: var(--ak-weave-primary);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	filter: var(--ak-weave-primary-shadow);
+	cursor: pointer;
+	text-decoration: none;
+	transition: opacity var(--ak-motion-fast) var(--ak-motion-ease-out);
+}
+.ak-btn:hover {
+	opacity: 0.92;
+}
+.ak-btn:active {
+	opacity: 0.85;
+}
+.ak-btn:focus-visible,
+.ak-btn-secondary:focus-visible {
+	outline: 2px solid var(--ak-focus-ring);
+	outline-offset: 3px;
+}
+.ak-btn:disabled,
+.ak-btn-secondary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* 次要按鈕:淺色織體,其他動作都用它。 */
+.ak-btn-secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 2.25rem;
+	padding: 0.5rem 1rem;
+	border: 0;
+	border-radius: 0.5rem;
+	font-family: var(--ak-font-body);
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.2;
+	color: var(--ak-text);
+	background-color: var(--ak-bone);
+	background-image: var(--ak-weave-secondary);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	filter: var(--ak-weave-secondary-shadow);
+	cursor: pointer;
+	text-decoration: none;
+	transition: opacity var(--ak-motion-fast) var(--ak-motion-ease-out);
+}
+.ak-btn-secondary:hover {
+	opacity: 0.92;
+}
+.ak-btn-secondary:active {
+	opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ak-btn,
+	.ak-btn-secondary {
+		transition: none;
+	}
+}

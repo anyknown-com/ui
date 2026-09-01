@@ -74,3 +74,21 @@ dark 跟隨 OS，跟 `tokens.css` 一致；`.ak-theme-light` / `.ak-theme-dark` 
 - 不做 Slack 裡的 design-agent，我們的入口是 Claude Code。
 - 不做 class 級的完整元件庫（dialog、select 那些）；一次性頁面不需要互動元件，需要就回到 `@anyknown/ui`。
 - 不做多品牌／多主題，只有 Ledger。
+
+## 第一輪基線(2026-09-02)
+
+五個場景各兩頁,sonnet subagent 產出,`node scripts/design-lint.mjs site/eval/out/*.html`:
+
+| | hex | color | class | font | easing | inline |
+| --- | --- | --- | --- | --- | --- | --- |
+| 帶 design.md + brand.css(5 頁合計) | 0 | 0 | 0 | 0 | 0 | 0 |
+| 不帶(5 頁合計) | 79 | 9 | 229 | 7 | 0 | 17 |
+
+不帶的五頁全部長成通用 SaaS:KPI 卡一排、表格塞卡片、彩色圓底 icon、全大寫 eyebrow、結論放最後一格深色框。帶的五頁機械錯誤為零,肉眼跟 example.html 是同一家。
+
+這輪的回饋分流:
+
+- 報名頁的表單控件沒有詞彙可用,agent 留了原生 input。加 `ak-field` 進 brand.css,DESIGN.md 第 2 節骨架三加一句。
+- 沒有判斷型修正;沒有新的 lint 規則。
+
+下一輪看的不是這張表(帶的已經是零),是判斷型的問題:結論有沒有放在第一屏、stat 是不是只放結論級數字、一頁是不是只有一顆 `ak-btn`。這些 lint 抓不到,要人看。

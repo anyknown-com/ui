@@ -1,6 +1,6 @@
 {
 	"name": "@anyknown/ui",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"description": "AnyKnown design system — StyleX tokens, themes, and 36 components",
 	"homepage": "https://ui.anyknown.com",
 	"bugs": {
@@ -31,19 +31,22 @@
 			"default": "./dist/themes.stylex.js"
 		},
 		"./tokens.css": "./dist/tokens.css",
-		"./scrollbar.css": "./dist/scrollbar.css"
+		"./scrollbar.css": "./dist/scrollbar.css",
+		"./brand.css": "./dist/brand.css"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/esm-extensions.mjs && cp src/tokens.css src/scrollbar.css dist/",
+		"build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/esm-extensions.mjs && cp src/tokens.css src/scrollbar.css dist/ && node scripts/brand-css.mjs",
 		"typecheck": "tsc --noEmit",
 		"lint": "oxlint src",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",
 		"gen:themes": "node -e \"import('./scripts/themes.mjs').then(async m => (await import('node:fs')).writeFileSync('src/themes.stylex.ts', m.generate()))\" && oxfmt src/themes.stylex.ts",
-		"check": "turbo run typecheck lint fmt:check",
+		"check": "turbo run typecheck lint fmt:check design:check",
+		"design:check": "node scripts/design-check.mjs",
+		"design:lint": "node scripts/design-lint.mjs",
 		"test": "vitest run",
 		"playground": "vite --config playground/vite.config.ts",
 		"site": "vite --config site/vite.config.ts",

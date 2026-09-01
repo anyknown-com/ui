@@ -2,9 +2,10 @@
 //
 // 文檔站是 hash 路由的 SPA,爬蟲抓 `#/guide/texture` 只會拿到空殼,所以 markdown 原文
 // 另外用穩定網址送一份出去,llms.txt 指過去。格式依 https://llmstxt.org。
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { generate as designMd } from "./design-md.mjs"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const out = join(root, "site/dist")
@@ -55,12 +56,23 @@ const read = (page) => readFileSync(join(root, page.file), "utf8").trim()
 mkdirSync(join(out, "docs"), { recursive: true })
 for (const page of PAGES) writeFileSync(join(out, `docs/${page.slug}.md`), `${read(page)}\n`)
 
+// design.md + brand.css:給外部 agent 做一次性頁面的兩個穩定網址(DESIGN.md、docs/plans/01-design-md.md)
+const brandCss = readFileSync(join(root, "dist/brand.css"), "utf8")
+const design = designMd(brandCss)
+writeFileSync(join(out, "design.md"), design)
+copyFileSync(join(root, "dist/brand.css"), join(out, "brand.css"))
+
 const index = `# ${pkg.name}
 
 > ${pkg.description}。light 為預設、dark 跟隨 OS;元件沒有 background —— 實心是線織出來的。
 
 視覺的真相是實作本身:每個元件在 ${site}/#/demo/<name> 都可以直接操作。
 下面每一項的 .md 是原文,#/guide/ 是站上排版後的同一份。
+
+## 做一個 AnyKnown 的頁面
+
+- [design.md](${site}/design.md): 頁面該怎麼組、什麼不准出現(判斷),後面接生成的 token 表與 brand.css 詞彙表。要產報告、提案、benchmark、活動頁這種一次性 HTML,先讀這份。
+- [brand.css](${site}/brand.css): 有界詞彙,純 CSS 單檔,\`<link rel="stylesheet" href="${site}/brand.css">\` 進來就能用。最短用法:\`<main class="ak-page">\` 包住,一個 \`ak-h1\`、一段 \`ak-prose\`、一張 \`ak-table\`;完整範例在 design.md 附錄。
 
 ## 指南
 
@@ -90,6 +102,8 @@ const full = [
 writeFileSync(join(out, "llms-full.txt"), `${full}\n`)
 
 const kb = (s) => `${(Buffer.byteLength(s) / 1024).toFixed(1)} kB`
+console.log(`  design.md       ${kb(design)}`)
+console.log(`  brand.css       ${kb(brandCss)}`)
 console.log(`  llms.txt        ${kb(index)}`)
 console.log(`  llms-full.txt   ${kb(full)}`)
 console.log(`  docs/*.md       ${PAGES.length} 份`)

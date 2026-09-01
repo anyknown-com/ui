@@ -7,6 +7,7 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 - `src/tokens.stylex.ts` — semantic tokens(color / font / text / space / radius / motion / shadow)。light 為預設,dark 跟隨 OS。**唯一真相**。
 - `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。
 - `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app:`<div {...stylex.props(...light)}>`。**由 `pnpm gen:themes` 從 tokens 生成**,不要手改(`themes.test.ts` 會擋住不同步)。
+- `src/brand.css` — 給沒有 bundler 的一次性頁面(報告、提案、benchmark)的有界詞彙,二十來個 `ak-*` class。build 時內聯 tokens、接 Google Fonts、把按鈕織體預渲染成 SVG data URI(`scripts/brand-css.mjs`),出 `dist/brand.css` 與 <https://ui.anyknown.com/brand.css>。判斷寫在根目錄的 [DESIGN.md](./DESIGN.md),`pnpm check` 會擋文件與詞彙不同步。
 - `src/scrollbar.css` — 客製捲軸(全域套用)。StyleX 做不了 `::-webkit-scrollbar` 偽元素,所以獨立成 css 檔。
 - `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx`)。清單與共同決策見 [components/README.md](./src/components/README.md),定案理由與走過的彎路見 [components/COMPONENTS.md](./src/components/COMPONENTS.md)。
 - `src/lib/` — 共用 hooks 與生成邏輯(reduced-motion、controllable state、clipboard、diff、`styled` 與 `reset.control`)。織體幾何在 `weave.ts`(靜態)與 `silk.ts`(動態),規格見 [components/TEXTURE-GUIDE.md](./src/components/TEXTURE-GUIDE.md)。
@@ -65,6 +66,8 @@ CI 驗不了的只剩視覺:發之前 `pnpm playground` 開一輪看視覺與動
 | repo | <https://github.com/anyknown-com/ui>(public、MIT) |
 | npm | `@anyknown/ui`,trusted publisher 綁 `anyknown-com/ui` → `release.yml` |
 | 文檔站 | <https://ui.anyknown.com>(Cloudflare Workers) |
+| design.md | <https://ui.anyknown.com/design.md>,`DESIGN.md` 原文 + 生成的 token 表與 `brand.css` 詞彙表;`llms.txt` 第一條 |
+| brand.css | <https://ui.anyknown.com/brand.css>,外部 agent 做一次性頁面 `<link>` 這份就好;同時是套件的 `@anyknown/ui/brand.css` |
 | remote cache | `turbo.anyknown.com`,team `anyknown-ui`;token 在 repo secret `TURBO_TOKEN`,本機 `export TURBO_TOKEN=<token>`(worker 端的來源是 `anyknown-com/turbo-cache` 的 secret binding) |
 
 ## 在各 app 使用(Vite)

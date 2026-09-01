@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>brand.css 範例:call 定價比較</title>
+<!-- 本機看用 ../../dist/brand.css;外部頁面用 https://ui.anyknown.com/brand.css -->
+<link rel="stylesheet" href="../../dist/brand.css">
+</head>
+<body>
+<main class="ak-page">
+  <h1 class="ak-display">Anyknown Call 該賣多少錢</h1>
+  <div class="ak-prose">
+    <p>結論:v2 每分鐘成本 $0.067,TTS 佔 85–90%。定價 $0.20/分可以維持 66% 毛利,比 Retell 便宜三成,比 Vapi 貴一成。建議先出一個 SKU,不做 Flash 分級。</p>
+  </div>
+
+  <div class="ak-grid-3">
+    <div class="ak-stat"><span class="ak-stat-value">$0.067</span><span class="ak-stat-label">每分鐘成本(v2)</span></div>
+    <div class="ak-stat"><span class="ak-stat-value">66%</span><span class="ak-stat-label">$0.20/分 的毛利</span></div>
+    <div class="ak-stat"><span class="ak-stat-value">88%</span><span class="ak-stat-label">TTS 佔成本比</span></div>
+  </div>
+
+  <div class="ak-callout ak-callout-warning">
+    <p>Flash 版 $0.037/分 的數字只跑過 40 分鐘樣本,還不能拿來定價。</p>
+  </div>
+
+  <section class="ak-section">
+    <h2 class="ak-h1">競品定價</h2>
+    <p class="ak-muted">全部換算成每分鐘 USD,含 STT + LLM + TTS,不含電話線路。</p>
+    <table class="ak-table">
+      <thead><tr><th>產品</th><th data-num>每分鐘</th><th data-num>最低月費</th><th>計費單位</th></tr></thead>
+      <tbody>
+        <tr><td>Anyknown Call(建議)</td><td data-num>0.20</td><td data-num>0</td><td>秒</td></tr>
+        <tr><td>Retell</td><td data-num>0.29</td><td data-num>0</td><td>分</td></tr>
+        <tr><td>Vapi</td><td data-num>0.18</td><td data-num>0</td><td>分</td></tr>
+        <tr><td>Bland</td><td data-num>0.09</td><td data-num>299</td><td>分</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="ak-h2">成本結構</h3>
+    <div class="ak-prose">
+      <p>TTS 是大頭,<code>CAM++</code> 跑在 R2 幾乎免費,Luna 的 STT 也是。換 TTS 供應商才動得了成本,LLM 換 Flash 只省 <span class="ak-mono">$0.03</span>。</p>
+      <ul>
+        <li>TTS:$0.058/分</li>
+        <li>LLM:$0.007/分</li>
+        <li>STT + 其他:$0.002/分</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="ak-section">
+    <h2 class="ak-h1">下一步</h2>
+    <div class="ak-prose">
+      <p>先以 $0.20/分 上線,跑一個月看實際毛利,再決定要不要加 Flash SKU。</p>
+    </div>
+    <p>
+      <button class="ak-btn">同意這個定價</button>
+      <button class="ak-btn-secondary">看完整成本表</button>
+    </p>
+  </section>
+</main>
+</body>
+</html>

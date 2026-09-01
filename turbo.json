@@ -31,6 +31,9 @@
 		"lint": {
 			"inputs": ["src/**", "!src/**/*.md", "!src/**/*.html", ".oxlintrc.json"]
 		},
+		"design:check": {
+			"inputs": ["DESIGN.md", "src/brand.css", "scripts/design-check.mjs"]
+		},
 		"fmt:check": {
 			"inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.html"]
 		},
