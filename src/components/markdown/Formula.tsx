@@ -53,16 +53,22 @@ export function Formula({ children, display = false, sx }: FormulaProps) {
 		let live = true
 		// Temml is ~250KB and most messages contain no maths at all, so it arrives only when the
 		// first formula does.
-		void import("temml").then((temml) => {
-			if (!live || !host.current) return
-			temml.default.render(children, host.current, {
-				displayMode: display,
-				// `throwOnError: false` renders the offending source in red instead of blowing up the
-				// whole message; `trust: false` (the default) keeps \href and friends inert.
-				throwOnError: false,
-				errorColor: "currentColor",
+		void import("temml")
+			.then((temml) => {
+				if (!live || !host.current) return
+				temml.default.render(children, host.current, {
+					displayMode: display,
+					// `throwOnError: false` renders the offending source in red instead of blowing up the
+					// whole message; `trust: false` (the default) keeps \href and friends inert.
+					throwOnError: false,
+					errorColor: "currentColor",
+				})
 			})
-		})
+			// Nothing about one formula is worth taking a message down for. `throwOnError` covers bad
+			// TeX, this covers everything else: a chunk that fails to load, or a DOM that will not
+			// take MathML at all (jsdom builds those elements without a `style`, so Temml throws
+			// there and only there). The source TeX is already on screen and simply stays.
+			.catch(() => {})
 		return () => {
 			live = false
 		}

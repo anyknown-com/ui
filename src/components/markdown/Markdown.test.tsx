@@ -6,10 +6,12 @@ import { Markdown } from "./Markdown"
 // there and nowhere else. What belongs to this component is *what it asks Temml for* and what it
 // shows while Temml is still loading; the MathML itself is Temml's job and the browser's.
 const calls = vi.hoisted(() => [] as { tex: string; display: boolean }[])
+const stub = vi.hoisted(() => ({ throws: false }))
 vi.mock("temml", () => ({
 	default: {
 		render(tex: string, node: HTMLElement, options?: { displayMode?: boolean }) {
 			calls.push({ tex, display: options?.displayMode ?? false })
+			if (stub.throws) throw new Error("jsdom has no MathML style object")
 			node.textContent = `⟨math⟩${tex}`
 		},
 	},
@@ -99,6 +101,7 @@ describe("Markdown", () => {
 	describe("maths", () => {
 		beforeEach(() => {
 			calls.length = 0
+			stub.throws = false
 		})
 
 		test("$…$ is handed to the renderer as inline maths", async () => {
@@ -126,6 +129,17 @@ describe("Markdown", () => {
 			// into a <br>.
 			expect(container.querySelectorAll("br")).toHaveLength(0)
 			expect(screen.getByText("從 $5 漲到 $10")).toBeInTheDocument()
+		})
+
+		test("a renderer that throws does not take the message down", async () => {
+			// This is exactly what jsdom does — it builds MathML elements with no `style` object, so
+			// Temml's own `node.style[x] = …` throws. An unhandled rejection here failed the whole
+			// site smoke suite; a formula is never worth that.
+			stub.throws = true
+			render(<Markdown>{"壞掉的 $E = mc^2$ 也要活著"}</Markdown>)
+			await waitFor(() => expect(calls).toHaveLength(1))
+			expect(screen.getByText("E = mc^2")).toBeInTheDocument()
+			expect(screen.getByText(/也要活著/)).toBeInTheDocument()
 		})
 
 		test("the source is what shows until the renderer arrives", () => {
