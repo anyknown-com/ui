@@ -94,6 +94,8 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
+- 預設寬度 `min(24rem, ...)` 只是常見尺寸,不是規定。`DialogContent` 收 `sx`,寬高由使用端
+  蓋掉(三欄選擇器那種);不給 `size` prop —— 尺寸的組合是無限的,`sx` 才是那個出口
 
 ### toast
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作

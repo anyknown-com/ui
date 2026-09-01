@@ -1,8 +1,24 @@
+import * as stylex from "@stylexjs/stylex"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { type StyleArg } from "../../lib/styled"
 import { Button } from "../button/Button"
 import { ConfirmDialog, Dialog, DialogActions, DialogClose, DialogContent, DialogTrigger } from "./Dialog"
+
+// 跟 popup 的 width 同值,用來確認 base 那顆 atom 被 sx 換掉而不是疊在一起
+const probe = stylex.create({
+	baseWidth: { width: "min(24rem, calc(100vw - 2rem))" },
+	wide: { width: "40rem" },
+})
+
+// dev build 會多帶一顆可讀的 debug class,atomic 的是雜湊那顆
+function atom(style: StyleArg): string {
+	const classes = stylex.props(style).className?.split(" ") ?? []
+	const hashed = classes.filter((name) => /^x[a-z0-9]+$/.test(name))
+	expect(hashed).toHaveLength(1)
+	return hashed[0] as string
+}
 
 function Rename() {
 	return (
@@ -50,6 +66,19 @@ describe("Dialog", () => {
 		await userEvent.keyboard("{Escape}")
 		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
 		expect(trigger).toHaveFocus()
+	})
+
+	test("sx replaces the popup's own width instead of stacking on top of it", async () => {
+		render(
+			<Dialog defaultOpen>
+				<DialogContent title="選模型" sx={probe.wide}>
+					三欄
+				</DialogContent>
+			</Dialog>,
+		)
+		const classes = (await screen.findByRole("dialog")).className.split(" ")
+		expect(classes).toContain(atom(probe.wide))
+		expect(classes).not.toContain(atom(probe.baseWidth))
 	})
 
 	test("a close button dismisses the dialog", async () => {

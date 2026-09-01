@@ -3,6 +3,7 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactElement, type ReactNode, useRef } from "react"
 import { layerStyles } from "../../lib/popup"
+import type { StyleArg } from "../../lib/styled"
 import { color, font, radius, shadow, space, text } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 
@@ -85,14 +86,16 @@ export type DialogContentProps = {
 	title: ReactNode
 	description?: ReactNode
 	children?: ReactNode
+	/** 寬高是 popup 自己的事,但要蓋得掉 —— 三欄選擇器那種得自己給 width / maxHeight */
+	sx?: StyleArg
 }
 
-export function DialogContent({ title, description, children }: DialogContentProps) {
+export function DialogContent({ title, description, children, sx }: DialogContentProps) {
 	return (
 		<BaseDialog.Portal>
 			<BaseDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
 			<BaseDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
-				<BaseDialog.Popup {...stylex.props(styles.popup)}>
+				<BaseDialog.Popup {...stylex.props(styles.popup, sx)}>
 					<BaseDialog.Title {...stylex.props(styles.title)}>{title}</BaseDialog.Title>
 					{description != null && (
 						<BaseDialog.Description {...stylex.props(styles.description)}>

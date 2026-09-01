@@ -62,6 +62,7 @@ const styles = stylex.create({
 		height: "9rem",
 	},
 	ringRow: { display: "flex", gap: space.lg, alignItems: "center" },
+	wideDialog: { width: "min(44rem, calc(100vw - 2rem))", height: "calc(100vh - 2rem)" },
 })
 
 function MemoryIcon() {
@@ -166,6 +167,22 @@ export function BasicsDemos() {
 								</DialogClose>
 								<DialogClose>
 									<Button>開始</Button>
+								</DialogClose>
+							</DialogActions>
+						</DialogContent>
+					</Dialog>
+					<Dialog>
+						<DialogTrigger>
+							<Button variant="secondary">自己給寬高</Button>
+						</DialogTrigger>
+						<DialogContent
+							title="選擇模型"
+							description="sx 蓋掉 popup 預設的 width / maxHeight,三欄選擇器才放得下。"
+							sx={styles.wideDialog}
+						>
+							<DialogActions>
+								<DialogClose>
+									<Button variant="ghost">關閉</Button>
 								</DialogClose>
 							</DialogActions>
 						</DialogContent>
