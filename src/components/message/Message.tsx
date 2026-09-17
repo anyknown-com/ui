@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { CSSProperties } from "react"
 import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { color, radius, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -114,6 +114,7 @@ export type AssistantMessageProps = {
 	pendingLabel?: string
 	authorLabel?: string
 	children?: ReactNode
+	sx?: StyleArg
 }
 
 export function AssistantMessage({
@@ -122,6 +123,7 @@ export function AssistantMessage({
 	pendingLabel = "回覆中",
 	authorLabel = "助理說:",
 	children,
+	sx,
 }: AssistantMessageProps) {
 	const body = useRef<HTMLDivElement>(null)
 	const parts = Children.toArray(children)
@@ -132,7 +134,7 @@ export function AssistantMessage({
 
 	return (
 		<MessageBodyContext value={body}>
-			<div ref={body} {...stylex.props(styles.turn, styles.assistant)}>
+			<div ref={body} {...stylex.props(styles.turn, styles.assistant, sx)}>
 				<span {...stylex.props(styles.srOnly)}>{authorLabel}</span>
 				{pending ? (
 					<span role="status">
