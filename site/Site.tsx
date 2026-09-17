@@ -40,6 +40,7 @@ const GROUPS: Record<string, string[]> = {
 		"handoff-receipt",
 		"composer",
 		"voice-indicator",
+		"live-dot",
 	],
 	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
 }

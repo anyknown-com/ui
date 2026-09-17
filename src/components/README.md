@@ -1,6 +1,6 @@
 # Components
 
-35 個元件,全部已實作。每個 folder 含:
+36 個元件,全部已實作。每個 folder 含:
 
 - `<Name>.tsx` — StyleX 實作
 - `<Name>.test.tsx` — vitest + testing-library
@@ -20,7 +20,7 @@ playground 與文檔站用同一組 section id。
 
 - **表單** — `input` `textarea` `label` `checkbox` `radio` `switch` `slider` `select` `dropdown`
 - **基礎** — `button` `dialog` `toast` `tooltip` `popover` `tabs` `badge` `kbd` `skeleton` `progress` `empty-state` `scrollbar`
-- **Desktop AI-native** — `message` `tool-card` `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt` `composer` `voice-indicator`
+- **Desktop AI-native** — `message` `tool-card` `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt` `composer` `voice-indicator` `live-dot`
 - **Storage / 資料** — `password-input` `recovery-key` `dropzone` `file-row` `diff-viewer` `data-table`
 
 ## 其他文件

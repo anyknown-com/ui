@@ -325,6 +325,13 @@ session」,可展開看交接摘要。用戶不管理 session,**這是他唯一�
 - 視覺化區**固定寬高**,換態不跳版;文案標明可插話(「說話中…插話會打斷」= barge-in)
 - reduced-motion:全部動畫關閉,bar 停在中段靜態高度,改顯示 mono uppercase 靜態文字標
 
+### live-dot
+「還在跑」的一顆呼吸點。給工具紀錄的當前動作、sub thread 的進行中狀態。
+
+- 呼吸只到 0.35 就回來:淡到底會變成閃爍,那是警報不是「還在跑」
+- 1.6s `ease-in-out` 無限循環,`prefers-reduced-motion` 直接停住(點還在,只是不動)
+- 預設 `aria-hidden` —— 一顆點沒有要唸的東西;給 `label` 才升成 `role="status"`
+
 ---
 
 ## Storage / 資料

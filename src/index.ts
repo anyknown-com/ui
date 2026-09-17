@@ -117,6 +117,7 @@ export type { HandoffReceiptProps, HandoffReason } from "./components/handoff-re
 export { Composer } from "./components/composer/Composer"
 export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
 export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
+export { LiveDot, type LiveDotProps } from "./components/live-dot/LiveDot"
 export type { VoiceState } from "./lib/voice"
 export { layerUp, type LayerName } from "./lib/layers"
 

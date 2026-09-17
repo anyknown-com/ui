@@ -26,7 +26,7 @@ const PAGES = [
 		file: "src/components/README.md",
 		guide: "components",
 		title: "元件總覽",
-		note: "35 個元件的清單、跨元件的共同決策(Base UI headless 層、動畫不回彈、禁用 useEffect、StyleX 0.19 的坑)。",
+		note: "36 個元件的清單、跨元件的共同決策(Base UI headless 層、動畫不回彈、禁用 useEffect、StyleX 0.19 的坑)。",
 	},
 	{
 		slug: "decisions",

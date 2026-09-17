@@ -7,6 +7,7 @@ import {
 	DecisionCard,
 	HandoffReceipt,
 	InlineCode,
+	LiveDot,
 	Markdown,
 	PermissionCard,
 	ReasoningFold,
@@ -288,6 +289,13 @@ export function DesktopDemos() {
 							{state}
 						</Button>
 					))}
+				</Row>
+			</Demo>
+
+			<Demo id="live-dot" title="live-dot" note="「還在跑」的一顆呼吸點;reduced-motion 下停住不消失。">
+				<Row>
+					<LiveDot label="還在跑" />
+					<span>讀 packages/runtime/src/loop.ts</span>
 				</Row>
 			</Demo>
 		</>
