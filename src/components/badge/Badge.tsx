@@ -91,10 +91,9 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 	)
 }
 
-export type ChipProps = BadgeProps & {
-	onRemove?: () => void
-	removeLabel: string
-}
+/** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
+export type ChipProps = BadgeProps &
+	({ onRemove: () => void; removeLabel: string } | { onRemove?: undefined; removeLabel?: string })
 
 export function Chip({ onRemove, removeLabel, variant = "outline", children, ...props }: ChipProps) {
 	return (

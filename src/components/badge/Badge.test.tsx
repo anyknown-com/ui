@@ -40,6 +40,12 @@ describe("Chip", () => {
 		expect(onRemove).toHaveBeenCalledTimes(1)
 	})
 
+	test("沒有 onRemove 就不必給 removeLabel", () => {
+		render(<Chip>只讀的一枚</Chip>)
+		expect(screen.getByText("只讀的一枚")).toBeInTheDocument()
+		expect(screen.queryByRole("button")).not.toBeInTheDocument()
+	})
+
 	test("is reachable and activatable by keyboard", async () => {
 		const onRemove = vi.fn()
 		render(
