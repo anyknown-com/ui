@@ -364,4 +364,6 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - **sticky header 用 `inset box-shadow` 當底線** —— `border-collapse` 下 border 不會
   跟著 sticky
 - 空結果:置中訊息帶查詢字 + 「清除過濾」動作
+- 捲動區高度 `maxHeight`(預設 20rem),`footer` 渲染在列之後、**捲動區之內** ——
+  「載入更多」待在清單裡才跟得上捲動
 - **刻意不用織體** —— 數據要安靜可判讀

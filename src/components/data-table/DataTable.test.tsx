@@ -225,4 +225,22 @@ describe("DataTable regressions", () => {
 		rerender(table(ENTRIES))
 		expect(screen.queryByRole("textbox", { name: /編輯 nav.projects/ })).not.toBeInTheDocument()
 	})
+
+	test("footer 跟著列一起捲,maxHeight 蓋得掉", () => {
+		render(
+			<DataTable
+				label="字典"
+				rows={ENTRIES}
+				rowKey={(row) => row.key}
+				columns={[{ id: "key", header: "key", value: (row) => row.key }]}
+				maxHeight="40rem"
+				footer={<button type="button">載入更多</button>}
+			/>,
+		)
+		const region = screen.getByRole("region", { name: "字典" })
+		const more = screen.getByRole("button", { name: "載入更多" })
+		expect(region).toContainElement(more)
+		expect(region.compareDocumentPosition(more) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+		expect(region.style.getPropertyValue("max-height") || region.getAttribute("style")).toContain("40rem")
+	})
 })

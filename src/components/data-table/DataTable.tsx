@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
-import { reset } from "../../lib/styled"
+import { type StyleArg, reset } from "../../lib/styled"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -47,10 +47,10 @@ const styles = stylex.create({
 		borderStyle: "solid",
 		borderColor: color.border,
 		borderRadius: radius.lg,
-		maxHeight: "20rem",
 		overflow: "auto",
 		marginTop: space.xs,
 	},
+	capped: (maxHeight: string | number) => ({ maxHeight }),
 	table: { width: "100%", borderCollapse: "collapse", fontFamily: font.body, fontSize: text.sm },
 	th: {
 		position: "sticky",
@@ -202,6 +202,11 @@ export type DataTableProps<Row> = {
 	selectAllLabel?: string
 	editLabel?: (column: string, key: string) => string
 	clearLabel?: string
+	/** 捲動區的高度上限。 @default "20rem" */
+	maxHeight?: string | number
+	/** 跟著列一起捲的結尾 —— 「載入更多」要待在清單裡,不是待在清單外。 */
+	footer?: ReactNode
+	sx?: StyleArg
 }
 
 // Entering edit mode is a user gesture (double-click), so moving focus into the
@@ -235,6 +240,9 @@ export function DataTable<Row>({
 	selectAllLabel = "全選",
 	editLabel = (column, key) => `編輯 ${key} 的 ${column}`,
 	clearLabel = "清除過濾",
+	maxHeight = "20rem",
+	footer,
+	sx,
 }: DataTableProps<Row>) {
 	const [editing, setEditing] = useState<{ key: string; col: string } | null>(null)
 	const cancelling = useRef(false)
@@ -297,7 +305,7 @@ export function DataTable<Row>({
 	}
 
 	return (
-		<div>
+		<div {...stylex.props(sx)}>
 			{onFilterChange != null && (
 				<div {...stylex.props(styles.toolbar)}>
 					<div {...stylex.props(styles.filter)}>
@@ -318,7 +326,12 @@ export function DataTable<Row>({
 					</span>
 				</div>
 			)}
-			<div tabIndex={0} role="region" aria-label={label} {...stylex.props(styles.wrap)}>
+			<div
+				tabIndex={0}
+				role="region"
+				aria-label={label}
+				{...stylex.props(styles.wrap, styles.capped(maxHeight))}
+			>
 				<table aria-label={label} {...stylex.props(styles.table)}>
 					<thead>
 						<tr>
@@ -461,6 +474,7 @@ export function DataTable<Row>({
 						)}
 					</tbody>
 				</table>
+				{footer}
 			</div>
 		</div>
 	)
