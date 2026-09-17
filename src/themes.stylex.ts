@@ -31,6 +31,11 @@ export const lightColor = stylex.createTheme(color, {
 	sheen: "#F6F4EC",
 	successHl: "#C6E0C6",
 	dangerHl: "#EFCEC3",
+	layer1: "#EFECE3",
+	layer2: "#FAFAF6",
+	layer3: "#F1EFE7",
+	layer4: "#E8E5DA",
+	layer5: "#DEDACD",
 })
 
 export const lightYarn = stylex.createTheme(yarn, {
@@ -122,6 +127,11 @@ export const darkColor = stylex.createTheme(color, {
 	sheen: "#35302A",
 	successHl: "#2F4A2E",
 	dangerHl: "#573328",
+	layer1: "#0E0C09",
+	layer2: "#181613",
+	layer3: "#211E19",
+	layer4: "#2B2721",
+	layer5: "#35302A",
 })
 
 export const darkYarn = stylex.createTheme(yarn, {

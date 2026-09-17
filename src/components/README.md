@@ -57,6 +57,9 @@ playground 與文檔站用同一組 section id。
     五組 yarn + shadow),用 `stylex.props(...light)` 展開。只套其中一個 var group 會讓
     布停在另一個主題 —— 深色布配深色字,secondary / ghost 的標籤整個看不見。
     那個檔由 `pnpm gen:themes` 從 tokens 生成,不要手改
+12. **面靠分層,不靠邊框**。`color.layer1`–`layer5` 是 rail → main → 訊息 → fold → 列
+    五階底色,數字越大越深。**hover 升一階**:`layerUp.layer3` 就是 `layer3` 的 hover 底色
+    (`lib/layers.ts`)。layer5 是最深的一階,它的上一階沒有名字,`layerUp` 給 `borderStrong`
 
 ## Field 的使用範圍
 

@@ -31,6 +31,13 @@ export const color = stylex.defineVars({
 	sheen: { default: "#F6F4EC", [DARK]: "#35302A" },
 	successHl: { default: "#C6E0C6", [DARK]: "#2F4A2E" },
 	dangerHl: { default: "#EFCEC3", [DARK]: "#573328" },
+	// 分層底色:rail → main → 訊息 → fold → 列,越深的一階數字越大。
+	// 面與面靠深淺分,不靠邊框;hover 升一階,對應表在 lib/layers.ts。
+	layer1: { default: "#EFECE3", [DARK]: "#0E0C09" },
+	layer2: { default: "#FAFAF6", [DARK]: "#181613" },
+	layer3: { default: "#F1EFE7", [DARK]: "#211E19" },
+	layer4: { default: "#E8E5DA", [DARK]: "#2B2721" },
+	layer5: { default: "#DEDACD", [DARK]: "#35302A" },
 })
 
 // 織體紗線階(TEXTURE-GUIDE §3.4):un 底紗、sh 縫隙陰影、y0–y4 面紗(深→淺)、hi 挑面亮紗、
