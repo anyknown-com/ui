@@ -154,10 +154,14 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
   x 與 width 各拆一條曲線的組合會衝過再收回,違反「任何邊不得倒退」
 
 ### badge / chip
-badge 是唯讀語意標籤,chip 是可互動(可移除)的篩選單位,同一家族。
+badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位,同一家族。
 
 - chip 的 `×`:負 block margin 讓圓鈕不撐高 chip,`::after` 補到 24px 命中區
   (WCAG 2.2)而不影響版面 —— 這一招可以套到其他小命中區
+- `removeLabel` 只在給了 `onRemove` 時必填;沒有 × 就沒有要唸的東西
+- 給 `onClick` 就渲染成真的 `<button aria-pressed>`(沒給就是 `<span>`)。
+  選取態是**反白**(text 底、bg 字),不是加一圈邊框 —— 一排篩選 chip 掃過去要一眼看出開哪幾個。
+  可按的 chip 不轉發 `ref`(那會是 button 的 ref,不是 span 的)
 
 ### kbd
 快捷鍵標示:surface 底 + border + 1px 下緣陰影做出按鍵感,Geist Mono,

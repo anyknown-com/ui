@@ -46,6 +46,20 @@ describe("Chip", () => {
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})
 
+	test("給了 onClick 就是真的按鈕,pressed 進 aria-pressed", async () => {
+		const onClick = vi.fn()
+		render(
+			<Chip onClick={onClick} pressed>
+				失敗 2
+			</Chip>,
+		)
+		const chip = screen.getByRole("button", { name: "失敗 2" })
+		expect(chip.tagName).toBe("BUTTON")
+		expect(chip).toHaveAttribute("aria-pressed", "true")
+		await userEvent.click(chip)
+		expect(onClick).toHaveBeenCalledTimes(1)
+	})
+
 	test("is reachable and activatable by keyboard", async () => {
 		const onRemove = vi.fn()
 		render(

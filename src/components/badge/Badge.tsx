@@ -43,6 +43,20 @@ const styles = stylex.create({
 	dotDanger: { color: color.danger },
 	dotWarning: { color: color.warning },
 	count: { fontFamily: font.mono, fontSize: "0.7rem", fontWeight: 600, lineHeight: 1 },
+	pressable: {
+		cursor: "pointer",
+		backgroundColor: {
+			default: "transparent",
+			":hover": "color-mix(in srgb, currentColor 10%, transparent)",
+		},
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: 2,
+	},
+	pressed: {
+		backgroundColor: { default: color.text, ":hover": color.text },
+		borderColor: color.text,
+		color: color.bg,
+	},
 	remove: {
 		position: "relative",
 		display: "grid",
@@ -93,11 +107,25 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 
 /** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
 export type ChipProps = BadgeProps &
-	({ onRemove: () => void; removeLabel: string } | { onRemove?: undefined; removeLabel?: string })
+	({ onRemove: () => void; removeLabel: string } | { onRemove?: undefined; removeLabel?: string }) & {
+		/** 給了就是可按的一枚(真的 `<button aria-pressed>`),沒給就是一枚標籤。 */
+		onClick?: () => void
+		pressed?: boolean
+	}
 
-export function Chip({ onRemove, removeLabel, variant = "outline", children, ...props }: ChipProps) {
-	return (
-		<Badge variant={variant} {...props}>
+export function Chip({
+	onRemove,
+	removeLabel,
+	onClick,
+	pressed,
+	variant = "outline",
+	children,
+	sx,
+	ref,
+	...props
+}: ChipProps) {
+	const body = (
+		<>
 			{children}
 			{onRemove != null && (
 				<button
@@ -120,6 +148,33 @@ export function Chip({ onRemove, removeLabel, variant = "outline", children, ...
 					</svg>
 				</button>
 			)}
-		</Badge>
+		</>
+	)
+
+	if (onClick == null) {
+		return (
+			<Badge variant={variant} sx={sx} ref={ref} {...props}>
+				{body}
+			</Badge>
+		)
+	}
+	return (
+		<button
+			type="button"
+			aria-pressed={pressed}
+			onClick={onClick}
+			{...props}
+			{...styled(
+				props,
+				reset.control,
+				styles.base,
+				styles.pressable,
+				styles[variant],
+				pressed === true && styles.pressed,
+				sx,
+			)}
+		>
+			{body}
+		</button>
 	)
 }
