@@ -10,6 +10,7 @@ import { ConfirmDialog, Dialog, DialogActions, DialogClose, DialogContent, Dialo
 const probe = stylex.create({
 	baseWidth: { width: "min(24rem, calc(100vw - 2rem))" },
 	wide: { width: "40rem" },
+	fullWidth: { width: "min(64rem, calc(100vw - 2rem))" },
 })
 
 // dev build 會多帶一顆可讀的 debug class,atomic 的是雜湊那顆
@@ -79,6 +80,25 @@ describe("Dialog", () => {
 		const classes = (await screen.findByRole("dialog")).className.split(" ")
 		expect(classes).toContain(atom(probe.wide))
 		expect(classes).not.toContain(atom(probe.baseWidth))
+	})
+
+	test("size 換掉 popup 自己的寬,body 是另一段(標頭不跟著捲)", async () => {
+		render(
+			<Dialog defaultOpen>
+				<DialogContent title="工具紀錄" size="full" body={<p>三十個動作</p>}>
+					<span>篩選</span>
+				</DialogContent>
+			</Dialog>,
+		)
+		const popup = await screen.findByRole("dialog")
+		const classes = popup.className.split(" ")
+		expect(classes).toContain(atom(probe.fullWidth))
+		expect(classes).not.toContain(atom(probe.baseWidth))
+
+		const scroller = screen.getByText("三十個動作").parentElement
+		expect(scroller?.parentElement).toBe(popup)
+		expect(scroller).not.toContainElement(screen.getByRole("heading", { name: "工具紀錄" }))
+		expect(scroller).not.toContainElement(screen.getByText("篩選"))
 	})
 
 	test("a close button dismisses the dialog", async () => {

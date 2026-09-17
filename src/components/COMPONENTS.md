@@ -104,8 +104,11 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
-- 預設寬度 `min(24rem, ...)` 只是常見尺寸,不是規定。`DialogContent` 收 `sx`,寬高由使用端
-  蓋掉(三欄選擇器那種);不給 `size` prop —— 尺寸的組合是無限的,`sx` 才是那個出口
+- 寬度三階 `size`:`sm`(預設 24rem)/ `md`(40rem)/ `full`(64rem 寬、46rem 高的沉浸式)。
+  **原本刻意不給 `size`**,理由是尺寸的組合無限;改口是因為「沉浸式」那個組合(寬 + 高 +
+  不自己捲)每個使用端都抄一次同一段 `sx`,那就是一個階不是一個偏好。階外的仍然走 `sx`
+- `body` 是會捲的那一段:給了 `body`,popup 自己不再捲(`overflow: hidden` + flex column),
+  標頭與 `children`(篩選 chips 那排)釘住,只有 `body` 捲 —— 沉浸式清單捲起來標頭不能跟著跑
 
 ### toast
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作

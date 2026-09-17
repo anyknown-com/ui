@@ -47,6 +47,14 @@ const styles = stylex.create({
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
+	md: { width: "min(40rem, calc(100vw - 2rem))" },
+	full: {
+		width: "min(64rem, calc(100vw - 2rem))",
+		height: "min(46rem, calc(100vh - 2rem))",
+	},
+	// 有 body 就換成「標頭釘住、只有 body 捲」:popup 自己不再捲
+	split: { display: "flex", flexDirection: "column", overflowY: "hidden" },
+	body: { flexGrow: 1, minHeight: 0, overflowY: "auto" },
 	title: {
 		fontFamily: font.display,
 		fontSize: text.lg,
@@ -86,16 +94,37 @@ export type DialogContentProps = {
 	title: ReactNode
 	description?: ReactNode
 	children?: ReactNode
+	/** 寬度階;`full` 是沉浸式(整個視窗那麼高)。 @default "sm" */
+	size?: "sm" | "md" | "full"
+	/** 會捲的那一段 —— 標頭與 children 釘住,只有這裡捲。 */
+	body?: ReactNode
+	bodySx?: StyleArg
 	/** 寬高是 popup 自己的事,但要蓋得掉 —— 三欄選擇器那種得自己給 width / maxHeight */
 	sx?: StyleArg
 }
 
-export function DialogContent({ title, description, children, sx }: DialogContentProps) {
+export function DialogContent({
+	title,
+	description,
+	children,
+	size = "sm",
+	body,
+	bodySx,
+	sx,
+}: DialogContentProps) {
 	return (
 		<BaseDialog.Portal>
 			<BaseDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
 			<BaseDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
-				<BaseDialog.Popup {...stylex.props(styles.popup, sx)}>
+				<BaseDialog.Popup
+					{...stylex.props(
+						styles.popup,
+						size === "md" && styles.md,
+						size === "full" && styles.full,
+						body != null && styles.split,
+						sx,
+					)}
+				>
 					<BaseDialog.Title {...stylex.props(styles.title)}>{title}</BaseDialog.Title>
 					{description != null && (
 						<BaseDialog.Description {...stylex.props(styles.description)}>
@@ -103,6 +132,7 @@ export function DialogContent({ title, description, children, sx }: DialogConten
 						</BaseDialog.Description>
 					)}
 					{children}
+					{body != null && <div {...stylex.props(styles.body, bodySx)}>{body}</div>}
 				</BaseDialog.Popup>
 			</BaseDialog.Viewport>
 		</BaseDialog.Portal>
