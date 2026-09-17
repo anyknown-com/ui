@@ -3,8 +3,12 @@
 //
 // 給有使用者切換主題的 app(例如 next-themes)。tokens 本身跟隨 OS,套上 theme 才會鎖定。
 // **要套就整組套**:只套 color 會讓布停在另一個主題,深色布配深色字。
+//
+// palette 是另一個維度:neutral 只換 color(紙與墨),布跟著亮暗走。
 import * as stylex from "@stylexjs/stylex"
 import { color, yarn, yarnSecondary, yarnGhost, yarnDanger, yarnSubtle, shadow } from "./tokens.stylex"
+
+const DARK = "@media (prefers-color-scheme: dark)"
 
 export const lightColor = stylex.createTheme(color, {
 	bg: "#FAFAF6",
@@ -198,6 +202,102 @@ export const darkShadow = stylex.createTheme(shadow, {
 	raised: "0 1px 2px rgba(0, 0, 0, 0.3)",
 })
 
+export const neutralColor = stylex.createTheme(color, {
+	bg: { default: "#FFFFFF", [DARK]: "#000000" },
+	surface: { default: "#F5F5F7", [DARK]: "#1C1C1E" },
+	surfaceRaised: { default: "#FFFFFF", [DARK]: "#2C2C2E" },
+	border: { default: "#E5E5EA", [DARK]: "#38383A" },
+	borderStrong: { default: "#C7C7CC", [DARK]: "#48484A" },
+	text: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	textMuted: { default: "#6E6E73", [DARK]: "#98989D" },
+	textFaint: { default: "#86868B", [DARK]: "#8E8E93" },
+	accent: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	accentText: { default: "#FFFFFF", [DARK]: "#000000" },
+	accentSubtle: { default: "#E8E8ED", [DARK]: "#2C2C2E" },
+	danger: { default: "#B3402E", [DARK]: "#DD7059" },
+	dangerSubtle: { default: "#F7E7E3", [DARK]: "#3D231E" },
+	success: { default: "#23705A", [DARK]: "#4FA184" },
+	successSubtle: { default: "#E7F0EB", [DARK]: "#22352E" },
+	warning: { default: "#B25000", [DARK]: "#FFB340" },
+	warningSubtle: { default: "#F5EBD9", [DARK]: "#3A2F1D" },
+	info: { default: "#2C5C86", [DARK]: "#6FA3CE" },
+	infoSubtle: { default: "#E4EDF5", [DARK]: "#1E2C38" },
+	focusRing: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	bone: { default: "#E6E6EA", [DARK]: "#2C2C2E" },
+	sheen: { default: "#F2F2F5", [DARK]: "#3F3F42" },
+	successHl: { default: "#C6E0C6", [DARK]: "#2F4A2E" },
+	dangerHl: { default: "#EFCEC3", [DARK]: "#573328" },
+	layer1: { default: "#EFEFF2", [DARK]: "#000000" },
+	layer2: { default: "#FFFFFF", [DARK]: "#161618" },
+	layer3: { default: "#F2F2F5", [DARK]: "#242426" },
+	layer4: { default: "#E6E6EA", [DARK]: "#323234" },
+	layer5: { default: "#D9D9DE", [DARK]: "#3F3F42" },
+})
+
+export const neutralLightColor = stylex.createTheme(color, {
+	bg: "#FFFFFF",
+	surface: "#F5F5F7",
+	surfaceRaised: "#FFFFFF",
+	border: "#E5E5EA",
+	borderStrong: "#C7C7CC",
+	text: "#1D1D1F",
+	textMuted: "#6E6E73",
+	textFaint: "#86868B",
+	accent: "#1D1D1F",
+	accentText: "#FFFFFF",
+	accentSubtle: "#E8E8ED",
+	danger: "#B3402E",
+	dangerSubtle: "#F7E7E3",
+	success: "#23705A",
+	successSubtle: "#E7F0EB",
+	warning: "#B25000",
+	warningSubtle: "#F5EBD9",
+	info: "#2C5C86",
+	infoSubtle: "#E4EDF5",
+	focusRing: "#1D1D1F",
+	bone: "#E6E6EA",
+	sheen: "#F2F2F5",
+	successHl: "#C6E0C6",
+	dangerHl: "#EFCEC3",
+	layer1: "#EFEFF2",
+	layer2: "#FFFFFF",
+	layer3: "#F2F2F5",
+	layer4: "#E6E6EA",
+	layer5: "#D9D9DE",
+})
+
+export const neutralDarkColor = stylex.createTheme(color, {
+	bg: "#000000",
+	surface: "#1C1C1E",
+	surfaceRaised: "#2C2C2E",
+	border: "#38383A",
+	borderStrong: "#48484A",
+	text: "#F5F5F7",
+	textMuted: "#98989D",
+	textFaint: "#8E8E93",
+	accent: "#F5F5F7",
+	accentText: "#000000",
+	accentSubtle: "#2C2C2E",
+	danger: "#DD7059",
+	dangerSubtle: "#3D231E",
+	success: "#4FA184",
+	successSubtle: "#22352E",
+	warning: "#FFB340",
+	warningSubtle: "#3A2F1D",
+	info: "#6FA3CE",
+	infoSubtle: "#1E2C38",
+	focusRing: "#F5F5F7",
+	bone: "#2C2C2E",
+	sheen: "#3F3F42",
+	successHl: "#2F4A2E",
+	dangerHl: "#573328",
+	layer1: "#000000",
+	layer2: "#161618",
+	layer3: "#242426",
+	layer4: "#323234",
+	layer5: "#3F3F42",
+})
+
 /** 套在 root element 上:`<div {...stylex.props(...light)}>` */
 export const light = [
 	lightColor,
@@ -210,6 +310,27 @@ export const light = [
 ] as const
 export const dark = [
 	darkColor,
+	darkYarn,
+	darkYarnSecondary,
+	darkYarnGhost,
+	darkYarnDanger,
+	darkYarnSubtle,
+	darkShadow,
+] as const
+
+/** neutral palette。`neutral` 跟隨系統 scheme,另外兩個鎖定。 */
+export const neutral = [neutralColor] as const
+export const neutralLight = [
+	neutralLightColor,
+	lightYarn,
+	lightYarnSecondary,
+	lightYarnGhost,
+	lightYarnDanger,
+	lightYarnSubtle,
+	lightShadow,
+] as const
+export const neutralDark = [
+	neutralDarkColor,
 	darkYarn,
 	darkYarnSecondary,
 	darkYarnGhost,

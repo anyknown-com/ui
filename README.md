@@ -5,8 +5,8 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 ## 結構
 
 - `src/tokens.stylex.ts` — semantic tokens(color / font / text / space / radius / motion / shadow)。light 為預設,dark 跟隨 OS。**唯一真相**。
-- `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。
-- `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app:`<div {...stylex.props(...light)}>`。**由 `pnpm gen:themes` 從 tokens 生成**,不要手改(`themes.test.ts` 會擋住不同步)。
+- `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。palette 掛在 `<html>` 的 `data-palette="neutral"`,亮暗照樣跟系統,`data-theme` 才鎖。
+- `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app:`<div {...stylex.props(...light)}>`。另一套 palette 是 `neutral`(冷灰;`neutral` 跟系統亮暗,`neutralLight` / `neutralDark` 鎖死),值在 `scripts/neutral.mjs`。**由 `pnpm gen:themes` 從 tokens 生成**,不要手改(`themes.test.ts` 會擋住不同步)。
 - `src/brand.css` — 給沒有 bundler 的一次性頁面(報告、提案、benchmark)的有界詞彙,二十來個 `ak-*` class。build 時內聯 tokens、接 Google Fonts、把按鈕織體預渲染成 SVG data URI(`scripts/brand-css.mjs`),出 `dist/brand.css` 與 <https://ui.anyknown.com/brand.css>。判斷寫在根目錄的 [DESIGN.md](./DESIGN.md),`pnpm check` 會擋文件與詞彙不同步。
 - `src/scrollbar.css` — 客製捲軸(全域套用)。StyleX 做不了 `::-webkit-scrollbar` 偽元素,所以獨立成 css 檔。
 - `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx`)。清單與共同決策見 [components/README.md](./src/components/README.md),定案理由與走過的彎路見 [components/COMPONENTS.md](./src/components/COMPONENTS.md)。
