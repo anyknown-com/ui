@@ -56,6 +56,16 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 - 走過的彎路:thumb 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳 —— 過衝一律不要
 - 設定列的慣用排版:文字在左、開關在右
 
+### slider
+一條連續的量(思考多少、門檻)。**沒有節點** —— 有節點就該是 Radio 或 Select。
+
+- **刻意不用 Base UI**:它的方向鍵一次走 `step`,要「拖曳連續、方向鍵 5%」就得跟它搶
+  keydown;一顆單向的 `role="slider"` 自己寫比較誠實
+- 方向鍵 ±5%(range 的,不是 step 的)、Home / End 到底,值一律 clamp 再 snap 回 step
+- 軌道 `layer4`、填滿 `borderStrong`、握把 `surfaceRaised` + `shadow.raised`
+- 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)
+- `valueText` 唸的是標籤不是數字:0.62 要唸成「多」
+
 ### select
 觸發鈕 + popover(頂部搜尋框 + 分組列表)。
 

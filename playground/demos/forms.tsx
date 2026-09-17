@@ -15,11 +15,15 @@ import {
 	Select,
 	SelectGroup,
 	SelectItem,
+	Slider,
 	Switch,
 	Textarea,
 } from "@anyknown/ui"
 import { useState } from "react"
 import { Demo, Row } from "../shell"
+
+const effortLabel = (f: number) =>
+	f < 0.03 ? "自動" : f < 0.3 ? "少" : f < 0.6 ? "中" : f < 0.85 ? "多" : "最多"
 
 function SearchIcon() {
 	return (
@@ -36,6 +40,7 @@ export function FormsDemos() {
 	const [model, setModel] = useState("")
 	const [memories, setMemories] = useState<string[]>([])
 	const [receipts, setReceipts] = useState(false)
+	const [effort, setEffort] = useState(0)
 
 	return (
 		<>
@@ -145,6 +150,16 @@ export function FormsDemos() {
 						<SelectItem value="desktop-first">先出 desktop</SelectItem>
 					</SelectGroup>
 				</Select>
+			</Demo>
+
+			<Demo id="slider" title="slider" note="連續、沒有節點;方向鍵一次 5%,Home / End 到底">
+				<Slider
+					value={effort}
+					onChange={setEffort}
+					label={`思考 · ${effortLabel(effort)}`}
+					valueText={() => effortLabel(effort)}
+				/>
+				<Slider value={0.4} onChange={() => {}} disabled aria-label="思考多少(停用)" />
 			</Demo>
 
 			<Demo id="dropdown" title="dropdown">

@@ -15,7 +15,7 @@ import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
 import readme from "../README.md?raw"
 
 const GROUPS: Record<string, string[]> = {
-	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "select", "dropdown"],
+	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "slider", "select", "dropdown"],
 	基礎: [
 		"button",
 		"dialog",

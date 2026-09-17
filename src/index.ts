@@ -10,6 +10,7 @@ export { Checkbox, type CheckboxProps } from "./components/checkbox/Checkbox"
 export { Radio, type RadioProps } from "./components/radio/Radio"
 export { RadioGroup, type RadioGroupProps } from "./components/radio/RadioGroup"
 export { Switch, type SwitchProps } from "./components/switch/Switch"
+export { Slider, type SliderProps } from "./components/slider/Slider"
 export {
 	Select,
 	SelectGroup,

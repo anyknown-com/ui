@@ -1,7 +1,7 @@
 {
 	"name": "@anyknown/ui",
 	"version": "0.6.1",
-	"description": "AnyKnown design system — StyleX tokens, themes, and 36 components",
+	"description": "AnyKnown design system — StyleX tokens, themes, and 37 components",
 	"homepage": "https://ui.anyknown.com",
 	"bugs": {
 		"url": "https://github.com/anyknown-com/ui/issues"

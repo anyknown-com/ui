@@ -7,7 +7,7 @@ import { StorageDemos } from "./demos/storage"
 import { FormsDemos } from "./demos/forms"
 
 const GROUPS: Record<string, string[]> = {
-	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "select", "dropdown"],
+	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "slider", "select", "dropdown"],
 	基礎: [
 		"button",
 		"dialog",
