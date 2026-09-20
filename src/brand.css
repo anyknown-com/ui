@@ -343,10 +343,6 @@ body {
 	line-height: 1.2;
 	color: var(--ak-accent-text);
 	background-color: var(--ak-accent);
-	background-image: var(--ak-weave-primary);
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-	filter: var(--ak-weave-primary-shadow);
 	cursor: pointer;
 	text-decoration: none;
 	transition: opacity var(--ak-motion-fast) var(--ak-motion-ease-out);
@@ -368,7 +364,7 @@ body {
 	cursor: not-allowed;
 }
 
-/* 次要按鈕:淺色織體,其他動作都用它。 */
+/* 次要按鈕:其他動作都用它。 */
 .ak-btn-secondary {
 	display: inline-flex;
 	align-items: center;
@@ -384,10 +380,6 @@ body {
 	line-height: 1.2;
 	color: var(--ak-text);
 	background-color: var(--ak-bone);
-	background-image: var(--ak-weave-secondary);
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-	filter: var(--ak-weave-secondary-shadow);
 	cursor: pointer;
 	text-decoration: none;
 	transition: opacity var(--ak-motion-fast) var(--ak-motion-ease-out);
