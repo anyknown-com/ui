@@ -6,7 +6,6 @@
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { ledgerValue } from "./ledger.mjs"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 
@@ -38,61 +37,24 @@ export function renderThemes(groups) {
 			.join("\n\n")
 	// 逐行展開,輸出直接就是 oxfmt 的格式(測試會逐字元比對)
 	const names = (mode) => groups.map((g) => `\n\t${mode}${cap(g.name)},`).join("")
-	const cloth = (mode) =>
-		groups
-			.filter((g) => g.name !== "color")
-			.map((g) => `\n\t${mode}${cap(g.name)},`)
-			.join("")
 	return `// 這個檔案由 scripts/themes.mjs 從 tokens.stylex.ts 生成 —— 不要手改。
 // 重生成:pnpm gen:themes(themes.test.ts 會擋住不同步)
 //
 // 給有使用者切換主題的 app(例如 next-themes)。tokens 本身跟隨 OS,套上 theme 才會鎖定。
 // **要套就整組套**:只套 color 會讓布停在另一個主題,深色布配深色字。
-//
-// palette 是另一個維度:ledger 只換 color(紙與墨),布跟著亮暗走。
 import * as stylex from "@stylexjs/stylex"
 import { ${imports} } from "./tokens.stylex"
-
-const DARK = "@media (prefers-color-scheme: dark)"
 
 ${block("light")}
 
 ${block("dark")}
-
-${ledgerBlock(groups)}
 
 /** 套在 root element 上:\`<div {...stylex.props(...light)}>\` */
 export const light = [${names("light")}
 ] as const
 export const dark = [${names("dark")}
 ] as const
-
-/** ledger palette。\`ledger\` 跟隨系統 scheme,另外兩個鎖定。 */
-export const ledger = [ledgerColor] as const
-export const ledgerLight = [
-	ledgerLightColor,${cloth("light")}
-] as const
-export const ledgerDark = [
-	ledgerDarkColor,${cloth("dark")}
-] as const
 `
-}
-
-function ledgerBlock(groups) {
-	const vars = groups.find((g) => g.name === "color").vars
-	const flat = (mode) =>
-		`export const ledger${cap(mode)}Color = stylex.createTheme(color, {\n` +
-		vars.map((v) => `\t${v.key}: "${ledgerValue(v, mode)}",`).join("\n") +
-		"\n})"
-	const responsive =
-		"export const ledgerColor = stylex.createTheme(color, {\n" +
-		vars
-			.map(
-				(v) => `\t${v.key}: { default: "${ledgerValue(v, "light")}", [DARK]: "${ledgerValue(v, "dark")}" },`,
-			)
-			.join("\n") +
-		"\n})"
-	return [responsive, flat("light"), flat("dark")].join("\n\n")
 }
 
 const cap = (s) => s[0].toUpperCase() + s.slice(1)

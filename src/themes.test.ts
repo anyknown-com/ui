@@ -1,9 +1,7 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import * as stylex from "@stylexjs/stylex"
 import { describe, expect, test } from "vitest"
 import { generate, readThemedGroups } from "../scripts/themes.mjs"
-import { dark, light, ledger, ledgerDark, ledgerLight } from "./themes.stylex"
 
 // themes.stylex.ts 是抄一份 token 值,抄的東西會漂 —— yarn 那五組加進 tokens 之後
 // 沒有跟著加進 themes,手動切「亮」時 color 變亮、布還停在 dark,secondary / ghost
@@ -21,13 +19,5 @@ describe("themes", () => {
 		for (const group of themed) {
 			expect(source, `${group} 沒有被 theme`).toContain(`stylex.createTheme(${group}, {`)
 		}
-	})
-
-	test("ledger 是另一套 palette,不是另一個亮暗", () => {
-		expect(stylex.props(...ledger).className).toBeTruthy()
-		expect(stylex.props(...ledger).className).not.toBe(stylex.props(...light).className)
-		expect(stylex.props(...ledgerLight).className).not.toBe(stylex.props(...ledgerDark).className)
-		expect(stylex.props(...ledgerLight).className).not.toBe(stylex.props(...light).className)
-		expect(stylex.props(...ledgerDark).className).not.toBe(stylex.props(...dark).className)
 	})
 })

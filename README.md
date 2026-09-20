@@ -5,8 +5,8 @@ AnyKnown 全產品線共用的 design system,以 [StyleX](https://stylexjs.com) 
 ## 結構
 
 - `src/tokens.stylex.ts` — semantic tokens(color / font / text / space / radius / motion / shadow)。light 為預設,dark 跟隨 OS。**唯一真相**。
-- `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。預設 palette 是 neutral;ledger 掛在 `<html>` 的 `data-palette="ledger"`,亮暗照樣跟系統,`data-theme` 才鎖。
-- `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app:`<div {...stylex.props(...light)}>`。另一套 palette 是 `ledger`(暖紙、viridian;`ledger` 跟系統亮暗,`ledgerLight` / `ledgerDark` 鎖死),值在 `scripts/ledger.mjs`。**由 `pnpm gen:themes` 從 tokens 生成**,不要手改(`themes.test.ts` 會擋住不同步)。
+- `src/tokens.css` — 同一組值的純 CSS variables(`--ak-*`),給非 StyleX 的使用端(desktop 的 Tailwind v4 `@theme` 直接引用)。import 路徑:`@anyknown/ui/tokens.css`。只有一套 palette(neutral);亮暗跟系統,`data-theme` 才鎖。
+- `src/themes.stylex.ts` — `light` / `dark` theme,給有手動切換主題的 app:`<div {...stylex.props(...light)}>`。**由 `pnpm gen:themes` 從 tokens 生成**,不要手改(`themes.test.ts` 會擋住不同步)。
 - `src/brand.css` — 給沒有 bundler 的一次性頁面(報告、提案、benchmark)的有界詞彙,二十來個 `ak-*` class。build 時內聯 tokens、接 Google Fonts、把按鈕織體預渲染成 SVG data URI(`scripts/brand-css.mjs`),出 `dist/brand.css` 與 <https://ui.anyknown.com/brand.css>。判斷寫在根目錄的 [DESIGN.md](./DESIGN.md),`pnpm check` 會擋文件與詞彙不同步。
 - `src/scrollbar.css` — 客製捲軸(全域套用)。StyleX 做不了 `::-webkit-scrollbar` 偽元素,所以獨立成 css 檔。
 - `src/components/` — 34 個元件,每個一個 folder(`<Name>.tsx` + `<Name>.test.tsx`)。清單與共同決策見 [components/README.md](./src/components/README.md),定案理由與走過的彎路見 [components/COMPONENTS.md](./src/components/COMPONENTS.md)。
@@ -118,7 +118,7 @@ app 自己的樣式一律引用 tokens,不寫死色值。`playground/` 就是照
 
 ## 視覺方向:平面、neutral
 
-白紙(#FFFFFF)、墨色文字、墨色 accent(#1D1D1F);ledger(暖紙、viridian)是 `data-palette="ledger"` 的選項。標題與內文都是 Geist,時間軸/數據用 Geist Mono。織物設計語言封存在 `archive/fiber` branch。使用端需安裝字體:
+白紙(#FFFFFF)、墨色文字、墨色 accent(#1D1D1F);標題與內文都是 Geist,時間軸/數據用 Geist Mono。織物設計語言與 ledger palette 封存在 `archive/fiber` branch。使用端需安裝字體:
 
 ```bash
 pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono
