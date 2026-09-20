@@ -15,9 +15,9 @@ import {
 	yarnSecondary,
 } from "../../tokens.stylex"
 
-// 織成的實心(TEXTURE-GUIDE):沒有 background,實心由紗織成;
-// 動態全由觸點決定 — 帶動 + 窩 + 掃光(press 全套),幾何在 client 端由
-// SilkBody 以固定種子現織(同尺寸恆定)。reduced-motion 時靜態織紋。
+// 預設是平的實心:一個 background、hover 升一階。織體(TEXTURE-GUIDE:沒有
+// background、實心由紗織成、動態全由觸點決定)改成 `woven` 才開 —— 一個畫面上
+// 每顆小按鈕都是布,讀起來是一排條紋,不是一塊布。
 const styles = stylex.create({
 	base: {
 		position: "relative",
@@ -34,7 +34,7 @@ const styles = stylex.create({
 		backgroundColor: "transparent",
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
-		transitionProperty: "color",
+		transitionProperty: "color, background-color",
 		transitionDuration: { default: motion.fast, "@media (prefers-reduced-motion: reduce)": "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
@@ -61,14 +61,34 @@ const styles = stylex.create({
 	iconMd: { paddingInline: 0, width: "2.25rem" },
 	iconSm: { paddingInline: 0, width: "1.75rem" },
 	iconXs: { paddingInline: 0, width: "1.5rem" },
-	// filter = 整塊布的落影(§3.3);ghost 是疏織,不落影
-	primary: { color: color.accentText, filter: yarn.shadow },
-	secondary: { color: color.text, filter: yarnSecondary.shadow },
-	ghost: { color: color.textMuted, filter: yarnGhost.shadow },
-	danger: { color: color.accentText, filter: yarnDanger.shadow },
-	// 「白底紅字」的織體版:份量走 ghost 疏織(不與 primary 打架),
-	// 語意走 danger token(和 interaction-card 收據列 rejected 的 ✓ 同一個 token)
-	dangerGhost: { color: color.danger, filter: yarnGhost.shadow },
+	primary: {
+		color: color.accentText,
+		backgroundColor: { default: color.accent, ":hover": yarn.y0 },
+	},
+	secondary: {
+		color: color.text,
+		backgroundColor: { default: color.bone, ":hover": color.layer5 },
+	},
+	ghost: {
+		color: color.textMuted,
+		backgroundColor: { default: "transparent", ":hover": color.bone },
+	},
+	danger: {
+		color: color.accentText,
+		backgroundColor: { default: color.danger, ":hover": yarnDanger.y0 },
+	},
+	// 「白底紅字」:份量走 ghost,語意走 danger token(和 interaction-card 收據列
+	// rejected 的 ✓ 同一個 token)
+	dangerGhost: {
+		color: color.danger,
+		backgroundColor: { default: "transparent", ":hover": color.dangerSubtle },
+	},
+	// 織體:沒有 background,filter = 整塊布的落影(§3.3);ghost 是疏織,不落影
+	wovenPrimary: { backgroundColor: "transparent", filter: yarn.shadow },
+	wovenSecondary: { backgroundColor: "transparent", filter: yarnSecondary.shadow },
+	wovenGhost: { backgroundColor: "transparent", filter: yarnGhost.shadow },
+	wovenDanger: { backgroundColor: "transparent", filter: yarnDanger.shadow },
+	wovenDangerGhost: { backgroundColor: "transparent", filter: yarnGhost.shadow },
 	silk: {
 		position: "absolute",
 		inset: 0,
@@ -94,20 +114,32 @@ const SILK: Record<string, { palette: SilkPalette; ghost?: boolean; bandMax: num
 	dangerGhost: { palette: palette(yarnGhost), ghost: true, bandMax: 0.5 },
 }
 
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
+
 type ButtonProps = ComponentProps<"button"> & {
-	variant?: "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
+	variant?: Variant
 	size?: "xs" | "sm" | "md"
 	/** Square, no side padding — for a button whose whole label is one icon. */
 	icon?: boolean
+	/** The woven body (TEXTURE-GUIDE): for the one ceremonial action on a screen, not a row of controls. */
+	woven?: boolean
 	sx?: StyleArg
 }
 
 const ICON_SIZE = { xs: "iconXs", sm: "iconSm", md: "iconMd" } as const
+const WOVEN = {
+	primary: "wovenPrimary",
+	secondary: "wovenSecondary",
+	ghost: "wovenGhost",
+	danger: "wovenDanger",
+	dangerGhost: "wovenDangerGhost",
+} as const
 
 export function Button({
 	variant = "primary",
 	size = "md",
 	icon = false,
+	woven = false,
 	children,
 	ref,
 	sx,
@@ -133,9 +165,17 @@ export function Button({
 			type="button"
 			{...props}
 			ref={(element) => assignRef(ref, element)}
-			{...styled(props, styles.base, styles[size], icon && styles[ICON_SIZE[size]], styles[variant], sx)}
+			{...styled(
+				props,
+				styles.base,
+				styles[size],
+				icon && styles[ICON_SIZE[size]],
+				styles[variant],
+				woven && styles[WOVEN[variant]],
+				sx,
+			)}
 		>
-			<svg ref={silk} aria-hidden="true" {...stylex.props(styles.silk)} />
+			{woven && <svg ref={silk} aria-hidden="true" {...stylex.props(styles.silk)} />}
 			<span {...stylex.props(styles.label)}>{children}</span>
 		</button>
 	)

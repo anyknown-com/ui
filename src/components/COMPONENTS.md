@@ -83,15 +83,19 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ## 基礎
 
 ### button
-按鈕沒有 background —— 實心是線織出來的。規格見 TEXTURE-GUIDE。
+預設是平的:一個 background、hover 升一階。織體(實心是線織出來的,規格見 TEXTURE-GUIDE)
+改成 `woven` 才開 —— 一個畫面上每顆小按鈕都是布(工具列、表格的動作鈕、設定頁的
+Remove)讀起來是一排條紋,不是一塊布;布留給一頁一顆的主動作。
 
-| variant | 布 | 標籤色 | 用在 |
-| --- | --- | --- | --- |
-| `primary` | `yarn` | `accentText` | 主要動作 |
-| `secondary` | `yarnSecondary` | `text` | 次要動作 |
-| `ghost` | `yarnGhost`(疏織、無底紗、不落影) | `textMuted` | 安靜的第三選項 |
-| `danger` | `yarnDanger` | `accentText` | 不可逆的破壞性動作 |
-| `dangerGhost` | `yarnGhost` | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
+| variant | 平面 | `woven` 的布 | 標籤色 | 用在 |
+| --- | --- | --- | --- | --- |
+| `primary` | `accent` | `yarn` | `accentText` | 主要動作 |
+| `secondary` | `bone` | `yarnSecondary` | `text` | 次要動作 |
+| `ghost` | 透明 | `yarnGhost`(疏織、無底紗、不落影) | `textMuted` | 安靜的第三選項 |
+| `danger` | `danger` | `yarnDanger` | `accentText` | 不可逆的破壞性動作 |
+| `dangerGhost` | 透明 | `yarnGhost` | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
+
+以下三條講的是 `woven`:
 
 - **觸發即時、動態緩成形**:pointerdown 當幀就開始,但窩約半秒才陷到位
 - **取消 = 安靜**:按住拖出元件 → 張力歸零;拖回來 → 窩回來;**在元件外放開 →
