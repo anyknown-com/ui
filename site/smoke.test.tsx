@@ -22,8 +22,6 @@ describe("site smoke", () => {
 		expect(screen.getByRole("link", { name: "StyleX" })).toBeInTheDocument()
 		goto("#/guide/decisions")
 		expect(screen.getByRole("heading", { name: "元件決定紀錄" })).toBeInTheDocument()
-		goto("#/guide/texture")
-		expect(screen.getByRole("heading", { name: /織物設計語言/ })).toBeInTheDocument()
 		goto("#/demo/badge")
 		expect(document.getElementById("badge")).not.toBeNull()
 		// NOTES 刪掉之後,舊的 #/docs/<name> 連結要落到該元件的示範,不是 404

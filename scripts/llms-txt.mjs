@@ -1,6 +1,6 @@
 // 產生 /llms.txt(索引)、/llms-full.txt(全文)與 /docs/*.md(原文)到 site/dist。
 //
-// 文檔站是 hash 路由的 SPA,爬蟲抓 `#/guide/texture` 只會拿到空殼,所以 markdown 原文
+// 文檔站是 hash 路由的 SPA,爬蟲抓 `#/guide/decisions` 只會拿到空殼,所以 markdown 原文
 // 另外用穩定網址送一份出去,llms.txt 指過去。格式依 https://llmstxt.org。
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
@@ -34,13 +34,6 @@ const PAGES = [
 		guide: "decisions",
 		title: "元件決定紀錄",
 		note: "每個元件的定案理由、走過的彎路、踩過的坑 —— 程式碼與型別裡看不出來的部分。",
-	},
-	{
-		slug: "texture",
-		file: "src/components/TEXTURE-GUIDE.md",
-		guide: "texture",
-		title: "織物設計語言",
-		note: "元件是線織成的實體。幾何配方(固定種子、共享波場、四層堆疊)、觸點驅動的動態、否決紀錄、適配到新元件的步驟。",
 	},
 	{
 		slug: "a11y",

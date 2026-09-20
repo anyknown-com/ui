@@ -10,7 +10,6 @@ import { FormsDemos } from "../playground/demos/forms"
 import { StorageDemos } from "../playground/demos/storage"
 import componentsReadme from "../src/components/README.md?raw"
 import componentsDoc from "../src/components/COMPONENTS.md?raw"
-import textureGuide from "../src/components/TEXTURE-GUIDE.md?raw"
 import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
 import readme from "../README.md?raw"
 
@@ -49,25 +48,15 @@ const GROUPS: Record<string, string[]> = {
 const GUIDES: Record<string, { title: string; body: string }> = {
 	readme: {
 		title: "開始使用",
-		body: readme
-			.replace("(./src/components/README.md)", "(#/guide/components)")
-			.replace("(./src/components/TEXTURE-GUIDE.md)", "(#/guide/texture)"),
+		body: readme.replace("(./src/components/README.md)", "(#/guide/components)"),
 	},
 	components: {
 		title: "元件總覽",
-		body: componentsReadme
-			.replace("(./TEXTURE-GUIDE.md)", "(#/guide/texture)")
-			.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
+		body: componentsReadme.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
 	},
 	decisions: {
 		title: "元件決定紀錄",
-		body: componentsDoc
-			.replace("(./TEXTURE-GUIDE.md)", "(#/guide/texture)")
-			.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
-	},
-	texture: {
-		title: "織物設計語言",
-		body: textureGuide.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
+		body: componentsDoc.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
 	},
 	a11y: { title: "a11y 偏差", body: a11yDebt },
 }
@@ -160,7 +149,7 @@ const styles = stylex.create({
 		gap: space.sm,
 		marginBottom: space.md,
 	},
-	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 500, margin: 0 },
+	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 600, margin: 0 },
 	themeGroup: {
 		display: "flex",
 		gap: 2,

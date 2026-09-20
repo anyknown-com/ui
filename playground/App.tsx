@@ -50,7 +50,7 @@ const styles = stylex.create({
 		borderRightColor: color.border,
 		padding: space.md,
 	},
-	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 500, margin: 0, marginBottom: space.md },
+	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 600, margin: 0, marginBottom: space.md },
 	groupName: {
 		display: "block",
 		fontFamily: font.mono,
