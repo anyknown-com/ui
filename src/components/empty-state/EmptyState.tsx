@@ -28,7 +28,7 @@ const styles = stylex.create({
 	title: {
 		fontFamily: font.display,
 		fontSize: text.base,
-		fontWeight: 500,
+		fontWeight: 600,
 		lineHeight: text.leadingSnug,
 		margin: 0,
 		color: color.text,

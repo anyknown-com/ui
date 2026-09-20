@@ -17,7 +17,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const { buildWeave, weaveRand } = await import(join(root, "dist/lib/weave.js"))
 
 const FONTS =
-	'@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap");'
+	'@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");'
 
 // 布的尺寸:高 = ak-btn 的 min-height(36px);寬取一段,preserveAspectRatio=none 隨按鈕拉寬。
 // 紗是橫的,橫向拉伸只會把波形攤平一點,看不出來;縱向永遠 1:1 所以粗細行距跟 Button 一致。

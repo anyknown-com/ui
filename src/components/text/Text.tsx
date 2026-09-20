@@ -13,14 +13,14 @@ const styles = stylex.create({
 	display: {
 		fontFamily: font.display,
 		fontSize: text.display,
-		fontWeight: 500,
+		fontWeight: 600,
 		lineHeight: text.leadingTight,
 		letterSpacing: "-0.01em",
 	},
 	title: {
 		fontFamily: font.display,
 		fontSize: text.xl,
-		fontWeight: 500,
+		fontWeight: 600,
 		lineHeight: text.leadingTight,
 	},
 	body: { fontSize: text.base },

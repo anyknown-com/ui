@@ -125,7 +125,7 @@ export const shadow = stylex.defineVars({
 })
 
 export const font = stylex.defineVars({
-	display: "'Newsreader Variable', Georgia, 'Times New Roman', serif",
+	display: "'Geist Variable', system-ui, sans-serif",
 	body: "'Geist Variable', system-ui, sans-serif",
 	mono: "'Geist Mono Variable', ui-monospace, monospace",
 })

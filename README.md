@@ -116,12 +116,12 @@ import { color, space } from "@anyknown/ui/tokens.stylex"
 
 app 自己的樣式一律引用 tokens,不寫死色值。`playground/` 就是照這套設定跑的,可以當範本。
 
-## 視覺方向:Ledger
+## 視覺方向:平面、neutral
 
-暖紙面(#FAFAF6)、墨色文字、青碧色 accent(#23705A)。標題用 Newsreader,內文 Geist,時間軸/數據用 Geist Mono。使用端需安裝字體:
+白紙(#FFFFFF)、墨色文字、墨色 accent(#1D1D1F);ledger(暖紙、viridian)是 `data-palette="ledger"` 的選項。標題與內文都是 Geist,時間軸/數據用 Geist Mono。織物設計語言封存在 `archive/fiber` branch。使用端需安裝字體:
 
 ```bash
-pnpm add @fontsource-variable/newsreader @fontsource-variable/geist @fontsource-variable/geist-mono
+pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono
 ```
 
 Texture(線/織的品牌語言)只用在等待、過渡、儀式時刻與主要互動面,精確區不加花 —— 規格與適配指引見 [components/TEXTURE-GUIDE.md](./src/components/TEXTURE-GUIDE.md)。
