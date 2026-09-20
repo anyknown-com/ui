@@ -6,7 +6,7 @@
 //
 // palette 是另一個維度:ledger 只換 color(紙與墨),布跟著亮暗走。
 import * as stylex from "@stylexjs/stylex"
-import { color, yarn, yarnSecondary, yarnGhost, yarnDanger, yarnSubtle, shadow } from "./tokens.stylex"
+import { color, yarn, yarnSecondary, yarnGhost, yarnDanger, yarnSubtle, shadow, tone } from "./tokens.stylex"
 
 const DARK = "@media (prefers-color-scheme: dark)"
 
@@ -106,6 +106,13 @@ export const lightShadow = stylex.createTheme(shadow, {
 	raised: "0 1px 2px rgba(35, 33, 29, 0.08)",
 })
 
+export const lightTone = stylex.createTheme(tone, {
+	layer6: "#CDCDD3",
+	faint: "#86868B",
+	railLayer2: "#FFFFFF",
+	railLayer3: "#E6E6EA",
+})
+
 export const darkColor = stylex.createTheme(color, {
 	bg: "#000000",
 	surface: "#1C1C1E",
@@ -200,6 +207,13 @@ export const darkYarnSubtle = stylex.createTheme(yarnSubtle, {
 export const darkShadow = stylex.createTheme(shadow, {
 	popover: "0 8px 24px rgba(0, 0, 0, 0.4)",
 	raised: "0 1px 2px rgba(0, 0, 0, 0.3)",
+})
+
+export const darkTone = stylex.createTheme(tone, {
+	layer6: "#4C4C50",
+	faint: "#8E8E93",
+	railLayer2: "#242426",
+	railLayer3: "#323234",
 })
 
 export const ledgerColor = stylex.createTheme(color, {
@@ -307,6 +321,7 @@ export const light = [
 	lightYarnDanger,
 	lightYarnSubtle,
 	lightShadow,
+	lightTone,
 ] as const
 export const dark = [
 	darkColor,
@@ -316,6 +331,7 @@ export const dark = [
 	darkYarnDanger,
 	darkYarnSubtle,
 	darkShadow,
+	darkTone,
 ] as const
 
 /** ledger palette。`ledger` 跟隨系統 scheme,另外兩個鎖定。 */
@@ -328,6 +344,7 @@ export const ledgerLight = [
 	lightYarnDanger,
 	lightYarnSubtle,
 	lightShadow,
+	lightTone,
 ] as const
 export const ledgerDark = [
 	ledgerDarkColor,
@@ -337,4 +354,5 @@ export const ledgerDark = [
 	darkYarnDanger,
 	darkYarnSubtle,
 	darkShadow,
+	darkTone,
 ] as const

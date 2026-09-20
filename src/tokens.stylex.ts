@@ -122,6 +122,9 @@ export const shadow = stylex.defineVars({
 		default: "0 1px 2px rgba(35, 33, 29, 0.08)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.3)",
 	},
+	pop: "0 10px 36px rgba(0, 0, 0, 0.22)",
+	sheet: "0 16px 50px rgba(0, 0, 0, 0.24)",
+	dock: "0 12px 40px rgba(0, 0, 0, 0.14)",
 })
 
 export const font = stylex.defineVars({
@@ -172,4 +175,43 @@ export const motion = stylex.defineVars({
 	// 過衝曲線。全站規則是「動畫不回彈」,所以這條目前沒有任何元件在用 ——
 	// 新元件不要挑它,滑動類一律 240ms easeOut。保留只是因為它已經在發佈的 API 裡。
 	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+})
+
+// The flat language's own scales: four text sizes, the corner each kind of control wears,
+// the ink washes hover paints with, and the four surfaces `color` has no name for.
+export const type = stylex.defineVars({
+	t1: "11px",
+	t2: "13px",
+	t3: "15px",
+	t4: "17px",
+	body: "1.6",
+	tight: "1.35",
+	snug: "1.45",
+})
+
+export const tone = stylex.defineVars({
+	layer6: { default: "#CDCDD3", [DARK]: "#4C4C50" },
+	faint: { default: "#86868B", [DARK]: "#8E8E93" },
+	railLayer2: { default: "#FFFFFF", [DARK]: "#242426" },
+	railLayer3: { default: "#E6E6EA", [DARK]: "#323234" },
+})
+
+export const corner = stylex.defineVars({
+	card: "12px",
+	ib: "0.6rem",
+	md: "0.5rem",
+	btn: "0.55rem",
+	sm: "0.4rem",
+	xs: "0.3rem",
+})
+
+export const ink = stylex.defineVars({
+	n4: "color-mix(in srgb, currentColor 4%, transparent)",
+	n5: "color-mix(in srgb, currentColor 5%, transparent)",
+	n6: "color-mix(in srgb, currentColor 6%, transparent)",
+	n8: "color-mix(in srgb, currentColor 8%, transparent)",
+	n10: "color-mix(in srgb, currentColor 10%, transparent)",
+	n12: "color-mix(in srgb, currentColor 12%, transparent)",
+	n14: "color-mix(in srgb, currentColor 14%, transparent)",
+	n18: "color-mix(in srgb, currentColor 18%, transparent)",
 })
