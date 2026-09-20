@@ -1,19 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
-import { BALL_STRANDS, ballDashOffset } from "../../lib/progress"
 import { Progress, ProgressBall, ProgressRing, Spinner } from "./Progress"
 
-describe("progress geometry", () => {
-	test("the ball winds strand by strand and finishes with an outline", () => {
-		expect(BALL_STRANDS).toHaveLength(25)
-		expect(BALL_STRANDS.at(-1)).toContain("A9.3,9.3")
-		expect(ballDashOffset(0, 0)).toBe(100)
-		expect(ballDashOffset(100, BALL_STRANDS.length - 1)).toBe(0)
-	})
-})
-
 describe("Progress", () => {
-	test("weave exposes determinate progressbar semantics", () => {
+	test("exposes determinate progressbar semantics", () => {
 		render(<Progress value={64} aria-label="同步 thread" valueText="3 則訊息交接中" />)
 		const bar = screen.getByRole("progressbar", { name: "同步 thread" })
 		expect(bar).toHaveAttribute("aria-valuenow", "64")
@@ -27,7 +17,7 @@ describe("Progress", () => {
 		expect(screen.getByRole("progressbar", { name: "同步" })).toHaveAttribute("aria-valuenow", "100")
 	})
 
-	test("without a value it renders the waiting cloth and sets no valuenow", () => {
+	test("without a value it renders the waiting bar and sets no valuenow", () => {
 		render(<Progress valueText="整理記憶中" aria-label="整理記憶" />)
 		const bar = screen.getByRole("progressbar", { name: "整理記憶" })
 		expect(bar).not.toHaveAttribute("aria-valuenow")
@@ -50,10 +40,10 @@ describe("Spinner", () => {
 })
 
 describe("ProgressBall", () => {
-	test("exposes determinate semantics and one path per strand", () => {
+	test("exposes determinate semantics and an arc that follows the value", () => {
 		const { container } = render(<ProgressBall value={64} valueText="下載模型 64%" aria-label="下載模型" />)
 		expect(screen.getByRole("progressbar", { name: "下載模型" })).toHaveAttribute("aria-valuenow", "64")
-		expect(container.querySelectorAll("path")).toHaveLength(BALL_STRANDS.length)
+		expect(container.querySelectorAll("circle")[1]).toHaveAttribute("stroke-dasharray", "64 36")
 	})
 })
 
@@ -61,9 +51,9 @@ function arc(value: number) {
 	const { container, unmount } = render(
 		<ProgressRing value={value} valueText="128k context" aria-label="context 用量" />,
 	)
-	const d = container.querySelector("clipPath path")?.getAttribute("d") ?? ""
+	const dash = container.querySelectorAll("circle")[1]?.getAttribute("stroke-dasharray") ?? ""
 	unmount()
-	return d
+	return dash
 }
 
 describe("ProgressRing", () => {
@@ -74,10 +64,10 @@ describe("ProgressRing", () => {
 		expect(ring).toHaveTextContent("42%")
 	})
 
-	test("the arc window opens with the percentage", () => {
+	test("the arc opens with the percentage", () => {
 		expect(arc(20)).not.toBe(arc(80))
 		expect(arc(0)).not.toBe(arc(100))
-		expect(arc(50)).toMatch(/^M[\d.,]+A/)
+		expect(arc(50)).toBe("50 50")
 	})
 })
 
