@@ -3,9 +3,8 @@ import * as stylex from "@stylexjs/stylex"
 import { createContext, useContext, useState } from "react"
 import { reset } from "../../lib/styled"
 import { usePrefersReducedMotion } from "../../lib/motion"
-import { UNWEAVE_PATH } from "../../lib/paths"
 import { layerStyles } from "../../lib/popup"
-import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const DEFAULT_TIMEOUT = 5000
@@ -15,7 +14,7 @@ const slideIn = stylex.keyframes({
 	to: { opacity: 1, translate: "0 0" },
 })
 
-const unweave = stylex.keyframes({
+const drain = stylex.keyframes({
 	from: { strokeDashoffset: 0 },
 	to: { strokeDashoffset: -100 },
 })
@@ -39,12 +38,12 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		backgroundColor: color.surface,
+		backgroundColor: color.surfaceRaised,
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: color.border,
-		borderRadius: radius.lg,
-		boxShadow: shadow.popover,
+		borderRadius: corner.md,
+		boxShadow: shadow.pop,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
 		fontFamily: font.body,
@@ -61,7 +60,7 @@ const styles = stylex.create({
 		strokeWidth: 1.5,
 		strokeLinecap: "round",
 		strokeDasharray: 100,
-		animationName: unweave,
+		animationName: drain,
 		animationTimingFunction: "linear",
 		animationFillMode: "forwards",
 	},
@@ -249,7 +248,7 @@ function ToastItem({ toast: item, fallbackTimeout, paused }: ToastItemProps) {
 					{...stylex.props(styles.countdown)}
 				>
 					<path
-						d={UNWEAVE_PATH}
+						d="M0 3H320"
 						pathLength="100"
 						{...stylex.props(styles.countLine, tone.line, styles.running(duration, paused))}
 					/>
