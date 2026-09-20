@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AnyKnown UI — flat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  color-scheme: light;
+  --bg: #ffffff; --surface: #f5f5f7; --raised: #ffffff; --layer1: #efeff2; --layer2: #ffffff;
+  --border: #e5e5ea; --border-strong: #c7c7cc;
+  --text: #1d1d1f; --muted: #6e6e73; --faint: #86868b;
+  --accent: #1d1d1f; --accent-text: #ffffff; --accent-subtle: #e8e8ed;
+  --danger: #b3402e; --danger-subtle: #f7e7e3;
+  --success: #23705a; --success-subtle: #e7f0eb;
+  --warning: #b25000; --warning-subtle: #f5ebd9;
+  --info: #2c5c86; --info-subtle: #e4edf5;
+  --shadow-pop: 0 10px 36px rgba(0, 0, 0, 0.14);
+  --t1: 11px; --t2: 13px; --t3: 15px; --t4: 17px;
+  --r-card: 12px; --r-md: 0.5rem; --r-btn: 0.55rem; --r-sm: 0.4rem; --r-xs: 0.3rem;
+  --n4: color-mix(in srgb, currentColor 4%, transparent);
+  --n6: color-mix(in srgb, currentColor 6%, transparent);
+  --n10: color-mix(in srgb, currentColor 10%, transparent);
+  --sans: "Geist", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, monospace;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --surface: #1c1c1e; --raised: #2c2c2e; --layer1: #000000; --layer2: #161618;
+  --border: #38383a; --border-strong: #48484a;
+  --text: #f5f5f7; --muted: #98989d; --faint: #8e8e93;
+  --accent: #f5f5f7; --accent-text: #000000; --accent-subtle: #2c2c2e;
+  --danger: #dd7059; --danger-subtle: #3d231e;
+  --success: #4fa184; --success-subtle: #22352e;
+  --warning: #ffb340; --warning-subtle: #3a2f1d;
+  --info: #6fa3ce; --info-subtle: #1e2c38;
+  --shadow-pop: 0 10px 36px rgba(0, 0, 0, 0.5);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: var(--t2)/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 64rem; margin: 0 auto; padding: 2rem 1.25rem 6rem; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+h1 { font-size: var(--t4); font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: var(--t3); font-weight: 600; margin: 3rem 0 0.25rem; }
+.lede, .sub { color: var(--muted); margin: 0 0 1rem; }
+.label { font: 500 var(--t1)/1.35 var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; margin: 1.5rem 0 0.5rem; }
+.rowx { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+.mono { font-family: var(--mono); }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.5rem; }
+.sw { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+.sw i { display: block; height: 2.25rem; border-bottom: 1px solid var(--border); }
+.sw span { display: block; padding: 0.3rem 0.5rem; font: var(--t1)/1.35 var(--mono); color: var(--muted); }
+.scale p { margin: 0.15rem 0; }
+
+.btn { font: 500 var(--t2)/1 var(--sans); height: 2rem; padding: 0 0.75rem; border-radius: var(--r-btn); border: 1px solid transparent; background: var(--accent-subtle); color: var(--text); display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: background-color 0.12s, border-color 0.12s, opacity 0.12s; }
+.btn:hover { background: var(--border); }
+.btn.sm { height: 1.625rem; padding: 0 0.55rem; font-size: 12px; border-radius: var(--r-sm); }
+.btn.primary { background: var(--accent); color: var(--accent-text); }
+.btn.primary:hover { opacity: 0.86; }
+.btn.bordered { background: transparent; border-color: var(--border-strong); }
+.btn.bordered:hover { background: var(--n6); }
+.btn.warn { background: var(--danger-subtle); color: var(--danger); }
+.btn.warn:hover { background: color-mix(in srgb, var(--danger) 18%, var(--bg)); }
+.btn.ghost { background: transparent; color: var(--muted); }
+.btn.ghost:hover { background: var(--n6); color: var(--text); }
+.btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+.btn:focus-visible, .input:focus-visible, .ib:focus-visible, .switch:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.ib { width: 2rem; height: 2rem; border-radius: 0.6rem; border: 0; background: transparent; color: var(--muted); display: inline-grid; place-items: center; cursor: pointer; }
+.ib:hover { background: var(--n6); color: var(--text); }
+.ib svg, .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+kbd { font: var(--t1)/1 var(--mono); padding: 0.15rem 0.3rem; border-radius: var(--r-xs); border: 1px solid color-mix(in srgb, currentColor 25%, transparent); opacity: 0.8; }
+
+.field { display: grid; gap: 0.3rem; }
+.field label { font-weight: 500; }
+.field small { color: var(--faint); font-size: var(--t1); }
+.input { font: var(--t2)/1.45 var(--sans); color: var(--text); background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--r-md); padding: 0.4rem 0.6rem; width: 100%; }
+.input::placeholder { color: var(--faint); }
+.input:hover { border-color: var(--faint); }
+.input.err { border-color: var(--danger); }
+textarea.input { min-height: 4.5rem; resize: vertical; }
+.select { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.switch { width: 2.1rem; height: 1.25rem; border-radius: 1rem; border: 0; background: var(--border-strong); position: relative; cursor: pointer; transition: background-color 0.12s; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: calc(1.25rem - 4px); height: calc(1.25rem - 4px); border-radius: 50%; background: #fff; transition: transform 0.14s ease-out; }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(0.85rem); background: var(--accent-text); }
+.seg { display: inline-flex; padding: 2px; border-radius: var(--r-btn); background: var(--surface); border: 1px solid var(--border); }
+.seg button { font: 500 12px/1 var(--sans); height: 1.5rem; padding: 0 0.6rem; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+
+.chip { font: 500 var(--t1)/1 var(--mono); height: 1.25rem; padding: 0 0.4rem; border-radius: var(--r-xs); display: inline-flex; align-items: center; gap: 0.3rem; background: var(--accent-subtle); color: var(--muted); }
+.chip.ok { background: var(--success-subtle); color: var(--success); }
+.chip.warnc { background: var(--warning-subtle); color: var(--warning); }
+.chip.bad { background: var(--danger-subtle); color: var(--danger); }
+.chip.info { background: var(--info-subtle); color: var(--info); }
+.chip i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.panel { border: 1px solid var(--border); border-radius: var(--r-card); background: var(--bg); }
+.panel > .row { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.9rem; border-top: 1px solid var(--border); }
+.panel > .row:first-child { border-top: 0; }
+.panel > .row:hover { background: var(--n4); }
+.row .grow { flex: 1; min-width: 0; }
+.row .t { font-weight: 500; }
+.row .d { color: var(--muted); font-size: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font: 500 var(--t1)/1.35 var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; padding: 0.5rem 0.9rem; border-bottom: 1px solid var(--border); }
+td { padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: 0; }
+.num { font-family: var(--mono); text-align: right; }
+.empty { border: 1px dashed var(--border-strong); border-radius: var(--r-card); padding: 2rem 1rem; text-align: center; color: var(--muted); }
+.empty b { display: block; color: var(--text); margin-bottom: 0.2rem; }
+
+.dialog { border: 1px solid var(--border); border-radius: var(--r-card); background: var(--raised); box-shadow: var(--shadow-pop); padding: 1.1rem; max-width: 24rem; }
+.dialog h3 { margin: 0 0 0.3rem; font-size: var(--t3); }
+.dialog .acts { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+.menu { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--raised); box-shadow: var(--shadow-pop); padding: 0.25rem; width: 13rem; }
+.menu div { padding: 0.35rem 0.55rem; border-radius: var(--r-sm); display: flex; justify-content: space-between; }
+.menu div:hover { background: var(--n6); }
+.menu hr { border: 0; border-top: 1px solid var(--border); margin: 0.25rem 0; }
+.tip { display: inline-block; background: var(--accent); color: var(--accent-text); font-size: 12px; padding: 0.2rem 0.45rem; border-radius: var(--r-sm); }
+.toast { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--raised); box-shadow: var(--shadow-pop); padding: 0.6rem 0.8rem; display: flex; gap: 0.6rem; align-items: center; width: 18rem; }
+
+.shell { display: grid; grid-template-columns: 13rem minmax(0, 34rem) 1fr; height: 30rem; border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--layer2); }
+.rail { background: var(--layer1); padding: 0.9rem 0.75rem; display: flex; flex-direction: column; min-height: 0; }
+.rail .brand { font-weight: 600; letter-spacing: -0.01em; padding: 0 0.3rem; margin-bottom: 1rem; }
+.rail .slot { flex: 1; min-height: 0; overflow: auto; display: grid; gap: 2px; align-content: start; margin-bottom: 0.75rem; }
+.rail .slot a { padding: 0.35rem 0.5rem; border-radius: var(--r-sm); color: var(--muted); text-decoration: none; display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; }
+.rail .slot a.on { background: var(--n6); color: var(--text); font-weight: 500; }
+.rail .slot a:hover { background: var(--n6); }
+.rail .actions { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.thread { background: var(--surface); position: relative; display: flex; flex-direction: column; min-height: 0; }
+.msgs { flex: 1; overflow: auto; padding: 1.25rem 1.5rem 6rem; display: grid; gap: 1rem; align-content: start; }
+.user { justify-self: end; background: var(--raised); border: 1px solid var(--border); border-radius: var(--r-card); padding: 0.45rem 0.75rem; max-width: 80%; }
+.fold { display: flex; gap: 0.35rem; align-items: center; color: var(--muted); }
+.dock { position: absolute; inset: auto 1rem 1rem; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--r-card); padding: 0.6rem 0.6rem 0.5rem 0.8rem; }
+.dock .ph { color: var(--faint); padding-bottom: 0.5rem; }
+.dock .bar { display: flex; align-items: center; gap: 0.35rem; }
+.widgets { padding: 0.9rem; display: grid; gap: 0.75rem; align-content: start; }
+.w { border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.65rem 0.75rem; }
+.w .k { font: var(--t1)/1.35 var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.bar2 { height: 4px; border-radius: 2px; background: var(--border); margin-top: 0.4rem; overflow: hidden; }
+.bar2 i { display: block; height: 100%; width: 38%; background: var(--accent); }
+@media (max-width: 52rem) { .shell { grid-template-columns: 1fr; height: auto; } .rail, .widgets { display: none; } .thread { height: 28rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>AnyKnown UI — flat</h1>
+      <p class="lede" style="margin:0">neutral 紙墨、Geist + Geist Mono、ui-next 的尺寸。沒有織法、沒有 serif、沒有綠色主動作。</p>
+    </div>
+    <div class="seg" id="theme">
+      <button aria-pressed="true" data-t="light">Light</button>
+      <button aria-pressed="false" data-t="dark">Dark</button>
+    </div>
+  </header>
+
+  <h2>1. Token</h2>
+  <p class="sub">顏色就是 <span class="mono">@anyknown/ui</span> 既有的 neutral palette，主動作是墨色（亮：近黑、暗：近白）。語意色只用在狀態。</p>
+  <div class="swatches" id="swatches"></div>
+  <div class="grid2">
+    <div>
+      <p class="label">字級 — Geist</p>
+      <div class="scale">
+        <p style="font-size:var(--t4);font-weight:600">17 標題 Page title</p>
+        <p style="font-size:var(--t3);font-weight:600">15 段落標題 Section</p>
+        <p style="font-size:var(--t2)">13 內文 Body — 一個人、一條永遠不結束的對話。</p>
+        <p style="font-size:var(--t1);color:var(--muted)">11 輔助 Caption</p>
+        <p class="mono" style="font-size:12px">Geist Mono 12 — claude-sonnet · 1,240 req · $84.21</p>
+      </div>
+    </div>
+    <div>
+      <p class="label">圓角</p>
+      <div class="rowx">
+        <span class="chip" style="border-radius:var(--r-xs)">xs 0.3</span>
+        <span class="chip" style="border-radius:var(--r-sm);height:1.6rem">sm 0.4</span>
+        <span class="chip" style="border-radius:var(--r-md);height:2rem">md 0.5</span>
+        <span class="chip" style="border-radius:var(--r-btn);height:2rem">btn 0.55</span>
+        <span class="chip" style="border-radius:var(--r-card);height:2.6rem;padding:0 0.8rem">card 12px</span>
+      </div>
+      <p class="label">陰影</p>
+      <p class="sub" style="margin:0">只有浮起來的東西（dialog / menu / toast）有陰影；頁面上的卡片只靠 1px 邊框。</p>
+    </div>
+  </div>
+
+  <h2>2. Button</h2>
+  <p class="sub">實心平塗。一個畫面只有一個 primary。</p>
+  <div class="rowx">
+    <button class="btn primary">送出 <kbd>↵</kbd></button>
+    <button class="btn">Fill</button>
+    <button class="btn bordered">Bordered</button>
+    <button class="btn warn">刪除</button>
+    <button class="btn ghost">Ghost</button>
+    <button class="btn primary" disabled>Disabled</button>
+  </div>
+  <div class="rowx" style="margin-top:0.6rem">
+    <button class="btn sm primary">Small</button>
+    <button class="btn sm">Small</button>
+    <button class="btn sm bordered">Small</button>
+    <button class="ib" aria-label="新增"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg></button>
+    <button class="ib" aria-label="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg></button>
+    <span class="tip">Tooltip</span>
+  </div>
+
+  <h2>3. 表單</h2>
+  <div class="grid2">
+    <div class="field"><label>名稱</label><input class="input" placeholder="anyknown" /><small>顯示在 project 切換器上。</small></div>
+    <div class="field"><label>API key</label><input class="input err mono" value="sk-ant-…9f2a" /><small style="color:var(--danger)">這把 key 驗不過。</small></div>
+    <div class="field"><label>模型</label><div class="input select"><span>claude-sonnet</span><span style="color:var(--faint)">⌄</span></div></div>
+    <div class="field"><label>備註</label><textarea class="input" placeholder="給未來的自己一句話"></textarea></div>
+  </div>
+  <div class="rowx" style="margin-top:1rem;gap:1.25rem">
+    <span class="rowx"><button class="switch" role="switch" aria-checked="true" aria-label="自動交接"></button> 自動交接</span>
+    <span class="rowx"><button class="switch" role="switch" aria-checked="false" aria-label="語音"></button> 語音</span>
+    <div class="seg"><button aria-pressed="true">全部</button><button aria-pressed="false">進行中</button><button aria-pressed="false">完成</button></div>
+  </div>
+
+  <h2>4. 狀態</h2>
+  <div class="rowx">
+    <span class="chip"><i></i>idle</span>
+    <span class="chip info"><i></i>running</span>
+    <span class="chip ok"><i></i>done</span>
+    <span class="chip warnc"><i></i>waiting</span>
+    <span class="chip bad"><i></i>failed</span>
+    <span class="chip">kind: code</span>
+  </div>
+
+  <h2>5. 容器</h2>
+  <div class="grid2">
+    <div>
+      <p class="label">Group / Row</p>
+      <div class="panel">
+        <div class="row"><div class="grow"><div class="t">重寫 thread layout</div><div class="d">anyknown · 3 個步驟</div></div><span class="chip info"><i></i>running</span></div>
+        <div class="row"><div class="grow"><div class="t">每週記憶整理</div><div class="d">流程 · 每 7 天</div></div><span class="chip ok"><i></i>done</span></div>
+        <div class="row"><div class="grow"><div class="t">找工作</div><div class="d">job-finding · 等你回答</div></div><span class="chip warnc"><i></i>waiting</span></div>
+      </div>
+      <p class="label">Settings rows</p>
+      <div class="panel">
+        <div class="row"><div class="grow"><div class="t">交接門檻</div><div class="d">context 到這個比例就交接</div></div><span class="mono">60%</span></div>
+        <div class="row"><div class="grow"><div class="t">深色模式</div></div><button class="switch" role="switch" aria-checked="false" aria-label="深色模式"></button></div>
+      </div>
+    </div>
+    <div>
+      <p class="label">Table</p>
+      <div class="panel">
+        <table>
+          <tr><th>Provider</th><th>Key</th><th style="text-align:right">本月</th></tr>
+          <tr><td>anthropic</td><td class="mono">…9f2a</td><td class="num">$61.40</td></tr>
+          <tr><td>openai</td><td class="mono">…c41d</td><td class="num">$22.81</td></tr>
+          <tr><td>cloudflare</td><td class="mono">…tk7q</td><td class="num">$0.00</td></tr>
+        </table>
+      </div>
+      <p class="label">Empty</p>
+      <div class="empty"><b>還沒有記憶</b>說一句話，或按這裡自己寫一條。<div style="margin-top:0.8rem"><button class="btn sm bordered">寫一條</button></div></div>
+    </div>
+  </div>
+
+  <h2>6. 浮層</h2>
+  <div class="rowx" style="align-items:flex-start;gap:1.25rem">
+    <div class="dialog"><h3>刪除這個 project？</h3><div style="color:var(--muted)">記憶不會刪，只是不再歸在它底下。</div><div class="acts"><button class="btn bordered">取消</button><button class="btn warn">刪除</button></div></div>
+    <div class="menu"><div>重新命名 <kbd>R</kbd></div><div>複製連結</div><hr /><div style="color:var(--danger)">刪除</div></div>
+    <div class="toast"><span class="chip ok"><i></i>ok</span><span>已存到記憶</span></div>
+  </div>
+
+  <h2>7. Thread page</h2>
+  <p class="sub">架構照現在的 product 不動：rail（brand 在上、清單在中、icon 動作在左下角）｜全高的 thread block（無圓角、無邊框，只靠底色分開）｜widget。</p>
+  <div class="shell">
+    <nav class="rail">
+      <div class="brand">anyknown</div>
+      <div class="slot">
+        <a class="on" href="#">主 thread</a>
+        <a href="#">research-bot <span class="chip info"><i></i>run</span></a>
+        <a href="#">job-finding <span class="chip warnc"><i></i>ask</span></a>
+        <a href="#">weekly-tidy <span class="chip ok"><i></i>done</span></a>
+      </div>
+      <div class="actions">
+        <button class="ib" aria-label="記憶" title="記憶"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></svg></button>
+        <button class="ib" aria-label="等你回答" title="等你回答"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01" /></svg></button>
+        <button class="ib" aria-label="輸入模式" title="輸入模式"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg></button>
+        <button class="ib" aria-label="設定" title="設定"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" /></svg></button>
+      </div>
+    </nav>
+    <section class="thread">
+      <div class="msgs">
+        <div class="user">把 thread 改成全高的 block</div>
+        <div class="fold"><span class="chip">edit</span><span class="mono" style="font-size:12px">thread-styles.ts</span><span class="chip ok"><i></i>done</span></div>
+        <div>改好了：拿掉圓角、邊框與四周的 margin，thread 現在貼著 rail、上下頂滿。</div>
+        <div class="user">好，接著換設計語言</div>
+        <div class="fold"><span class="chip info"><i></i>running</span><span style="font-size:12px">正在讀 ui 的 token…</span></div>
+      </div>
+      <div class="dock">
+        <div class="ph">說點什麼…</div>
+        <div class="bar"><button class="ib" aria-label="附件"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg></button><span class="chip">claude-sonnet</span><span style="flex:1"></span><button class="btn sm primary">送出 <kbd>↵</kbd></button></div>
+      </div>
+    </section>
+    <aside class="widgets">
+      <div class="w"><div class="k">Context</div><div class="mono">38% · 交接在 60%</div><div class="bar2"><i></i></div></div>
+      <div class="w"><div class="k">Project</div><div>anyknown</div></div>
+      <div class="w"><div class="k">等你</div><div>1 個問題</div></div>
+    </aside>
+  </div>
+</div>
+<script>
+const names = ["bg","surface","raised","border","border-strong","text","muted","faint","accent","accent-subtle","danger","success","warning","info"];
+document.getElementById("swatches").innerHTML = names.map((n) => `<div class="sw"><i style="background:var(--${n})"></i><span>${n}</span></div>`).join("");
+const seg = document.getElementById("theme");
+const apply = (t) => { document.documentElement.dataset.theme = t; seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.t === t))); };
+seg.addEventListener("click", (e) => e.target.dataset.t && apply(e.target.dataset.t));
+apply(matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+document.addEventListener("click", (e) => { const s = e.target.closest(".switch"); if (s) s.setAttribute("aria-checked", String(s.getAttribute("aria-checked") !== "true")); });
+</script>
+</body>
+</html>
