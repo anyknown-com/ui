@@ -43,4 +43,13 @@ describe("Input regressions", () => {
 		render(<Input aria-label="外部" aria-invalid="true" />)
 		expect(screen.getByRole("textbox", { name: "外部" })).toHaveAttribute("aria-invalid", "true")
 	})
+
+	test("mono is a look, not an attribute", () => {
+		render(<Input mono aria-label="API key" />)
+		const input = screen.getByRole("textbox", { name: "API key" })
+		expect(input).not.toHaveAttribute("mono")
+		expect(input.className).not.toBe(
+			render(<Input aria-label="名稱" />).container.querySelector("input")?.className,
+		)
+	})
 })

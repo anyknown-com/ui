@@ -43,6 +43,7 @@ export const controlStyles = stylex.create({
 })
 
 const styles = stylex.create({
+	mono: { fontFamily: font.mono },
 	affix: { position: "relative", display: "block", width: "100%" },
 	icon: {
 		position: "absolute",
@@ -60,11 +61,13 @@ const styles = stylex.create({
 export type InputProps = Omit<ComponentProps<"input">, "size"> & {
 	size?: "sm" | "md"
 	invalid?: boolean
+	/** Keys, URLs, ids: anything read character by character. */
+	mono?: boolean
 	leadingIcon?: ReactNode
 	sx?: StyleArg
 }
 
-export function Input({ size = "md", invalid, leadingIcon, sx, ...props }: InputProps) {
+export function Input({ size = "md", invalid, mono = false, leadingIcon, sx, ...props }: InputProps) {
 	const { invalid: fieldInvalid, ...field } = useFieldControl(props)
 	const isInvalid = invalid ?? fieldInvalid
 	const input = (
@@ -77,6 +80,7 @@ export function Input({ size = "md", invalid, leadingIcon, sx, ...props }: Input
 				controlStyles.base,
 				controlStyles[size],
 				isInvalid && controlStyles.invalid,
+				mono && styles.mono,
 				Boolean(leadingIcon) && (size === "sm" ? styles.withIconSm : styles.withIconMd),
 				sx,
 			)}
