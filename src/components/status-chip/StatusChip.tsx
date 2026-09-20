@@ -1,0 +1,107 @@
+import * as stylex from "@stylexjs/stylex"
+import { color, font, space, tone, type } from "../../tokens.stylex"
+import type { ReactNode } from "react"
+import { Spin } from "../spin/Spin"
+
+/**
+ * `.tchip` / `.achip`: a mono word in a 16px pill. `r` read-only (outline), `w` writes (layer),
+ * `d` destructive (warning fill), `n` unmarked (faint outline), `a` active (accent, spinning),
+ * `f` failed (warning outline + dot), `plain` the catalogue's auth chip.
+ */
+
+const styles = stylex.create({
+	root: {
+		alignItems: "center",
+		borderRadius: "1rem",
+		display: "inline-flex",
+		flex: "none",
+		fontFamily: font.mono,
+		fontSize: type.t1,
+		gap: space.xxs,
+		lineHeight: "16px",
+		paddingInline: 6,
+		whiteSpace: "nowrap",
+	},
+	r: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
+	w: { backgroundColor: color.layer4, color: color.text },
+	d: { backgroundColor: color.warning, color: color.bg },
+	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: tone.faint },
+	a: { backgroundColor: color.accentSubtle, color: color.text },
+	f: {
+		boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color.warning} 55%, transparent)`,
+		color: color.warning,
+	},
+	plain: { backgroundColor: color.layer3, color: color.textMuted, textAlign: "center" },
+	dot: { backgroundColor: color.warning, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	pill: {
+		alignItems: "center",
+		backgroundColor: color.layer3,
+		borderRadius: 11,
+		color: color.textMuted,
+		display: "inline-flex",
+		fontFamily: font.mono,
+		fontSize: type.t1,
+		gap: space.xxs,
+		height: 22,
+		paddingInline: space.xs,
+		whiteSpace: "nowrap",
+	},
+	status: { paddingInlineStart: 6 },
+	live: { backgroundColor: color.accent, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	paused: { backgroundColor: color.warning },
+	done: { backgroundColor: tone.faint },
+	title: {
+		color: color.text,
+		display: "inline-block",
+		fontFamily: font.body,
+		fontSize: type.t2,
+		lineHeight: "20px",
+		minWidth: 0,
+		overflow: "hidden",
+		textOverflow: "ellipsis",
+	},
+})
+
+export type StatusChipProps = {
+	variant: "r" | "w" | "d" | "n" | "a" | "f" | "plain"
+	children: ReactNode
+	sx?: stylex.StyleXStyles
+}
+
+export function StatusChip({ variant, children, sx }: StatusChipProps) {
+	return (
+		<span {...stylex.props(styles.root, styles[variant], sx)}>
+			{variant === "a" && <Spin small />}
+			{variant === "f" && <i {...stylex.props(styles.dot)} aria-hidden="true" />}
+			{children}
+		</span>
+	)
+}
+
+export type PillProps = {
+	/** A dot in front, coloured by what the thing is doing. */
+	status?: "live" | "paused" | "done"
+	/** The sub thread's name: body face, text colour, truncates. */
+	title?: boolean
+	children: ReactNode
+	sx?: stylex.StyleXStyles
+}
+
+/** `.pill-s`: the 22px mono pills a fold's first line is made of. */
+export function Pill({ status, title = false, children, sx }: PillProps) {
+	return (
+		<span {...stylex.props(styles.pill, status !== undefined && styles.status, title && styles.title, sx)}>
+			{status !== undefined && (
+				<span
+					aria-hidden="true"
+					{...stylex.props(
+						styles.live,
+						status === "paused" && styles.paused,
+						status === "done" && styles.done,
+					)}
+				/>
+			)}
+			{children}
+		</span>
+	)
+}

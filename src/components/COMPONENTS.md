@@ -351,3 +351,16 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - 空結果:置中訊息帶查詢字 + 「清除過濾」動作
 - 捲動區高度 `maxHeight`(預設 20rem),`footer` 渲染在列之後、**捲動區之內** ——
   「載入更多」待在清單裡才跟得上捲動
+
+### ghost / icon-button / segmented / spin / status-chip
+平面語言的小控件,從 product 的 ui-next 原樣搬來:`Ghost` / `GhostLink` 是沒有底的文字鈕,
+`IconButton` 一定帶 Tooltip(名字就是 tooltip),`Segmented` 是 `aria-pressed` 的按鈕組不是
+tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字母的狀態碼
+(`r` `w` `d` `n` `a` `f` `plain`),`Pill` 是 fold 第一行的 22px mono 藥丸。
+
+### group / page / settings-rows / table
+頁面骨架的零件:`Group` + `Row` / `Item` 是一張有邊框的清單卡,`PageHead` / `SectionLabel` /
+`Panel` / `Snippet` 是頁面的字與面,`SettingsRows` + `SettingsRow` 是設定頁左標籤右控件的列,
+`Table` + `Tr` + `Cell` 是低階的表格零件(要排序、分頁用 `DataTable`)。字級用 `type`、
+圓角用 `corner`、hover 用 `ink`。
+
