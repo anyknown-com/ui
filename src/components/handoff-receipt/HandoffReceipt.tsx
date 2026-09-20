@@ -1,14 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useCallback, useId, useState } from "react"
-import { KNOT_LEAD, KNOT_LOOP } from "../../lib/paths"
-import { type SilkPalette, SilkBody } from "../../lib/silk"
-import { color, font, motion, radius, space, text, yarnSecondary } from "../../tokens.stylex"
+import { type ReactNode, useId, useState } from "react"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
-// 卡面 = 淺色布(TEXTURE-GUIDE §3、handoff-receipt/NOTES.md):沒有 background,
-// 實心由紗織成;動態取「僅展示面」子集 — hover 帶動 + 光澤帶,無窩、無掃光。
-// 布是固定高度 480 的長布,展開只是露出同一塊布更多 → 高度變化零重織、織紋恆定。
 const styles = stylex.create({
 	receipt: {
 		position: "relative",
@@ -16,12 +11,12 @@ const styles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: color.border,
-		borderRadius: radius.md,
+		borderRadius: corner.md,
+		backgroundColor: color.surfaceRaised,
 	},
-	face: { position: "absolute", top: 0, left: 0, pointerEvents: "none" },
 	row: {
 		// 注意:StyleX 0.19 會靜默丟掉 `all: unset`(編不出任何規則),原生按鈕的
-		// buttonface 底色與 outset 邊框會蓋住布 —— 要逐項重設
+		// buttonface 底色與 outset 邊框會留在畫面上 —— 要逐項重設
 		appearance: "none",
 		backgroundColor: "transparent",
 		borderWidth: 0,
@@ -37,7 +32,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: text.xs,
 		color: { default: color.textMuted, ":hover": color.text },
-		borderRadius: radius.md,
+		borderRadius: corner.md,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
@@ -53,23 +48,13 @@ const styles = stylex.create({
 	ruleOpen: { borderTopStyle: "solid", borderTopColor: color.accent },
 	label: { whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: space.xxs },
 	mono: { fontFamily: font.mono, fontSize: "0.76rem", lineHeight: 1 },
-	knot: { flex: "none", overflow: "visible" },
-	lead: {
-		stroke: color.textFaint,
-		transitionProperty: "opacity",
+	link: {
+		flex: "none",
+		color: color.textFaint,
+		transitionProperty: "color",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 	},
-	leadHidden: { opacity: 0 },
-	loop: {
-		stroke: color.accent,
-		strokeDasharray: 100,
-		strokeDashoffset: 100,
-		transitionProperty: "stroke-dashoffset",
-		transitionDuration: { default: "500ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "ease",
-		transitionDelay: { default: "120ms", [REDUCED]: "0s" },
-	},
-	loopTied: { strokeDashoffset: 0 },
+	linkOpen: { color: color.accent },
 	chevron: {
 		flex: "none",
 		color: color.textFaint,
@@ -165,24 +150,9 @@ export function HandoffReceipt({
 }: HandoffReceiptProps) {
 	const bodyId = useId()
 	const [open, setOpen] = useState(defaultOpen)
-	// ref callback + cleanup(React 19)管動態的生命週期,不用 effect;client-only
-	const face = useCallback((node: SVGSVGElement | null) => {
-		if (!node) return
-		const silk = new SilkBody(node.parentElement as HTMLElement, node, {
-			palette: yarnSecondary as unknown as SilkPalette,
-			mode: "hover",
-			bandMax: 0.5,
-			pitch: 2,
-			hiCount: 12,
-			hiSpan: 0.95,
-			fixedHeight: 480,
-		})
-		return () => silk.destroy()
-	}, [])
 
 	return (
 		<div {...stylex.props(styles.receipt)}>
-			<svg ref={face} aria-hidden="true" {...stylex.props(styles.face)} />
 			<button
 				type="button"
 				aria-expanded={open}
@@ -193,17 +163,17 @@ export function HandoffReceipt({
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 				<span {...stylex.props(styles.label)}>
 					<svg
-						width="15"
+						width="13"
 						height="13"
-						viewBox="0 0 15 13"
+						viewBox="0 0 24 24"
 						fill="none"
-						strokeWidth="1.7"
+						stroke="currentColor"
+						strokeWidth="2"
 						strokeLinecap="round"
 						aria-hidden="true"
-						{...stylex.props(styles.knot)}
+						{...stylex.props(styles.link, open && styles.linkOpen)}
 					>
-						<path d={KNOT_LEAD} {...stylex.props(styles.lead, open && styles.leadHidden)} />
-						<path d={KNOT_LOOP} pathLength="100" {...stylex.props(styles.loop, open && styles.loopTied)} />
+						<path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" />
 					</svg>
 					<span>
 						{"換班完成 · "}
