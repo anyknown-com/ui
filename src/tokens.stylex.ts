@@ -1,43 +1,44 @@
 import * as stylex from "@stylexjs/stylex"
 
-// Semantic tokens for all AnyKnown products — direction B "Ledger":
-// warm paper ground, ink text, viridian accent. Light is the primary mode;
+// Semantic tokens for all AnyKnown products. The default palette is neutral:
+// white paper, ink text, ink accent. Ledger (warm paper, viridian accent) is the
+// opt-in palette in scripts/ledger.mjs. Light is the primary mode;
 // dark follows the OS unless a theme from themes.stylex.ts is applied.
 
 const DARK = "@media (prefers-color-scheme: dark)"
 
 export const color = stylex.defineVars({
-	bg: { default: "#FAFAF6", [DARK]: "#181613" },
-	surface: { default: "#FFFFFF", [DARK]: "#201D18" },
-	surfaceRaised: { default: "#FFFFFF", [DARK]: "#282420" },
-	border: { default: "#E3E0D5", [DARK]: "#35302A" },
-	borderStrong: { default: "#C8C3B4", [DARK]: "#4A443C" },
-	text: { default: "#23211D", [DARK]: "#EAE6DC" },
-	textMuted: { default: "#635D52", [DARK]: "#B0A697" },
-	textFaint: { default: "#9C958A", [DARK]: "#736A5D" },
-	accent: { default: "#23705A", [DARK]: "#4FA184" },
-	accentText: { default: "#FCFCF9", [DARK]: "#14120F" },
-	accentSubtle: { default: "#E7F0EB", [DARK]: "#22352E" },
+	bg: { default: "#FFFFFF", [DARK]: "#000000" },
+	surface: { default: "#F5F5F7", [DARK]: "#1C1C1E" },
+	surfaceRaised: { default: "#FFFFFF", [DARK]: "#2C2C2E" },
+	border: { default: "#E5E5EA", [DARK]: "#38383A" },
+	borderStrong: { default: "#C7C7CC", [DARK]: "#48484A" },
+	text: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	textMuted: { default: "#6E6E73", [DARK]: "#98989D" },
+	textFaint: { default: "#86868B", [DARK]: "#8E8E93" },
+	accent: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	accentText: { default: "#FFFFFF", [DARK]: "#000000" },
+	accentSubtle: { default: "#E8E8ED", [DARK]: "#2C2C2E" },
 	danger: { default: "#B3402E", [DARK]: "#DD7059" },
 	dangerSubtle: { default: "#F7E7E3", [DARK]: "#3D231E" },
 	success: { default: "#23705A", [DARK]: "#4FA184" },
 	successSubtle: { default: "#E7F0EB", [DARK]: "#22352E" },
-	warning: { default: "#9A6A1B", [DARK]: "#D9A254" },
+	warning: { default: "#B25000", [DARK]: "#FFB340" },
 	warningSubtle: { default: "#F5EBD9", [DARK]: "#3A2F1D" },
 	info: { default: "#2C5C86", [DARK]: "#6FA3CE" },
 	infoSubtle: { default: "#E4EDF5", [DARK]: "#1E2C38" },
-	focusRing: { default: "#23705A", [DARK]: "#4FA184" },
-	bone: { default: "#ECE9DF", [DARK]: "#2A2620" },
-	sheen: { default: "#F6F4EC", [DARK]: "#35302A" },
+	focusRing: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
+	bone: { default: "#E6E6EA", [DARK]: "#2C2C2E" },
+	sheen: { default: "#F2F2F5", [DARK]: "#3F3F42" },
 	successHl: { default: "#C6E0C6", [DARK]: "#2F4A2E" },
 	dangerHl: { default: "#EFCEC3", [DARK]: "#573328" },
 	// 分層底色:rail → main → 訊息 → fold → 列,越深的一階數字越大。
 	// 面與面靠深淺分,不靠邊框;hover 升一階,對應表在 lib/layers.ts。
-	layer1: { default: "#EFECE3", [DARK]: "#0E0C09" },
-	layer2: { default: "#FAFAF6", [DARK]: "#181613" },
-	layer3: { default: "#F1EFE7", [DARK]: "#211E19" },
-	layer4: { default: "#E8E5DA", [DARK]: "#2B2721" },
-	layer5: { default: "#DEDACD", [DARK]: "#35302A" },
+	layer1: { default: "#EFEFF2", [DARK]: "#000000" },
+	layer2: { default: "#FFFFFF", [DARK]: "#161618" },
+	layer3: { default: "#F2F2F5", [DARK]: "#242426" },
+	layer4: { default: "#E6E6EA", [DARK]: "#323234" },
+	layer5: { default: "#D9D9DE", [DARK]: "#3F3F42" },
 })
 
 // 織體紗線階(TEXTURE-GUIDE §3.4):un 底紗、sh 縫隙陰影、y0–y4 面紗(深→淺)、hi 挑面亮紗、

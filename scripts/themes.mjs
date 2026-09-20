@@ -6,7 +6,7 @@
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { neutralValue } from "./neutral.mjs"
+import { ledgerValue } from "./ledger.mjs"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 
@@ -49,7 +49,7 @@ export function renderThemes(groups) {
 // 給有使用者切換主題的 app(例如 next-themes)。tokens 本身跟隨 OS,套上 theme 才會鎖定。
 // **要套就整組套**:只套 color 會讓布停在另一個主題,深色布配深色字。
 //
-// palette 是另一個維度:neutral 只換 color(紙與墨),布跟著亮暗走。
+// palette 是另一個維度:ledger 只換 color(紙與墨),布跟著亮暗走。
 import * as stylex from "@stylexjs/stylex"
 import { ${imports} } from "./tokens.stylex"
 
@@ -59,7 +59,7 @@ ${block("light")}
 
 ${block("dark")}
 
-${neutralBlock(groups)}
+${ledgerBlock(groups)}
 
 /** 套在 root element 上:\`<div {...stylex.props(...light)}>\` */
 export const light = [${names("light")}
@@ -67,29 +67,28 @@ export const light = [${names("light")}
 export const dark = [${names("dark")}
 ] as const
 
-/** neutral palette。\`neutral\` 跟隨系統 scheme,另外兩個鎖定。 */
-export const neutral = [neutralColor] as const
-export const neutralLight = [
-	neutralLightColor,${cloth("light")}
+/** ledger palette。\`ledger\` 跟隨系統 scheme,另外兩個鎖定。 */
+export const ledger = [ledgerColor] as const
+export const ledgerLight = [
+	ledgerLightColor,${cloth("light")}
 ] as const
-export const neutralDark = [
-	neutralDarkColor,${cloth("dark")}
+export const ledgerDark = [
+	ledgerDarkColor,${cloth("dark")}
 ] as const
 `
 }
 
-function neutralBlock(groups) {
+function ledgerBlock(groups) {
 	const vars = groups.find((g) => g.name === "color").vars
 	const flat = (mode) =>
-		`export const neutral${cap(mode)}Color = stylex.createTheme(color, {\n` +
-		vars.map((v) => `\t${v.key}: "${neutralValue(v, mode)}",`).join("\n") +
+		`export const ledger${cap(mode)}Color = stylex.createTheme(color, {\n` +
+		vars.map((v) => `\t${v.key}: "${ledgerValue(v, mode)}",`).join("\n") +
 		"\n})"
 	const responsive =
-		"export const neutralColor = stylex.createTheme(color, {\n" +
+		"export const ledgerColor = stylex.createTheme(color, {\n" +
 		vars
 			.map(
-				(v) =>
-					`\t${v.key}: { default: "${neutralValue(v, "light")}", [DARK]: "${neutralValue(v, "dark")}" },`,
+				(v) => `\t${v.key}: { default: "${ledgerValue(v, "light")}", [DARK]: "${ledgerValue(v, "dark")}" },`,
 			)
 			.join("\n") +
 		"\n})"
