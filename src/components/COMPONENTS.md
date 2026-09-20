@@ -3,7 +3,6 @@
 36 個元件的**定案理由、走過的彎路、踩過的坑** —— 只留程式碼與型別裡看不出來的東西。
 API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)。
 
-織體(線織成的實心)的完整規格在 [TEXTURE-GUIDE.md](./TEXTURE-GUIDE.md);
 對比與命中區的已知偏差在 [A11Y-DEBT.md](./A11Y-DEBT.md)。
 
 ---
@@ -33,27 +32,24 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ### checkbox
 原生 `<input type="checkbox">` 隱藏 + 自繪 box。
 
-- 勾選底是一塊布(織體,seed 10075、primary 色票),依 14.8px 顯示尺寸換算比例,紗的
-  粗細行距與 button 等粗;勾用 `accentText` 縫上去,織入動畫 = clipPath width 推進
-- 走過的彎路:勾選底曾是 5×5 crosshatch pattern ——「有紋路的方塊」不是布。
-  勾曾用 `stroke-dasharray: 24` 但路徑長約 28,unchecked 時會漏出尾巴(改縫線後自然消失)
+- 未勾是 `bg` 上一圈 1.5px `borderStrong`;勾選 / indeterminate 是 `accent` 實心方塊,
+  上面一筆 `accentText` 的勾(或一橫),`stroke-dashoffset` 160ms 畫出來
+- dasharray(32)要比路徑(約 18)長:曾用 24 配 28 的路徑,unchecked 時會漏出尾巴
+- field context 的 `invalid` 畫成 `danger` 邊框
 
 ### radio
 原生 `<input type="radio">` + `fieldset/legend`。`variant="card"` 選中時亮整張。
 
-- 選中的內圈是**鏡頭**:布在後面延伸,圓形只是取景框 —— 孔徑從 0 打開,**布本身完全
-  不動**。孔徑只開到 r 6.8(viewBox 24),維持 radio 的標準構成(外環 + 空隙 + 內圓)
-- 走過的彎路:線繞成小線圈走了兩版都被打回,問題都是「讓線侷限在圓裡自己繞成一團」——
-  舊 coil(2.3 圈)「是圈圈,不是線在圈圈區域」;密繞螺旋「還是像蚊香」。
-  改成「布在後面、圓形只是取景框」才成立,這個語言後來也用在 tabs pills 與 progress
+- 標準構成:外環 + 空隙 + 內圓。選中時外環與內圓都是 `accent`,內圓 scale 0 → 1
+  160ms ease-out,不過衝
 
 ### switch
 即時生效的開關(相對於 Checkbox 的「提交後生效」)。原生 checkbox + `role="switch"`。
 
-- thumb 滑動 240ms `cubic-bezier(.32,.85,.45,1)`,收尾乾淨**不過衝**
-- 開啟的軌道是布,織入動畫 = clipPath width 推進;關閉時是 `borderStrong` 的空槽
-- 選取控件保持安靜:靜態織紋、無 rAF、不做窩與掃光(那是 button 的語言)
-- 走過的彎路:thumb 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳 —— 過衝一律不要
+- 軌道是實心藥丸:關 `borderStrong`、開 `accent`。thumb 關的時候永遠是白的(用 `bg`
+  在暗色下會變成黑鈕),開的時候是 `accentText`
+- thumb 滑動 180ms ease-out,**不過衝** —— 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳,
+  過衝一律不要
 - 設定列的慣用排版:文字在左、開關在右
 
 ### slider
@@ -83,25 +79,17 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ## 基礎
 
 ### button
-預設是平的:一個 background、hover 升一階。織體(實心是線織出來的,規格見 TEXTURE-GUIDE)
-改成 `woven` 才開 —— 一個畫面上每顆小按鈕都是布(工具列、表格的動作鈕、設定頁的
-Remove)讀起來是一排條紋,不是一塊布;布留給一頁一顆的主動作。
+平的:一個 background、hover 往頁面底色混 14%(ghost 類是透明 → `bone` / `dangerSubtle`)。
 
-| variant | 平面 | `woven` 的布 | 標籤色 | 用在 |
-| --- | --- | --- | --- | --- |
-| `primary` | `accent` | `yarn` | `accentText` | 主要動作 |
-| `secondary` | `bone` | `yarnSecondary` | `text` | 次要動作 |
-| `ghost` | 透明 | `yarnGhost`(疏織、無底紗、不落影) | `textMuted` | 安靜的第三選項 |
-| `danger` | `danger` | `yarnDanger` | `accentText` | 不可逆的破壞性動作 |
-| `dangerGhost` | 透明 | `yarnGhost` | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
+| variant | 底 | 標籤色 | 用在 |
+| --- | --- | --- | --- |
+| `primary` | `accent` | `accentText` | 主要動作,一個畫面一顆 |
+| `secondary` | `bone` | `text` | 次要動作 |
+| `ghost` | 透明 | `textMuted` | 安靜的第三選項 |
+| `danger` | `danger` | `accentText` | 不可逆的破壞性動作 |
+| `dangerGhost` | 透明 | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
 
-以下三條講的是 `woven`:
-
-- **觸發即時、動態緩成形**:pointerdown 當幀就開始,但窩約半秒才陷到位
-- **取消 = 安靜**:按住拖出元件 → 張力歸零;拖回來 → 窩回來;**在元件外放開 →
-  不播過衝、不播掃光**。過衝 + 掃光是「確認觸發」的專屬語言
-- children 要包進 `position: relative` 的 span 才會蓋在布上面
-- 完整否決紀錄(七個版本、設計者原話)在 TEXTURE-GUIDE §2
+- children 包在 `position: relative` 的 span 裡
 
 ### dialog
 模態對話框:半透明 blur backdrop、scale+fade 進場、Esc / backdrop 關閉。
@@ -153,10 +141,9 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
   disabled tab 保持可聚焦不被跳過 —— 這是 APG 預設。可見的 disabled 樣式要用
   `state.disabled`,寫 `:disabled` 永遠不會命中
 - underline 240ms `cubic-bezier(.16,1,.3,1)`,兩邊各自單調往目標走,**無倒退無過衝**
-- pills:布織滿整條 tablist 只建一次,選取高亮是圓角取景窗滑動 —— **窗動、布不動**
+- pills:選取高亮是一顆平的藥丸(`surfaceRaised` + 1px `border`)在 tab 底下滑
 - indicator 位置不自己量:Base UI 的 `Tabs.Indicator` 本來就把 `--active-tab-*` 寫成
-  inline style,拿它當**變數載體**(絕對定位鋪滿、自己不動、`pointer-events: none`),
-  clipPath 的 rect 用 CSS 幾何屬性直接吃那些變數
+  inline style,藥丸的 `width` / `height` / `translate` 直接吃那些變數
 - 走過的彎路:底線的「鬆緊彈性」(雙彈簧 + 拉伸下垂)——「太誇張了」;
   x 與 width 各拆一條曲線的組合會衝過再收回,違反「任何邊不得倒退」
 
@@ -176,33 +163,20 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 
 ### skeleton
 載入骨架:占位形狀 + shimmer,形狀要對齊實際內容的排版(thread 骨架就長得像 thread),
-避免載入完成時跳版。**刻意不用織體** —— 載入骨架要低調不搶戲。
+避免載入完成時跳版。
 
 ### progress
-進度 = 一個容器裡長出一塊布。布就是 button 那塊,不另外發明織法。
+1. **bar(determinate)** — 4px 的 `border` 軌 + `accent` 實心填充,寬度跟著 value 走
+   (進度更新頻繁,用短的 linear transition,expo 會拖在後面)
+2. **bar(indeterminate)** — 40% 的一段 1.8s linear 滑過去;底下一行 mono 說現在在做什麼。
+   reduced motion 時停在原地
+3. **ring(context 用量)** — `border` 的軌圓 + `accent` 的弧(`stroke-dasharray`)。精確讀數
+4. **spinner** — 一段 `currentColor` 的弧 0.8s linear 在轉
+5. **ball** — 跟 ring 同一張圖,只是尺寸不同;API 留著
 
-1. **bar(determinate)** — 軌是凹進去的容器(高 20px、內距 2px)。布是**整條軌的寬度
-   織一次**,放在會被裁切的填充盒裡 —— 長出來是露出同一塊布的更多段,不是把布拉長或
-   重織。寬度走 120ms linear(進度更新頻繁,expo 會拖在後面)
-2. **bar(indeterminate)** — 同一塊布切 32% 一段,−32% → 100% 走 1.8s linear;
-   底下一行 mono 說現在在做什麼
-3. **ring(context 用量)** — 布在後面鋪滿方框,弧形只是取景框;預設 60px = 布的座標
-   尺寸,**不縮放**,紗才不會變粗細。精確讀數,不玩比喻
-4. **spinner** — 一段布做的 C 弧在轉(缺口 28%、圓頭)。布不動,轉的是遮罩上那道弧
-5. **ball** — 毛線球的捆法:4 方向 × 每方向 6 條大圓弧,一束繞完換方向,補輪廓圓收尾
-
-- **零 rAF**:determinate 靠 CSS width transition,indeterminate 靠 CSS animation
+- **零 rAF**:determinate 靠 CSS transition,indeterminate 靠 CSS animation
 - indeterminate **不設 `aria-valuenow`、不顯示百分比** —— 沒有真實進度可報
 - spinner 用 `role=status`;它不從內容取名,所以 `aria-label` 與視覺隱藏的內文都要
-- `ringSector()` 的滿格陷阱:單段 359.99° 的弧,起訖點 `toFixed(2)` 後會變成同一個
-  字串,SVG 規範會把整段弧丟掉 → clip 變空、什麼都不畫。RING=60 剛好差 0.01 不會撞,
-  **換尺寸就會踩到**
-- 走過的彎路:辮子(braided cable)、12px 薄布 + clip 推進 —— 都「看不出在織」;
-  加經線做平織 —— 變成布料樣本,和 button 不是同一件事。lissajous 亂結與八塊小布繞圈
-  ——「好爛」,形狀太碎。不定量曾是「織布」,但每幀重算而且在假裝有進度(8 層 = 8 個
-  12.5%),語意是錯的
-- **ProgressBall 留在線語言是刻意的例外**:ball 和 ring 都是圓的,改成織體取景框會和
-  ring 變成同一張圖;而「一個東西被一圈一圈繞滿」本來就不是「一塊布長出來」能表達的
 
 ### empty-state
 空狀態 = 行動邀請:icon + 一句說明 + 主要動作。文案永遠說「下一步做什麼」,
@@ -215,7 +189,6 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 - thumb 是 `borderStrong` 圓角線,外圍 3px 透明邊距(`background-clip: padding-box`)
   讓它浮在內容旁;hover 轉 `textFaint`。寬 10px,實際可見約 4px
 - 容器建議加 `scrollbar-gutter: stable` 防止內容因捲軸出現而跳動
-- **刻意不用織體** —— 全域基礎設施要隱形
 
 ---
 
@@ -285,7 +258,7 @@ pending 是可操作物,回覆後收成過去區的不可改收據。
   (安靜邊框、「等你 · deadlineAt 倒數」);內容走 block DSL(markdown / options /
   text / table / image / diff);必填未選時送出 disabled,有 recommended 時多一顆「照建議」
 - 三顆回覆鈕:允許一次 `primary`、總是允許 `secondary`、拒絕 `dangerGhost`。
-  拒絕不給整塊 danger 織體(一整塊紅布會蓋過 primary),但語意要看得出來 ——
+  拒絕不給整塊實心 danger(一整塊紅會蓋過 primary),但語意要看得出來 ——
   這個元件自己的 token 語彙裡 danger 本來就是「拒絕」的顏色(收據列 rejected 的 ✓
   用的就是 `color.danger`)
 - 複選 options 是**無框列**:Checkbox 沒有 card variant,外框也無法從外面套
@@ -300,17 +273,13 @@ rotation 分隔線:thread 過去區裡一條安靜的細列「換班完成 · �
 session」,可展開看交接摘要。用戶不管理 session,**這是他唯一看見換班的地方**。
 
 - collapsed 為預設,左右虛線把它嵌進時間軸;展開(同列 toggle,不開 dialog)看三項
-  核對:記憶落盤幾筆 / 摘要已交給下一輪(讀後銷毀)/ 本輪 Ledger 收據數
+  核對:記憶落盤幾筆 / 摘要已交給下一輪(讀後銷毀)/ 本輪收據數
 - **是收據不是控制**:不可改、無任何動作按鈕
-- 卡面是一塊 secondary 淺色布,動態只取「僅展示面」子集(hover 帶動 + 光澤帶,
-  亮度上限 0.5,**無窩無掃光**)
-- **布只織一次**:固定高度 480px 的長布,卡片 `overflow` 裁形。展開只是露出更多,
-  高度變化零重織
+- 卡面是平的 `surfaceRaised` + 1px `border`;展開時虛線變實線、連結 icon 轉 `accent`
 - 收合狀態用 `inert` 不能用 `hidden` —— 一樣離開 a11y tree 與 tab 序,但留在版面上
   讓 0fr→1fr 跑得動
-- 走過的彎路:展開後重織一塊新的布會不一致而且會閃;`display: none` 硬切 + 單向 fade
-  被打回「死板」;展開讓頁面長高 → scrollbar 出現 → 置中內容左移(修法是
-  `html { scrollbar-gutter: stable }`,已進 `tokens.css`)
+- 走過的彎路:`display: none` 硬切 + 單向 fade 被打回「死板」;展開讓頁面長高 →
+  scrollbar 出現 → 置中內容左移(修法是 `html { scrollbar-gutter: stable }`,已進 `tokens.css`)
 
 ### composer
 釘在現在線上的 prompt bar:**說話發生在現在** —— 送出後上方多一條收據、下方未來區
@@ -349,7 +318,6 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 
 - 分段 mono(4 字一組)、預設模糊遮罩(hover / focus / 點擊才顯示)、一鍵複製(變 ✓)、
   下載 .txt、警告卡、「我已抄下」checkbox **gate 住主要按鈕**
-- **刻意不用織體** —— 金鑰要安靜可判讀
 
 ### dropzone
 拖放上傳區:虛線框 idle、dragover 高亮(accent 邊框 + accentSubtle 底)、
@@ -369,7 +337,6 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - 收合未變動區段:「⋯ N 行未變動」列可展開收合
 - 檔案標題列:kind 色點(modified 黃 / added 綠 / deleted 紅)+ path + `+N −N` 統計;
   added = 只有 after,deleted = 只有 before
-- **刻意不用織體** —— 精準區不加花
 
 ### data-table
 排序、過濾、選取、inline edit 的資料表。第一個消費者是 i18n 字典編輯。
@@ -384,4 +351,3 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - 空結果:置中訊息帶查詢字 + 「清除過濾」動作
 - 捲動區高度 `maxHeight`(預設 20rem),`footer` 渲染在列之後、**捲動區之內** ——
   「載入更多」待在清單裡才跟得上捲動
-- **刻意不用織體** —— 數據要安靜可判讀

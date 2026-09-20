@@ -27,7 +27,6 @@ playground 與文檔站用同一組 section id。
 
 - [COMPONENTS.md](./COMPONENTS.md) — 34 個元件的定案理由、走過的彎路、踩過的坑。
   改任何一個元件之前先讀它那一節,免得把已經被否決的路再走一次
-- [TEXTURE-GUIDE.md](./TEXTURE-GUIDE.md) — 織物設計語言的完整規格與適配指引。
   **適配新元件前必讀**,參數照抄不要重 tune
 - [A11Y-DEBT.md](./A11Y-DEBT.md) — 已知的對比與命中區偏差,等設計決策
 
@@ -39,7 +38,7 @@ playground 與文檔站用同一組 section id。
    不必套 primitive
 2. 所有顏色/間距/圓角/動效引用 `tokens.stylex.ts`,不寫死值
 3. **動畫不回彈**:滑動類 240ms `cubic-bezier(.16,1,.3,1)`,進度類 120ms linear;
-   任何邊不得倒退或過衝。唯一的例外是 button 放開時的回彈微鼓,那是織體的語意
+   任何邊不得倒退或過衝
 4. **禁用 `useEffect`**:用 ref callback + cleanup(React 19)。量尺寸一律
    ref callback + `ResizeObserver`
 5. 一律包 `prefers-reduced-motion`
@@ -54,8 +53,8 @@ playground 與文檔站用同一組 section id。
     不要靠 caller 傳 `className` —— StyleX 是 atomic class,字串接在後面不保證勝出,
     要覆蓋就得在同一次 `stylex.props` 裡排在後面
 11. **theme 要整組套**。`themes.stylex.ts` 的 `light` / `dark` 是一組 theme(color +
-    五組 yarn + shadow),用 `stylex.props(...light)` 展開。只套其中一個 var group 會讓
-    布停在另一個主題 —— 深色布配深色字,secondary / ghost 的標籤整個看不見。
+    shadow + tone),用 `stylex.props(...light)` 展開。只套其中一個 var group 會讓
+    另外兩組停在另一個主題。
     那個檔由 `pnpm gen:themes` 從 tokens 生成,不要手改
 12. **面靠分層,不靠邊框**。`color.layer1`–`layer5` 是 rail → main → 訊息 → fold → 列
     五階底色,數字越大越深。**hover 升一階**:`layerUp.layer3` 就是 `layer3` 的 hover 底色
@@ -72,7 +71,7 @@ playground 與文檔站用同一組 section id。
 `@anyknown/ui` 輸出兩種形式:
 
 1. `tokens.stylex.ts` — StyleX 使用端(desktop / accounts / storage / i18n)
-2. `tokens.css` — 純 CSS variables(同一組 Ledger 值),給非 StyleX 的使用端。desktop
+2. `tokens.css` — 純 CSS variables(同一組值),給非 StyleX 的使用端。desktop
    自己是純 StyleX,只有 streamdown 那個第三方 markdown 元件 ship 了 Tailwind utility
    class,它的 `@theme inline` 引用這些 `--ak-*`
 

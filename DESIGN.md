@@ -6,7 +6,7 @@
 
 ## 1. 這是什麼
 
-Ledger。暖紙底、墨字。viridian 只給一個主動作,頁面裡其他地方看到綠色都是錯的。serif(Newsreader)只給標題與大數字,內文一律 Geist,數據與代碼用 Geist Mono。元件沒有 background,實心是線織出來的,所以按鈕是一塊布不是一塊色。
+平面、neutral。白紙、墨字。主動作是墨色實心,一頁一顆;顏色只留給語意(danger / success / warning / info),拿來裝飾都是錯的。標題與內文一律 Geist(標題 600),數據與代碼用 Geist Mono。只有浮起來的東西(dialog / popover / toast)有陰影,頁面上的東西靠 1px 邊框分開。
 
 氣質是帳本:安靜、可對照、沒有裝飾。讀者來是為了做一個決定,頁面的工作是把證據擺整齊,不是說服。
 
@@ -83,5 +83,5 @@ Ledger。暖紙底、墨字。viridian 只給一個主動作,頁面裡其他地�
 
 - 光暗兩色都要看。暗色不是把顏色反過來,是另一組 token;沒看過暗色就等於沒做。
 - 縮到 375 寬要能讀。`ak-grid-*` 會自己折成單欄,表格要能橫向捲,不能把頁面撐寬。
-- 截圖跟 `https://ui.anyknown.com` 的元件放一起,看不出是兩家。特別是按鈕:`ak-btn` 的織體與 playground 的 Button 應該是同一塊布。
+- 截圖跟 `https://ui.anyknown.com` 的元件放一起,看不出是兩家。特別是按鈕:`ak-btn` 與 playground 的 Button 應該是同一顆。
 - 跑 `node scripts/design-lint.mjs <html>`,自創 hex、詞彙外 class、內聯 style 都要是 0。
