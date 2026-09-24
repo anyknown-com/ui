@@ -56,9 +56,10 @@ export const shadow = stylex.defineVars({
 })
 
 export const font = stylex.defineVars({
-	display: "'Geist Variable', system-ui, sans-serif",
-	body: "'Geist Variable', system-ui, sans-serif",
-	mono: "'Geist Mono Variable', ui-monospace, monospace",
+	display:
+		"'Geist Variable', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+	body: "'Geist Variable', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+	mono: "'Geist Mono Variable', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
 export const text = stylex.defineVars({

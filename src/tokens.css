@@ -42,9 +42,13 @@ html {
 	--ak-shadow-popover: 0 8px 24px rgba(35, 33, 29, 0.1);
 	--ak-shadow-raised: 0 1px 2px rgba(35, 33, 29, 0.08);
 
-	--ak-font-display: "Geist Variable", system-ui, sans-serif;
-	--ak-font-body: "Geist Variable", system-ui, sans-serif;
-	--ak-font-mono: "Geist Mono Variable", ui-monospace, monospace;
+	--ak-font-display:
+		"Geist Variable", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui,
+		sans-serif;
+	--ak-font-body:
+		"Geist Variable", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui,
+		sans-serif;
+	--ak-font-mono: "Geist Mono Variable", "Noto Sans TC Variable", "Noto Sans TC", ui-monospace, monospace;
 
 	--ak-radius-sm: 0.375rem;
 	--ak-radius-md: 0.5rem;
