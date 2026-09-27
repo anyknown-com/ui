@@ -271,6 +271,17 @@ TeX → MathML,交給瀏覽器排版。**選 Temml 不選 KaTeX**:輸出 MathML 
   block 層的 hint 指到行內數學的 `$`,就會把整個句子從中間切成兩段(`breaks: true`
   之下前半的尾隨空白還會變成 `<br>`)。所以 block 與 inline 各有各的 hint
 
+### payload-block
+工具被呼叫時帶的參數、回來的結果(0.9,product 殼搬來):1px `border` 的框、`corner.card`、
+mono `t2` / `snug`,內容左 16 右 48 上下 12、橫向捲動,右上角一顆 32px 的複製鈕
+(`IconButton`,1.5 秒後從勾變回複製)。沒有語言標頭,這是它跟 `CodeBlock` 的差別。
+
+- **不帶語法高亮**。shiki 一裝就是幾 MB 的語法與主題,設計系統不該讓每個 app 背;
+  也不收 HTML 字串 —— 整個套件不走 `innerHTML`。要上色的殼傳 `highlight(code)`,
+  回一個 React node 放在原本 `<pre>` 的位置(shiki 的 `codeToHast` + `toJsxRuntime`,
+  或殼自己決定要不要 `dangerouslySetInnerHTML`);沒傳就是純文字的 `<pre>`
+- 複製的永遠是 `code` 原文,不是畫出來的東西
+
 ### interaction-card
 agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)。
 pending 是可操作物,回覆後收成過去區的不可改收據。

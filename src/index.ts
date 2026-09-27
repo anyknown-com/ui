@@ -109,6 +109,7 @@ export type {
 	RegenerateActionProps,
 } from "./components/action-bar/ActionBar"
 export { CodeBlock, InlineCode, type CodeBlockProps } from "./components/code-block/CodeBlock"
+export { PayloadBlock, type PayloadBlockProps } from "./components/payload-block/PayloadBlock"
 export { PermissionCard, DecisionCard } from "./components/interaction-card/InteractionCard"
 export type {
 	PermissionCardProps,
