@@ -78,6 +78,12 @@ export type {
 } from "./components/message/Message"
 export { Bubble, type BubbleProps } from "./components/bubble/Bubble"
 export {
+	AttachmentGrid,
+	AttachmentTile,
+	type AttachmentGridProps,
+	type AttachmentTileProps,
+} from "./components/attachment/Attachment"
+export {
 	ToolCard,
 	ToolInput,
 	ToolOutput,

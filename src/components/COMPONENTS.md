@@ -208,6 +208,15 @@ product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3
   的泡泡、全寬的回覆、串流游標、action bar),這個是殼的一列一泡泡。位置與寬度交給 thread
 - prop 叫 `from` 不叫 `role`:`role` 是 ARIA 的字,給一個不是 ARIA role 的值 lint 會擋
 
+### attachment
+訊息帶的檔案(0.9,product 殼搬來):`AttachmentGrid` 一排會折行、間距 16 的 150px
+方塊;`AttachmentTile` 是 `layer3`、`radius.xl` 的方塊,上面一段名字 + 一個字的種類
+(`PDF`)。有 `preview` 就是圖,`object-fit: cover` 鋪滿,說明變白字加陰影;沒有就在左下角
+畫 28px 的檔案 glyph。
+
+- 不是 `FileRow`:那是檔案管理的一列(勾選、動作),這是訊息裡看得到的附件
+- 圖的 `alt=""`:名字已經寫在 `figcaption`,再唸一次是重複
+
 ### tool-card
 工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,
 展開看輸入/輸出。**subagent 是它的變體,不是新元件家族**。
