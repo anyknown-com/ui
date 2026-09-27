@@ -61,6 +61,8 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 - 軌道 `layer4`、填滿 `borderStrong`、握把 `surfaceRaised` + `shadow.raised`
 - 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)
 - `valueText` 唸的是標籤不是數字:0.62 要唸成「多」
+- 存檔接 `onValueCommit` 不接 `onChange`:拖曳放開(含 pointercancel)給一次、方向鍵 / Home / End
+  每動一次給一次;值沒變就不給。拖一下 PATCH 一次就是接錯了事件
 
 ### select
 觸發鈕 + popover(頂部搜尋框 + 分組列表)。

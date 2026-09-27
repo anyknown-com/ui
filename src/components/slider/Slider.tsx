@@ -54,6 +54,11 @@ function snap(raw: number, min: number, max: number, step: number): number {
 export type SliderProps = {
 	value: number
 	onChange: (value: number) => void
+	/**
+	 * The value a gesture ended on: once when a drag lets go, once per key that moved it. Nothing
+	 * when the gesture left the value where it started. Save here, not in `onChange`.
+	 */
+	onValueCommit?: (value: number) => void
 	/** @default 0 */
 	min?: number
 	/** @default 1 */
@@ -71,6 +76,7 @@ export type SliderProps = {
 export function Slider({
 	value,
 	onChange,
+	onValueCommit,
 	min = 0,
 	max = 1,
 	step = 0.01,
@@ -84,13 +90,30 @@ export function Slider({
 	const control = useRef<HTMLDivElement>(null)
 	const thumb = useRef<HTMLSpanElement>(null)
 	const [dragging, setDragging] = useState(false)
+	const gesture = useRef({ from: 0, to: 0 })
 
 	const current = snap(value, min, max, step)
 	const ratio = max === min ? 0 : (current - min) / (max - min)
 
 	function emit(raw: number) {
 		const next = snap(raw, min, max, step)
+		gesture.current.to = next
 		if (next !== current) onChange(next)
+	}
+
+	function begin() {
+		gesture.current = { from: current, to: current }
+	}
+
+	function commit() {
+		const { from, to } = gesture.current
+		if (to !== from) onValueCommit?.(to)
+	}
+
+	function release() {
+		if (!dragging) return
+		setDragging(false)
+		commit()
 	}
 
 	function ratioAt(clientX: number) {
@@ -131,22 +154,25 @@ export function Slider({
 					event.currentTarget.setPointerCapture(event.pointerId)
 					event.currentTarget.focus()
 					setDragging(true)
+					begin()
 					drag(event)
 				}}
 				onPointerMove={(event) => {
 					if (dragging) drag(event)
 				}}
-				onPointerUp={() => setDragging(false)}
-				onPointerCancel={() => setDragging(false)}
+				onPointerUp={release}
+				onPointerCancel={release}
 				onKeyDown={(event) => {
 					if (disabled) return
 					const nudge = (max - min) * ARROW_FRACTION
+					begin()
 					if (event.key === "ArrowRight" || event.key === "ArrowUp") emit(current + nudge)
 					else if (event.key === "ArrowLeft" || event.key === "ArrowDown") emit(current - nudge)
 					else if (event.key === "Home") emit(min)
 					else if (event.key === "End") emit(max)
 					else return
 					event.preventDefault()
+					commit()
 				}}
 				{...stylex.props(styles.control, disabled && styles.disabled)}
 			>

@@ -1,12 +1,28 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { Slider } from "./Slider"
 
-function Effort({ start = 0 }: { start?: number }) {
+function Effort({ start = 0, onCommit }: { start?: number; onCommit?: (value: number) => void }) {
 	const [value, setValue] = useState(start)
-	return <Slider value={value} onChange={setValue} label="思考多少" valueText={(v) => `${v}`} />
+	return (
+		<Slider
+			value={value}
+			onChange={setValue}
+			onValueCommit={onCommit}
+			label="思考多少"
+			valueText={(v) => `${v}`}
+		/>
+	)
+}
+
+/** jsdom lays nothing out: give the track a 100px width and let it take pointer capture. */
+function track(slider: HTMLElement) {
+	slider.setPointerCapture = vi.fn()
+	vi.spyOn(slider, "getBoundingClientRect").mockReturnValue(
+		DOMRect.fromRect({ x: 0, y: 0, width: 100, height: 24 }),
+	)
 }
 
 describe("Slider", () => {
@@ -65,5 +81,51 @@ describe("Slider", () => {
 		slider.focus()
 		await user.keyboard("{ArrowRight}")
 		expect(onChange).not.toHaveBeenCalled()
+	})
+
+	test("拖曳一路 onChange,放開才 onValueCommit 一次", () => {
+		const onCommit = vi.fn()
+		render(<Effort onCommit={onCommit} />)
+		const slider = screen.getByRole("slider", { name: "思考多少" })
+		track(slider)
+
+		fireEvent.pointerDown(slider, { pointerId: 1, clientX: 20 })
+		fireEvent.pointerMove(slider, { pointerId: 1, clientX: 40 })
+		fireEvent.pointerMove(slider, { pointerId: 1, clientX: 60 })
+		expect(slider).toHaveAttribute("aria-valuenow", "0.6")
+		expect(onCommit).not.toHaveBeenCalled()
+
+		fireEvent.pointerUp(slider, { pointerId: 1, clientX: 60 })
+		expect(onCommit).toHaveBeenCalledOnce()
+		expect(onCommit).toHaveBeenCalledWith(0.6)
+	})
+
+	test("pointercancel 也收尾;沒動到值就不 commit", () => {
+		const onCommit = vi.fn()
+		render(<Effort start={0.3} onCommit={onCommit} />)
+		const slider = screen.getByRole("slider", { name: "思考多少" })
+		track(slider)
+
+		fireEvent.pointerDown(slider, { pointerId: 1, clientX: 30 })
+		fireEvent.pointerUp(slider, { pointerId: 1, clientX: 30 })
+		expect(onCommit).not.toHaveBeenCalled()
+
+		fireEvent.pointerDown(slider, { pointerId: 2, clientX: 80 })
+		fireEvent.pointerCancel(slider, { pointerId: 2 })
+		expect(onCommit).toHaveBeenCalledExactlyOnceWith(0.8)
+	})
+
+	test("鍵盤每動一次值就 commit 一次,到底再按不 commit", async () => {
+		const onCommit = vi.fn()
+		const user = userEvent.setup()
+		render(<Effort start={0.9} onCommit={onCommit} />)
+		await user.tab()
+
+		await user.keyboard("{ArrowRight}")
+		expect(onCommit).toHaveBeenLastCalledWith(0.95)
+		await user.keyboard("{End}")
+		expect(onCommit).toHaveBeenLastCalledWith(1)
+		await user.keyboard("{ArrowRight}{Tab}")
+		expect(onCommit).toHaveBeenCalledTimes(2)
 	})
 })
