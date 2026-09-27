@@ -391,3 +391,11 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
   字留 muted —— 平靜的狀態不搶眼。沒給 `dot` 就只有字。`warn` 是 `tone="warning"` +
   實心點的簡寫(0.8 的 API)
 
+### status-badge
+一個東西自己在跑時(AI 在操作的畫面)放在它頭上的狀態藥丸:`t2`、上下 4 左右 10、
+全圓角。`live` 是 `layer4` 底 + 呼吸的 `LiveDot`、`warn` 是 22% 的 warning 底配 warning 字、
+`plain` 是 `layer4` 底配 muted 字。
+
+- 不是 `Pill`(fold 第一行 22px 的 mono 藥丸),也不是 `StatusChip`(16px 的工具狀態碼)
+- `live` 的字只唸一次:`LiveDot` 帶 `role="status"` 唸狀態,看得到的字 `aria-hidden`
+

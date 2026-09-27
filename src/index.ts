@@ -139,6 +139,7 @@ export { ICON_STROKE, icon } from "./components/icon/icon"
 export { Segmented, type SegmentedProps } from "./components/segmented/Segmented"
 export { Spin } from "./components/spin/Spin"
 export { Pill, StatusChip, type PillProps, type StatusChipProps } from "./components/status-chip/StatusChip"
+export { StatusBadge, type StatusBadgeProps } from "./components/status-badge/StatusBadge"
 export {
 	Acts,
 	Empty,
