@@ -334,6 +334,18 @@ chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `Ic
 - 不是 `Dropzone` / `UploadList`:那是整塊虛線拖放區與帶進度條的上傳清單,
   chatbox 只要一顆鈕跟一排 chip
 
+### call-bar
+通話時 chatbox 換成的那一條(0.9,product 殼搬來):`layer4` 底、`corner.card`、左 16 其他 8;
+呼吸的點、狀態字、mono 的 `mm:ss`、靜音、紅色的掛斷。
+
+- **受控,自己不存任何狀態**:`status` / `seconds` / `muted` 都從通話 session 來,
+  `onMute(next)` 交出要切到的值。舊版在元件裡自己 `setInterval` 數秒、自己記靜音,
+  換頁重掛就歸零
+- `status` 跟 product contract 的 `CallStatus` 同一組七個值。字是預設的中文,
+  `labels` 換;稿只畫了 `listening`「通話中」與靜音「已靜音」,其他五個是先給的字
+- 狀態變化**不做 live region**:通話中讀屏插嘴會蓋掉對方的聲音。整條是
+  `role="group"`(名字「通話」),點是裝飾
+
 ### voice-indicator
 一眼看出 agent 現在是在聽你、在想、還是在說 —— 對應 STT → runtime LLM → TTS 的三段。
 

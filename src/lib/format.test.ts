@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { formatBytes, formatDuration } from "./format"
+import { formatBytes, formatClock, formatDuration } from "./format"
 
 describe("formatBytes", () => {
 	test("formats each unit", () => {
@@ -39,5 +39,19 @@ describe("formatDuration", () => {
 		expect(formatDuration(0)).toBe("0ms")
 		expect(formatDuration(-1)).toBe("0ms")
 		expect(formatDuration(Number.NaN)).toBe("0ms")
+	})
+})
+
+describe("formatClock", () => {
+	test("mm:ss in whole seconds", () => {
+		expect(formatClock(0)).toBe("00:00")
+		expect(formatClock(3.9)).toBe("00:03")
+		expect(formatClock(75)).toBe("01:15")
+		expect(formatClock(6000)).toBe("100:00")
+	})
+
+	test("survives degenerate input", () => {
+		expect(formatClock(-5)).toBe("00:00")
+		expect(formatClock(Number.NaN)).toBe("00:00")
 	})
 })

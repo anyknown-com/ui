@@ -20,3 +20,10 @@ export function formatDuration(ms: number): string {
 	if (seconds < 60) return `${(ms / 1000).toFixed(1)}s`
 	return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
 }
+
+/** A running call's clock: `mm:ss`, whole seconds, minutes past 99 just grow. */
+export function formatClock(seconds: number): string {
+	const whole = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
+	const minutes = Math.floor(whole / 60)
+	return `${String(minutes).padStart(2, "0")}:${String(whole % 60).padStart(2, "0")}`
+}

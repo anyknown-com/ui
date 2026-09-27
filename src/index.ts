@@ -131,6 +131,12 @@ export {
 } from "./components/pending-files/PendingFiles"
 export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
 export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
+export {
+	CallBar,
+	type CallBarLabels,
+	type CallBarProps,
+	type CallStatus,
+} from "./components/call-bar/CallBar"
 export { LiveDot, type LiveDotProps } from "./components/live-dot/LiveDot"
 export type { VoiceState } from "./lib/voice"
 export { layerUp, type LayerName } from "./lib/layers"

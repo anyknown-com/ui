@@ -62,3 +62,36 @@ export function PlusGlyph(props: GlyphProps) {
 		</Glyph>
 	)
 }
+
+export function MicGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<path d="M12 19v3" />
+			<path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+			<rect x="9" y="2" width="6" height="13" rx="3" />
+		</Glyph>
+	)
+}
+
+export function MicOffGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<path d="M12 19v3" />
+			<path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+			<path d="M16.95 16.95A7 7 0 0 1 5 12v-2" />
+			<path d="M18.89 13.23A7 7 0 0 0 19 12v-2" />
+			<path d="m2 2 20 20" />
+			<path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+		</Glyph>
+	)
+}
+
+export function PhoneOffGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<path d="M10.1 13.9a14 14 0 0 0 3.732 2.668 1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2 18 18 0 0 1-12.728-5.272" />
+			<path d="M22 2 2 22" />
+			<path d="M4.76 13.582A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 .244.473" />
+		</Glyph>
+	)
+}
