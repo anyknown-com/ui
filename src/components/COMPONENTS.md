@@ -365,8 +365,25 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 (`r` `w` `d` `n` `a` `f` `plain`),`Pill` 是 fold 第一行的 22px mono 藥丸。
 
 ### group / page / settings-rows / table
-頁面骨架的零件:`Group` + `Row` / `Item` 是一張有邊框的清單卡,`PageHead` / `SectionLabel` /
+頁面骨架的零件:`Group` + `Row` / `Item` 是一張清單卡(見下一節),`PageHead` / `SectionLabel` /
 `Panel` / `Snippet` 是頁面的字與面,`SettingsRows` + `SettingsRow` 是設定頁左標籤右控件的列,
 `Table` + `Tr` + `Cell` 是低階的表格零件(要排序、分頁用 `DataTable`)。字級用 `type`、
 圓角用 `corner`、hover 用 `ink`。
+
+### group(分組清單)
+設定頁的分組清單,照 product 殼對過稿的 `ios/` 原樣搬來(0.9)。`Group` 上面一行 muted 的
+`header`、中間一張 `layer3` 的卡(圓角 10、沒有邊框)、下面一段 muted 的 `footer`;
+0.8 的有框 `surface` 卡沒有人用,直接換掉。
+
+- 卡裡的列是 cell:`GroupCell`(字、第二行 `detail`、右邊 `value` / `control`)、
+  `InputCell`(96px 的名字欄 + 沒框的 Input)、`TextCell`(會長高的 Textarea)、
+  `SliderCell`(名字與讀數一行、slider 在下)。44px、左右 16px、`t3`
+- 列與列之間的細線是 cell 自己的 `background-image`,寬 `100% - 16px` 靠右,
+  **不是**卡的 `gap` 或 `border`:第一列沒有線,線從左邊 16px 起
+- `GroupCell` 有 `onPress` 就整列是一顆 `Ghost`;沒有 `tone`、不是選項(`checked`)才畫
+  chevron —— 「新增」「刪除」這種動作列與單選的選項都不是「點進去」
+- 列前面的東西:`IconTile`(28px `layer4` 方塊 + 16px glyph)、`LetterTile`(同一塊寫
+  第一個字母)、`ActionIcon`(沒有方塊的 18px glyph,動作列用)。glyph 收 lucide 的元件,
+  這個套件不依賴 lucide
+- 0.8 的 `Item` / `Row` 還在,放進新的卡裡:`Item` 自己把字級壓回 `t2`,hover 升到 `layer4`
 

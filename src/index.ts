@@ -152,10 +152,30 @@ export {
 	Status,
 	Tag,
 	type ExpandProps,
+	type GroupProps,
 	type MarkProps,
 	type RowProps,
 	type StatusProps,
 } from "./components/group/Group"
+export {
+	GroupCell,
+	InputCell,
+	SliderCell,
+	TextCell,
+	type GroupCellProps,
+	type InputCellProps,
+	type SliderCellProps,
+	type TextCellProps,
+} from "./components/group/Cells"
+export {
+	ActionIcon,
+	IconTile,
+	LetterTile,
+	type ActionIconProps,
+	type IconTileProps,
+	type LetterTileProps,
+	type TileIcon,
+} from "./components/group/Tiles"
 export {
 	B,
 	Bars,

@@ -5,32 +5,33 @@ import type { ReactNode } from "react"
 import { icon } from "../icon/icon"
 
 /**
- * `.group` / `.item` / `.row`: a bordered list where each line is a thing (a server, a key, a
- * rule) with its name, its state and its one action on the right. What a row opens unfolds under
- * it in an `Expand`, never over the screen.
+ * `.group` / `.item` / `.row`: a grouped list. An optional muted header above, the lines on one
+ * `layer3` card with hairlines between them, an optional muted footer below. The lines are cells
+ * (`GroupCell`, `InputCell`, `TextCell`, `SliderCell`) or, for a thing with its name, its state
+ * and its one action on the right, an `Item` holding a `Row`, whose detail unfolds under it in an
+ * `Expand`, never over the screen.
  */
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
 	group: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
 		color: color.text,
-		fontSize: type.t2,
+		display: "flex",
+		flexDirection: "column",
+		fontSize: type.t3,
+		gap: 6,
 		lineHeight: type.body,
 	},
+	header: { color: color.textMuted, fontSize: type.t2, paddingInline: 16 },
+	cells: { backgroundColor: color.layer3, borderRadius: 10, overflow: "hidden" },
+	footer: { color: color.textMuted, fontSize: type.t2, lineHeight: type.snug, paddingInline: 16 },
 	item: {
-		borderRadius: {
-			default: 0,
-			":first-child": `${corner.card} ${corner.card} 0 0`,
-			":last-child": `0 0 ${corner.card} ${corner.card}`,
-		},
 		boxShadow: { default: "none", ":not(:first-child)": `inset 0 1px 0 ${color.border}` },
+		fontSize: type.t2,
 		overflow: "hidden",
 	},
-	go: { backgroundColor: { default: "transparent", ":hover": color.layer3 } },
+	go: { backgroundColor: { default: "transparent", ":hover": color.layer4 } },
 	row: {
 		alignItems: "center",
 		columnGap: space.sm,
@@ -132,8 +133,23 @@ const styles = stylex.create({
 
 type Sx = { sx?: stylex.StyleXStyles }
 
-export function Group({ children, sx }: { children: ReactNode } & Sx) {
-	return <div {...stylex.props(styles.group, sx)}>{children}</div>
+export type GroupProps = {
+	/** A muted line above the card that names what the group is about. */
+	header?: ReactNode
+	/** A muted sentence under the card that says what the settings in it do. */
+	footer?: ReactNode
+	children: ReactNode
+	sx?: stylex.StyleXStyles
+}
+
+export function Group({ header, footer, children, sx }: GroupProps) {
+	return (
+		<div {...stylex.props(styles.group, sx)}>
+			{header !== undefined && <div {...stylex.props(styles.header)}>{header}</div>}
+			<div {...stylex.props(styles.cells)}>{children}</div>
+			{footer !== undefined && <div {...stylex.props(styles.footer)}>{footer}</div>}
+		</div>
+	)
 }
 
 export function Item({ children, go = false, sx }: { children: ReactNode; go?: boolean } & Sx) {
