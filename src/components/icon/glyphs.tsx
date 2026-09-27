@@ -53,3 +53,12 @@ export function CopyGlyph(props: GlyphProps) {
 		</Glyph>
 	)
 }
+
+export function PlusGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<path d="M5 12h14" />
+			<path d="M12 5v14" />
+		</Glyph>
+	)
+}

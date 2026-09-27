@@ -324,6 +324,16 @@ session」,可展開看交接摘要。用戶不管理 session,**這是他唯一�
 - 打 `@` 時浮層列出來源建議(檔案 / ledger 收據 / 記憶,各帶種類標),點選補全
 - focus 時整條 border 轉 accent(`:focus-within`)
 
+### attach-button / pending-files
+chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `IconButton`(18px 的
+`+`),按了開檔案選擇器;`PendingFiles` 是選好還沒送的檔,一檔一個 outline `Chip`、`×`
+拿掉,間距 6、會折行。
+
+- 鍵盤與讀屏摸到的是按鈕;真正的 `<input type="file">` 是 `hidden`、`tabIndex -1`,
+  只給 `.click()` 打開選擇器。選完把 `value` 清掉,同一個檔可以再選一次
+- 不是 `Dropzone` / `UploadList`:那是整塊虛線拖放區與帶進度條的上傳清單,
+  chatbox 只要一顆鈕跟一排 chip
+
 ### voice-indicator
 一眼看出 agent 現在是在聽你、在想、還是在說 —— 對應 STT → runtime LLM → TTS 的三段。
 

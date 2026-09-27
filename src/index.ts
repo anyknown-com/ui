@@ -123,6 +123,12 @@ export type {
 export { HandoffReceipt } from "./components/handoff-receipt/HandoffReceipt"
 export type { HandoffReceiptProps, HandoffReason } from "./components/handoff-receipt/HandoffReceipt"
 export { Composer } from "./components/composer/Composer"
+export { AttachButton, type AttachButtonProps } from "./components/attach-button/AttachButton"
+export {
+	PendingFiles,
+	type PendingFile,
+	type PendingFilesProps,
+} from "./components/pending-files/PendingFiles"
 export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
 export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
 export { LiveDot, type LiveDotProps } from "./components/live-dot/LiveDot"
