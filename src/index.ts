@@ -203,5 +203,15 @@ export {
 	Value,
 	type SettingsRowProps,
 } from "./components/settings-rows/SettingsRows"
+export {
+	ListHead,
+	ListRow,
+	ListSort,
+	WeightDot,
+	type ListHeadProps,
+	type ListRowProps,
+	type ListSortProps,
+	type WeightDotProps,
+} from "./components/list/List"
 export { Detail, Head, ListScroll, MoreRow, Table, Tr, type TableProps } from "./components/table/Table"
 export { Break, Cell, StatusCell, Subject, Toggle, type CellProps } from "./components/table/TableCells"

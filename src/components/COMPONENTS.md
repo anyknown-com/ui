@@ -399,3 +399,16 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 - 不是 `Pill`(fold 第一行 22px 的 mono 藥丸),也不是 `StatusChip`(16px 的工具狀態碼)
 - `live` 的字只唸一次:`LiveDot` 帶 `role="status"` 唸狀態,看得到的字 `aria-hidden`
 
+### list
+一張「點開來看」的清單(記憶、問題):`ListHead` 一行 `t1` faint 的欄名、底下一條細線;
+`ListRow` 每列是一顆 `Ghost`,40px、`t3`、hover `layer3`、圓角 `radius.md`,沒有框。
+跟 `Table` 不同:`Table` 是 mono 的帳本,這裡一個 mono 都沒有。
+
+- **欄寬是呼叫端的**:同一個 grid template 用 `sx` 給表頭與每一列。手機上怎麼排
+  (藏表頭、一列折兩行、列上下各 10px)也寫在同一個 `sx` 裡 —— 元件不帶 breakpoint,
+  殼的 640px 與這個套件的 45rem 才不會打架
+- 列是 `minHeight: 40` 不是 `height: 40`:折兩行時自己長高
+- 能排序的欄名用 `ListSort`(`t1` 的 `Ghost`),`active` 變深色、後面跟一個 ` ↓`
+- `WeightDot`:問題前面 8px 的點。`light` 灰色實心(沒人回答就照建議做)、`soon` 紅色實心
+  (快到期了)、`heavy` 1.5px 橘色空心環(一定要人決定)。不是 `Dot`(設定列 6px accent)
+
