@@ -15,7 +15,7 @@ describe("site smoke", () => {
 		location.hash = ""
 		render(<Site />)
 		expect(screen.getByRole("heading", { name: "@anyknown/ui" })).toBeInTheDocument()
-		for (const id of ["input", "dialog", "message", "data-table"]) {
+		for (const id of ["input", "dialog", "message", "data-table", "group", "call-bar"]) {
 			expect(document.getElementById(id)).not.toBeNull()
 		}
 		goto("#/guide/readme")

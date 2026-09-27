@@ -5,6 +5,7 @@ import { BasicsDemos } from "./demos/basics"
 import { DesktopDemos } from "./demos/desktop"
 import { StorageDemos } from "./demos/storage"
 import { FormsDemos } from "./demos/forms"
+import { WebDemos } from "./demos/web"
 
 const GROUPS: Record<string, string[]> = {
 	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "slider", "select", "dropdown"],
@@ -36,6 +37,7 @@ const GROUPS: Record<string, string[]> = {
 		"live-dot",
 	],
 	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
+	"Web 殼": ["group", "status", "list", "bubble", "attachment", "payload-block", "chatbox", "call-bar"],
 }
 
 const styles = stylex.create({
@@ -95,6 +97,7 @@ export function App() {
 				<BasicsDemos />
 				<DesktopDemos />
 				<StorageDemos />
+				<WebDemos />
 			</main>
 			<Toaster />
 		</div>

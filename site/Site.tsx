@@ -8,6 +8,7 @@ import { BasicsDemos } from "../playground/demos/basics"
 import { DesktopDemos } from "../playground/demos/desktop"
 import { FormsDemos } from "../playground/demos/forms"
 import { StorageDemos } from "../playground/demos/storage"
+import { WebDemos } from "../playground/demos/web"
 import componentsReadme from "../src/components/README.md?raw"
 import componentsDoc from "../src/components/COMPONENTS.md?raw"
 import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
@@ -42,6 +43,7 @@ const GROUPS: Record<string, string[]> = {
 		"live-dot",
 	],
 	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
+	"Web 殼": ["group", "status", "list", "bubble", "attachment", "payload-block", "chatbox", "call-bar"],
 }
 
 // Repo 內的相對連結改指到站內對應頁。
@@ -230,6 +232,7 @@ function DemoPage({ anchor }: { anchor?: string }) {
 			<BasicsDemos />
 			<DesktopDemos />
 			<StorageDemos />
+			<WebDemos />
 		</>
 	)
 }
