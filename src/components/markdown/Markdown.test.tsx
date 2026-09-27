@@ -45,6 +45,23 @@ describe("Markdown", () => {
 		expect(screen.getByText("2")).toHaveStyle({ textAlign: "end" })
 	})
 
+	test("ruled tables draw a hairline between rows and none under the last", () => {
+		render(<Markdown tables="ruled">{"| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |"}</Markdown>)
+		expect(screen.getByRole("columnheader", { name: "a" })).toHaveStyle({
+			borderBottomWidth: "1px",
+			fontWeight: "500",
+			paddingInlineStart: "0px",
+		})
+		expect(screen.getByRole("cell", { name: "1" })).toHaveStyle({ borderBottomWidth: "1px" })
+		expect(screen.getByRole("cell", { name: "3" })).toHaveStyle({ borderBottomWidth: "0px" })
+	})
+
+	test("tables are a grid unless asked to be ruled", () => {
+		render(<Markdown>{"| a |\n| --- |\n| 1 |"}</Markdown>)
+		expect(screen.getByRole("columnheader", { name: "a" })).toHaveStyle({ fontWeight: "600" })
+		expect(screen.getByRole("cell", { name: "1" })).toHaveStyle({ borderBottomWidth: "1px" })
+	})
+
 	test("task list items keep their checkbox state", () => {
 		render(<Markdown>{"- [x] 做完了\n- [ ] 還沒"}</Markdown>)
 		const boxes = screen.getAllByRole("checkbox")

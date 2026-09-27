@@ -229,6 +229,10 @@ header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
   color 畫自己,完全不看主題)
 - 表格**照內容寬度**,不 `minWidth: 100%`:兩欄表格拉滿訊息寬只會把字推到左右兩端。
   外層 wrapper 才是捲動的那一層
+- `tables="ruled"` 是泡泡裡的表格:沒有框、沒有底,表頭下與列之間一條 `border` 細線、
+  最後一列下面沒有;表頭 13px `textMuted` 500,格子 `8px 24px 8px 0`。預設 `grid` 不變
+  (記憶的附件內文還在用)。以前 product 靠 `[data-bubble] th/td { … !important }` 蓋掉,
+  現在不用了
 - `breaks: true`。這是訊息不是文件 —— 單獨一個換行是寫的人真的想換行
 - 圖表不做:mermaid 光 unpack 就 84MB,設計系統不該讓每個裝它的 app 背。
   留 `renderBlock({lang, code})` 這個口子給 shell 自己接,沒接就退回 code block

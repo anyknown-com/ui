@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Marked, type Token, type Tokens } from "marked"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, radius, space, text } from "../../tokens.stylex"
+import { color, radius, space, text, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { CodeBlock, InlineCode } from "../code-block/CodeBlock"
 import { Formula } from "./Formula"
@@ -76,6 +76,21 @@ const styles = stylex.create({
 		verticalAlign: "top",
 	},
 	head: { backgroundColor: color.surface, fontWeight: 600 },
+	// Ruled: no frame and no fill, a hairline under the head and between rows, none under the last.
+	ruledTable: { borderCollapse: "collapse", marginBlock: 4 },
+	ruledCell: {
+		borderColor: color.border,
+		borderStyle: "solid",
+		borderWidth: 0,
+		borderBottomWidth: 1,
+		paddingBlock: 8,
+		paddingInlineEnd: 24,
+		paddingInlineStart: 0,
+		textAlign: "start",
+		verticalAlign: "top",
+	},
+	ruledHead: { color: color.textMuted, fontSize: type.t2, fontWeight: 500 },
+	ruledLast: { borderBottomWidth: 0 },
 })
 
 const ALIGN = { left: "start", center: "center", right: "end" } as const
@@ -97,10 +112,16 @@ export type MarkdownProps = Omit<ComponentProps<"div">, "children"> & {
 	/** Passed through to code blocks, so a shell can localise their copy button. */
 	copyLabel?: string
 	copiedLabel?: string
+	/**
+	 * `grid` frames every cell and fills the head; `ruled` draws only a hairline under the head and
+	 * between rows, with a muted head, for a table that sits inside a bubble.
+	 * @default "grid"
+	 */
+	tables?: "grid" | "ruled"
 	sx?: StyleArg
 }
 
-type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel">
+type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel" | "tables">
 
 function inlineTokens(token: Token): Token[] | undefined {
 	return (token as { tokens?: Token[] }).tokens
@@ -223,15 +244,20 @@ function renderList(token: Tokens.List, context: Context, key: string): ReactNod
 }
 
 function renderTable(token: Tokens.Table, context: Context, key: string): ReactNode {
+	const ruled = context.tables === "ruled"
+	const last = token.rows.length - 1
 	return (
 		<div key={key} {...stylex.props(styles.tableWrap)}>
-			<table {...stylex.props(styles.table)}>
+			<table {...stylex.props(ruled ? styles.ruledTable : styles.table)}>
 				<thead>
 					<tr>
 						{token.header.map((cell, index) => (
 							<th
 								key={index}
-								{...stylex.props(styles.cell, styles.head)}
+								{...stylex.props(
+									ruled ? styles.ruledCell : styles.cell,
+									ruled ? styles.ruledHead : styles.head,
+								)}
 								style={{ textAlign: ALIGN[token.align[index] ?? "left"] }}
 							>
 								{renderInline(cell.tokens, context, `${key}.h.${index}`)}
@@ -245,7 +271,10 @@ function renderTable(token: Tokens.Table, context: Context, key: string): ReactN
 							{row.map((cell, index) => (
 								<td
 									key={index}
-									{...stylex.props(styles.cell)}
+									{...stylex.props(
+										ruled ? styles.ruledCell : styles.cell,
+										ruled && rowIndex === last && styles.ruledLast,
+									)}
 									style={{ textAlign: ALIGN[token.align[index] ?? "left"] }}
 								>
 									{renderInline(cell.tokens, context, `${key}.${rowIndex}.${index}`)}
@@ -369,11 +398,19 @@ function headingLevel(depth: number): 1 | 2 | 3 {
  * Nothing here goes through `innerHTML`. The markdown is tokenised and every token is turned into
  * a React element, so a model that emits `<script>` gets its source shown, not run.
  */
-export function Markdown({ children, renderBlock, copyLabel, copiedLabel, sx, ...rest }: MarkdownProps) {
+export function Markdown({
+	children,
+	renderBlock,
+	copyLabel,
+	copiedLabel,
+	tables = "grid",
+	sx,
+	...rest
+}: MarkdownProps) {
 	const tokens = parser.lexer(children)
 	return (
 		<div {...rest} {...styled(rest, styles.root, sx)}>
-			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel })}
+			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel, tables })}
 		</div>
 	)
 }
