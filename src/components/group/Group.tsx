@@ -89,14 +89,23 @@ const styles = stylex.create({
 	status: {
 		alignItems: "center",
 		color: color.textMuted,
-		display: "inline-flex",
+		display: "flex",
 		fontSize: type.t2,
-		gap: space.xs,
+		gap: 6,
+		lineHeight: type.tight,
 		minWidth: 0,
 	},
 	statusText: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-	warn: { color: color.warning },
-	dot: { backgroundColor: color.warning, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	warning: { color: color.warning },
+	danger: { color: color.danger },
+	dot: { borderRadius: "50%", boxSizing: "border-box", flex: "none", height: 7, width: 7 },
+	filled: { backgroundColor: "currentColor" },
+	hollow: { borderColor: "currentColor", borderStyle: "solid", borderWidth: 1.5 },
+	dashed: { borderColor: "currentColor", borderStyle: "dashed", borderWidth: 1.5 },
+	dotMuted: { color: color.textMuted },
+	dotSuccess: { color: color.success },
+	dotWarning: { color: color.warning },
+	dotDanger: { color: color.danger },
 	tag: { color: color.textMuted, flex: "none", fontFamily: font.mono, fontSize: type.t2 },
 	act: { alignItems: "center", display: "flex", gap: space.xs },
 	chevron: { color: tone.faint },
@@ -167,12 +176,46 @@ export function Mark({ letter, tint, sx }: MarkProps) {
 	)
 }
 
-export type StatusProps = { children: ReactNode; warn?: boolean; sx?: stylex.StyleXStyles }
+export type StatusTone = "muted" | "success" | "warning" | "danger"
 
-export function Status({ children, warn = false, sx }: StatusProps) {
+const DOT_TONE = {
+	muted: styles.dotMuted,
+	success: styles.dotSuccess,
+	warning: styles.dotWarning,
+	danger: styles.dotDanger,
+} as const
+
+export type StatusProps = {
+	children: ReactNode
+	/** `filled` settled, `hollow` waiting on someone, `dashed` gone stale. No dot without it. */
+	dot?: "filled" | "hollow" | "dashed"
+	/**
+	 * The dot's colour. `warning` and `danger` colour the words too; a calm state reads muted.
+	 * @default "muted"
+	 */
+	tone?: StatusTone
+	/** Shorthand for `tone="warning"` with a filled dot. */
+	warn?: boolean
+	sx?: stylex.StyleXStyles
+}
+
+/** A state in words after a dot: the state after a row's name, or a list's status column. */
+export function Status(props: StatusProps) {
+	const { children, dot, warn = false, sx } = props
+	const shape = dot ?? (warn ? "filled" : undefined)
+	const hue = props.tone ?? (warn ? "warning" : "muted")
 	return (
-		<span {...stylex.props(styles.status, warn && styles.warn, sx)}>
-			{warn && <span {...stylex.props(styles.dot)} aria-hidden="true" />}
+		<span
+			{...stylex.props(
+				styles.status,
+				hue === "warning" && styles.warning,
+				hue === "danger" && styles.danger,
+				sx,
+			)}
+		>
+			{shape !== undefined && (
+				<span {...stylex.props(styles.dot, DOT_TONE[hue], styles[shape])} aria-hidden="true" />
+			)}
 			<span {...stylex.props(styles.statusText)}>{children}</span>
 		</span>
 	)

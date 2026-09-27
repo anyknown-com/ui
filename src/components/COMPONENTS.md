@@ -386,4 +386,8 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
   第一個字母)、`ActionIcon`(沒有方塊的 18px glyph,動作列用)。glyph 收 lucide 的元件,
   這個套件不依賴 lucide
 - 0.8 的 `Item` / `Row` 還在,放進新的卡裡:`Item` 自己把字級壓回 `t2`,hover 升到 `layer4`
+- `Status` 是點 + 字:`dot` 給 `filled`(定了)/ `hollow`(等人確認)/ `dashed`(過期了)
+  三種 7px 的點,`tone` 給點的顏色;`warning` / `danger` 連字一起染,`success` / `muted`
+  字留 muted —— 平靜的狀態不搶眼。沒給 `dot` 就只有字。`warn` 是 `tone="warning"` +
+  實心點的簡寫(0.8 的 API)
 

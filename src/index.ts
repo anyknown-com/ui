@@ -156,6 +156,7 @@ export {
 	type MarkProps,
 	type RowProps,
 	type StatusProps,
+	type StatusTone,
 } from "./components/group/Group"
 export {
 	GroupCell,
