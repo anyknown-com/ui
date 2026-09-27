@@ -200,6 +200,14 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 過去區的訊息節奏:user 右對齊氣泡、assistant 全寬純文字。turn 24px / part 8px,
 字級只走三個 token。
 
+### bubble
+product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3` / `body`。人說的是
+`successHl` 底、照打的字顯示;回覆是 `layer3` 底、`Markdown tables="ruled"`。
+
+- 跟 `UserMessage` / `AssistantMessage` 不是同一個版面:那組是 desktop 的 turn(靠右 85%
+  的泡泡、全寬的回覆、串流游標、action bar),這個是殼的一列一泡泡。位置與寬度交給 thread
+- prop 叫 `from` 不叫 `role`:`role` 是 ARIA 的字,給一個不是 ARIA role 的值 lint 會擋
+
 ### tool-card
 工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,
 展開看輸入/輸出。**subagent 是它的變體,不是新元件家族**。

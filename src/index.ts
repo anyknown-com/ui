@@ -76,6 +76,7 @@ export type {
 	AssistantMessageProps,
 	TextPartProps,
 } from "./components/message/Message"
+export { Bubble, type BubbleProps } from "./components/bubble/Bubble"
 export {
 	ToolCard,
 	ToolInput,
