@@ -170,6 +170,13 @@ export { LiveDot, type LiveDotProps } from "./components/live-dot/LiveDot"
 export type { VoiceState } from "./lib/voice"
 export { layerUp, type LayerName } from "./lib/layers"
 export { createStore, useStore, type Store } from "./lib/store"
+export {
+	setTextLayoutEngine,
+	measureTextHeight,
+	type TextLayoutEngine,
+	type MeasureTextOptions,
+	type TextWhiteSpace,
+} from "./lib/textLayout"
 
 export { PasswordInput, defaultScorer } from "./components/password-input/PasswordInput"
 export type { PasswordInputProps } from "./components/password-input/PasswordInput"
