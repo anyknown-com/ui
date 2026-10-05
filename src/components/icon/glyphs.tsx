@@ -63,6 +63,15 @@ export function PlusGlyph(props: GlyphProps) {
 	)
 }
 
+export function XGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<path d="M18 6 6 18" />
+			<path d="m6 6 12 12" />
+		</Glyph>
+	)
+}
+
 export function MicGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>

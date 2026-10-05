@@ -119,7 +119,7 @@ test("every animated property is wrapped in prefers-reduced-motion", async () =>
 test("the documented exceptions still exist and are still exceptional", async () => {
 	const toast = await readFile(join(SRC, "components/toast/Toast.tsx"), "utf8")
 	expect(toast).toContain("usePrefersReducedMotion")
-	expect(toast).toContain("{!reduced && duration > 0 && (")
+	expect(toast).toContain("{!reduced && record.duration > 0 && (")
 
 	const toolCard = await readFile(join(SRC, "components/tool-card/ToolCard.tsx"), "utf8")
 	expect(toolCard).toContain('animationDuration: { default: "0.8s", [REDUCED]: "1.6s" }')

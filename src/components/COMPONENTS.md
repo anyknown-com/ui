@@ -108,6 +108,28 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作
 按鈕(「已刪除 · 復原」)。danger / success 用色點區分。
 
+- **狀態自己養,不靠 Base UI toast**。`createToastManager()` 跑在 `lib/store.ts`
+  (`subscribe` / `getSnapshot` / `set`,React 端走 `useSyncExternalStore`),計時器也在
+  manager 裡。改這裡之前要知道:live region、暫停、limit 現在都是我們的責任,沒有人替我們兜
+- API:`toast(title, opts)` / `toast.success` / `toast.danger` 回傳 id;
+  `toast.update(id, patch)`、`toast.close(id)`、
+  `toast.promise(promise, { loading, success, error })`(`success` / `error` 可以是字串或
+  拿到值 / 錯誤的函式,回傳原本的 promise)。`toastManager.add({ title, type, ... })` 的形狀
+  沿用 Base UI 的 `type` 欄位名,舊的呼叫端不用改
+- **loading 不倒數**,落定才換成 success / danger 並從頭倒數。`update` 也從頭倒數 ——
+  內容換了就是新訊息,要給完整的時間讀
+- **同 key 去重就是全部的「分組」**:同一個 `key` 還在畫面上時,不疊新的一則,原地換內容、
+  重新倒數、計數 +1,標題後面一個 `×N`(tabular 數字)。沒有更精巧的分組
+- `limit`(預設 3)超過就**丟掉最舊的**,不是藏起來排隊
+- 暫停有三個來源,任何一個在就停:viewport 上 hover、viewport 內有 focus、`document.hidden`。
+  倒數線是 CSS 動畫,`animationPlayState` 跟著同一個 `paused` 走;重新倒數靠 `epoch` 換 key
+  重播。全部關掉時順手清掉 hover / focus —— viewport 縮成 0,mouseleave 不一定會來,
+  不清的話下一則會永遠停住
+- 無障礙:viewport 是常駐的 `role="region"` + `aria-live="polite"`;每則是
+  `role="status"`(`aria-atomic`,去重 / promise 更新時整則重念),danger 是 `role="alert"`。
+  色點之外有視覺隱藏的「成功:/ 錯誤:」;每則都有一顆「關閉通知」
+- viewport 的 hover / focus / visibility 監聽掛在 ref callback 裡(含 cleanup),不用 `useEffect`
+
 ### tooltip
 純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,反色小氣泡,只放一行文字(可附 Kbd)。
 **絕不放互動內容**。

@@ -83,6 +83,12 @@ function MemoryIcon() {
 	)
 }
 
+function wait(ms: number, ok: boolean) {
+	return new Promise<void>((resolve, reject) =>
+		setTimeout(() => (ok ? resolve() : reject(new Error("vault 離線"))), ms),
+	)
+}
+
 function useDemoProgress() {
 	const [percent, setPercent] = useState(0)
 	useEffect(() => {
@@ -200,7 +206,11 @@ export function BasicsDemos() {
 				</Row>
 			</Demo>
 
-			<Demo id="toast" title="toast" note="倒數是一條退織的線;hover 停住。">
+			<Demo
+				id="toast"
+				title="toast"
+				note="倒數是一條退織的線;hover、focus、切走分頁都會停住。loading 不倒數;同 key 原地更新並計數。"
+			>
 				<Row>
 					<Button variant="secondary" onClick={() => toast("交接摘要已複製")}>
 						default
@@ -222,6 +232,46 @@ export function BasicsDemos() {
 						onClick={() => toast("已刪除「偏好 pnpm」", { action: { label: "復原", onClick: () => {} } })}
 					>
 						with action
+					</Button>
+				</Row>
+				<Row>
+					<Button
+						variant="secondary"
+						onClick={() =>
+							toast.promise(wait(1600, true), {
+								loading: "正在同步 vault…",
+								success: "vault 已同步",
+								error: "同步失敗",
+							})
+						}
+					>
+						promise 成功
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() =>
+							toast
+								.promise(wait(1600, false), {
+									loading: "正在上傳 3 個檔案…",
+									success: "已上傳",
+									error: (error) => `上傳失敗:${(error as Error).message}`,
+								})
+								.catch(() => {})
+						}
+					>
+						promise 失敗
+					</Button>
+					<Button variant="secondary" onClick={() => toast("已複製連結", { key: "copy-link" })}>
+						同 key 連按(×N)
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							const id = toast("正在換班…", { timeout: 0 })
+							setTimeout(() => toast.update(id, { title: "換班完成", type: "success", timeout: 4000 }), 1200)
+						}}
+					>
+						update
 					</Button>
 				</Row>
 			</Demo>

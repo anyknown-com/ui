@@ -42,8 +42,19 @@ export {
 	ConfirmDialog,
 } from "./components/dialog/Dialog"
 export type { DialogProps, DialogContentProps, ConfirmDialogProps } from "./components/dialog/Dialog"
-export { Toaster, toast, useToast, toastManager } from "./components/toast/Toast"
-export type { ToasterProps, ToastOptions } from "./components/toast/Toast"
+export { Toaster, toast, useToast, toastManager, createToastManager } from "./components/toast/Toast"
+export type {
+	ToasterProps,
+	ToastOptions,
+	ToastAction,
+	ToastInput,
+	ToastUpdate,
+	ToastType,
+	ToastPromiseMessages,
+	ToastRecord,
+	ToastState,
+	ToastManager,
+} from "./components/toast/Toast"
 export { Tooltip, TooltipProvider, type TooltipProps } from "./components/tooltip/Tooltip"
 export {
 	Popover,
