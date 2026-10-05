@@ -1,8 +1,9 @@
 import { AlertDialog } from "@base-ui/react/alert-dialog"
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import * as stylex from "@stylexjs/stylex"
-import { type ReactElement, type ReactNode, useRef } from "react"
+import { createContext, type ReactElement, type ReactNode, useContext, useRef, useState } from "react"
 import { layerStyles } from "../../lib/popup"
+import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
 import { color, font, radius, shadow, space, text } from "../../tokens.stylex"
 import { Button } from "../button/Button"
@@ -162,34 +163,276 @@ export function ConfirmDialog({
 	onConfirm,
 	...props
 }: ConfirmDialogProps) {
-	const cancelRef = useRef<HTMLButtonElement>(null)
 	return (
 		<AlertDialog.Root {...props}>
 			{trigger != null && <AlertDialog.Trigger render={trigger} />}
-			<AlertDialog.Portal>
-				<AlertDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
-				<AlertDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
-					<AlertDialog.Popup initialFocus={danger ? cancelRef : undefined} {...stylex.props(styles.popup)}>
-						<AlertDialog.Title {...stylex.props(styles.title)}>{title}</AlertDialog.Title>
-						{description != null && (
-							<AlertDialog.Description {...stylex.props(styles.description)}>
-								{description}
-							</AlertDialog.Description>
-						)}
-						<div {...stylex.props(styles.actions)}>
-							<AlertDialog.Close render={<Button ref={cancelRef} variant="ghost" />}>
+			<ConfirmContent
+				title={title}
+				description={description}
+				danger={danger}
+				confirmLabel={confirmLabel}
+				cancelLabel={cancelLabel}
+				onConfirm={onConfirm}
+			/>
+		</AlertDialog.Root>
+	)
+}
+
+type ConfirmContentProps = {
+	title: ReactNode
+	description?: ReactNode
+	danger: boolean
+	confirmLabel: string
+	/** null = 只有一顆按鈕(alert) */
+	cancelLabel: string | null
+	onConfirm: () => void
+	onCancel?: () => void
+}
+
+/** ConfirmDialog 與 `dialog.confirm` / `dialog.alert` 共用的那張卡;要放在 AlertDialog.Root 裡。 */
+function ConfirmContent({
+	title,
+	description,
+	danger,
+	confirmLabel,
+	cancelLabel,
+	onConfirm,
+	onCancel,
+}: ConfirmContentProps) {
+	const cancelRef = useRef<HTMLButtonElement>(null)
+	return (
+		<AlertDialog.Portal>
+			<AlertDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
+			<AlertDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
+				<AlertDialog.Popup
+					initialFocus={danger && cancelLabel != null ? cancelRef : undefined}
+					{...stylex.props(styles.popup)}
+				>
+					<AlertDialog.Title {...stylex.props(styles.title)}>{title}</AlertDialog.Title>
+					{description != null && (
+						<AlertDialog.Description {...stylex.props(styles.description)}>
+							{description}
+						</AlertDialog.Description>
+					)}
+					<div {...stylex.props(styles.actions)}>
+						{cancelLabel != null && (
+							<AlertDialog.Close render={<Button ref={cancelRef} variant="ghost" />} onClick={onCancel}>
 								{cancelLabel}
 							</AlertDialog.Close>
-							<AlertDialog.Close
-								render={<Button variant={danger ? "danger" : "primary"} />}
-								onClick={onConfirm}
-							>
-								{confirmLabel}
-							</AlertDialog.Close>
-						</div>
-					</AlertDialog.Popup>
-				</AlertDialog.Viewport>
-			</AlertDialog.Portal>
+						)}
+						<AlertDialog.Close
+							render={<Button variant={danger ? "danger" : "primary"} />}
+							onClick={onConfirm}
+						>
+							{confirmLabel}
+						</AlertDialog.Close>
+					</div>
+				</AlertDialog.Popup>
+			</AlertDialog.Viewport>
+		</AlertDialog.Portal>
+	)
+}
+
+// ---------------------------------------------------------------------------
+// 命令式:dialog.open / confirm / alert,狀態在 lib/store,畫面由 <Dialogs /> 掛
+
+export type DialogControls<T = unknown> = { close: (result?: T) => void }
+
+export type DialogRender<T = unknown> = (controls: DialogControls<T>) => ReactNode
+
+export type DialogOptions = {
+	/** `alertdialog`:要使用者明確回答;點 backdrop 不會關,Esc 仍會。 @default "dialog" */
+	role?: "dialog" | "alertdialog"
+}
+
+export type DialogHandle<T = unknown> = {
+	id: string
+	close: (result?: T) => void
+	/** 關掉時落定;Esc / backdrop / `closeAll` 關掉的是 `undefined`(confirm 是 `false`)。 */
+	result: Promise<T | undefined>
+}
+
+export type DialogEntry = {
+	id: string
+	render: DialogRender<never>
+	role: "dialog" | "alertdialog"
+}
+
+export type ConfirmOptions = {
+	title: ReactNode
+	description?: ReactNode
+	/** @default "確認" */
+	confirmLabel?: string
+	/** @default "取消" */
+	cancelLabel?: string
+	/** `danger`:紅色確認鈕,焦點先落在取消。 @default "default" */
+	tone?: "default" | "danger"
+}
+
+export type AlertOptions = {
+	title: ReactNode
+	description?: ReactNode
+	/** @default "知道了" */
+	confirmLabel?: string
+	tone?: "default" | "danger"
+}
+
+export type DialogManager = {
+	open: <T = unknown>(render: DialogRender<T>, options?: DialogOptions) => DialogHandle<T>
+	/** 連同疊在它上面的 dialog 一起關。 */
+	close: (id: string, result?: unknown) => void
+	closeAll: () => void
+	/** 確認 → true;取消、Esc → false。 */
+	confirm: (options: ConfirmOptions) => Promise<boolean>
+	alert: (options: AlertOptions) => Promise<void>
+	subscribe: (listener: () => void) => () => void
+	getSnapshot: () => readonly DialogEntry[]
+}
+
+let dialogSeq = 0
+
+export function createDialogManager(): DialogManager {
+	const store = createStore<readonly DialogEntry[]>([])
+	// 結果的出口不放進 snapshot:畫面用不到
+	const settle = new Map<string, { resolve: (value: unknown) => void; dismiss: unknown }>()
+
+	function push<T>(render: DialogRender<T>, role: DialogEntry["role"], dismiss: unknown): DialogHandle<T> {
+		dialogSeq += 1
+		const id = `dialog-${dialogSeq}`
+		const result = new Promise<T | undefined>((resolve) => {
+			settle.set(id, { resolve: resolve as (value: unknown) => void, dismiss })
+		})
+		store.set((entries) => [...entries, { id, render: render as DialogRender<never>, role }])
+		return { id, close: (value) => close(id, value), result }
+	}
+
+	function close(id: string, result?: unknown) {
+		const entries = store.getSnapshot()
+		const index = entries.findIndex((entry) => entry.id === id)
+		if (index === -1) return
+		store.set(entries.slice(0, index))
+		// 由上往下落定:疊在上面的先用各自的 dismiss 值
+		for (let i = entries.length - 1; i >= index; i -= 1) {
+			const entryId = entries[i].id
+			const pending = settle.get(entryId)
+			settle.delete(entryId)
+			pending?.resolve(entryId === id && result !== undefined ? result : pending.dismiss)
+		}
+	}
+
+	return {
+		open: (render, options = {}) => push(render, options.role ?? "dialog", undefined),
+		close,
+		closeAll() {
+			const [first] = store.getSnapshot()
+			if (first != null) close(first.id)
+		},
+		confirm({ title, description, confirmLabel = "確認", cancelLabel = "取消", tone = "default" }) {
+			const handle = push<boolean>(
+				({ close: done }) => (
+					<ConfirmContent
+						title={title}
+						description={description}
+						danger={tone === "danger"}
+						confirmLabel={confirmLabel}
+						cancelLabel={cancelLabel}
+						onConfirm={() => done(true)}
+						onCancel={() => done(false)}
+					/>
+				),
+				"alertdialog",
+				false,
+			)
+			return handle.result.then((value) => value === true)
+		},
+		alert({ title, description, confirmLabel = "知道了", tone = "default" }) {
+			const handle = push<void>(
+				({ close: done }) => (
+					<ConfirmContent
+						title={title}
+						description={description}
+						danger={tone === "danger"}
+						confirmLabel={confirmLabel}
+						cancelLabel={null}
+						onConfirm={() => done()}
+					/>
+				),
+				"alertdialog",
+				undefined,
+			)
+			return handle.result.then(() => undefined)
+		},
+		subscribe: store.subscribe,
+		getSnapshot: store.getSnapshot,
+	}
+}
+
+/** 只有一個 <Dialogs/> 的 app 用這個:直接 import `dialog` 就能用。 */
+export const dialogManager = createDialogManager()
+
+export const dialog: DialogManager = dialogManager
+
+const DialogManagerContext = createContext<DialogManager | null>(null)
+
+/** 在 `<Dialogs manager>` 底下拿到那個 manager,否則是預設的 `dialog`。 */
+export function useDialog() {
+	const scoped = useContext(DialogManagerContext)
+	return { dialog: scoped ?? dialog }
+}
+
+export type DialogsProps = {
+	/** Pass a manager from `createDialogManager()` to scope this host. 一個 manager 只掛一個 host。 */
+	manager?: DialogManager
+	/** 包在裡面的 `useDialog()` 拿到的是這個 host 的 manager。 */
+	children?: ReactNode
+}
+
+export function Dialogs({ manager, children }: DialogsProps) {
+	const [own] = useState(() => manager ?? dialogManager)
+	const entries = useStore(own)
+	const first = entries[0]
+	return (
+		<DialogManagerContext value={own}>
+			{children}
+			{first != null && <StackedDialog key={first.id} entries={entries} index={0} manager={own} />}
+		</DialogManagerContext>
+	)
+}
+
+type StackedDialogProps = { entries: readonly DialogEntry[]; index: number; manager: DialogManager }
+
+/**
+ * 上一層的 Root 包住下一層,Base UI 才知道它們是巢狀的:Esc 只關最上面那個、
+ * 底下那個的 backdrop 不會吃掉上面那個的點擊。
+ *
+ * 下一層要等這一層開好(`onOpenChangeComplete(true)`)才掛:兩層在同一個 commit 掛上時,
+ * React 先跑子層的 effect,上一層隨後把「自己以外」全標成 aria-hidden,連上面那層一起蓋掉。
+ * 所以 `render` 要回傳 DialogContent(或 Base UI Dialog 的 Popup),不然下一層永遠不會出現。
+ */
+function StackedDialog({ entries, index, manager }: StackedDialogProps) {
+	const [ready, setReady] = useState(false)
+	const entry = entries[index]
+	const next = ready ? entries[index + 1] : undefined
+	const close = (result?: unknown) => manager.close(entry.id, result)
+	const onOpenChange = (open: boolean) => {
+		if (!open) manager.close(entry.id)
+	}
+	const onOpenChangeComplete = (open: boolean) => {
+		if (open) setReady(true)
+	}
+	const body = (
+		<>
+			{(entry.render as DialogRender)({ close })}
+			{next != null && <StackedDialog key={next.id} entries={entries} index={index + 1} manager={manager} />}
+		</>
+	)
+	return entry.role === "alertdialog" ? (
+		<AlertDialog.Root open onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
+			{body}
 		</AlertDialog.Root>
+	) : (
+		<BaseDialog.Root open onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
+			{body}
+		</BaseDialog.Root>
 	)
 }

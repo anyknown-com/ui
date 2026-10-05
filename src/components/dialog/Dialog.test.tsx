@@ -1,10 +1,22 @@
 import * as stylex from "@stylexjs/stylex"
-import { render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test, vi } from "vitest"
+import { afterEach, describe, expect, test, vi } from "vitest"
 import { type StyleArg } from "../../lib/styled"
 import { Button } from "../button/Button"
-import { ConfirmDialog, Dialog, DialogActions, DialogClose, DialogContent, DialogTrigger } from "./Dialog"
+import {
+	ConfirmDialog,
+	createDialogManager,
+	Dialog,
+	DialogActions,
+	DialogClose,
+	DialogContent,
+	type DialogHandle,
+	dialogManager,
+	Dialogs,
+	DialogTrigger,
+	useDialog,
+} from "./Dialog"
 
 // 跟 popup 的 width 同值,用來確認 base 那顆 atom 被 sx 換掉而不是疊在一起
 const probe = stylex.create({
@@ -142,5 +154,175 @@ describe("ConfirmDialog", () => {
 		await userEvent.click(screen.getByRole("button", { name: "刪除記憶" }))
 		await screen.findByRole("alertdialog")
 		await waitFor(() => expect(screen.getByRole("button", { name: "取消" })).toHaveFocus())
+	})
+})
+
+function Opener({
+	label = "開啟",
+	onOpen,
+}: {
+	label?: string
+	onOpen: (api: ReturnType<typeof useDialog>["dialog"]) => void
+}) {
+	const { dialog } = useDialog()
+	return <Button onClick={() => onOpen(dialog)}>{label}</Button>
+}
+
+function RenameForm({ close }: { close: (result?: string) => void }) {
+	return (
+		<DialogContent title="重新命名">
+			<DialogActions>
+				<DialogClose>
+					<Button variant="ghost">取消</Button>
+				</DialogClose>
+				<Button onClick={() => close("新名稱")}>儲存</Button>
+			</DialogActions>
+		</DialogContent>
+	)
+}
+
+describe("dialog store", () => {
+	afterEach(() => act(() => dialogManager.closeAll()))
+
+	test("open renders through <Dialogs /> and resolves with the close result", async () => {
+		let handle: DialogHandle<string> | undefined
+		render(
+			<Dialogs>
+				<Opener
+					onOpen={(dialog) => (handle = dialog.open<string>(({ close }) => <RenameForm close={close} />))}
+				/>
+			</Dialogs>,
+		)
+		const opener = screen.getByRole("button", { name: "開啟" })
+		await userEvent.click(opener)
+		expect(await screen.findByRole("dialog", { name: "重新命名" })).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "儲存" }))
+		await expect(handle?.result).resolves.toBe("新名稱")
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+		await waitFor(() => expect(opener).toHaveFocus())
+	})
+
+	test("Escape, a DialogClose button and handle.close resolve undefined unless given a result", async () => {
+		render(<Dialogs />)
+		let handle: DialogHandle<string> | undefined
+		act(() => void (handle = dialogManager.open<string>(({ close }) => <RenameForm close={close} />)))
+		await screen.findByRole("dialog")
+		await userEvent.keyboard("{Escape}")
+		await expect(handle?.result).resolves.toBeUndefined()
+
+		act(() => void (handle = dialogManager.open<string>(({ close }) => <RenameForm close={close} />)))
+		await userEvent.click(await screen.findByRole("button", { name: "取消" }))
+		await expect(handle?.result).resolves.toBeUndefined()
+
+		act(() => void (handle = dialogManager.open<string>(({ close }) => <RenameForm close={close} />)))
+		await screen.findByRole("dialog")
+		act(() => handle?.close("外部"))
+		await expect(handle?.result).resolves.toBe("外部")
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+	})
+
+	test("confirm resolves true from the confirm button, false from cancel and Escape", async () => {
+		render(<Dialogs />)
+		let answer: Promise<boolean> = Promise.resolve(false)
+
+		act(
+			() =>
+				void (answer = dialogManager.confirm({
+					title: "刪除這則記憶?",
+					confirmLabel: "刪除",
+					tone: "danger",
+				})),
+		)
+		await screen.findByRole("alertdialog", { name: "刪除這則記憶?" })
+		await waitFor(() => expect(screen.getByRole("button", { name: "取消" })).toHaveFocus())
+		await userEvent.click(screen.getByRole("button", { name: "刪除" }))
+		await expect(answer).resolves.toBe(true)
+
+		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?" })))
+		await userEvent.click(await screen.findByRole("button", { name: "取消" }))
+		await expect(answer).resolves.toBe(false)
+
+		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?" })))
+		await screen.findByRole("alertdialog")
+		await userEvent.keyboard("{Escape}")
+		await expect(answer).resolves.toBe(false)
+		await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument())
+	})
+
+	test("alert has one button and resolves when it is pressed", async () => {
+		render(<Dialogs />)
+		let done: Promise<void> = Promise.resolve()
+		act(() => void (done = dialogManager.alert({ title: "已達上限", description: "先封存幾個 thread。" })))
+		const alert = await screen.findByRole("alertdialog", { name: "已達上限" })
+		expect(alert.querySelectorAll("button")).toHaveLength(1)
+		await userEvent.click(screen.getByRole("button", { name: "知道了" }))
+		await expect(done).resolves.toBeUndefined()
+	})
+
+	test("a dialog opened from inside another stacks on top; Escape closes only the top one", async () => {
+		let inner: Promise<boolean> = Promise.resolve(true)
+		render(<Dialogs />)
+		act(
+			() =>
+				void dialogManager.open(() => (
+					<DialogContent title="設定">
+						<Opener
+							label="刪除工作區"
+							onOpen={(dialog) => (inner = dialog.confirm({ title: "真的要刪除?" }))}
+						/>
+					</DialogContent>
+				)),
+		)
+		await userEvent.click(await screen.findByRole("button", { name: "刪除工作區" }))
+		const top = await screen.findByRole("alertdialog", { name: "真的要刪除?" })
+		await waitFor(() => expect(top.contains(document.activeElement)).toBe(true))
+		expect(dialogManager.getSnapshot()).toHaveLength(2)
+
+		await userEvent.keyboard("{Escape}")
+		await expect(inner).resolves.toBe(false)
+		await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument())
+		expect(screen.getByRole("dialog", { name: "設定" })).toBeInTheDocument()
+		expect(dialogManager.getSnapshot()).toHaveLength(1)
+	})
+
+	test("closing a dialog closes the ones stacked on it; closeAll settles every one", async () => {
+		render(<Dialogs />)
+		let bottom: DialogHandle | undefined
+		let answer: Promise<boolean> = Promise.resolve(true)
+		act(() => {
+			bottom = dialogManager.open(() => <DialogContent title="底下" />)
+			answer = dialogManager.confirm({ title: "上面" })
+		})
+		await screen.findByRole("alertdialog")
+		act(() => bottom?.close())
+		await expect(answer).resolves.toBe(false)
+		await expect(bottom?.result).resolves.toBeUndefined()
+
+		act(() => {
+			dialogManager.open(() => <DialogContent title="一" />)
+			answer = dialogManager.confirm({ title: "二" })
+		})
+		await screen.findByRole("alertdialog")
+		act(() => dialogManager.closeAll())
+		await expect(answer).resolves.toBe(false)
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+	})
+
+	test("a scoped manager renders in its own host and useDialog reaches it", async () => {
+		const scoped = createDialogManager()
+		render(
+			<>
+				<Dialogs />
+				<Dialogs manager={scoped}>
+					<Opener onOpen={(dialog) => dialog.open(() => <DialogContent title="只在這裡" />)} />
+				</Dialogs>
+			</>,
+		)
+		await userEvent.click(screen.getByRole("button", { name: "開啟" }))
+		expect(await screen.findByRole("dialog", { name: "只在這裡" })).toBeInTheDocument()
+		expect(scoped.getSnapshot()).toHaveLength(1)
+		expect(dialogManager.getSnapshot()).toHaveLength(0)
+		expect(screen.getAllByRole("dialog")).toHaveLength(1)
+		act(() => scoped.closeAll())
 	})
 })

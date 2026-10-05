@@ -1,4 +1,4 @@
-import { Toaster } from "@anyknown/ui"
+import { Dialogs, Toaster } from "@anyknown/ui"
 import { dark, light } from "@anyknown/ui/themes.stylex"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
@@ -296,6 +296,7 @@ export function Site() {
 				</div>
 			</main>
 			<Toaster />
+			<Dialogs />
 		</div>
 	)
 }

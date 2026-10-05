@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
-import { Toaster } from "@anyknown/ui"
+import { Dialogs, Toaster } from "@anyknown/ui"
 import { BasicsDemos } from "./demos/basics"
 import { DesktopDemos } from "./demos/desktop"
 import { StorageDemos } from "./demos/storage"
@@ -100,6 +100,7 @@ export function App() {
 				<WebDemos />
 			</main>
 			<Toaster />
+			<Dialogs />
 		</div>
 	)
 }

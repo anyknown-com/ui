@@ -32,6 +32,7 @@ import {
 	Text,
 	ThreadSkeleton,
 	Tooltip,
+	useDialog,
 	useToast,
 } from "@anyknown/ui"
 import * as stylex from "@stylexjs/stylex"
@@ -98,8 +99,35 @@ function useDemoProgress() {
 	return percent
 }
 
+function StackedSettings() {
+	const { dialog } = useDialog()
+	const { toast } = useToast()
+	return (
+		<DialogActions>
+			<Button
+				variant="dangerGhost"
+				onClick={async () => {
+					const ok = await dialog.confirm({
+						title: "刪除這個工作區?",
+						description: "疊在設定上面;Esc 只關這一層。",
+						confirmLabel: "刪除",
+						tone: "danger",
+					})
+					toast(ok ? "已刪除工作區" : "保留工作區")
+				}}
+			>
+				刪除工作區…
+			</Button>
+			<DialogClose>
+				<Button variant="ghost">關閉</Button>
+			</DialogClose>
+		</DialogActions>
+	)
+}
+
 export function BasicsDemos() {
 	const { toast } = useToast()
+	const { dialog } = useDialog()
 	const percent = useDemoProgress()
 
 	return (
@@ -141,7 +169,7 @@ export function BasicsDemos() {
 				</Row>
 			</Demo>
 
-			<Demo id="dialog" title="dialog">
+			<Demo id="dialog" title="dialog" note="第二排是命令式的 dialog store:要在 app 裡掛一個 <Dialogs />。">
 				<Row>
 					<Dialog>
 						<DialogTrigger>
@@ -203,6 +231,60 @@ export function BasicsDemos() {
 							toast("已刪除「部署走 Cloudflare」", { action: { label: "復原", onClick: () => {} } })
 						}
 					/>
+				</Row>
+				<Row>
+					<Button
+						variant="secondary"
+						onClick={async () => {
+							const name = await dialog.open<string>(({ close }) => (
+								<DialogContent
+									title="重新命名 thread"
+									description="dialog.open 回傳的 result 會帶回 close 的值。"
+								>
+									<DialogActions>
+										<DialogClose>
+											<Button variant="ghost">取消</Button>
+										</DialogClose>
+										<Button onClick={() => close("部署筆記")}>改成「部署筆記」</Button>
+									</DialogActions>
+								</DialogContent>
+							)).result
+							toast(name == null ? "沒有改名" : `已改名為「${name}」`)
+						}}
+					>
+						dialog.open
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={async () => {
+							const ok = await dialog.confirm({
+								title: "封存這個 thread?",
+								description: "封存後仍可從側欄找回。",
+								confirmLabel: "封存",
+							})
+							toast(ok ? "已封存" : "取消封存")
+						}}
+					>
+						dialog.confirm
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() => dialog.alert({ title: "已達上限", description: "免費方案最多 3 個工作區。" })}
+					>
+						dialog.alert
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() =>
+							dialog.open(() => (
+								<DialogContent title="工作區設定" description="從這裡再開一個 confirm,兩層疊放。">
+									<StackedSettings />
+								</DialogContent>
+							))
+						}
+					>
+						疊放
+					</Button>
 				</Row>
 			</Demo>
 

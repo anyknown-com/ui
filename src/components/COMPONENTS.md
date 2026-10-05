@@ -103,6 +103,20 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   不自己捲)每個使用端都抄一次同一段 `sx`,那就是一個階不是一個偏好。階外的仍然走 `sx`
 - `body` 是會捲的那一段:給了 `body`,popup 自己不再捲(`overflow: hidden` + flex column),
   標頭與 `children`(篩選 chips 那排)釘住,只有 `body` 捲 —— 沉浸式清單捲起來標頭不能跟著跑
+- **命令式的那一套跟 toast 同形**:`dialog.open(({ close }) => <DialogContent …/>, { role? })`
+  回傳 `{ id, close(result?), result }`;`dialog.close(id, result?)`、`dialog.closeAll()`;
+  `dialog.confirm({ title, description?, confirmLabel?, cancelLabel?, tone? })` → `Promise<boolean>`、
+  `dialog.alert(…)` → `Promise<void>`,長相就是 ConfirmDialog 那張卡(共用 `ConfirmContent`)。
+  畫面要在 app 裡掛一個 `<Dialogs />`;`createDialogManager()` + `<Dialogs manager>` 做 scope,
+  包在裡面的 `useDialog()` 拿到那個 manager,外面拿到預設的 `dialog`。受控的 `Dialog` 照舊
+- 狀態在 `lib/store.ts`,焦點陷阱、inert、Esc、scroll lock 仍然交給 Base UI Dialog ——
+  只有「現在開著哪些」是我們養的
+- Esc / backdrop / `closeAll` 關掉的 `result` 是 `undefined`,confirm 是 `false`。
+  關掉一個 dialog 會連同疊在它上面的一起關(由上往下落定)
+- **疊放是巢狀渲染**:上一層的 Root 包住下一層,Base UI 才知道誰在最上面(Esc 只關頂層)。
+  走過的坑:兩層在同一個 commit 掛上時,React 先跑子層的 effect,上一層隨後把自己以外的
+  portal 全標 `aria-hidden` —— 上面那層看得到卻被讀屏蓋掉。所以下一層等這一層
+  `onOpenChangeComplete(true)` 才掛,`render` 因此要回傳 DialogContent(含 Popup)
 
 ### toast
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作

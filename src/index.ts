@@ -40,8 +40,26 @@ export {
 	DialogActions,
 	DialogClose,
 	ConfirmDialog,
+	Dialogs,
+	dialog,
+	dialogManager,
+	createDialogManager,
+	useDialog,
 } from "./components/dialog/Dialog"
-export type { DialogProps, DialogContentProps, ConfirmDialogProps } from "./components/dialog/Dialog"
+export type {
+	DialogProps,
+	DialogContentProps,
+	ConfirmDialogProps,
+	DialogsProps,
+	DialogManager,
+	DialogHandle,
+	DialogControls,
+	DialogRender,
+	DialogOptions,
+	DialogEntry,
+	ConfirmOptions,
+	AlertOptions,
+} from "./components/dialog/Dialog"
 export { Toaster, toast, useToast, toastManager, createToastManager } from "./components/toast/Toast"
 export type {
 	ToasterProps,
