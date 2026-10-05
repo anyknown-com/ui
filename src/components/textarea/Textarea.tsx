@@ -85,10 +85,13 @@ function autoGrow(area: HTMLTextAreaElement, maxRows: number | undefined) {
 	resize()
 	area.addEventListener("input", resize)
 	let width = area.clientWidth
+	let frame = 0
 	const observer = new ResizeObserver(() => {
 		if (area.clientWidth === width) return
 		width = area.clientWidth
-		resize()
+		// 在 callback 裡直接改高度會再觸發一次觀察,Safari 報 "ResizeObserver loop";下一幀再量
+		cancelAnimationFrame(frame)
+		frame = requestAnimationFrame(resize)
 	})
 	observer.observe(area)
 	// 受控的 textarea 每打一個字就重接一次,只有字型真的在載時才等 ready
@@ -100,6 +103,7 @@ function autoGrow(area: HTMLTextAreaElement, maxRows: number | undefined) {
 		disposed = true
 		area.removeEventListener("input", resize)
 		observer.disconnect()
+		cancelAnimationFrame(frame)
 		fonts?.removeEventListener("loadingdone", refresh)
 	}
 }

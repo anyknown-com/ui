@@ -143,12 +143,19 @@ describe("Textarea autoGrow", () => {
 		expect(area().style.height).toBe(`${LINE + FRAME}px`)
 	})
 
-	test("re-measures when the width changes", () => {
+	test("re-measures on the next frame when the width changes", () => {
+		const frames: FrameRequestCallback[] = []
+		vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback))
 		const engine = fakeEngine()
 		setTextLayoutEngine(engine)
 		render(<Textarea aria-label="長高" autoGrow defaultValue="a" />)
+		act(() => resizeObservers.at(-1)!())
+		expect(frames).toHaveLength(0) // 高度改變也會觸發,寬度沒變就不量
+
 		width = 160
 		act(() => resizeObservers.at(-1)!())
+		expect(engine.layout).not.toHaveBeenLastCalledWith("a", 140, LINE)
+		act(() => frames.at(-1)!(0))
 		expect(engine.layout).toHaveBeenLastCalledWith("a", 140, LINE)
 	})
 
