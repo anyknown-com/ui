@@ -20,6 +20,32 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 - **單行控件行高用 `leadingTight`**。1.5 會把 md 撐到 39px,和 button / select 差 3px。
   Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
 - 尺寸:md / sm / button / select = 36 / 28 / 36 / 36px,textarea 72px
+- **`autoGrow` 依序走三條路**:
+  1. 支援 `field-sizing: content`(Chrome / Edge 123、Safari 26.2、Firefox 152 起)→ 純 CSS,
+     不寫 inline height
+  2. 不支援,但 app 註冊了文字排版引擎 → 用 Pretext 從 computed 的字型、行高、padding、
+     border、內容寬算高度
+  3. 都沒有 → 傳統的 `height: auto` 再設成 `scrollHeight`
+
+  2 和 3 在 input、受控 `value` 改變、寬度改變(`ResizeObserver`)時重量,夾在 `maxRows`
+  以內,不給拉把(`resize: none`)
+- **Pretext 是 optional peer dependency**,這個套件不 import 它。要用就在 app 進入點註冊一次:
+
+  ```ts
+  import * as pretext from "@chenglou/pretext"
+  import { setTextLayoutEngine } from "@anyknown/ui"
+
+  setTextLayoutEngine(pretext)
+  ```
+
+  `lib/textLayout.ts` 是唯一碰 Pretext API 的地方(`prepare` / `layout` / `clearCache`),
+  Pretext 改 API 只改那個檔。`measureTextHeight(text, { font, width, lineHeight, whiteSpace })`
+  也一起輸出,沒註冊引擎時回 `null`
+- 坑:**字型載完之前量的寬是 fallback 字型的**,Pretext 會照 font 字串把它快取住。字型還在
+  載(`document.fonts.status === "loading"`)時先用 scrollHeight,`fonts.ready` 與每次
+  `loadingdone`(Noto Sans TC 是 unicode-range 切片,打到那個字才載)都清快取重量
+- 坑:Pretext 照 block 的規則排版,**結尾的換行不算一行、空字串是 0 行**;textarea 兩者都
+  佔一行,所以量之前補一個空白(pre-wrap 的行尾空白不佔寬)
 
 ### label
 表單標籤,含 required / optional 標記。連同 `Field`(label + control + help/error 的組合

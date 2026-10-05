@@ -18,9 +18,19 @@ import {
 	Slider,
 	Switch,
 	Textarea,
+	setTextLayoutEngine,
 } from "@anyknown/ui"
+import * as pretext from "@chenglou/pretext"
 import { useState } from "react"
 import { Demo, Row } from "../shell"
+
+// 沒有 field-sizing 的瀏覽器,autoGrow 用 Pretext 量高度
+setTextLayoutEngine(pretext)
+
+const growPath =
+	typeof CSS !== "undefined" && CSS.supports("field-sizing", "content")
+		? "這個瀏覽器支援 field-sizing,由 CSS 長高"
+		: "這個瀏覽器不支援 field-sizing,由 Pretext 量高度"
 
 const effortLabel = (f: number) =>
 	f < 0.03 ? "自動" : f < 0.3 ? "少" : f < 0.6 ? "中" : f < 0.85 ? "多" : "最多"
@@ -41,6 +51,9 @@ export function FormsDemos() {
 	const [memories, setMemories] = useState<string[]>([])
 	const [receipts, setReceipts] = useState(false)
 	const [effort, setEffort] = useState(0)
+	const [note, setNote] = useState(
+		"交接時把這段貼給下一個 session。\n\n第二段:受控的值,按「清空」高度會縮回去。",
+	)
 
 	return (
 		<>
@@ -56,7 +69,7 @@ export function FormsDemos() {
 				<Input aria-label="停用" disabled defaultValue="senlima@anyknown.com" />
 			</Demo>
 
-			<Demo id="textarea" title="textarea">
+			<Demo id="textarea" title="textarea" note={growPath}>
 				<Field label="回報問題">
 					<Textarea placeholder="發生了什麼事?" />
 				</Field>
@@ -67,6 +80,16 @@ export function FormsDemos() {
 					defaultValue="打字時高度會跟著內容長,到上限後出現捲軸。"
 					placeholder="跟同一條 thread 說話…"
 				/>
+				<Textarea
+					aria-label="受控的自動長高"
+					autoGrow
+					maxRows={6}
+					value={note}
+					onChange={(event) => setNote(event.target.value)}
+				/>
+				<Button variant="secondary" size="sm" onClick={() => setNote("")}>
+					清空
+				</Button>
 				<Field label="交接備註" error="最多 200 字,目前 214 字。">
 					<Textarea defaultValue="內容超過 200 字上限。" />
 				</Field>
