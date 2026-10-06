@@ -156,14 +156,21 @@ function CheckIcon() {
 	)
 }
 
+/** Why the session rotated: the soft threshold, the hard context limit, or a state change. */
 export type HandoffReason = "soft-threshold" | "hard-limit" | "state-transition"
 
 export type HandoffReceiptProps = {
+	/** When the handoff happened, already formatted (e.g. `"14:32"`). */
 	at: string
+	/** How full the context was at the handoff, 0–100. */
 	ctxPercent: number
+	/** Why it rotated. `hard-limit` and `state-transition` are named in the row; the default is not. */
 	reason?: HandoffReason
+	/** The memories carried over: how many, and optionally their names. */
 	memory: { count: number; items?: string[] }
+	/** How many records of this round stay behind, still searchable. */
 	ledgerCount: number
+	/** The handoff summary itself, shown under the three checks. */
 	handoffSummary?: ReactNode
 	/** Whether the checks are shown. Pass it to control the fold; pair it with `onOpenChange`. */
 	open?: boolean
@@ -187,6 +194,11 @@ export type HandoffReceiptProps = {
 	ledgerLabel?: (count: number) => string
 }
 
+/**
+ * A receipt in the thread where the agent rotated to a new session: one row (time, context
+ * fill, reason) that folds open to what was kept, handed over and left behind. The row is a
+ * real button: Enter and Space toggle it.
+ */
 export function HandoffReceipt({
 	at,
 	ctxPercent,
