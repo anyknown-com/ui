@@ -70,7 +70,7 @@ body {
 }
 
 .prose a {
-	color: var(--ak-accent-text);
+	color: var(--ak-link);
 	text-decoration: underline;
 	text-underline-offset: 2px;
 }
