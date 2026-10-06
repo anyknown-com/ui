@@ -3,7 +3,7 @@ import type { CSSProperties } from "react"
 import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, space, type } from "../../tokens.stylex"
+import { color, corner, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // 觸控裝置沒有 hover:只在 hover 才出現的東西要一直顯示
@@ -82,7 +82,7 @@ const styles = stylex.create({
 		forcedColorAdjust: "none",
 		animationName: { default: pulse, [REDUCED]: "none" },
 		animationDuration: "1.2s",
-		animationTimingFunction: "ease-in-out",
+		animationTimingFunction: motion.easeInOut,
 		animationIterationCount: "infinite",
 	},
 })
