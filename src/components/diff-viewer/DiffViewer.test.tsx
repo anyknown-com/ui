@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
 import { buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
+import { LocaleProvider } from "../../lib/i18n"
 import { expectNoAxeViolations } from "../../test/axe"
 import { DiffViewer } from "./DiffViewer"
 
@@ -156,6 +157,34 @@ describe("DiffViewer", () => {
 		render(<DiffViewer file={{ path: "gone.ts", before: BEFORE }} />)
 		expect(screen.getByText("−3")).toBeInTheDocument()
 		expect(screen.getByText("+0")).toBeInTheDocument()
+	})
+})
+
+describe("DiffViewer words", () => {
+	test("reads English under an en LocaleProvider", () => {
+		render(
+			<LocaleProvider locale="en">
+				<DiffViewer file={{ path: "a.ts", before: LONG_BEFORE, after: LONG_AFTER }} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("region", { name: "Changes to a.ts" })).toBeInTheDocument()
+		expect(screen.getByText("Modified")).toBeInTheDocument()
+		expect(screen.getByText("Added line")).toBeInTheDocument()
+		expect(screen.getByText("Removed line")).toBeInTheDocument()
+		expect(screen.getAllByRole("button")[0]).toHaveTextContent(/⋯ \d+ unchanged lines/)
+	})
+
+	test("labels override single words, and foldLabel still wins over labels.fold", () => {
+		render(
+			<DiffViewer
+				file={{ path: "a.ts", before: LONG_BEFORE, after: LONG_AFTER }}
+				labels={{ addedLine: "加", fold: () => "labels" }}
+				foldLabel={(count) => `prop ${count}`}
+			/>,
+		)
+		expect(screen.getByText("加")).toBeInTheDocument()
+		expect(screen.getByText("刪除行")).toBeInTheDocument()
+		expect(screen.getAllByRole("button")[0]).toHaveTextContent(/^prop \d+$/)
 	})
 })
 

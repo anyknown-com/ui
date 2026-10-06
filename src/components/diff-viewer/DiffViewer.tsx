@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, useId, useMemo, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
@@ -122,12 +123,34 @@ const styles = stylex.create({
 	},
 })
 
-const KIND_LABEL = { modified: "已修改", added: "新增檔案", deleted: "已刪除" } as const
+const strings = defineStrings({
+	"zh-TW": {
+		modified: "已修改",
+		added: "新增檔案",
+		deleted: "已刪除",
+		addedLine: "新增行",
+		removedLine: "刪除行",
+		region: (path: string) => `${path} 的變更`,
+		fold: (count: number) => `⋯ ${count} 行未變動`,
+	},
+	en: {
+		modified: "Modified",
+		added: "Added file",
+		deleted: "Deleted",
+		addedLine: "Added line",
+		removedLine: "Removed line",
+		region: (path: string) => `Changes to ${path}`,
+		fold: (count: number) => `⋯ ${count} unchanged ${count === 1 ? "line" : "lines"}`,
+	},
+})
+
+/** The DiffViewer's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type DiffViewerLabels = StringsOf<typeof strings>
 
 const SIGN = { context: " ", add: "+", del: "−" } as const
-const PREFIX = { context: "", add: "新增行 ", del: "刪除行 " } as const
 
-function Line({ row }: { row: DiffRow }) {
+function Line({ row, t }: { row: DiffRow; t: DiffViewerLabels }) {
+	const prefix = row.type === "add" ? t.addedLine : row.type === "del" ? t.removedLine : ""
 	return (
 		<div
 			{...stylex.props(
@@ -153,7 +176,7 @@ function Line({ row }: { row: DiffRow }) {
 				{SIGN[row.type]}
 			</span>
 			<span {...stylex.props(styles.code)}>
-				{PREFIX[row.type] !== "" && <span {...stylex.props(styles.srOnly)}>{PREFIX[row.type]}</span>}
+				{prefix !== "" && <span {...stylex.props(styles.srOnly)}>{`${prefix} `}</span>}
 				{row.segments.map((segment, index) =>
 					segment.marked && row.type === "add" ? (
 						<ins key={index} {...stylex.props(styles.change, styles.changeAdd)}>
@@ -172,7 +195,7 @@ function Line({ row }: { row: DiffRow }) {
 	)
 }
 
-function Fold({ rows, label }: { rows: DiffRow[]; label: string }) {
+function Fold({ rows, label, t }: { rows: DiffRow[]; label: string; t: DiffViewerLabels }) {
 	const id = useId()
 	const [open, setOpen] = useState(false)
 	return (
@@ -191,7 +214,7 @@ function Fold({ rows, label }: { rows: DiffRow[]; label: string }) {
 			</button>
 			<div id={id} hidden={!open} {...stylex.props(open && styles.foldLines)}>
 				{rows.map((row, index) => (
-					<Line key={index} row={row} />
+					<Line key={index} row={row} t={t} />
 				))}
 			</div>
 		</>
@@ -209,15 +232,20 @@ export type DiffViewerProps = {
 	file: DiffFile
 	collapseContext?: number
 	wordDiff?: boolean
+	/** What a folded run of unchanged lines says. Wins over `labels.fold`. */
 	foldLabel?: (count: number) => string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DiffViewerLabels>
 }
 
 export function DiffViewer({
 	file,
 	collapseContext = 3,
 	wordDiff = true,
-	foldLabel = (count) => `⋯ ${count} 行未變動`,
+	foldLabel,
+	labels,
 }: DiffViewerProps) {
+	const t = useStrings(strings, labels)
 	const kind = file.kind ?? diffKind(file.before, file.after)
 	const { blocks, added, removed } = useMemo(() => {
 		const rows = buildDiffRows(file.before ?? "", file.after ?? "", { wordDiff })
@@ -236,19 +264,24 @@ export function DiffViewer({
 						kind === "deleted" && styles.dotDeleted,
 					)}
 				/>
-				<span {...stylex.props(styles.srOnly)}>{KIND_LABEL[kind]}</span>
+				<span {...stylex.props(styles.srOnly)}>{t[kind]}</span>
 				{file.path}
 				<span {...stylex.props(styles.stat)}>
 					<b {...stylex.props(styles.plus)}>{`+${added}`}</b>{" "}
 					<b {...stylex.props(styles.minus)}>{`−${removed}`}</b>
 				</span>
 			</div>
-			<div tabIndex={0} role="region" aria-label={`${file.path} 的變更`} {...stylex.props(styles.body)}>
+			<div tabIndex={0} role="region" aria-label={t.region(file.path)} {...stylex.props(styles.body)}>
 				{blocks.map((block, index) =>
 					block.kind === "fold" ? (
-						<Fold key={`${file.path}-${index}`} rows={block.rows} label={foldLabel(block.rows.length)} />
+						<Fold
+							key={`${file.path}-${index}`}
+							rows={block.rows}
+							label={(foldLabel ?? t.fold)(block.rows.length)}
+							t={t}
+						/>
 					) : (
-						block.rows.map((row, rowIndex) => <Line key={`${index}-${rowIndex}`} row={row} />)
+						block.rows.map((row, rowIndex) => <Line key={`${index}-${rowIndex}`} row={row} t={t} />)
 					),
 				)}
 			</div>
