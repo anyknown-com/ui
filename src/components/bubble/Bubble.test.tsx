@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Bubble } from "./Bubble"
 
 describe("Bubble", () => {
@@ -13,5 +14,15 @@ describe("Bubble", () => {
 		expect(screen.getByText("好").tagName).toBe("STRONG")
 		expect(screen.getByRole("columnheader", { name: "項目" })).toHaveStyle({ fontWeight: "500" })
 		expect(screen.getByRole("cell", { name: "房租" })).toHaveStyle({ borderBottomWidth: "0px" })
+	})
+
+	test("has no axe violations from either side", async () => {
+		const { container } = render(
+			<>
+				<Bubble from="user">{"**先**看記憶"}</Bubble>
+				<Bubble from="assistant">{"**好**\n\n- 一\n- 二\n\n| 項目 |\n| --- |\n| 房租 |"}</Bubble>
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
