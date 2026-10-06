@@ -25,29 +25,29 @@
 
 body {
 	margin: 0;
-	background: var(--ak-bg);
+	background: var(--ak-layer1);
 	color: var(--ak-text);
 	font-family: var(--ak-font-body);
-	font-size: 1rem;
+	font-size: 0.9375rem;
 	line-height: 1.6;
 	-webkit-font-smoothing: antialiased;
 }
 
 /* ---- 骨架 ---- */
 
-/* 頁面容器:最大寬、左右留白、紙底。一頁一個。 */
+/* 主紙:冷灰桌面上的一張白紙,最大寬、sheet 圓角、四周露出桌面。一頁一個。 */
 .ak-page {
-	max-width: 64rem;
-	margin-inline: auto;
+	box-sizing: border-box;
+	width: min(67rem, 100% - 2rem);
+	margin: 1rem auto;
 	padding: 3rem 1.5rem;
-	background: var(--ak-bg);
+	background: var(--ak-layer2);
+	border-radius: var(--ak-corner-sheet);
 }
 
-/* 分段:上方一條髮線加留白。結論在前的頁面用它切證據段。 */
+/* 分段:上方留白,不畫線。結論在前的頁面用它切證據段。 */
 .ak-section {
 	margin-top: 3rem;
-	padding-top: 2rem;
-	border-top: 1px solid var(--ak-border);
 }
 
 /* 兩欄網格,375 寬以下折成單欄。 */
@@ -66,6 +66,8 @@ body {
 
 @media (max-width: 40rem) {
 	.ak-page {
+		width: calc(100% - 1rem);
+		margin-block: 0.5rem;
 		padding: 2rem 1rem;
 	}
 	.ak-grid-2,
@@ -76,7 +78,7 @@ body {
 
 /* ---- 文字 ---- */
 
-/* display 級標題,serif。一頁一個。 */
+/* display 級標題。一頁一個。 */
 .ak-display {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -88,7 +90,7 @@ body {
 	text-wrap: balance;
 }
 
-/* section 標題,serif。 */
+/* section 標題。 */
 .ak-h1 {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -99,7 +101,7 @@ body {
 	text-wrap: balance;
 }
 
-/* section 內的分節標題,serif。 */
+/* section 內的分節標題。 */
 .ak-h2 {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -113,7 +115,7 @@ body {
 /* 正文區:p / ul / ol / a / code / pre / blockquote / h3 的階層與行長。 */
 .ak-prose {
 	max-width: 68ch;
-	font-size: 1rem;
+	font-size: 0.9375rem;
 	line-height: 1.6;
 }
 .ak-prose p,
@@ -192,10 +194,11 @@ body {
 
 /* ---- 證據 ---- */
 
-/* 證據表:滿版、tabular-nums、斑馬用 bone。數字欄加 data-num 靠右。 */
+/* 證據表:滿版、不進卡片、tabular-nums;表頭是凹下去的 surface 條,列之間一條髮線。數字欄加 data-num 靠右。 */
 .ak-table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	font-size: 0.875rem;
 	line-height: 1.5;
 	font-variant-numeric: tabular-nums;
@@ -211,10 +214,22 @@ body {
 .ak-table th {
 	font-weight: 500;
 	color: var(--ak-text-muted);
-	border-bottom-color: var(--ak-border-strong);
 }
-.ak-table tbody tr:nth-child(even) {
-	background: var(--ak-bone);
+.ak-table thead tr:first-child > th,
+.ak-table:not(:has(thead)) tr:first-child > th {
+	/* 表頭列(thead 的第一列;沒有 thead 時是第一列):凹下去的 surface 條,不畫底線 */
+	background: var(--ak-surface);
+	border-bottom: 0;
+}
+.ak-table thead tr:first-child > th:first-child,
+.ak-table:not(:has(thead)) tr:first-child > th:first-child {
+	border-start-start-radius: var(--ak-corner-small);
+	border-end-start-radius: var(--ak-corner-small);
+}
+.ak-table thead tr:first-child > th:last-child,
+.ak-table:not(:has(thead)) tr:first-child > th:last-child {
+	border-start-end-radius: var(--ak-corner-small);
+	border-end-end-radius: var(--ak-corner-small);
 }
 .ak-table [data-num] {
 	text-align: end;
@@ -231,9 +246,13 @@ body {
 		display: block;
 		overflow-x: auto;
 	}
+	.ak-table th,
+	.ak-table td {
+		white-space: nowrap;
+	}
 }
 
-/* 結論級的大數字:serif 數字加 muted 小標。一排最多四個。 */
+/* 結論級的大數字:display 字的數字加 muted 小標。一排最多四個。 */
 .ak-stat {
 	display: flex;
 	flex-direction: column;
