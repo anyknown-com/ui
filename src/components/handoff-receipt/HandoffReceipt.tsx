@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -31,7 +31,7 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		color: { default: color.textMuted, ":hover": color.text },
 		borderRadius: corner.pill,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	rule: {
@@ -41,7 +41,7 @@ const styles = stylex.create({
 		borderTopColor: color.borderStrong,
 		minWidth: space.md,
 		transitionProperty: "border-color",
-		transitionDuration: { default: "300ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
 	},
 	ruleOpen: { borderTopStyle: "solid", borderTopColor: color.accent },
 	label: {
@@ -69,8 +69,8 @@ const styles = stylex.create({
 		flex: "none",
 		color: color.textFaint,
 		transitionProperty: "rotate",
-		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "ease",
+		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.ease,
 	},
 	chevronOpen: { rotate: "180deg" },
 	// 展開 = 0fr → 1fr(雙向平滑,不是 display 硬切);內容 opacity 跟進
@@ -79,8 +79,8 @@ const styles = stylex.create({
 		display: "grid",
 		gridTemplateRows: "0fr",
 		transitionProperty: "grid-template-rows",
-		transitionDuration: { default: "240ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	bodyWrapOpen: { gridTemplateRows: "1fr" },
 	bodyClip: { overflow: "hidden", minHeight: 0 },
@@ -97,8 +97,8 @@ const styles = stylex.create({
 		gap: space.xxs,
 		opacity: 0,
 		transitionProperty: "opacity",
-		transitionDuration: { default: "200ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
+		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	bodyOpen: { opacity: 1 },
 	check: { display: "flex", alignItems: "baseline", gap: space.xxs, margin: 0 },
