@@ -105,6 +105,8 @@ const styles = stylex.create({
 	lineDefault: { backgroundColor: color.textFaint },
 	lineSuccess: { backgroundColor: color.success },
 	lineDanger: { backgroundColor: color.danger },
+	lineWarning: { backgroundColor: color.warning },
+	lineInfo: { backgroundColor: color.signal },
 	running: (ms: number, paused: boolean) => ({
 		animationDuration: `${ms}ms`,
 		animationPlayState: paused ? "paused" : "running",
@@ -121,6 +123,9 @@ const styles = stylex.create({
 	dotDefault: { backgroundColor: color.text },
 	dotSuccess: { backgroundColor: color.success },
 	dotDanger: { backgroundColor: color.danger },
+	// 琥珀只說「要留意」;藍是 signal —— 資訊提示跟「agent 在跟你說話」是同一件事
+	dotWarning: { backgroundColor: color.warning },
+	dotInfo: { backgroundColor: color.signal },
 	spin: { color: color.signal, width: space.md, height: space.md },
 	content: { flex: 1, minWidth: 0, display: "grid", gap: "0.125rem" },
 	title: { margin: 0, fontSize: scale.t2, color: color.text },
@@ -189,13 +194,29 @@ const styles = stylex.create({
 const TONE = {
 	success: { dot: styles.dotSuccess, line: styles.lineSuccess },
 	danger: { dot: styles.dotDanger, line: styles.lineDanger },
+	warning: { dot: styles.dotWarning, line: styles.lineWarning },
+	info: { dot: styles.dotInfo, line: styles.lineInfo },
 	default: { dot: styles.dotDefault, line: styles.lineDefault },
 } as const
 
-// success / danger 是唸給螢幕閱讀器的前綴:顏色看不到,類型要用說的
+// success / danger / warning / info 是唸給螢幕閱讀器的前綴:顏色看不到,類型要用說的
 const strings = defineStrings({
-	"zh-TW": { region: "通知", dismiss: "關閉通知", success: "成功:", danger: "錯誤:" },
-	en: { region: "Notifications", dismiss: "Dismiss notification", success: "Success:", danger: "Error:" },
+	"zh-TW": {
+		region: "通知",
+		dismiss: "關閉通知",
+		success: "成功:",
+		danger: "錯誤:",
+		warning: "注意:",
+		info: "提示:",
+	},
+	en: {
+		region: "Notifications",
+		dismiss: "Dismiss notification",
+		success: "Success:",
+		danger: "Error:",
+		warning: "Warning:",
+		info: "Info:",
+	},
 })
 
 /** The Toaster's built-in words (follow `<LocaleProvider>`); override any with `<Toaster labels={…}>`. */
@@ -424,6 +445,8 @@ function makeApi(getManager: () => ToastManager) {
 	return Object.assign(add("default"), {
 		success: add("success"),
 		danger: add("danger"),
+		warning: add("warning"),
+		info: add("info"),
 		update: (id: string, patch: ToastUpdate) => getManager().update(id, patch),
 		close: (id: string) => getManager().close(id),
 		promise: <T,>(promise: Promise<T>, messages: ToastPromiseMessages<T>) =>
@@ -582,7 +605,7 @@ type ToastItemProps = { record: ToastRecord; paused: boolean; onClose: (id: stri
 function ToastItem({ record, paused, onClose, t }: ToastItemProps) {
 	const reduced = usePrefersReducedMotion()
 	const tone = TONE[record.type in TONE ? record.type : "default"]
-	const word = record.type === "success" || record.type === "danger" ? t[record.type] : ""
+	const word = record.type in TONE && record.type !== "default" ? t[record.type] : ""
 	const action = record.action
 	const twoLine = record.description != null
 

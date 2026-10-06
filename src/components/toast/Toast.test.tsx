@@ -158,6 +158,38 @@ describe("Toast regressions", () => {
 		await waitFor(() => expect(line.getAttribute("style")).toContain("paused"))
 	})
 
+	test("warning and info are polite statuses that say their type in words", () => {
+		const manager = setup()
+		act(() => {
+			manager.add({ title: "額度快用完了", type: "warning" })
+			manager.add({ title: "新版本可用", type: "info" })
+		})
+		const [info, warning] = screen.getAllByRole("status")
+		expect(warning).toHaveAttribute("data-type", "warning")
+		expect(warning).toHaveTextContent("注意:額度快用完了")
+		expect(info).toHaveAttribute("data-type", "info")
+		expect(info).toHaveTextContent("提示:新版本可用")
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+	})
+
+	test("toast.warning and toast.info add typed toasts that time out like the default", () => {
+		vi.useFakeTimers()
+		try {
+			render(<Toaster timeout={3000} />)
+			act(() => {
+				moduleToast.warning("額度快用完了")
+				moduleToast.info("新版本可用")
+			})
+			expect(screen.getAllByRole("status").map((node) => node.dataset.type)).toEqual(["info", "warning"])
+			act(() => vi.advanceTimersByTime(3000))
+			expect(shown("額度快用完了")).toBe(false)
+			expect(shown("新版本可用")).toBe(false)
+			act(() => vi.advanceTimersByTime(EXIT_MS))
+		} finally {
+			vi.useRealTimers()
+		}
+	})
+
 	test("a success toast says so in words, not only in colour", async () => {
 		render(<Harness />)
 		await userEvent.click(screen.getByRole("button", { name: "success" }))
