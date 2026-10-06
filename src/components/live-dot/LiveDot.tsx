@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, space } from "../../tokens.stylex"
+import { color, corner, motion, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const FORCED = "@media (forced-colors: active)"
@@ -22,7 +22,7 @@ const styles = stylex.create({
 		animationName: { default: breathe, [REDUCED]: "none" },
 		animationDuration: "1.6s",
 		animationIterationCount: "infinite",
-		animationTimingFunction: "ease-in-out",
+		animationTimingFunction: motion.easeInOut,
 	},
 	srOnly: {
 		position: "absolute",
