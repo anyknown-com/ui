@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { voicePath } from "../../lib/voice"
+import { expectNoAxeViolations } from "../../test/axe"
 import { VoiceIndicator } from "./VoiceIndicator"
 
 describe("voicePath", () => {
@@ -62,6 +63,26 @@ describe("VoiceIndicator", () => {
 		)
 		expect(screen.getByRole("status")).toHaveTextContent("Call on standby · Ready")
 	})
+
+	test("the status changes with the state, not with the level", () => {
+		const { rerender } = render(<VoiceIndicator state="listening" level={0.1} />)
+		const status = screen.getByRole("status")
+		const text = status.textContent
+		rerender(<VoiceIndicator state="listening" level={0.9} />)
+		expect(screen.getByRole("status")).toBe(status)
+		expect(status.textContent).toBe(text)
+		rerender(<VoiceIndicator state="thinking" level={0.9} />)
+		expect(screen.getByRole("status")).toBe(status)
+		expect(status).toHaveTextContent("思考中")
+	})
+
+	test.each(["idle", "listening", "thinking", "speaking"] as const)(
+		"has no axe violations: %s",
+		async (state) => {
+			const { container } = render(<VoiceIndicator state={state} />)
+			await expectNoAxeViolations(container)
+		},
+	)
 
 	test("is not interactive", () => {
 		render(<VoiceIndicator state="listening" />)
