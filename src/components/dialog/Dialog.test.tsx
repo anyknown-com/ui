@@ -20,9 +20,9 @@ import {
 
 // 跟 popup 的 width 同值,用來確認 base 那顆 atom 被 sx 換掉而不是疊在一起
 const probe = stylex.create({
-	baseWidth: { width: "min(24rem, calc(100vw - 2rem))" },
+	baseWidth: { width: "min(28rem, calc(100vw - 2rem))" },
 	wide: { width: "40rem" },
-	fullWidth: { width: "min(64rem, calc(100vw - 2rem))" },
+	fullWidth: { width: "min(68rem, calc(100vw - 2rem))" },
 })
 
 // dev build 會多帶一顆可讀的 debug class,atomic 的是雜湊那顆

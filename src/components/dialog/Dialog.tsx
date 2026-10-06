@@ -41,7 +41,7 @@ const styles = stylex.create({
 		// 28px
 		padding: `calc(${space.lg} + ${space.xxs})`,
 		boxSizing: "border-box",
-		width: "min(24rem, calc(100vw - 2rem))",
+		width: "min(28rem, calc(100vw - 2rem))",
 		maxHeight: "calc(100vh - 2rem)",
 		overflowY: "auto",
 		fontFamily: font.body,
@@ -51,9 +51,9 @@ const styles = stylex.create({
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
-	md: { width: "min(40rem, calc(100vw - 2rem))" },
+	md: { width: "min(44rem, calc(100vw - 2rem))" },
 	full: {
-		width: "min(64rem, calc(100vw - 2rem))",
+		width: "min(68rem, calc(100vw - 2rem))",
 		height: "min(46rem, calc(100vh - 2rem))",
 	},
 	// 有 body 就換成「標頭釘住、只有 body 捲」:popup 自己不再捲
