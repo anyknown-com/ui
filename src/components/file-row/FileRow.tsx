@@ -4,7 +4,7 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -49,7 +49,7 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		"--ak-row-affordance": { default: "0", ":hover": "1", ":focus-within": "1", [NO_HOVER]: "1" },
 		":last-child": { borderBottomWidth: 0 },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	selected: { backgroundColor: color.accentSubtle, "--ak-row-affordance": "1" },
@@ -113,7 +113,7 @@ const styles = stylex.create({
 		borderRadius: corner.small,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.surface },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
 	count: {
 		fontFamily: font.body,
@@ -152,7 +152,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		animationName: { default: spin, [REDUCED]: "none" },
 		animationDuration: "1.2s",
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 })

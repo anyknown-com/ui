@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, font, type } from "../../tokens.stylex"
+import { breakpoint, color, focusRing, font, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { useControllableState } from "../../lib/useControllableState"
 import { Ghost } from "../ghost/Ghost"
@@ -63,7 +63,7 @@ const styles = stylex.create({
 	inputCell: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
-		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		color: color.text,
 		cursor: "text",
@@ -91,7 +91,7 @@ const styles = stylex.create({
 	},
 	textCell: {
 		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
-		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		color: color.text,
 		fontSize: type.t3,

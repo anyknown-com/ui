@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, tone, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, tone, type } from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
 import { type ReactNode, createContext, useContext, useId, useMemo } from "react"
 import { icon } from "../icon/icon"
@@ -58,7 +58,7 @@ const styles = stylex.create({
 		lineHeight: "inherit",
 		margin: 0,
 		minWidth: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 		padding: 0,
 		textAlign: "start",

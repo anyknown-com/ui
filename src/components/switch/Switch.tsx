@@ -76,8 +76,8 @@ const styles = stylex.create({
 		boxShadow: shadow.rest,
 		// 用邏輯方向的 inset 移動,不用 translate:translate 是物理的 x,RTL 時鈕會往軌道外跑
 		transitionProperty: "inset-inline-start, background-color",
-		transitionDuration: { default: "180ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
+		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	// 軌道 2.75rem − 鈕 (1.4rem − 4px) − 2px 的邊 = 1.35rem + 2px
 	thumbOn: {

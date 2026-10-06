@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
@@ -31,7 +31,7 @@ const styles = stylex.create({
 		height: 28,
 		paddingInline: space.sm,
 	},
-	sticky: { position: "sticky", top: 0, zIndex: 1 },
+	sticky: { position: "sticky", top: 0, zIndex: 1 }, // literal-ok: local stacking, the head over its own rows
 	row: {
 		alignItems: "center",
 		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
@@ -66,7 +66,7 @@ const styles = stylex.create({
 		justifyContent: "center",
 		lineHeight: type.body,
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		padding: 0,
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },

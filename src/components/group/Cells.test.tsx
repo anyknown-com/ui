@@ -89,7 +89,7 @@ describe("InputCell", () => {
 	test("focus draws a solid ring around the row", () => {
 		render(<InputCell label="名稱" />)
 		const row = screen.getByRole("textbox", { name: "名稱" }).closest("label") as HTMLElement
-		expect(focusWithinOutline(row)).toMatch(/^2px solid var\(/)
+		expect(focusWithinOutline(row)).toMatch(/^var\(--[\w-]+\) solid var\(/)
 		expect(row).toHaveStyle({ outlineOffset: "-2px" })
 	})
 })
@@ -103,7 +103,7 @@ describe("TextCell", () => {
 	test("focus draws a solid ring around the row", () => {
 		render(<TextCell aria-label="說明" />)
 		const row = screen.getByRole("textbox", { name: "說明" }).parentElement as HTMLElement
-		expect(focusWithinOutline(row)).toMatch(/^2px solid var\(/)
+		expect(focusWithinOutline(row)).toMatch(/^var\(--[\w-]+\) solid var\(/)
 	})
 })
 

@@ -41,7 +41,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		transitionProperty: "color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	tabDisabled: {
@@ -64,7 +64,7 @@ const styles = stylex.create({
 			},
 		},
 	},
-	pillTab: { zIndex: 1 },
+	pillTab: { zIndex: 1 }, // literal-ok: local stacking, the tab words over the sliding pill
 	// Base UI 給的 --active-tab-left 是從清單「左緣」量的物理距離(RTL 也是),所以這裡錨在
 	// left: 0 而不是 insetInlineStart —— 後者在 RTL 會從右緣起算,指示條往反方向跑
 	indicator: {
@@ -78,8 +78,8 @@ const styles = stylex.create({
 		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
 		forcedColorAdjust: "none",
 		transitionProperty: "translate, width",
-		transitionDuration: { default: "240ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	// Indicator 本來就把 --active-tab-* 寫成 inline style,pills 直接拿它當滑動的藥丸。
 	pillIndicator: {
@@ -98,8 +98,8 @@ const styles = stylex.create({
 		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
 		pointerEvents: "none",
 		transitionProperty: "translate, width",
-		transitionDuration: { default: "240ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	panel: {
 		fontFamily: font.body,
@@ -107,7 +107,7 @@ const styles = stylex.create({
 		color: color.textMuted,
 		paddingBlock: space.xxs,
 		borderRadius: radius.sm,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 })

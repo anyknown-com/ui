@@ -3,7 +3,7 @@ import { type ReactNode, useCallback, useRef, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -38,7 +38,7 @@ const styles = stylex.create({
 		minHeight: "1.9rem",
 		transitionProperty: "border-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 		"::placeholder": { color: color.textMuted },
 	},
@@ -52,7 +52,7 @@ const styles = stylex.create({
 	},
 	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
 	wrap: {
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		borderRadius: corner.small,
 		overflow: "auto",
@@ -69,7 +69,7 @@ const styles = stylex.create({
 	th: {
 		position: "sticky",
 		insetBlockStart: 0,
-		zIndex: 1,
+		zIndex: 1, // literal-ok: local stacking, the sticky head over its own rows
 		backgroundColor: color.surface,
 		borderStartStartRadius: { default: 0, ":first-child": corner.small },
 		borderEndStartRadius: { default: 0, ":first-child": corner.small },
@@ -95,7 +95,7 @@ const styles = stylex.create({
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
 		borderRadius: corner.small,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	plainHeader: {
@@ -152,7 +152,7 @@ const styles = stylex.create({
 		width: "0.85rem",
 		height: "0.85rem",
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 	},
 	emptyRow: {
@@ -166,7 +166,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		textDecorationLine: "underline",
 		textUnderlineOffset: 2,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 })

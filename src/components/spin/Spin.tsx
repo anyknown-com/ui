@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
+import { motion } from "../../tokens.stylex"
 
 /** `.spin`: 12px ring, the one thing on a button that moves while it waits. */
 
@@ -9,7 +10,7 @@ const styles = stylex.create({
 		animationDuration: "0.7s",
 		animationIterationCount: "infinite",
 		animationName: { default: turn, "@media (prefers-reduced-motion: reduce)": "none" },
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		borderColor: "color-mix(in srgb, currentColor 28%, transparent)",
 		borderRadius: "50%",
 		borderStyle: "solid",

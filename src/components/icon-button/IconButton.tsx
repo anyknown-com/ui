@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { press } from "../../lib/styled"
-import { color, corner, font, ink, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, ink, type } from "../../tokens.stylex"
 import { Tooltip } from "../tooltip/Tooltip"
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
 
@@ -26,7 +26,7 @@ const styles = stylex.create({
 		justifyItems: "center",
 		lineHeight: "inherit",
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 		padding: 0,
 		placeItems: "center",

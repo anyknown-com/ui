@@ -1,5 +1,16 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, corner, font, ink, motion, space, tone, type } from "../../tokens.stylex"
+import {
+	breakpoint,
+	color,
+	corner,
+	focusRing,
+	font,
+	ink,
+	motion,
+	space,
+	tone,
+	type,
+} from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
 import type { ReactNode } from "react"
 import { icon } from "../icon/icon"
@@ -50,7 +61,7 @@ const styles = stylex.create({
 		height: 24,
 		justifySelf: "end",
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		padding: 0,
 		placeItems: "center",
 		width: 24,
@@ -75,7 +86,7 @@ const styles = stylex.create({
 		margin: 0,
 		marginInlineStart: -4,
 		maxWidth: "100%",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		overflow: "hidden",
 		paddingBlock: 0,
 		paddingInline: 4,

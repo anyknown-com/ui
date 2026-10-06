@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { press } from "../../lib/styled"
-import { breakpoint, color, corner, font, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import type { ButtonHTMLAttributes, Ref } from "react"
 
 /** `.ghost`: a word that is a button. 28px, muted until the pointer is on it; `danger` is warning. */
@@ -24,7 +24,7 @@ const styles = stylex.create({
 		margin: 0,
 		minHeight: { default: 0, [breakpoint.phone]: 40 },
 		opacity: { default: 1, ":disabled": 0.4 },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 		paddingBlock: 0,
 		paddingInline: space.xs,

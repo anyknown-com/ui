@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 
 const styles = stylex.create({
@@ -51,7 +51,7 @@ const styles = stylex.create({
 			default: "transparent",
 			":hover": "color-mix(in srgb, currentColor 10%, transparent)",
 		},
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	pressed: {
@@ -76,7 +76,7 @@ const styles = stylex.create({
 			default: "transparent",
 			":hover": "color-mix(in srgb, currentColor 14%, transparent)",
 		},
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 		// 看起來 16px、可點 24px(WCAG 2.2 target size),不影響版面
 		"::after": { content: '""', position: "absolute", inset: "-0.25rem" },

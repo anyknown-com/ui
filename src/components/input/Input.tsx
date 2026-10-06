@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { breakpoint, color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 // 輸入框是紙上凹下去的一格:surface 底 + 1px border(邊界要 3:1 才看得到,只靠底色不夠)。
@@ -31,7 +31,7 @@ export const controlStyles = stylex.create({
 		transitionProperty: "border-color",
 		transitionDuration: { default: motion.fast, "@media (prefers-reduced-motion: reduce)": "0s" },
 		transitionTimingFunction: motion.ease,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 		cursor: { default: "auto", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },

@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { press, type StyleArg, styled } from "../../lib/styled"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { Spin } from "../spin/Spin"
 
 const FORCED = "@media (forced-colors: active)"
@@ -27,7 +27,7 @@ const styles = stylex.create({
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
 		// 按下去壓一點點與轉場是共用的 press.button
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
 	// 膠囊三階 48 / 40 / 32,預設 40 是觸控的高。xs 28 只給擠的工具列,不在三階裡

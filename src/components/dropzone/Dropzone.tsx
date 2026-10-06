@@ -3,7 +3,7 @@ import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, motion, shadow, space, tone, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, shadow, space, tone, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -22,7 +22,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		backgroundColor: color.surface,
 		transitionProperty: "background-color",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	over: { backgroundColor: color.accentSubtle },
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
@@ -35,19 +35,19 @@ const styles = stylex.create({
 		strokeWidth: 2,
 		strokeDasharray: "7 6",
 		transitionProperty: "stroke",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	seamOver: {
 		stroke: color.accent,
 		animationName: { default: sew, [REDUCED]: "none" },
 		animationDuration: "0.5s",
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 	icon: {
 		color: color.textFaint,
 		transitionProperty: "color",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	iconOver: { color: color.text },
 	title: { margin: 0, fontSize: type.t2, color: color.text },
@@ -65,7 +65,7 @@ const styles = stylex.create({
 		paddingInline: space.md,
 		cursor: "pointer",
 		marginTop: space.xxs,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 	},
 	hiddenInput: {
@@ -128,7 +128,7 @@ const styles = stylex.create({
 		placeItems: "center",
 		borderRadius: corner.small,
 		justifySelf: "end",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
 	track: {
 		gridColumn: "1 / -1",
@@ -145,7 +145,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
-		transitionTimingFunction: "linear",
+		transitionTimingFunction: motion.linear,
 	},
 	status: { gridColumn: "1 / -1", fontSize: type.t2, color: color.textMuted },
 	statusError: { color: color.danger },
