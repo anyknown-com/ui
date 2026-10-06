@@ -5,7 +5,7 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { popupStyles } from "../../lib/popup"
-import { breakpoint, color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, motion, space, type, zIndex } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -22,7 +22,7 @@ const styles = stylex.create({
 		paddingInlineEnd: space.xs,
 		display: "grid",
 		gap: space.xs,
-		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 0,
 	},
 	textarea: {
@@ -63,7 +63,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
 	iconButtonOn: { backgroundColor: color.accentSubtle, color: color.accent },
@@ -82,7 +82,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
 	// 圓的墨色送出鈕;空值時退成凹下的灰
@@ -96,12 +96,12 @@ const styles = stylex.create({
 		backgroundColor: { default: color.accent, ":disabled": color.accentSubtle },
 		color: { default: color.accentText, ":disabled": color.textFaint },
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	popup: {
 		position: "absolute",
-		zIndex: 10,
+		zIndex: zIndex.popup,
 		bottom: `calc(100% + ${space.xxs})`,
 		insetInlineStart: space.xs,
 		width: `min(20rem, calc(100% - ${space.md}))`,
@@ -133,9 +133,9 @@ const styles = stylex.create({
 	},
 	optionActive: {
 		backgroundColor: color.accentSubtle,
-		outline: `2px solid ${color.focusRing}`,
+		outline: `${focusRing.width} solid ${color.focusRing}`,
 		outlineOffset: -2,
-		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
+		"@media (forced-colors: active)": { outline: `${focusRing.width} solid Highlight` },
 	},
 	kind: { color: color.textMuted, fontSize: type.t1, marginInlineStart: "auto" },
 	hint: {
