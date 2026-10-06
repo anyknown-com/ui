@@ -45,7 +45,7 @@ The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenC
 - Base UI Menu: the `trigger` element gets `aria-haspopup` and `aria-expanded`; the popup is `role="menu"` with `menuitem`, `menuitemcheckbox` (with `aria-checked`) and `separator`. `DropdownGroup`'s `label` names its group.
 - The trigger must be a single focusable element with its own name (a `Button`, or an `IconButton` with `label`).
 - `shortcut` is shown visually with `aria-hidden` and exposed as `aria-keyshortcuts`, so it is not part of the item's name. The menu does not bind the shortcut; the app must.
-- `icon` and the submenu chevron are `aria-hidden`.
+- `icon` and the submenu chevron are `aria-hidden`. Under `<DirectionProvider direction="rtl">` the chevron points to the inline end (left), where the submenu opens.
 - `variant="danger"` is color only; the item text must say what happens.
 - `disabled` items (and a disabled `DropdownSub`) stay focusable with `aria-disabled`, so they can be found, but do nothing.
 - Highlighted item: `accentSubtle` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
@@ -63,8 +63,8 @@ Base UI Menu handles these keys (APG menu button).
 | <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the highlight through every item, disabled ones included; wraps at the ends. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Moves to the first or last item. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the item. A `DropdownItem` closes the menu (unless `closeOnClick={false}`); a checkbox item toggles and stays open (unless `closeOnClick`). |
-| <kbd>→</kbd> | Opens the highlighted submenu. |
-| <kbd>←</kbd> | Closes the current submenu. |
+| <kbd>→</kbd> | Opens the highlighted submenu (<kbd>←</kbd> under `<DirectionProvider direction="rtl">`). |
+| <kbd>←</kbd> | Closes the current submenu (<kbd>→</kbd> under `<DirectionProvider direction="rtl">`). |
 | <kbd>Escape</kbd> | Closes the menu and returns focus to the trigger. |
 | <kbd>Tab</kbd> | Closes the menu. |
 | Typing | Moves to the next item starting with that letter; quick typing matches a prefix. |

@@ -30,7 +30,8 @@ import { Ghost, GhostLink } from "@anyknown/ui"
 - `Ghost` renders a native `<button type="button">`; the label is the children. `disabled` is native and drops opacity to 0.4.
 - `GhostLink` renders a native `<a href>`. With `external` it adds `target="_blank"` and `rel="noreferrer"`. It does not announce that it opens a new tab; say so in the text if that matters.
 - Both are 28 px tall (40 px on phones), above the 24 px minimum target.
-- Focus ring: a 2 px `focusRing` outline, offset 2 px, on `:focus-visible`.
+- Focus ring: a 2 px `focusRing` outline, offset 2 px, on `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the hover wash is dropped, so hover draws a 1 px `ButtonText` outline instead (not on a disabled `Ghost`).
 - Pressing scales to 0.98; no scale and no transition under `prefers-reduced-motion`.
 - `danger` is color only; the word must carry the meaning.
 

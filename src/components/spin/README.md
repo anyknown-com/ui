@@ -33,7 +33,7 @@ For a button, pass `loading` to [Button](../button/README.md) instead of placing
 
 - A `<span aria-hidden="true">`: it has no name and is never announced.
 - The caller must say that something is waiting in a way assistive technology can read, for example `aria-busy` on the host, a changed label ("Saving…"), or a toast. `Button`'s `loading` sets `aria-busy` for you.
-- It turns once every 0.7 s. Under `prefers-reduced-motion: reduce` it stops turning and stays as a still ring.
+- It turns once every 0.8 s (`motion.loopFast`). Under `prefers-reduced-motion: reduce` it stops turning and stays as a still ring.
 
 ## Keyboard
 

@@ -47,8 +47,8 @@ The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`valu
 ## Accessibility
 
 - APG select-only combobox on Base UI Combobox: the trigger has `role="combobox"` with `aria-expanded`; the list is a `listbox` of `option`s; group labels name their groups.
-- Name: inside a `Field`, the trigger takes the Field's control id, so the Field `label` names it and the Field's error and help describe it. Outside a Field, pass `aria-label` or `aria-labelledby`; the trigger's `aria-labelledby` then lists that name and the trigger itself, so the current value is read too. For `multiple` inside a Field, also pass `aria-label`.
-- `required` sets `aria-required`; `invalid` (or a Field `error`) sets `aria-invalid`.
+- Name: inside a `Field`, the trigger takes the Field's control id, so the Field `label` names it and the Field's error and help describe it. Outside a Field, pass `aria-label` or `aria-labelledby`; the trigger's `aria-labelledby` then lists that name and the trigger itself, so the current value is read too. With `multiple` the trigger is a `div`, which `<label for>` cannot name, so inside a Field the trigger, the list and the search box point `aria-labelledby` at the Field's label instead.
+- `required` sets `aria-required`; `invalid` (or a Field `error`) sets `aria-invalid`. Under `forced-colors: active` an invalid trigger has a 2px dashed frame.
 - The search box is named by `searchLabel`. Without the search box, a visually hidden input carries the Select's name.
 - Each chip's remove button is named by `remove(item)`. Clicking it does not open the list.
 - The empty state shows the query (`empty(query)`).

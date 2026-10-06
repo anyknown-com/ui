@@ -35,7 +35,9 @@ Sizes are 36 / 32 / 28 px for `md` / `sm` / `xs` (default `md`). `side` places t
 - `open` only changes the look (an ink wash) and removes the tooltip. It does not set `aria-expanded` or `aria-pressed`; pass the one that fits (a popover trigger usually sets `aria-expanded` for you).
 - The `badge` count is not part of the accessible name, because `aria-label` replaces the content. If the count matters, put it in `label` (for example "Inbox, 3 unread").
 - Every size is at least 28 px across, above the 24 px minimum target.
-- Focus ring: a 2 px `focusRing` outline, offset 2 px, on `:focus-visible`. Pressing scales to 0.98; no scale and no transition under reduced motion.
+- Focus ring: a 2 px `focusRing` outline, offset 2 px, on `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the hover wash is dropped, so hover draws a 1 px `ButtonText` outline around the circle instead (not when disabled).
+- Pressing scales to 0.98; no scale and no transition under reduced motion.
 
 ## Keyboard
 

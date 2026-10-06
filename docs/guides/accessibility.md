@@ -16,7 +16,7 @@ Widgets that need roving focus, typeahead, focus trapping or nested menus use [B
 
 ### Keyboard patterns
 
-- **One tab stop per group.** `Tabs`, `RadioGroup`, `Segmented` (`role="radiogroup"`) and `ActionBar` (`role="toolbar"`) take one Tab press. Arrow keys move inside the group and wrap at the ends, and <kbd>Home</kbd> / <kbd>End</kbd> jump to the first and last item. `Segmented` and `ActionBar` mirror <kbd>←</kbd> / <kbd>→</kbd> under right-to-left.
+- **One tab stop per group.** `Tabs`, `RadioGroup`, `Segmented` (`role="radiogroup"`) and `ActionBar` (`role="toolbar"`) take one Tab press. Arrow keys move inside the group and wrap at the ends, and <kbd>Home</kbd> / <kbd>End</kbd> jump to the first and last item. `Segmented` and `ActionBar` mirror <kbd>←</kbd> / <kbd>→</kbd> under right-to-left; `Tabs` does under `DirectionProvider`.
 - **Overlays give focus back.** `Dialog`, `Popover`, `DropdownMenu` and `Select` return focus to the element that opened them. A dialog does this as its exit starts. <kbd>Escape</kbd> closes only the top dialog of a stack.
 - **Toasts are reachable.** <kbd>F8</kbd> moves focus to the notification region and <kbd>Escape</kbd> returns it. See [State management](./state.md#keyboard).
 
@@ -29,7 +29,7 @@ outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.
 outlineOffset: 2,
 ```
 
-Controls that sit inside a frame use an offset of `-1` or `-2` so the ring is not clipped. Under `@media (forced-colors: active)` the ring uses the system `Highlight` color in `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Select`, `DropdownMenu`, `Composer`, `ToolCard`, toasts and dialogs.
+Controls that sit inside a frame use an offset of `-1` or `-2` so the ring is not clipped. Under `@media (forced-colors: active)` the ring uses the system `Highlight` color in `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Select`, `DropdownMenu`, `Ghost`, `IconButton`, `Composer`, `ToolCard`, toasts and dialogs.
 
 ### Reduced motion everywhere
 
@@ -45,19 +45,21 @@ Windows high contrast mode (`forced-colors: active`) drops shadows and replaces 
 - `Button` draws a `ButtonText` frame, and a `GrayText` one when disabled, because its fill disappears.
 - `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented` and `Tabs` draw their on, off and disabled states with `Highlight`, `HighlightText`, `ButtonText`, `Canvas` and `GrayText`.
 - Highlighted options in `Select` and `DropdownMenu` use `Highlight`. Changed words in `DiffViewer` use `Mark` / `MarkText`.
-
-Not covered yet: the danger border of an invalid `Input`, `Textarea` or `Select`, and the `Ghost` and `IconButton` frames. Check those by hand.
+- An invalid `Input`, `Textarea`, `PasswordInput` or `Select` draws a 2px dashed frame, because the danger border is repainted as the plain frame color. An invalid `Checkbox` box is a 2px dashed `ButtonText` frame.
+- `Ghost` and `IconButton` have no edge once the hover wash is dropped, so hover draws a 1px `ButtonText` outline.
 
 ### Right-to-left layout
 
 Styles use logical properties (`paddingInline`, `marginInline`, `insetInlineStart`, `insetInlineEnd`) instead of left and right, so layouts mirror under `dir="rtl"`. For example, the `Switch` thumb moves with `insetInlineStart` rather than `translate`, because `translate` is a physical x offset and would push the thumb off the track under RTL. The one deliberate exception is the `Tabs` indicator: Base UI measures its position from the physical left edge in both directions, so it is anchored with `left: 0`.
 
-What an RTL app needs today:
+What an RTL app needs:
 
 - Set `dir="rtl"` on `<html>`. Portalled layers (toasts, menus, dialogs) inherit direction from the document, not from a `dir` on a wrapper.
-- Base UI widgets (`Tabs`, the `DropdownMenu` submenu) read direction from Base UI's own `DirectionProvider` (`@base-ui/react/direction-provider`), not from the `dir` attribute. Wrap the app in it as well.
+- Wrap the app in `<DirectionProvider direction="rtl">` from `@anyknown/ui`. `Tabs` and the `DropdownMenu` submenu read direction from it, not from the `dir` attribute, and swap <kbd>←</kbd> / <kbd>→</kbd>.
+- `Slider` reads the provider or the computed CSS direction: under RTL <kbd>←</kbd> raises the value and a drag measures from the right edge.
 - `ActionBar` and `Segmented` read the direction from the page, so they need nothing more.
-- Known gap: `Slider` does not mirror its arrow keys. Under RTL its fill grows toward the left, but <kbd>→</kbd> still raises the value.
+
+See [Internationalization](./i18n.md#right-to-left) for the setup.
 
 ### Hit targets of at least 24px
 
@@ -80,8 +82,8 @@ Words that a component owns (an `aria-label` on a close button, a screen-reader 
 
 - **axe.** `src/test/axe.ts` exports `expectNoAxeViolations(context?, options?)` and `axeViolations(...)`. They run `axe-core` on `document.body` by default, because Base UI popups, dialogs and toasts portal out of the render container. Rules that jsdom cannot answer are off: color contrast, target size, scrollable regions, and page-level rules such as `region` and `landmark-one-main`. Every component folder has at least one axe test in its own `*.test.tsx`. `src/test/a11y.test.tsx` adds a cross-component sweep and checks that the helper does report a real violation.
 - **Keyboard.** Component tests drive the keyboard with `@testing-library/user-event` (`user.keyboard(...)`, `user.tab()`): arrow keys in tabs, radios, segmented controls, sliders, selects, menus and the action bar, with <kbd>Home</kbd> / <kbd>End</kbd> and wrapping where the widget has them; Escape and focus return in overlays; F8 to reach toasts; Enter and Shift+Enter in the composer.
-- **Right-to-left.** `src/test/rtl.test.tsx` renders with `<html dir="rtl">` and checks which way the arrow keys move in `Tabs`, the `DropdownMenu` submenu and `ActionBar`, that `Switch`, `Slider`, `Tabs`, menus, toasts and `Composer` write no physical left or right inline style, and that the toast region still takes F8. The `Slider` key direction is pinned as a known failure (`test.fails`). jsdom has no layout, so where things land on screen still needs a real browser.
-- **Forced colors.** Tests read the CSS StyleX emits under `@media (forced-colors: active)` and check the system colors for `Button`, `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs` and every overlay surface (`src/lib/popup.test.tsx`). They check the declared colors, not the rendered result.
+- **Right-to-left.** `src/test/rtl.test.tsx` renders with `<html dir="rtl">` and checks which way the arrow keys move in `Tabs`, the `DropdownMenu` submenu, `Slider` and `ActionBar`, that a `Slider` drag measures from the right edge, that `Switch`, `Slider`, `Tabs`, menus, toasts and `Composer` write no physical left or right inline style, and that the toast region still takes F8. jsdom has no layout, so where things land on screen still needs a real browser.
+- **Forced colors.** Tests read the CSS StyleX emits under `@media (forced-colors: active)` and check the system colors for `Button`, `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Ghost`, `IconButton`, the invalid frame of `Input`, `Textarea` and `Select`, and every overlay surface (`src/lib/popup.test.tsx`). They check the declared colors, not the rendered result.
 - **Reduced motion.** `src/test/reduced-motion.test.ts` scans every `stylex.create` in the source and fails if an `animationName` or `transitionDuration` is not wrapped in the reduced-motion media query, except for a short, named list of exceptions. It also checks that `requestAnimationFrame` animations are gated on `usePrefersReducedMotion`. Component tests that branch on reduced motion (`Toast`, `VoiceIndicator`) also render with it on.
 - **The literal guard.** `src/test/literals.test.ts` fails when a component adds a raw hex color, duration, `zIndex`, font size or media-query breakpoint instead of a token. Tokens carry the contrast-checked colors and the reduced-motion-aware durations, so this keeps components on them.
 
@@ -92,12 +94,12 @@ Contrast and target size are measured, not tested: jsdom cannot compute either. 
 The components cannot invent these for you:
 
 - **An accessible name for every icon-only control.** `IconButton` requires `label`, which becomes both its tooltip and its accessible name. A removable `Chip` requires `removeLabel`. A table row's `Toggle` requires `label`. Anything else without visible text needs `aria-label`.
-- **A label for every input.** Wrap an `Input`, `Textarea`, `PasswordInput` or `Select` in a `Field` with `label` (or pair it with a `Label`). `Field` owns the control's `id` and renders `help` and `error`; the control sets `aria-describedby`, `aria-invalid` and its required state to match. A `Select` with `multiple` inside a `Field` also needs `aria-label`. Outside a `Field`, give `Select` `aria-label` or `aria-labelledby`. `Checkbox`, `Radio` and `Switch` take their own `label`.
+- **A label for every input.** Wrap an `Input`, `Textarea`, `PasswordInput` or `Select` in a `Field` with `label` (or pair it with a `Label`). `Field` owns the control's `id` and renders `help` and `error`; the control sets `aria-describedby`, `aria-invalid` and its required state to match. Outside a `Field`, give `Select` `aria-label` or `aria-labelledby`. `Checkbox`, `Radio` and `Switch` take their own `label`.
 - **Names for regions and widgets that have no visible label.** `Progress` requires `aria-label` and `valueText` (what a screen reader reads, such as "Uploading 3 files · 64%"). `Slider` takes `label` or `aria-label`, and `valueText` when the raw number is not meaningful. `Segmented` and `DataTable` require `label`. `TabsList` requires `aria-label`, and `PopoverContent` needs either `aria-label` or `titled` with a `PopoverTitle` inside.
 - **Clear words.** Button and action labels must make sense on their own. A confirm button starts with a verb and names the consequence ("Delete memory", not "OK"); `ConfirmDialog` and `dialog.confirm` have no default `confirmLabel` for this reason.
-- **The page's language and direction.** Set `<html lang>` and, for a right-to-left language, `dir="rtl"` (see above). `<LocaleProvider>` sets neither.
+- **The page's language and direction.** Set `<html lang>` and, for a right-to-left language, `dir="rtl"` plus `<DirectionProvider direction="rtl">` (see above). `<LocaleProvider>` sets neither.
 - **Translations of your own text.** The library translates only its built-in words.
 
 ## Known debt
 
-Gaps that are waiting on a design decision are tracked in [A11Y-DEBT.md](../../src/components/A11Y-DEBT.md). Today that is placeholder and hint text that still uses `textFaint` (the `Select` trigger and search box, the free-text box of `DecisionCard`, the separator of a `KbdGroup` sequence). Beyond that list: the forced-colors gaps and the RTL `Slider` keys above.
+Gaps that are waiting on a design decision are tracked in [A11Y-DEBT.md](../../src/components/A11Y-DEBT.md). Today that is placeholder and hint text that still uses `textFaint` (the `Select` trigger and search box, the free-text box of `DecisionCard`, the separator of a `KbdGroup` sequence).

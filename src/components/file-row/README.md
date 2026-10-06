@@ -54,7 +54,7 @@ Deprecated: `onSelectChange` (use `onSelectedChange`), `selectLabel` (use `label
 - A busy row has `aria-busy="true"`. An encrypting row says `labels.encrypting`. An uploading row has a `progressbar` named by the file name, with `aria-valuetext` from `labels.uploading(name, percent)`.
 - `selectedCount` renders an `aria-live="polite"` line with `labels.selected(count)`, empty at 0.
 - The words (`select`, `encrypting`, `uploading`, `selected`) follow `<LocaleProvider>` (zh-TW by default). `FileRow` and `FileList` both take `labels` (`Partial<FileRowLabels>`).
-- Focus rings are 2px `focusRing` outlines. With `prefers-reduced-motion: reduce`, the encrypting spinner stops.
+- Focus rings are 2px `focusRing` outlines. The encrypting spinner turns once every 1.2 s (`motion.loop`); with `prefers-reduced-motion: reduce`, it stops.
 - Known gap: the grid has no arrow-key navigation, and every row is its own Tab stop.
 
 ## Keyboard

@@ -32,13 +32,14 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`)
 
 - Renders a native `<input>` (`type="password"`, or `"text"` while revealed) with the Input styling, and a native toggle `<button>`.
 - The accessible name comes from the caller: a [Field](../label/README.md) `label` or `aria-label`. Inside a Field, the Field's id, help and error are wired in.
-- Toggle button: named by `labels.show` / `labels.hide`, with `aria-pressed` for the revealed state. It is 28px across, above the 24px minimum target. After toggling, focus goes back to the field. A visually hidden `role="status"` says `labels.shown` when the text is revealed.
+- Toggle button: one name in both states, `labels.show` ("顯示 passphrase" / "Show passphrase"), with `aria-pressed="true"` while the text is revealed. The name does not switch to "hide", so a screen reader never hears "hide, pressed". It is 28px across, above the 24px minimum target. After toggling, focus goes back to the field. A visually hidden `role="status"` says `labels.shown` when the text is revealed.
 - Meter: the bars are `aria-hidden`; the level text is `aria-live="polite"` and is in the field's `aria-describedby`.
 - Caps Lock: a `role="status"` region, mounted from the start, shows `labels.capsLock` while Caps Lock is on; it clears on blur. Set `capsLockWarning={false}` to turn it off.
 - Confirm field: once something is typed and it differs from `confirmOf`, `aria-invalid="true"` is set and `labels.mismatch` is shown and added to `aria-describedby`.
 - Paste is not blocked.
 - Put requirements in the Field `help`, not the placeholder.
-- Built-in words follow `<LocaleProvider>` (zh-TW, en): `show`, `hide`, `shown`, `capsLock`, `mismatch` and the five strength words `levelEmpty` … `levelVeryStrong`. Override any with `labels`. The single-word props `showLabel`, `hideLabel`, `shownStatus`, `capsLockLabel`, `mismatchLabel` and the array `levelLabels` still work and win over `labels`.
+- Invalid (mismatch, `invalid` or a Field `error`): under `forced-colors: active` the frame turns 2px dashed, since the danger colour is repainted.
+- Built-in words follow `<LocaleProvider>` (zh-TW, en): `show`, `shown`, `capsLock`, `mismatch` and the five strength words `levelEmpty` … `levelVeryStrong`. Override any with `labels`. The single-word props `showLabel`, `shownStatus`, `capsLockLabel`, `mismatchLabel` and the array `levelLabels` still work and win over `labels`.
 - Under `forced-colors: active` each meter bar is a `GrayText` outline and filled bars paint `CanvasText`, so the level still shows.
 - The meter transition is off under `prefers-reduced-motion: reduce`.
 
@@ -46,8 +47,8 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`)
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Moves from the field to the show/hide button and on. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> on the toggle | Shows or hides the text (native `<button>`), then focus returns to the field. |
+| <kbd>Tab</kbd> | Moves from the field to the reveal toggle and on. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> on the toggle | Shows or hides the text and flips `aria-pressed` (native `<button>`), then focus returns to the field. |
 | <kbd>Caps Lock</kbd> | Its state is read on every key press and release in the field. |
 
 ## Related

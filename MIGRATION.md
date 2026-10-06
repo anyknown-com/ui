@@ -1,6 +1,6 @@
 # Migrating from 0.9 to 0.10
 
-0.10 has four breaking changes. Most apps only need to touch the first two. Everything else
+0.10 has five breaking changes. Most apps only need to touch the first two. Everything else
 in this release is either additive or a deprecation, and the old names keep working. The full
 list is in [CHANGELOG.md](CHANGELOG.md).
 
@@ -206,6 +206,36 @@ screen.getByRole("button", { name: "Mute", pressed: true })
 ```
 
 Under `<LocaleProvider locale="en">` the English words are built in, so you can drop `labels`.
+
+### 5. `PasswordInput` has no `hideLabel`
+
+**What changed:** the reveal toggle keeps one name in both states, `showLabel` (or
+`labels.show`: "顯示 passphrase" / "Show passphrase"), and reports the state with
+`aria-pressed`. The `hideLabel` prop is removed, so passing it is a type error. The new
+`PasswordInputLabels` has no `hide` either.
+
+**Why:** in 0.9 the toggle both renamed itself and set `aria-pressed`, so a screen reader heard
+"Hide passphrase, pressed". The WAI-ARIA toggle button pattern uses one or the other.
+
+Before (0.9):
+
+```tsx
+<PasswordInput showLabel="Show passphrase" hideLabel="Hide passphrase" />
+
+await user.click(screen.getByRole("button", { name: "Show passphrase" }))
+screen.getByRole("button", { name: "Hide passphrase" })
+```
+
+After (0.10):
+
+```tsx
+<PasswordInput showLabel="Show passphrase" />
+
+await user.click(screen.getByRole("button", { name: "Show passphrase" }))
+screen.getByRole("button", { name: "Show passphrase", pressed: true })
+```
+
+Under `<LocaleProvider locale="en">` the English name is built in, so you can drop `showLabel`.
 
 ## Deprecations
 
@@ -461,11 +491,17 @@ These do not need code changes, but they can change screenshots, tests or how a 
 - **Focus returns as the exit starts.** Dialog, ConfirmDialog, Select, Dropdown and Popover move
   focus back to the trigger at the start of the fade, not after it.
 - **CallBar**: the mute button keeps one name with `aria-pressed` (see breaking change 4).
+- **PasswordInput**: the reveal toggle keeps one name with `aria-pressed` (see breaking change 5).
+- **RecoveryKey**'s reveal button no longer has `aria-pressed`; its text says the next action.
 - **Toasts with an `action` or of type `danger` wait to be dismissed.** Pass `timeout` to count
   them down anyway. Toasts over `limit` are dropped.
 - **F8** moves focus to the toast region and Escape gives it back.
 - **ActionBar** is one tab stop; use ← / → between its buttons.
-- **Placeholders** use `color.textMuted` (darker than before).
+- **Placeholders** in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter
+  use `color.textMuted` (darker than before). The `Select` and `DecisionCard` placeholders are
+  unchanged.
+- **Spin** turns a little slower (0.8s, was 0.7s), and the **Dropzone** drag-over outline cycles
+  in 0.8s (was 0.5s).
 - **Fields use 16px text on phones** (below 45rem) to stop iOS zooming on focus.
 - **Buttons are larger pills:** `xs` 28px, `sm` 32px, `md` 40px, new `lg` 48px.
 - **The focus ring is blue** (`color.focusRing`, 2px solid), and primary actions and links are ink.
@@ -476,6 +512,11 @@ These do not need code changes, but they can change screenshots, tests or how a 
   no longer carry `aria-required`.
 - **Hover-only controls** (FileRow checkbox and actions, the message ActionBar) stay visible on
   touch devices.
+- **Right-to-left** needs `<DirectionProvider direction="rtl">` (new) at the root as well as
+  `dir="rtl"` on `<html>`. With it, `Tabs` and `DropdownMenu` submenus swap ← / →, and `Slider`
+  mirrors its keys and drag (it also follows a computed `direction: rtl` on its own, so an RTL
+  page without the provider now gets ← raising a Slider). See
+  [Right-to-left](docs/guides/i18n.md#right-to-left).
 
 ## Checklist
 
@@ -485,6 +526,7 @@ These do not need code changes, but they can change screenshots, tests or how a 
 - [ ] Add `confirmLabel` to every `<ConfirmDialog>`.
 - [ ] Update Segmented tests and selectors from `button` / `aria-pressed` to `radio` / `aria-checked`.
 - [ ] Remove `unmute` from CallBar `labels`; query the mute button with `pressed`.
+- [ ] Remove `hideLabel` from PasswordInput; query the reveal toggle by its show name with `pressed`.
 - [ ] Wrap the app in `<LocaleProvider locale="en">` if it is not zh-TW, with `<Toaster>` and `<Dialogs>` inside.
 - [ ] Move `onChange` → `onValueChange`, `onToggle` → `onOpenChange`, `onSelectChange` → `onSelectedChange`, and `*Label` props → `labels`.
 - [ ] Rename `B`, `Sub`, `Item`, `Row`, `Head`, `Value`, `Cell` to their family-prefixed names.

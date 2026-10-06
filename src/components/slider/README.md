@@ -44,19 +44,20 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`,
 - Under `forced-colors: active` the track gets a `ButtonText` frame and the fill and thumb ring paint in `Highlight`; disabled draws in `GrayText`.
 - The fill and thumb move together (200ms ease-out); the transition is off while dragging and under `prefers-reduced-motion: reduce`.
 - Pointer: pressing the track focuses the slider and captures the pointer until release.
+- Right-to-left: the thumb and fill are placed with logical properties, so under `dir="rtl"` the track fills from the right and a drag measures from the right edge. The Slider reads either `<DirectionProvider direction="rtl">` or the computed CSS `direction`.
 - The Slider does not read [Field](../label/README.md) context; use its own `label`.
 
 ## Keyboard
 
 | Key | Action |
 | --- | --- |
-| <kbd>→</kbd> / <kbd>↑</kbd> | Increases by 5% of the range (not by `step`), then snaps. |
-| <kbd>←</kbd> / <kbd>↓</kbd> | Decreases by 5% of the range, then snaps. |
+| <kbd>→</kbd> / <kbd>↑</kbd> | Increases by 5% of the range (not by `step`), then snaps. Under RTL, <kbd>→</kbd> decreases. |
+| <kbd>←</kbd> / <kbd>↓</kbd> | Decreases by 5% of the range, then snaps. Under RTL, <kbd>←</kbd> increases. |
 | <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Increases / decreases by `largeStep` (default 10% of the range), then snaps. |
 | <kbd>Home</kbd> | Moves to `min`. |
 | <kbd>End</kbd> | Moves to `max`. |
 
-The value stops at the ends; it does not wrap. Each key press that moves the value calls `onValueCommit` once. Keys do nothing while `disabled`.
+The value stops at the ends; it does not wrap. Each key press that moves the value calls `onValueCommit` once. Keys do nothing while `disabled`. RTL means `<DirectionProvider direction="rtl">` or a computed `direction: rtl`; <kbd>↑</kbd> / <kbd>↓</kbd> never mirror.
 
 ## Related
 

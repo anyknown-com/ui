@@ -52,10 +52,12 @@ Base UI Tabs handles these keys.
 
 | Key | Action |
 | --- | --- |
-| <kbd>←</kbd> / <kbd>→</kbd> | Moves focus to the previous or next tab, including disabled ones. |
+| <kbd>←</kbd> / <kbd>→</kbd> | Moves focus to the previous or next tab, including disabled ones; wraps at the ends. Under `<DirectionProvider direction="rtl">` they swap: <kbd>←</kbd> is next. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Moves focus to the first or last tab. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Selects the focused tab. |
 | <kbd>Tab</kbd> | Moves from the tab list into the active panel. |
+
+The `dir` attribute alone does not mirror the arrow keys; Base UI reads the direction from `DirectionProvider`. Home / End follow the list order in both directions.
 
 ## Related
 

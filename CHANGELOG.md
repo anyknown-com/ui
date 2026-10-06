@@ -22,6 +22,7 @@ accessibility pass over every component. See [MIGRATION.md](MIGRATION.md) for up
 - **ConfirmDialog:** `confirmLabel` is required; the `"確認"` default is gone. Pass a verb that names the consequence.
 - **Segmented:** the control is a `role="radiogroup"` of `role="radio"` segments with `aria-checked` and a roving tabindex, instead of buttons with `aria-pressed`. Only the checked segment is a tab stop; tests that query `getByRole("button")` must query `"radio"`.
 - **CallBar:** `CallBarLabels` no longer has `unmute`. The mute button keeps the name `labels.mute` and reports its state with `aria-pressed`.
+- **PasswordInput:** the `hideLabel` prop is removed, and the new `PasswordInputLabels` has no `hide`. The reveal toggle keeps one name, `showLabel` / `labels.show` ("顯示 passphrase" / "Show passphrase"), in both states and reports the state with `aria-pressed`.
 
 ### Added
 
@@ -76,6 +77,7 @@ accessibility pass over every component. See [MIGRATION.md](MIGRATION.md) for up
 
 #### Internationalisation
 
+- `DirectionProvider` (`direction: "ltr" | "rtl"`) and `DirectionProviderProps`, wrapping Base UI's provider. Under `"rtl"`, `Tabs` and `DropdownMenu` submenus swap ← / →, the submenu chevron points to the inline end, and `Slider` mirrors its arrow keys and drag. `Slider` also follows a computed CSS `direction: rtl` without the provider.
 - `LocaleProvider`, `useLocale`, `defineStrings`, `useStrings`, `resolveStrings`, `DEFAULT_LOCALE` (`"zh-TW"`), `FALLBACK_LOCALE` (`"en"`) and the types `Locale`, `LocaleProviderProps`, `LocaleStrings`, `StringsOf`, `StringTable`, `Word`.
 - Every component's built-in words come in zh-TW and English and follow `<LocaleProvider>`; a `labels` prop overrides any word per instance.
 - Exported label types: `ActionBarLabels`, `AttachButtonLabels`, `CodeBlockLabels`, `ComposerLabels`, `DataTableLabels`, `DialogLabels`, `DiffViewerLabels`, `DropzoneLabels`, `FileRowLabels`, `HandoffReceiptLabels`, `InteractionCardLabels`, `LabelLabels`, `ListLabels`, `MarkdownLabels`, `MessageLabels`, `PageLabels`, `PasswordInputLabels`, `PayloadBlockLabels`, `PendingFilesLabels`, `ProgressLabels`, `ReasoningFoldLabels`, `RecoveryKeyLabels`, `SelectLabels`, `SpinnerLabels`, `ThreadSkeletonLabels`, `ToastLabels`, `ToolCardLabels`, `VoiceIndicatorLabels`.
@@ -122,7 +124,8 @@ accessibility pass over every component. See [MIGRATION.md](MIGRATION.md) for up
 - Toasts with an `action` or of type `danger` no longer time out unless you pass `timeout`.
 - Toast timers pause on hover, on focus inside the viewport and while the document is hidden.
 - Escape closes only the top dialog of a stack.
-- Placeholders use `color.textMuted`.
+- Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter use `color.textMuted`. The `Select` trigger and search placeholders and the `DecisionCard` free-text placeholder still use `color.textFaint` (see `src/components/A11Y-DEBT.md`).
+- Spinning and looping animations take their period from the `motion` loop tokens: `Spin` turns in 0.8s (`loopFast`, was 0.7s), the `Dropzone` drag-over outline cycles in 0.8s (`loopFast`, was 0.5s), the `FileRow` spinner stays at 1.2s (`loop`).
 - Fields use 16px text below the phone breakpoint, so iOS does not zoom on focus.
 - Hover-only affordances (FileRow checkbox and actions, the assistant message's ActionBar) stay visible on touch devices.
 - DiffViewer marks word changes with `<ins>` / `<del>` instead of `<mark>`.
@@ -167,11 +170,16 @@ All deprecated names still work and will be removed in a future major release.
 - Control boundaries reach 3:1 contrast (`color.borderControl`); selected tab pills are ringed at 3:1.
 - Small checkboxes, radios, switches, ActionBar and CodeBlock buttons have 24px hit areas.
 - Controls, overlays, ToolCard, LiveDot, Skeleton, Progress, CallBar, Bubble and Message stay distinguishable in forced-colors mode.
-- Readable text moved from `textFaint` to `textMuted`.
+- Readable text moved from `textFaint` to `textMuted`, except the `Select` trigger and search placeholders, the `DecisionCard` free-text placeholder and the `KbdGroup` sequence separator (listed in A11Y-DEBT).
 - F8 moves focus to the toast region and Escape returns it; every toast has a named close button; the viewport is a polite live region and `danger` toasts are alerts.
 - Dialog, ConfirmDialog, Select, Dropdown and Popover return focus to the trigger as the exit starts.
 - Segmented follows the WAI-ARIA radio group pattern; ActionBar follows the toolbar pattern.
 - CallBar's mute button uses `aria-pressed` with a constant name.
+- PasswordInput's reveal toggle keeps a constant name with `aria-pressed`, so it is no longer read as "hide, pressed".
+- RecoveryKey's reveal button drops `aria-pressed`: its text already names the next action (reveal / hide).
+- `Field` gives its label an id; a `multiple` Select inside a `Field` (a `div` trigger that `<label for>` cannot name) points `aria-labelledby` at it from the trigger, the list and the search box.
+- Forced-colors mode: an invalid `Input`, `Textarea`, `PasswordInput` or `Select` draws a 2px dashed frame, and an invalid `Checkbox` a 2px dashed `ButtonText` frame, so the error does not rely on colour. `Ghost` and `IconButton` draw a 1px `ButtonText` outline on hover and a `Highlight` focus ring.
+- Right-to-left: under `DirectionProvider` the arrow keys of `Tabs`, `DropdownMenu` submenus and `Slider` follow the reading direction, and a `Slider` drag measures from the right edge.
 - ListSort's arrow is hidden and an active column is named "X, sorted" (`X，排序中` in zh-TW).
 - DiffViewer no longer relies on colour: `<ins>` / `<del>`, ± signs and visually hidden prefixes.
 - RecoveryKey announces a copy politely; its key box is a focusable, named region that selects the key on focus.

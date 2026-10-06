@@ -214,7 +214,7 @@ With Tailwind v4, map them in `@theme inline`. `inline` makes each utility read 
 
 Toasts and imperative dialogs render through hosts. Mount `<Toaster />` and `<Dialogs />` once, near the root. Then `toast(...)` and `dialog.confirm(...)` work from anywhere, including outside React.
 
-The built-in words (aria-labels, screen-reader prefixes) default to Traditional Chinese (`DEFAULT_LOCALE` is `"zh-TW"`). For an English app, wrap everything in `<LocaleProvider locale="en">`. See [Internationalization](./i18n.md).
+The built-in words (aria-labels, screen-reader prefixes) default to Traditional Chinese (`DEFAULT_LOCALE` is `"zh-TW"`). For an English app, wrap everything in `<LocaleProvider locale="en">`. See [Internationalization](./i18n.md). A right-to-left app also sets `dir="rtl"` on `<html>` and wraps the root in `<DirectionProvider direction="rtl">`; see [Right-to-left](./i18n.md#right-to-left).
 
 ## A first screen
 
@@ -255,7 +255,7 @@ Run `pnpm vite`. The button is an ink pill; clicking it shows a toast in the bot
 ## Next steps
 
 - [Theming](./theming.md): dark mode, a manual theme switch, the `sx` prop, changing the palette.
-- [Internationalization](./i18n.md): locales, `labels` overrides, adding a language.
+- [Internationalization](./i18n.md): locales, `labels` overrides, adding a language, right-to-left.
 - [State management](./state.md): `createStore` and `useStore`, which the toast and dialog managers use.
 - [Accessibility](./accessibility.md): what the components do for you and what stays your job.
 - [Text layout](./text-layout.md): the optional Pretext engine behind Textarea auto-grow.

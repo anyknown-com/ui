@@ -33,7 +33,7 @@ The key is split on `-` and shown in mono groups; the dashes are visually hidden
 
 - The key box is `role="region"`, named by `labels.key` ("復原金鑰" / "Recovery key"), with `tabIndex={0}`. Focusing it unblurs the key (like hover) and selects the whole key, dashes included, ready for the system copy shortcut.
 - The key is plain text, so screen readers can read it even while it is blurred. The blur and the "hover to reveal" veil are only visual, and the veil is `aria-hidden`.
-- Reveal is a native button with `aria-pressed`. Its text switches between `labels.reveal` and `labels.hide`.
+- Reveal is a native button without `aria-pressed`: its text names the next action, switching between `labels.reveal` and `labels.hide`.
 - Copy and download are native buttons, and their icons are `aria-hidden`. After a copy, the button text changes to `labels.copied` for 2 seconds, and a status region that is always mounted announces it once.
 - The warning is `role="note"`.
 - The acknowledgement is a [Checkbox](../checkbox/README.md) labeled by `labels.ack`.

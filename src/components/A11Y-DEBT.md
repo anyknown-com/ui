@@ -43,6 +43,10 @@ All four pass in dark mode on these backgrounds and fail in light mode. The fix 
 | `Dropzone` cancel button | 22.4px | 30.4px with an `::after` that does not affect layout |
 | `FileRow` checkbox | 16px | a 24px `<label>` around the 16px box |
 | `DataTable` row and select-all checkboxes | 13.6px | a 24px `<label>` around the box |
+| Invalid `Input`, `Textarea`, `PasswordInput`, `Select` under forced colors | the danger border was repainted as the plain frame, so an invalid field looked valid | a 2px dashed frame |
+| Invalid `Checkbox` under forced colors | the box opts out of forced colors, so the raw danger color leaked through | a 2px dashed `ButtonText` frame |
+| `Ghost` / `IconButton` under forced colors | the hover wash, their only edge, was dropped | a 1px `ButtonText` outline on hover, a `Highlight` focus ring |
+| `Slider` under RTL | <kbd>→</kbd> raised the value while the fill grew toward the left | <kbd>←</kbd> raises it and a drag measures from the right edge, under `DirectionProvider` or a computed `direction: rtl` |
 
 ## Resolved earlier: moved to the 12-step neutral palette
 

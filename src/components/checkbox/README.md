@@ -35,7 +35,7 @@ It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChe
 - Accessible name: `label`, through `aria-labelledby`. Without `label`, pass `aria-label`.
 - `description` is added to `aria-describedby`, before any Field help or error.
 - `indeterminate` is written to the native element's `indeterminate` property, so assistive technology reports "mixed".
-- `aria-invalid="true"` comes from `aria-invalid` or a Field `error`; the box border turns `danger`.
+- `aria-invalid="true"` comes from `aria-invalid` or a Field `error`; the box border turns `danger`. Under `forced-colors: active` the invalid box is a 2px dashed `ButtonText` frame instead, so the error does not rely on colour.
 - Inside a [Field](../label/README.md), give only `help`, `error` or `disabled`; the Checkbox already has its own label.
 - Focus ring: a 2px `focusRing` outline around the box when the input has `:focus-visible` (`Highlight` under forced colors).
 - Under `forced-colors: active` the box is a `ButtonText` frame on `Canvas`; checked fills with `Highlight` and a `HighlightText` tick; disabled draws in `GrayText`.

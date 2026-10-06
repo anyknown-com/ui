@@ -33,7 +33,7 @@ import { Field, Input } from "@anyknown/ui"
 - Renders a native `<input>` and forwards every native prop.
 - The accessible name comes from the caller: wrap it in a [Field](../label/README.md) with `label`, point a `Label` at it with `htmlFor`, or pass `aria-label`. Nothing is built in.
 - Inside a Field, the Field owns the `id` (a caller `id` is ignored) and supplies `aria-describedby` (error, then help), `required` and `disabled`.
-- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. The border turns `danger`; the focus ring stays the same.
+- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. The border turns `danger`; the focus ring stays the same. Under `forced-colors: active`, where the danger colour is repainted, the invalid frame is 2px dashed.
 - `leadingIcon` is wrapped in `aria-hidden="true"` and ignores the pointer.
 - Focus ring: on `:focus-visible` the border turns `focusRing` and a 2px solid `focusRing` outline sits 1px outside.
 - The border-color transition is turned off under `prefers-reduced-motion: reduce`.
