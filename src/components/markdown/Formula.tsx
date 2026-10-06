@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { useEffect, useRef } from "react"
+import { useCallback } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
 import { color, space, type } from "../../tokens.stylex"
 
@@ -45,34 +45,36 @@ export type FormulaProps = { children: string; display?: boolean; sx?: StyleArg 
  * start, given the TeX usually arrives from a language model.
  */
 export function Formula({ children, display = false, sx }: FormulaProps) {
-	const host = useRef<HTMLSpanElement>(null)
-
-	useEffect(() => {
-		const node = host.current
-		if (!node) return
-		let live = true
-		// Temml is ~250KB and most messages contain no maths at all, so it arrives only when the
-		// first formula does.
-		void import("temml")
-			.then((temml) => {
-				if (!live || !host.current) return
-				temml.default.render(children, host.current, {
-					displayMode: display,
-					// `throwOnError: false` renders the offending source in red instead of blowing up the
-					// whole message; `trust: false` (the default) keeps \href and friends inert.
-					throwOnError: false,
-					errorColor: "currentColor",
+	// A ref callback rather than an effect: it runs when the node mounts and again when the TeX
+	// changes (a new callback), and its cleanup retires a chunk that lands after unmount.
+	const host = useCallback(
+		(node: HTMLSpanElement | null) => {
+			if (!node) return
+			let live = true
+			// Temml is ~250KB and most messages contain no maths at all, so it arrives only when the
+			// first formula does.
+			void import("temml")
+				.then((temml) => {
+					if (!live) return
+					temml.default.render(children, node, {
+						displayMode: display,
+						// `throwOnError: false` renders the offending source in red instead of blowing up the
+						// whole message; `trust: false` (the default) keeps \href and friends inert.
+						throwOnError: false,
+						errorColor: "currentColor",
+					})
 				})
-			})
-			// Nothing about one formula is worth taking a message down for. `throwOnError` covers bad
-			// TeX, this covers everything else: a chunk that fails to load, or a DOM that will not
-			// take MathML at all (jsdom builds those elements without a `style`, so Temml throws
-			// there and only there). The source TeX is already on screen and simply stays.
-			.catch(() => {})
-		return () => {
-			live = false
-		}
-	}, [children, display])
+				// Nothing about one formula is worth taking a message down for. `throwOnError` covers bad
+				// TeX, this covers everything else: a chunk that fails to load, or a DOM that will not
+				// take MathML at all (jsdom builds those elements without a `style`, so Temml throws
+				// there and only there). The source TeX is already on screen and simply stays.
+				.catch(() => {})
+			return () => {
+				live = false
+			}
+		},
+		[children, display],
+	)
 
 	return (
 		<span
