@@ -172,6 +172,89 @@ describe("DataTable", () => {
 	})
 })
 
+const KEY_COLUMN: DataTableColumn<Entry>[] = [
+	{ id: "key", header: "key", sortable: true, value: (row) => row.key },
+]
+
+describe("DataTable uncontrolled state", () => {
+	test("defaultSelected adds the checkbox column and toggles on its own", async () => {
+		const onSelectedChange = vi.fn()
+		render(
+			<DataTable
+				label="字典"
+				rows={ENTRIES}
+				rowKey={(row) => row.key}
+				columns={KEY_COLUMN}
+				defaultSelected={new Set(["nav.projects"])}
+				onSelectedChange={onSelectedChange}
+			/>,
+		)
+		expect(screen.getByRole("checkbox", { name: "選取 nav.projects" })).toBeChecked()
+		await userEvent.click(screen.getByRole("checkbox", { name: "選取 nav.settings" }))
+		expect(screen.getByRole("checkbox", { name: "選取 nav.settings" })).toBeChecked()
+		expect(onSelectedChange).toHaveBeenCalledExactlyOnceWith(new Set(["nav.projects", "nav.settings"]))
+	})
+
+	test("controlled selection stays where the parent puts it", async () => {
+		const onSelectedChange = vi.fn()
+		render(
+			<DataTable
+				label="字典"
+				rows={ENTRIES}
+				rowKey={(row) => row.key}
+				columns={KEY_COLUMN}
+				selected={new Set()}
+				onSelectedChange={onSelectedChange}
+			/>,
+		)
+		await userEvent.click(screen.getByRole("checkbox", { name: "全選" }))
+		expect(onSelectedChange).toHaveBeenCalledWith(new Set(ENTRIES.map((entry) => entry.key)))
+		expect(screen.getByRole("checkbox", { name: "全選" })).not.toBeChecked()
+	})
+
+	test("defaultSort starts the order and the headers cycle it", async () => {
+		const onSortChange = vi.fn()
+		render(
+			<DataTable
+				label="字典"
+				rows={ENTRIES}
+				rowKey={(row) => row.key}
+				columns={KEY_COLUMN}
+				defaultSort={{ col: "key", dir: "asc" }}
+				onSortChange={onSortChange}
+			/>,
+		)
+		const header = screen.getByRole("button", { name: /^key/ })
+		expect(header.closest("th")).toHaveAttribute("aria-sort", "ascending")
+		await userEvent.click(header)
+		expect(header.closest("th")).toHaveAttribute("aria-sort", "descending")
+		expect(onSortChange).toHaveBeenCalledWith({ col: "key", dir: "desc" })
+	})
+
+	test("defaultFilter shows the filter box, and clearing empties it", async () => {
+		const onFilterChange = vi.fn()
+		const onClearFilter = vi.fn()
+		render(
+			<DataTable
+				label="字典"
+				rows={[]}
+				total={ENTRIES.length}
+				rowKey={(row: Entry) => row.key}
+				columns={KEY_COLUMN}
+				defaultFilter="zzz"
+				onFilterChange={onFilterChange}
+				onClearFilter={onClearFilter}
+			/>,
+		)
+		const box = screen.getByRole("searchbox")
+		expect(box).toHaveValue("zzz")
+		await userEvent.click(screen.getByRole("button", { name: "清除過濾" }))
+		expect(box).toHaveValue("")
+		expect(onFilterChange).toHaveBeenCalledWith("")
+		expect(onClearFilter).toHaveBeenCalledOnce()
+	})
+})
+
 describe("DataTable regressions", () => {
 	test("the count reports the pre-filter total, not the filtered length twice", async () => {
 		render(<Dictionary />)

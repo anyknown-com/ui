@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
@@ -168,34 +169,62 @@ function SearchIcon() {
 	)
 }
 
+/** The column a table is ordered by and which way, or `null` for the rows' own order. */
 export type SortState = { col: string; dir: "asc" | "desc" } | null
 
 export type DataTableColumn<Row> = {
+	/** Unique among the columns; what `SortState.col` names. */
 	id: string
+	/** The column's name in the head, and in the edit field's label. */
 	header: string
+	/** Keys, ids, numbers: the cells in mono. */
 	mono?: boolean
+	/** The header is a button that cycles ascending → descending → none. */
 	sortable?: boolean
+	/** Double-click, Enter or F2 on a cell edits it in place; `onCommit` gets the new text. */
 	editable?: boolean
+	/** The cell as text: what is shown without `cell`, what an edit starts from. */
 	value?: (row: Row) => string
+	/** Draws the cell instead of `value` (a badge, a link). */
 	cell?: (row: Row) => ReactNode
+	/** An edit was confirmed with Enter or by leaving the field, and the text changed. */
 	onCommit?: (row: Row, next: string) => void
 }
 
 export type DataTableProps<Row> = {
+	/** The rows to show, already filtered and sorted by the caller. */
 	rows: Row[]
 	/** Total before filtering, for the "N / M" readout. Defaults to `rows.length`. */
 	total?: number
+	/** A stable, unique key per row; also what selection holds. */
 	rowKey: (row: Row) => string
+	/** The columns, in order. */
 	columns: DataTableColumn<Row>[]
+	/** The table's accessible name (also names its scroll region). */
 	label: string
+	/** The filter box's text, for a controlled filter. Pair it with `onFilterChange`. */
 	filter?: string
+	/** The filter box's starting text, for an uncontrolled filter. Giving it shows the filter box. */
+	defaultFilter?: string
+	/** Called on each edit of the filter box. Giving it shows the filter box. */
 	onFilterChange?: (filter: string) => void
+	/** @deprecated Use `labels={{ filterPlaceholder }}`. */
 	filterPlaceholder?: string
+	/** The order, for a controlled table (`null` is no order). Pair it with `onSortChange`. */
 	sort?: SortState
+	/** The starting order of an uncontrolled table. @default null */
+	defaultSort?: SortState
+	/** Called when a sortable header is pressed, with the next order. */
 	onSortChange?: (sort: SortState) => void
+	/** The selected row keys, for controlled selection. Giving it adds the checkbox column. */
 	selected?: Set<string>
+	/** The keys selected at first, for uncontrolled selection. Giving it adds the checkbox column. */
+	defaultSelected?: Set<string>
+	/** Called with the whole new set whenever a row or the select-all box is toggled. */
 	onSelectedChange?: (selected: Set<string>) => void
+	/** What to say when there are no rows, given the filter text. */
 	emptyState?: (query: string) => ReactNode
+	/** Shows a "clear filter" link in the empty row; it empties the filter, then calls this. */
 	onClearFilter?: () => void
 	countLabel?: (shown: number, total: number) => string
 	selectLabel?: (key: string) => string
@@ -220,18 +249,26 @@ function cellValue<Row>(column: DataTableColumn<Row>, row: Row): string {
 	return column.value?.(row) ?? ""
 }
 
+/**
+ * A real `<table>` of records: an optional filter box with a live "N / M" count, sortable
+ * headers (with `aria-sort`), a checkbox column for selection, and cells edited in place.
+ * Filtering and sorting the rows is the caller's job; the table reports what was asked for.
+ */
 export function DataTable<Row>({
 	rows,
 	total,
 	rowKey,
 	columns,
 	label,
-	filter = "",
+	filter: filterProp,
+	defaultFilter,
 	onFilterChange,
 	filterPlaceholder = "過濾…",
-	sort = null,
+	sort: sortProp,
+	defaultSort = null,
 	onSortChange,
-	selected,
+	selected: selectedProp,
+	defaultSelected,
 	onSelectedChange,
 	emptyState,
 	onClearFilter,
@@ -247,6 +284,16 @@ export function DataTable<Row>({
 	const [editing, setEditing] = useState<{ key: string; col: string } | null>(null)
 	const cancelling = useRef(false)
 	const [draft, setDraft] = useState("")
+	const [filter, setFilter] = useControllableState(filterProp, defaultFilter ?? "", onFilterChange)
+	const [sort, setSort] = useControllableState(sortProp, defaultSort, onSortChange)
+	const selectable = selectedProp !== undefined || defaultSelected !== undefined
+	const [selectedSet, setSelected] = useControllableState(
+		selectedProp,
+		defaultSelected ?? new Set<string>(),
+		onSelectedChange,
+	)
+	const selected = selectable ? selectedSet : undefined
+	const filtering = onFilterChange != null || defaultFilter !== undefined
 	const visible = rows
 	const keys = visible.map(rowKey)
 	const selectedCount = selected ? keys.filter((key) => selected.has(key)).length : 0
@@ -294,8 +341,8 @@ export function DataTable<Row>({
 
 	function toggleSort(column: DataTableColumn<Row>) {
 		if (!column.sortable) return
-		if (sort?.col !== column.id) onSortChange?.({ col: column.id, dir: "asc" })
-		else onSortChange?.(sort.dir === "asc" ? { col: column.id, dir: "desc" } : null)
+		if (sort?.col !== column.id) setSort({ col: column.id, dir: "asc" })
+		else setSort(sort.dir === "asc" ? { col: column.id, dir: "desc" } : null)
 	}
 
 	function toggleAll(checked: boolean) {
@@ -304,12 +351,12 @@ export function DataTable<Row>({
 			if (checked) next.add(key)
 			else next.delete(key)
 		}
-		onSelectedChange?.(next)
+		setSelected(next)
 	}
 
 	return (
 		<div {...stylex.props(sx)}>
-			{onFilterChange != null && (
+			{filtering && (
 				<div {...stylex.props(styles.toolbar)}>
 					<div {...stylex.props(styles.filter)}>
 						<span {...stylex.props(styles.filterIcon)}>
@@ -320,7 +367,7 @@ export function DataTable<Row>({
 							aria-label={filterPlaceholder}
 							placeholder={filterPlaceholder}
 							value={filter}
-							onChange={(event) => onFilterChange(event.currentTarget.value)}
+							onChange={(event) => setFilter(event.currentTarget.value)}
 							{...stylex.props(styles.filterInput)}
 						/>
 					</div>
@@ -389,7 +436,10 @@ export function DataTable<Row>({
 											{" "}
 											<button
 												type="button"
-												onClick={onClearFilter}
+												onClick={() => {
+													setFilter("")
+													onClearFilter()
+												}}
 												{...stylex.props(reset.control, styles.clear)}
 											>
 												{clearLabel}
@@ -414,7 +464,7 @@ export function DataTable<Row>({
 														const next = new Set(selected)
 														if (event.currentTarget.checked) next.add(key)
 														else next.delete(key)
-														onSelectedChange?.(next)
+														setSelected(next)
 													}}
 													{...stylex.props(styles.checkbox)}
 												/>
