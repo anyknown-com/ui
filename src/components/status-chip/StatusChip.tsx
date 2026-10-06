@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, font, space, tone, type } from "../../tokens.stylex"
+import { color, corner, font, space, tone, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { Spin } from "../spin/Spin"
 
@@ -12,7 +12,7 @@ import { Spin } from "../spin/Spin"
 const styles = stylex.create({
 	root: {
 		alignItems: "center",
-		borderRadius: "1rem",
+		borderRadius: corner.pill,
 		display: "inline-flex",
 		flex: "none",
 		fontFamily: font.mono,
@@ -26,7 +26,8 @@ const styles = stylex.create({
 	w: { backgroundColor: color.layer4, color: color.text },
 	d: { backgroundColor: color.warning, color: color.bg },
 	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: tone.faint },
-	a: { backgroundColor: color.accentSubtle, color: color.text },
+	// 執行中 = agent 在做事
+	a: { backgroundColor: color.signalSubtle, color: color.signal },
 	f: {
 		boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color.warning} 55%, transparent)`,
 		color: color.warning,
@@ -36,7 +37,7 @@ const styles = stylex.create({
 	pill: {
 		alignItems: "center",
 		backgroundColor: color.layer3,
-		borderRadius: 11,
+		borderRadius: corner.pill,
 		color: color.textMuted,
 		display: "inline-flex",
 		fontFamily: font.mono,
@@ -47,7 +48,7 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	status: { paddingInlineStart: 6 },
-	live: { backgroundColor: color.accent, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	live: { backgroundColor: color.signal, borderRadius: "50%", flex: "none", height: 6, width: 6 },
 	paused: { backgroundColor: color.warning },
 	done: { backgroundColor: tone.faint },
 	title: {

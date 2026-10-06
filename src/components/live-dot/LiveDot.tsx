@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { StyleArg } from "../../lib/styled"
-import { color, radius, space } from "../../tokens.stylex"
+import { color, corner, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -13,8 +13,9 @@ const styles = stylex.create({
 		flex: "none",
 		width: "0.375rem",
 		height: "0.375rem",
-		borderRadius: radius.full,
-		backgroundColor: color.accent,
+		borderRadius: corner.pill,
+		// 「agent 正在做事」是 signal 的意思
+		backgroundColor: color.signal,
 		animationName: { default: breathe, [REDUCED]: "none" },
 		animationDuration: "1.6s",
 		animationIterationCount: "infinite",

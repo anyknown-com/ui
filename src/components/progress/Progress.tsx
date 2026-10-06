@@ -1,14 +1,15 @@
 import * as stylex from "@stylexjs/stylex"
 import { useCallback, useState } from "react"
 import { styled } from "../../lib/styled"
-import { color, font, motion, radius, space } from "../../tokens.stylex"
+import { color, corner, font, motion, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const STAGES = ["掃描對話", "挑出耐久事實", "合併重複", "落盤固定"]
 
-// 進度 = 一條軌加一段填充:軌是 border 色的 4px 帶,填充是實心 accent,
-// 寬度就是讀數。不定量時同一段填充在軌上等速滑過。全部 CSS,零 rAF。
-const TRACK_H = 4
+// 進度 = 一條膠囊軌加一段填充:軌是凹下去的 accentSubtle 6px 帶,填充是實心 signal
+// (進度條說的是 agent 正在做事),寬度就是讀數。不定量時同一段填充在軌上等速滑過。
+// ring / ball 是讀數(context 用量)不是工作中,留墨色。全部 CSS,零 rAF。
+const TRACK_H = 6
 const RING = 60
 const BAND = 6
 const SWEEP_W = 40
@@ -28,8 +29,8 @@ const styles = stylex.create({
 		width: "100%",
 		height: TRACK_H,
 		boxSizing: "border-box",
-		borderRadius: radius.full,
-		backgroundColor: color.border,
+		borderRadius: corner.pill,
+		backgroundColor: color.accentSubtle,
 		overflow: "hidden",
 	},
 	fill: {
@@ -37,8 +38,8 @@ const styles = stylex.create({
 		top: 0,
 		bottom: 0,
 		insetInlineStart: 0,
-		borderRadius: radius.full,
-		backgroundColor: color.accent,
+		borderRadius: corner.pill,
+		backgroundColor: color.signal,
 		transitionProperty: "width",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionTimingFunction: "linear",

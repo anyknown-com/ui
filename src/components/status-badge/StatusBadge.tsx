@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, type } from "../../tokens.stylex"
+import { color, corner, type } from "../../tokens.stylex"
 import { LiveDot } from "../live-dot/LiveDot"
 
 /**
@@ -10,7 +10,7 @@ import { LiveDot } from "../live-dot/LiveDot"
 const styles = stylex.create({
 	badge: {
 		alignItems: "center",
-		borderRadius: 999,
+		borderRadius: corner.pill,
 		display: "inline-flex",
 		flexShrink: 0,
 		fontSize: type.t2,
@@ -20,12 +20,13 @@ const styles = stylex.create({
 		paddingInline: 10,
 		whiteSpace: "nowrap",
 	},
-	live: { backgroundColor: color.layer4, color: color.text },
+	// 正在跑 = agent 在做事:signal 的字與點放在 signalSubtle 上
+	live: { backgroundColor: color.signalSubtle, color: color.signal },
 	warn: {
 		backgroundColor: `color-mix(in oklab, ${color.warning} 22%, transparent)`,
 		color: color.warning,
 	},
-	plain: { backgroundColor: color.layer4, color: color.textMuted },
+	plain: { backgroundColor: color.accentSubtle, color: color.textMuted },
 })
 
 export type StatusBadgeProps = {
