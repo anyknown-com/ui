@@ -5,10 +5,13 @@ import { createContext, type ReactElement, type ReactNode, useContext, useRef, u
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, font, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+
+// 退場:Base UI 關的時候先掛 data-ending-style,等 transition 跑完才拆 —— 淡到 0,dialog 再縮到 0.98
+const ENDING = ":is([data-ending-style])"
 
 const grow = stylex.keyframes({
 	from: { opacity: 0, scale: 0.96 },
@@ -21,6 +24,10 @@ const styles = stylex.create({
 		position: "fixed",
 		inset: 0,
 		backgroundColor: color.scrim,
+		opacity: { default: 1, [ENDING]: 0 },
+		transitionProperty: "opacity",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 	},
 	viewport: {
 		position: "fixed",
@@ -50,6 +57,11 @@ const styles = stylex.create({
 		animationTimingFunction: "ease-out",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
+		opacity: { default: 1, [ENDING]: 0 },
+		scale: { default: 1, [ENDING]: 0.98 },
+		transitionProperty: "opacity, scale",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 	},
 	md: { width: "min(44rem, calc(100vw - 2rem))" },
 	full: {

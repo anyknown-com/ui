@@ -5,19 +5,26 @@ import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import { press, reset } from "../../lib/styled"
-import { color, corner, font, shadow, space, text, type as scale } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, type as scale } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const DEFAULT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 3
+/** 退場的毫秒數:這段時間裡那則還在畫面上淡出,但已經不在無障礙樹上、也不算進 limit。 */
+const EXIT_MS = 120
 /** 把焦點跳到通知區的快捷鍵(跟 Radix 同一顆;F6 是瀏覽器自己在區塊間跳的鍵)。 */
 const HOTKEY = "F8"
 
 const slideIn = stylex.keyframes({
 	from: { opacity: 0, translate: "1rem 0" },
 	to: { opacity: 1, translate: "0 0" },
+})
+
+const fadeOut = stylex.keyframes({
+	from: { opacity: 1 },
+	to: { opacity: 0 },
 })
 
 const drain = stylex.keyframes({
@@ -64,6 +71,14 @@ const styles = stylex.create({
 		animationName: { default: slideIn, [REDUCED]: "none" },
 		animationDuration: "180ms",
 		animationTimingFunction: "ease-out",
+	},
+	// 關掉之後淡出 120ms 才拿掉;reduced motion 時 Toaster 把退場設成 0,直接拿掉
+	leaving: {
+		animationName: { default: fadeOut, [REDUCED]: "none" },
+		animationDuration: motion.fast,
+		animationTimingFunction: "ease-out",
+		animationFillMode: "forwards",
+		pointerEvents: "none",
 	},
 	// 有說明的那則:點與按鈕對齊第一行
 	twoLine: { alignItems: "flex-start" },
@@ -224,6 +239,8 @@ export type ToastRecord = {
 	duration: number
 	/** 每重新倒數一次 +1,倒數線靠它重播。 */
 	epoch: number
+	/** 已經關了、正在淡出;不唸、不能按、不算進 limit,也不再被同 key 更新。 */
+	leaving: boolean
 }
 
 export type ToastState = { toasts: readonly ToastRecord[]; paused: boolean }
@@ -238,8 +255,8 @@ export type ToastManager = {
 	promise: <T>(promise: Promise<T>, messages: ToastPromiseMessages<T>) => Promise<T>
 	subscribe: (listener: () => void) => () => void
 	getSnapshot: () => ToastState
-	/** @internal Toaster 用:預設 timeout 與 limit。 */
-	configure: (config: { timeout: number; limit: number }) => void
+	/** @internal Toaster 用:預設 timeout、limit 與退場毫秒數(reduced motion 時 0)。 */
+	configure: (config: { timeout: number; limit: number; exit?: number }) => void
 	/** @internal Toaster 用:hover / focus / 分頁隱藏時停住所有倒數。 */
 	pause: (reason: PauseReason) => void
 	/** @internal */
@@ -255,7 +272,7 @@ let seq = 0
 
 export function createToastManager(): ToastManager {
 	const store = createStore<ToastState>({ toasts: [], paused: false })
-	const config = { timeout: DEFAULT_TIMEOUT, limit: DEFAULT_LIMIT }
+	const config = { timeout: DEFAULT_TIMEOUT, limit: DEFAULT_LIMIT, exit: EXIT_MS }
 	const timers = new Map<string, Timer>()
 	const reasons = new Set<PauseReason>()
 
@@ -286,8 +303,9 @@ export function createToastManager(): ToastManager {
 	}
 
 	function keep(toasts: readonly ToastRecord[]) {
-		for (const dropped of toasts.slice(config.limit)) stop(dropped.id)
-		commit(toasts.slice(0, config.limit))
+		const dropped = new Set(toasts.filter((t) => !t.leaving).slice(config.limit))
+		for (const record of dropped) stop(record.id)
+		commit(toasts.filter((t) => !dropped.has(t)))
 	}
 
 	function insert(input: ToastInput, loading: boolean): string {
@@ -300,14 +318,22 @@ export function createToastManager(): ToastManager {
 			timeout: input.timeout,
 			loading,
 		}
-		const same = input.key == null ? undefined : toasts.find((t) => t.key === input.key)
+		const same = input.key == null ? undefined : toasts.find((t) => t.key === input.key && !t.leaving)
 		if (same != null) {
 			const next = arm({ ...same, ...fields, count: same.count + 1 })
 			commit(toasts.map((t) => (t === same ? next : t)))
 			return same.id
 		}
 		seq += 1
-		const record = arm({ id: `toast-${seq}`, key: input.key, ...fields, count: 1, duration: 0, epoch: 0 })
+		const record = arm({
+			id: `toast-${seq}`,
+			key: input.key,
+			...fields,
+			count: 1,
+			duration: 0,
+			epoch: 0,
+			leaving: false,
+		})
 		// 新的在前;超過 limit 丟最舊的
 		keep([record, ...toasts])
 		return record.id
@@ -316,22 +342,27 @@ export function createToastManager(): ToastManager {
 	function patch(id: string, changes: ToastUpdate & { loading?: boolean }) {
 		const { toasts } = store.getSnapshot()
 		const current = toasts.find((t) => t.id === id)
-		if (current == null) return
+		if (current == null || current.leaving) return
 		const next = arm({ ...current, ...changes })
 		commit(toasts.map((t) => (t === current ? next : t)))
 	}
 
+	const remove = (id: string) => commit(store.getSnapshot().toasts.filter((t) => t.id !== id))
+
 	function close(id: string) {
 		const { toasts } = store.getSnapshot()
-		if (!toasts.some((t) => t.id === id)) return
+		const current = toasts.find((t) => t.id === id)
+		if (current == null || current.leaving) return
 		stop(id)
-		const rest = toasts.filter((t) => t.id !== id)
 		// 清空時 viewport 縮成 0,mouseleave / blur 可能不會來;別讓下一則卡在暫停
-		if (rest.length === 0) {
+		if (!toasts.some((t) => t.id !== id && !t.leaving)) {
 			reasons.delete("hover")
 			reasons.delete("focus")
 		}
-		commit(rest)
+		if (config.exit <= 0) return remove(id)
+		// 先標成 leaving 讓它淡出,時間到才真的拿掉
+		commit(toasts.map((t) => (t === current ? { ...t, leaving: true } : t)))
+		setTimeout(() => remove(id), config.exit)
 	}
 
 	return {
@@ -348,11 +379,12 @@ export function createToastManager(): ToastManager {
 		},
 		subscribe: store.subscribe,
 		getSnapshot: store.getSnapshot,
-		configure({ timeout, limit }) {
+		configure({ timeout, limit, exit = EXIT_MS }) {
 			config.timeout = timeout
 			config.limit = limit
+			config.exit = exit
 			const { toasts } = store.getSnapshot()
-			if (toasts.length > limit) keep(toasts)
+			if (toasts.filter((t) => !t.leaving).length > limit) keep(toasts)
 		},
 		pause(reason) {
 			if (reasons.has(reason)) return
@@ -425,6 +457,7 @@ export function Toaster({
 	manager,
 }: ToasterProps) {
 	const [own] = useState(() => manager ?? toastManager)
+	const reduced = usePrefersReducedMotion()
 	const [api] = useState(() => makeApi(() => own))
 	const { toasts, paused } = useStore(own)
 	// portal 只在 client 掛;server 上沒有 document.body
@@ -441,11 +474,11 @@ export function Toaster({
 	const connect = useCallback(
 		(node: HTMLDivElement) => {
 			region.current = node
-			own.configure({ timeout, limit })
+			own.configure({ timeout, limit, exit: reduced ? 0 : EXIT_MS })
 			const doc = node.ownerDocument
 			const hotkey = (event: KeyboardEvent) => {
 				if (event.key !== HOTKEY || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-				if (own.getSnapshot().toasts.length === 0) return
+				if (!own.getSnapshot().toasts.some((t) => !t.leaving)) return
 				event.preventDefault()
 				if (!node.contains(doc.activeElement)) returnTo.current = doc.activeElement as HTMLElement | null
 				node.focus()
@@ -484,14 +517,14 @@ export function Toaster({
 				own.resume("focus")
 			}
 		},
-		[own, timeout, limit],
+		[own, timeout, limit, reduced],
 	)
 
 	// 關掉焦點所在的那則時,焦點不能掉回 body:還有別則就留在通知區,沒了就還給按 F8 前的地方
 	const dismiss = (id: string) => {
 		const node = region.current
 		const inside = node?.contains(node.ownerDocument.activeElement) ?? false
-		const last = own.getSnapshot().toasts.length <= 1
+		const last = own.getSnapshot().toasts.filter((t) => !t.leaving).length <= 1
 		own.close(id)
 		if (!inside) return
 		if (!last) node?.focus()
@@ -542,8 +575,10 @@ function ToastItem({ record, paused, onClose }: ToastItemProps) {
 		<div
 			role={record.type === "danger" ? "alert" : "status"}
 			aria-atomic="true"
+			aria-hidden={record.leaving || undefined}
+			inert={record.leaving || undefined}
 			data-type={record.type}
-			{...stylex.props(styles.toast, twoLine && styles.twoLine)}
+			{...stylex.props(styles.toast, twoLine && styles.twoLine, record.leaving && styles.leaving)}
 		>
 			{!reduced && record.duration > 0 && (
 				<span key={record.epoch} aria-hidden="true" {...stylex.props(styles.countdown)}>

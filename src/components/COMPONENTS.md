@@ -148,6 +148,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   不畫框。backdrop 是 `color.scrim`(中性墨 32%,暗色是黑 32%),**不加 blur** ——
   `backdrop-filter` 是 DESIGN.md 的反模式。ConfirmContent 的取消鈕是 secondary
 - popup 是 `border-box`:`size` 的寬度含 padding,375 寬時不會比視窗寬
+- 退場走 Base UI 的 `[data-ending-style]`:popup 淡到 0、縮到 0.98,backdrop 淡到 0,
+  120ms ease-out,reduced motion 時沒有。Base UI 等 transition 跑完才拆,焦點在拆的時候還回
+  trigger,所以會晚 120ms。命令式 `dialog.open` 那一套是 store 拿掉就拆,沒有退場
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
 - 寬度三階 `size`:`sm`(預設 24rem)/ `md`(40rem)/ `full`(64rem 寬、46rem 高的沉浸式)。
@@ -195,6 +198,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 - **同 key 去重就是全部的「分組」**:同一個 `key` 還在畫面上時,不疊新的一則,原地換內容、
   重新倒數、計數 +1,標題後面一個 `×N`(tabular 數字)。沒有更精巧的分組
 - `limit`(預設 3)超過就**丟掉最舊的**,不是藏起來排隊
+- **退場在 store 裡**:`close` 先把那則標成 `leaving`(`aria-hidden` + `inert`,淡出 120ms),
+  時間到才從 `toasts` 拿掉。`leaving` 的那則不算進 limit、不再被同 key 更新、F8 不會跳過去。
+  Toaster 在 reduced motion 時把退場設成 0,直接拿掉。焦點在關的當下就移走,不等淡出
 - 暫停有三個來源,任何一個在就停:viewport 上 hover、viewport 內有 focus、`document.hidden`。
   倒數線是 CSS 動畫,`animationPlayState` 跟著同一個 `paused` 走;重新倒數靠 `epoch` 換 key
   重播。全部關掉時順手清掉 hover / focus —— viewport 縮成 0,mouseleave 不一定會來,
@@ -218,6 +224,8 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 - 長相是 float 階,集中在 `lib/popup.ts` 的 `popupStyles.surface`:`surfaceRaised` 底
   (暗色因此升一階)、`shadow.float`、`corner.float`(16),不畫框。框是 1px 透明的 ——
   forced-colors 下陰影會消失,透明框會被換成系統色,浮層才有邊。Composer 的浮層也吃這一份
+- 退場也在這一份:Base UI 關的時候掛 `[data-ending-style]`,surface 淡到 0(120ms ease-out,
+  reduced motion 時沒有),跑完才拆。Composer 的浮層不是 Base UI,沒有退場
 - popover 面板 16px padding,寬度上限 `min(22rem, 100vw − 2rem)`,窄螢幕上長說明會折行
 
 疊層值集中在 `lib/popup.ts` 的 `layer`,元件不自己寫 magic number —— Base UI 的浮層一律

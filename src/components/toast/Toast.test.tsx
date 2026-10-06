@@ -27,12 +27,23 @@ function Harness({ onUndo }: { onUndo?: () => void }) {
 	)
 }
 
-// 預設 manager 是 module 層級的,測試之間要清乾淨
-afterEach(() => {
+// 預設 manager 是 module 層級的,測試之間要清乾淨;關掉的那幾則要等退場跑完才真的拿掉
+afterEach(async () => {
+	const open = toastManager.getSnapshot().toasts
+	if (open.length === 0) return
 	act(() => {
-		for (const item of toastManager.getSnapshot().toasts) toastManager.close(item.id)
+		for (const item of open) toastManager.close(item.id)
 	})
+	await act(() => new Promise((resolve) => setTimeout(resolve, EXIT_MS + 30)))
 })
+
+const EXIT_MS = 120
+
+/** 關掉的那則會淡出 120ms 才拆;那段時間它已經 aria-hidden,對使用者來說就是不在了。 */
+function shown(text: string) {
+	const node = screen.queryByText(text)
+	return node != null && node.closest("[aria-hidden='true']") == null
+}
 
 function setup(props: { timeout?: number; limit?: number } = {}) {
 	const manager = createToastManager()
@@ -82,7 +93,7 @@ describe("Toast", () => {
 		await userEvent.click(screen.getByRole("button", { name: "with action" }))
 		await userEvent.click(await screen.findByRole("button", { name: "復原" }))
 		expect(onUndo).toHaveBeenCalledTimes(1)
-		await waitFor(() => expect(screen.queryByText("已刪除「偏好 pnpm」")).not.toBeInTheDocument())
+		await waitFor(() => expect(shown("已刪除「偏好 pnpm」")).toBe(false))
 	})
 
 	test("a danger toast is an alert", async () => {
@@ -97,7 +108,7 @@ describe("Toast", () => {
 		render(<Harness />)
 		await userEvent.click(screen.getByRole("button", { name: "default" }))
 		await userEvent.click(await screen.findByRole("button", { name: "關閉通知" }))
-		expect(screen.queryByText("交接摘要已複製")).not.toBeInTheDocument()
+		expect(shown("交接摘要已複製")).toBe(false)
 	})
 })
 
@@ -164,7 +175,7 @@ describe("toast manager", () => {
 		act(() => vi.advanceTimersByTime(2999))
 		expect(screen.getByText("已複製")).toBeInTheDocument()
 		act(() => vi.advanceTimersByTime(1))
-		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		expect(shown("已複製")).toBe(false)
 	})
 
 	test("a per-toast timeout wins; 0 never times out", () => {
@@ -174,7 +185,7 @@ describe("toast manager", () => {
 			manager.add({ title: "常駐", timeout: 0 })
 		})
 		act(() => vi.advanceTimersByTime(1000))
-		expect(screen.queryByText("短")).not.toBeInTheDocument()
+		expect(shown("短")).toBe(false)
 		act(() => vi.advanceTimersByTime(60_000))
 		expect(screen.getByText("常駐")).toBeInTheDocument()
 	})
@@ -201,8 +212,8 @@ describe("toast manager", () => {
 			manager.add({ title: "離線", type: "danger", timeout: 8000 })
 		})
 		act(() => vi.advanceTimersByTime(8000))
-		expect(screen.queryByText("已刪除")).not.toBeInTheDocument()
-		expect(screen.queryByText("離線")).not.toBeInTheDocument()
+		expect(shown("已刪除")).toBe(false)
+		expect(shown("離線")).toBe(false)
 	})
 
 	test("update patches the toast in place and restarts its timer", () => {
@@ -211,14 +222,14 @@ describe("toast manager", () => {
 		act(() => void (id = manager.add({ title: "上傳中" })))
 		act(() => vi.advanceTimersByTime(2000))
 		act(() => manager.update(id, { title: "已上傳", type: "success", description: "3 個檔案" }))
-		expect(screen.queryByText("上傳中")).not.toBeInTheDocument()
+		expect(shown("上傳中")).toBe(false)
 		expect(screen.getByText("已上傳")).toBeInTheDocument()
 		expect(screen.getByText("3 個檔案")).toBeInTheDocument()
 		expect(screen.getByRole("status")).toHaveAttribute("data-type", "success")
 		act(() => vi.advanceTimersByTime(2000))
 		expect(screen.getByText("已上傳")).toBeInTheDocument()
 		act(() => vi.advanceTimersByTime(1000))
-		expect(screen.queryByText("已上傳")).not.toBeInTheDocument()
+		expect(shown("已上傳")).toBe(false)
 	})
 
 	test("promise: loading does not time out, then success", async () => {
@@ -235,7 +246,7 @@ describe("toast manager", () => {
 		expect(screen.getByText("已儲存 3 筆")).toBeInTheDocument()
 		expect(screen.getByRole("status")).toHaveAttribute("data-type", "success")
 		act(() => vi.advanceTimersByTime(3000))
-		expect(screen.queryByText("已儲存 3 筆")).not.toBeInTheDocument()
+		expect(shown("已儲存 3 筆")).toBe(false)
 	})
 
 	test("toast.promise: a rejection becomes a danger toast", async () => {
@@ -269,7 +280,7 @@ describe("toast manager", () => {
 		act(() => vi.advanceTimersByTime(2999))
 		expect(screen.getByText("已複製")).toBeInTheDocument()
 		act(() => vi.advanceTimersByTime(1))
-		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		expect(shown("已複製")).toBe(false)
 	})
 
 	test("limit drops the oldest toast", () => {
@@ -279,7 +290,7 @@ describe("toast manager", () => {
 			manager.add({ title: "二" })
 			manager.add({ title: "三" })
 		})
-		expect(screen.queryByText("一")).not.toBeInTheDocument()
+		expect(shown("一")).toBe(false)
 		expect(screen.getByText("二")).toBeInTheDocument()
 		expect(screen.getByText("三")).toBeInTheDocument()
 	})
@@ -295,7 +306,7 @@ describe("toast manager", () => {
 		act(() => vi.advanceTimersByTime(1999))
 		expect(screen.getByText("已複製")).toBeInTheDocument()
 		act(() => vi.advanceTimersByTime(1))
-		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		expect(shown("已複製")).toBe(false)
 	})
 
 	test("focus within the viewport pauses the timer", () => {
@@ -306,7 +317,7 @@ describe("toast manager", () => {
 		expect(screen.getByText("已複製")).toBeInTheDocument()
 		act(() => screen.getByRole("button", { name: "關閉通知" }).blur())
 		act(() => vi.advanceTimersByTime(3000))
-		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		expect(shown("已複製")).toBe(false)
 	})
 
 	test("a hidden document pauses the timer", () => {
@@ -319,8 +330,39 @@ describe("toast manager", () => {
 		hidden.mockReturnValue(false)
 		act(() => void document.dispatchEvent(new Event("visibilitychange")))
 		act(() => vi.advanceTimersByTime(3000))
-		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		expect(shown("已複製")).toBe(false)
 		hidden.mockRestore()
+	})
+
+	test("a closed toast leaves the accessibility tree at once and the DOM after its exit", () => {
+		const manager = setup({ timeout: 3000 })
+		let id = ""
+		act(() => void (id = manager.add({ title: "已複製" })))
+		act(() => manager.close(id))
+		expect(screen.queryByRole("status")).not.toBeInTheDocument()
+		expect(screen.getByText("已複製").closest("[aria-hidden='true']")).not.toBeNull()
+		act(() => vi.advanceTimersByTime(EXIT_MS))
+		expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+	})
+
+	test("under reduced motion a closed toast is removed at once", () => {
+		const original = window.matchMedia
+		window.matchMedia = (query: string) =>
+			({
+				matches: query.includes("reduce"),
+				media: query,
+				addEventListener: () => {},
+				removeEventListener: () => {},
+			}) as unknown as MediaQueryList
+		try {
+			const manager = setup({ timeout: 3000 })
+			let id = ""
+			act(() => void (id = manager.add({ title: "已複製" })))
+			act(() => manager.close(id))
+			expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		} finally {
+			window.matchMedia = original
+		}
 	})
 
 	test("a scoped manager only reaches its own viewport", () => {

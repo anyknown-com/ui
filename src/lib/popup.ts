@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, shadow } from "../tokens.stylex"
+import { color, corner, motion, shadow } from "../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -51,6 +51,11 @@ export const popupStyles = stylex.create({
 		animationName: { default: growIn, [REDUCED]: "none" },
 		animationDuration: "140ms",
 		animationTimingFunction: "ease-out",
+		// 退場:Base UI 關的時候先掛 data-ending-style,等 transition 跑完才拆
+		opacity: { default: 1, ":is([data-ending-style])": 0 },
+		transitionProperty: "opacity",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
