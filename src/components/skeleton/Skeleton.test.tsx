@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { Skeleton, SkeletonGroup, ThreadSkeleton } from "./Skeleton"
 
 describe("Skeleton", () => {
@@ -32,5 +33,18 @@ describe("Skeleton", () => {
 		const status = screen.getByRole("status", { name: "thread 載入中" })
 		// first child is the visually-hidden label the live region announces
 		expect(status.children).toHaveLength(4)
+	})
+
+	test("the thread preset's label follows the LocaleProvider; label and labels override it", () => {
+		render(
+			<LocaleProvider locale="en">
+				<ThreadSkeleton />
+				<ThreadSkeleton label="Opening chat" />
+				<ThreadSkeleton labels={{ loading: "Fetching history" }} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("status", { name: "Loading thread" })).toBeInTheDocument()
+		expect(screen.getByRole("status", { name: "Opening chat" })).toBeInTheDocument()
+		expect(screen.getByRole("status", { name: "Fetching history" })).toBeInTheDocument()
 	})
 })

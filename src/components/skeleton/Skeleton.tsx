@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
 import { color, corner, radius, space } from "../../tokens.stylex"
 
@@ -79,9 +80,27 @@ export function SkeletonGroup({ label, children, sx, ...props }: SkeletonGroupPr
 	)
 }
 
-export type ThreadSkeletonProps = { messages?: number; label?: string }
+const threadStrings = defineStrings({
+	"zh-TW": { loading: "thread 載入中" },
+	en: { loading: "Loading thread" },
+})
 
-export function ThreadSkeleton({ messages = 2, label = "thread 載入中" }: ThreadSkeletonProps) {
+/** The ThreadSkeleton's built-in words (follow `<LocaleProvider>`): `loading` is its status label. */
+export type ThreadSkeletonLabels = StringsOf<typeof threadStrings>
+
+export type ThreadSkeletonProps = {
+	/** How many user + assistant turns to draw. Defaults to 2. */
+	messages?: number
+	/** Shorthand for `labels.loading`, the status label; wins over it. */
+	label?: string
+	/** Override built-in words for this skeleton; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ThreadSkeletonLabels>
+}
+
+/** A conversation-shaped placeholder: one status region over a few bubble and text bones. */
+export function ThreadSkeleton({ messages = 2, label: labelProp, labels }: ThreadSkeletonProps) {
+	const t = useStrings(threadStrings, labels)
+	const label = labelProp ?? t.loading
 	return (
 		<SkeletonGroup label={label} sx={threadStyles.thread}>
 			{Array.from({ length: messages }, (_, index) => (
