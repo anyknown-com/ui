@@ -3,7 +3,7 @@ import { Fragment, useId, useMemo, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -40,7 +40,10 @@ const styles = stylex.create({
 	stat: { marginInlineStart: "auto", fontSize: type.t1, color: color.textMuted },
 	plus: { color: color.success, fontWeight: 600 },
 	minus: { color: color.danger, fontWeight: 600 },
-	body: { overflowX: "auto", outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` } },
+	body: {
+		overflowX: "auto",
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+	},
 	line: {
 		display: "flex",
 		fontFamily: font.mono,
@@ -95,20 +98,20 @@ const styles = stylex.create({
 		fontSize: type.t1,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	chevron: {
 		transitionProperty: "rotate",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
+		transitionTimingFunction: motion.easeOut,
 	},
 	chevronOpen: { rotate: "90deg" },
 	foldLines: {
 		overflow: "hidden",
 		animationName: { default: unfold, [REDUCED]: "none" },
-		animationDuration: "160ms",
-		animationTimingFunction: "ease-out",
+		animationDuration: motion.quick,
+		animationTimingFunction: motion.easeOut,
 	},
 	srOnly: {
 		position: "absolute",
