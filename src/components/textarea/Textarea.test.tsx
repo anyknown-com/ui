@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { createRef } from "react"
 import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from "vitest"
 import { setTextLayoutEngine } from "../../lib/textLayout"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Textarea } from "./Textarea"
 
 describe("Textarea", () => {
@@ -22,6 +23,34 @@ describe("Textarea", () => {
 		const ref = createRef<HTMLTextAreaElement>()
 		render(<Textarea aria-label="備註" ref={ref} autoGrow />)
 		expect(ref.current).toBe(screen.getByRole("textbox", { name: "備註" }))
+	})
+
+	test("onValueChange hears the text, next to onChange", async () => {
+		const onChange = vi.fn()
+		const onValueChange = vi.fn()
+		render(<Textarea aria-label="備註" onChange={onChange} onValueChange={onValueChange} />)
+		await userEvent.type(screen.getByRole("textbox", { name: "備註" }), "a")
+		expect(onValueChange).toHaveBeenCalledExactlyOnceWith("a")
+		expect(onChange).toHaveBeenCalledOnce()
+	})
+
+	test("controlled: the value stays what the parent says", async () => {
+		const onValueChange = vi.fn()
+		render(<Textarea aria-label="備註" value="x" onValueChange={onValueChange} />)
+		await userEvent.type(screen.getByRole("textbox", { name: "備註" }), "y")
+		expect(onValueChange).toHaveBeenCalledWith("xy")
+		expect(screen.getByRole("textbox", { name: "備註" })).toHaveValue("x")
+	})
+
+	test("axe: plain, invalid, disabled", async () => {
+		const { container } = render(
+			<>
+				<Textarea aria-label="備註" placeholder="寫點什麼" />
+				<Textarea aria-label="錯誤" invalid />
+				<Textarea aria-label="停用" disabled />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
 

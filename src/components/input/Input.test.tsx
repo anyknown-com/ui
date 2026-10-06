@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
+import { Field } from "../label/Field"
 import { Input } from "./Input"
 
 describe("Input", () => {
@@ -21,6 +23,38 @@ describe("Input", () => {
 	test("leading icon is hidden from the accessibility tree", () => {
 		render(<Input aria-label="搜尋" leadingIcon={<svg data-testid="icon" />} />)
 		expect(screen.getByTestId("icon").closest("[aria-hidden]")).not.toBeNull()
+	})
+
+	test("onValueChange hears the text, next to onChange (uncontrolled)", async () => {
+		const onChange = vi.fn()
+		const onValueChange = vi.fn()
+		render(<Input aria-label="名稱" defaultValue="a" onChange={onChange} onValueChange={onValueChange} />)
+		await userEvent.type(screen.getByRole("textbox", { name: "名稱" }), "b")
+		expect(onValueChange).toHaveBeenCalledExactlyOnceWith("ab")
+		expect(onChange).toHaveBeenCalledOnce()
+	})
+
+	test("controlled: the value stays what the parent says", async () => {
+		const onValueChange = vi.fn()
+		render(<Input aria-label="名稱" value="a" onValueChange={onValueChange} />)
+		const input = screen.getByRole("textbox", { name: "名稱" })
+		await userEvent.type(input, "b")
+		expect(onValueChange).toHaveBeenCalledWith("ab")
+		expect(input).toHaveValue("a")
+	})
+
+	test("axe: plain, with icon, invalid in a Field, disabled", async () => {
+		const { container } = render(
+			<>
+				<Input aria-label="名稱" placeholder="AnyKnown" />
+				<Input aria-label="搜尋" leadingIcon={<svg />} />
+				<Field label="Email" error="格式不完整。">
+					<Input type="email" defaultValue="a@" />
+				</Field>
+				<Input aria-label="停用" disabled />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("disabled blocks input", async () => {

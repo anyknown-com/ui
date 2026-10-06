@@ -24,9 +24,14 @@ const styles = stylex.create({
 })
 
 export type TextareaProps = ComponentProps<"textarea"> & {
+	/** Grows with its content instead of scrolling (CSS `field-sizing`, measured where that is missing). */
 	autoGrow?: boolean
+	/** With `autoGrow`, stop growing at this many lines and scroll after. */
 	maxRows?: number
+	/** Draws the danger border and sets `aria-invalid`. Inside a `Field` with an `error`, it is set for you. */
 	invalid?: boolean
+	/** The new text on every edit, next to the native `onChange`. Use `value` / `defaultValue` as usual. */
+	onValueChange?: (value: string) => void
 	sx?: StyleArg
 }
 
@@ -108,7 +113,17 @@ export function autoGrow(area: HTMLTextAreaElement, maxRows: number | undefined)
 	}
 }
 
-export function Textarea({ autoGrow: grow, maxRows, invalid, sx, ref, ...props }: TextareaProps) {
+/** A multi-line text field. Native `<textarea>` props pass through; inside a `Field` it is wired to the label, help and error. */
+export function Textarea({
+	autoGrow: grow,
+	maxRows,
+	invalid,
+	onValueChange,
+	onChange,
+	sx,
+	ref,
+	...props
+}: TextareaProps) {
 	const { invalid: fieldInvalid, ...field } = useFieldControl(props)
 	const isInvalid = invalid ?? fieldInvalid
 	const { value, placeholder } = props
@@ -130,6 +145,10 @@ export function Textarea({ autoGrow: grow, maxRows, invalid, sx, ref, ...props }
 			{...props}
 			{...field}
 			ref={attach}
+			onChange={(event) => {
+				onChange?.(event)
+				onValueChange?.(event.currentTarget.value)
+			}}
 			aria-invalid={isInvalid || undefined}
 			{...styled(
 				props,

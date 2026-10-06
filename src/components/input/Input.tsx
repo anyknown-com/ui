@@ -68,21 +68,40 @@ const styles = stylex.create({
 })
 
 export type InputProps = Omit<ComponentProps<"input">, "size"> & {
+	/** `md` is 40px, the height of a `md` button; `sm` is 32px. @default "md" */
 	size?: "sm" | "md"
+	/** Draws the danger border and sets `aria-invalid`. Inside a `Field` with an `error`, it is set for you. */
 	invalid?: boolean
 	/** Keys, URLs, ids: anything read character by character. */
 	mono?: boolean
+	/** An icon inside the start edge (a search glyph); decorative, hidden from screen readers. */
 	leadingIcon?: ReactNode
+	/** The new text on every edit, next to the native `onChange`. Use `value` / `defaultValue` as usual. */
+	onValueChange?: (value: string) => void
 	sx?: StyleArg
 }
 
-export function Input({ size = "md", invalid, mono = false, leadingIcon, sx, ...props }: InputProps) {
+/** A one-line text field. Native `<input>` props pass through; inside a `Field` it is wired to the label, help and error. */
+export function Input({
+	size = "md",
+	invalid,
+	mono = false,
+	leadingIcon,
+	onValueChange,
+	onChange,
+	sx,
+	...props
+}: InputProps) {
 	const { invalid: fieldInvalid, ...field } = useFieldControl(props)
 	const isInvalid = invalid ?? fieldInvalid
 	const input = (
 		<input
 			{...props}
 			{...field}
+			onChange={(event) => {
+				onChange?.(event)
+				onValueChange?.(event.currentTarget.value)
+			}}
 			aria-invalid={isInvalid || undefined}
 			{...styled(
 				props,
