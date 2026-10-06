@@ -47,10 +47,12 @@ const styles = stylex.create({
 	tabSelectedUnderline: { color: color.accent },
 	tabSelectedPills: { color: color.text, backgroundColor: "transparent" },
 	pillTab: { zIndex: 1 },
+	// Base UI 給的 --active-tab-left 是從清單「左緣」量的物理距離(RTL 也是),所以這裡錨在
+	// left: 0 而不是 insetInlineStart —— 後者在 RTL 會從右緣起算,指示條往反方向跑
 	indicator: {
 		position: "absolute",
 		bottom: -1,
-		insetInlineStart: 0,
+		left: 0,
 		height: 2,
 		width: "var(--active-tab-width)",
 		translate: "var(--active-tab-left)",
@@ -63,7 +65,7 @@ const styles = stylex.create({
 	pillIndicator: {
 		position: "absolute",
 		insetBlockStart: 0,
-		insetInlineStart: 0,
+		left: 0,
 		width: "var(--active-tab-width)",
 		height: "var(--active-tab-height)",
 		translate: "var(--active-tab-left) var(--active-tab-top)",

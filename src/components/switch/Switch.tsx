@@ -42,12 +42,13 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		backgroundColor: "#FFFFFF",
 		boxShadow: shadow.rest,
-		translate: "0 0",
-		transitionProperty: "translate, background-color",
+		// 用邏輯方向的 inset 移動,不用 translate:translate 是物理的 x,RTL 時鈕會往軌道外跑
+		transitionProperty: "inset-inline-start, background-color",
 		transitionDuration: { default: "180ms", [REDUCED]: "0s" },
 		transitionTimingFunction: "ease-out",
 	},
-	thumbOn: { translate: "1.35rem 0", backgroundColor: color.accentText },
+	// 軌道 2.75rem − 鈕 (1.4rem − 4px) − 2px 的邊 = 1.35rem + 2px
+	thumbOn: { insetInlineStart: "calc(1.35rem + 2px)", backgroundColor: color.accentText },
 	labelText: { display: "block", fontWeight: 500, fontSize: text.sm, color: color.text },
 	description: { display: "block", fontSize: text.xs, color: color.textMuted },
 })

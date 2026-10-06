@@ -87,6 +87,8 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
   —— 淺色是白;暗色的墨是淺色,鈕跟著反成深色,不然白鈕放在近白的軌道上分不出來
 - thumb 滑動 180ms ease-out,**不過衝** —— 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳,
   過衝一律不要
+- 鈕移動的是 `inset-inline-start`,不是 `translate`:translate 的 x 是物理方向,`dir="rtl"`
+  時鈕會往軌道外面跑
 - 設定列的慣用排版:文字在左、開關在右
 
 ### slider
@@ -264,6 +266,8 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
   只有 1.09:1,所以那張紙外圈再一條 1px `borderControl` 環(3:1 以上),選中的是哪格才看得出來
 - indicator 位置不自己量:Base UI 的 `Tabs.Indicator` 本來就把 `--active-tab-*` 寫成
   inline style,藥丸的 `width` / `height` / `translate` 直接吃那些變數
+- `--active-tab-left` 是從清單左緣量的物理距離,RTL 也一樣,所以底線與藥丸錨在 `left: 0`,
+  不是 `insetInlineStart`(那樣 RTL 會從右緣起算,指示條跑到反方向)
 - 走過的彎路:底線的「鬆緊彈性」(雙彈簧 + 拉伸下垂)——「太誇張了」;
   x 與 width 各拆一條曲線的組合會衝過再收回,違反「任何邊不得倒退」
 
