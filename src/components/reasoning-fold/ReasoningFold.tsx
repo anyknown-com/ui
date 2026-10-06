@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useEffect, useId, useRef, useState } from "react"
+import { type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
 import { color, corner, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
@@ -95,7 +95,6 @@ export function ReasoningFold({
 }: ReasoningFoldProps) {
 	const bodyId = useId()
 	const row = useRef<HTMLButtonElement>(null)
-	const body = useRef<HTMLDivElement>(null)
 	const [userToggled, setUserToggled] = useState(false)
 	const [open, setOpen] = useState(defaultOpen || streaming)
 	const [wasStreaming, setWasStreaming] = useState(streaming)
@@ -107,15 +106,17 @@ export function ReasoningFold({
 		if (streaming && !userToggled) setOpen(true)
 	}
 
-	useEffect(() => {
-		if (userToggled || streaming || !justFinished) return
+	// 串流剛結束、使用者沒動過:一秒後自己收起。計時器掛在 body 的 ref callback 上 ——
+	// 條件不成立時 ref 換成 undefined,React 會跑 cleanup 清掉計時器(卸載時也是)
+	const collapseLater = useCallback((node: HTMLDivElement) => {
 		const timer = setTimeout(() => {
 			setOpen(false)
-			if (body.current?.contains(document.activeElement)) row.current?.focus()
+			if (node.contains(document.activeElement)) row.current?.focus()
 			setJustFinished(false)
 		}, AUTO_COLLAPSE_MS)
 		return () => clearTimeout(timer)
-	}, [streaming, userToggled, justFinished])
+	}, [])
+	const collapsing = justFinished && !userToggled && !streaming
 
 	const label = streaming ? (
 		<span {...stylex.props(styles.shimmer)}>{streamingLabel}</span>
@@ -142,7 +143,12 @@ export function ReasoningFold({
 				<Chevron open={open} />
 				{label}
 			</button>
-			<div id={bodyId} ref={body} hidden={!open} {...stylex.props(styles.body)}>
+			<div
+				id={bodyId}
+				ref={collapsing ? collapseLater : undefined}
+				hidden={!open}
+				{...stylex.props(styles.body)}
+			>
 				{children}
 			</div>
 		</div>

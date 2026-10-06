@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test, vi } from "vitest"
+import { afterEach, describe, expect, test, vi } from "vitest"
 import { ReasoningFold } from "./ReasoningFold"
 
 describe("ReasoningFold", () => {
@@ -61,5 +61,46 @@ describe("ReasoningFold", () => {
 		)
 		await new Promise((resolve) => setTimeout(resolve, 1200))
 		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true")
+	})
+})
+
+describe("ReasoningFold auto collapse", () => {
+	afterEach(() => vi.useRealTimers())
+
+	test("focus inside the body moves back to the row when it collapses", () => {
+		vi.useFakeTimers()
+		const { rerender } = render(
+			<ReasoningFold streaming>
+				<a href="#source">來源</a>
+			</ReasoningFold>,
+		)
+		rerender(
+			<ReasoningFold durationSec={2}>
+				<a href="#source">來源</a>
+			</ReasoningFold>,
+		)
+		screen.getByRole("link").focus()
+		act(() => vi.advanceTimersByTime(1000))
+		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "false")
+		expect(screen.getByRole("button")).toHaveFocus()
+	})
+
+	test("streaming again before the timer fires cancels the collapse", () => {
+		vi.useFakeTimers()
+		const { rerender } = render(<ReasoningFold streaming>內容</ReasoningFold>)
+		rerender(<ReasoningFold durationSec={2}>內容</ReasoningFold>)
+		act(() => vi.advanceTimersByTime(500))
+		rerender(<ReasoningFold streaming>內容</ReasoningFold>)
+		act(() => vi.advanceTimersByTime(1500))
+		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true")
+	})
+
+	test("unmounting clears the pending timer", () => {
+		vi.useFakeTimers()
+		const { rerender, unmount } = render(<ReasoningFold streaming>內容</ReasoningFold>)
+		rerender(<ReasoningFold durationSec={2}>內容</ReasoningFold>)
+		expect(vi.getTimerCount()).toBe(1)
+		unmount()
+		expect(vi.getTimerCount()).toBe(0)
 	})
 })
