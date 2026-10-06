@@ -73,6 +73,12 @@ const SOURCES = [
 	{ id: "m1", label: "部署走 Cloudflare", kind: "記憶" },
 ]
 
+const PRICING = [
+	{ value: "three", label: "三檔方案", description: "Free / Pro / Team。", recommended: true },
+	{ value: "single", label: "單一價", description: "先驗證願付,之後再拆檔。" },
+	{ value: "none", label: "先不放定價", description: "只收 waitlist。" },
+]
+
 export function DesktopDemos() {
 	const [voice, setVoice] = useState<VoiceState>("listening")
 	const [permission, setPermission] = useState<string | null>(null)
@@ -226,15 +232,15 @@ export function DesktopDemos() {
 							kind: "options",
 							id: "variant",
 							required: true,
-							options: [
-								{ value: "three", label: "三檔方案", description: "Free / Pro / Team。", recommended: true },
-								{ value: "single", label: "單一價", description: "先驗證願付,之後再拆檔。" },
-								{ value: "none", label: "先不放定價", description: "只收 waitlist。" },
-							],
+							options: PRICING,
 						},
 						{ kind: "text", id: "note", label: "補充", placeholder: "想補充什麼,寫在這裡(選填)…" },
 					]}
-					onAnswer={(answer) => setDecision(`已決定 · 你選了 ${answer.variant}`)}
+					onAnswer={(answer) =>
+						setDecision(
+							`已決定 · 你選了「${PRICING.find((option) => option.value === answer.variant)?.label ?? ""}」`,
+						)
+					}
 					resolved={decision ? { text: decision } : undefined}
 				/>
 			</Demo>

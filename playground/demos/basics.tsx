@@ -265,7 +265,7 @@ export function BasicsDemos() {
 								description: "封存後仍可從側欄找回。",
 								confirmLabel: "封存",
 							})
-							toast(ok ? "已封存" : "取消封存")
+							toast(ok ? "已封存" : "沒有封存")
 						}}
 					>
 						dialog.confirm
