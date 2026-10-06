@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
@@ -94,21 +95,38 @@ function CopyIcon() {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		copy: "複製",
+		copied: "已複製 ✓",
+		code: "程式碼",
+		codeIn: (lang: string) => `${lang} 程式碼`,
+	},
+	en: {
+		copy: "Copy",
+		copied: "Copied ✓",
+		code: "Code",
+		codeIn: (lang: string) => `${lang} code`,
+	},
+})
+
+/** The CodeBlock's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type CodeBlockLabels = StringsOf<typeof strings>
+
 export type CodeBlockProps = {
 	lang?: string
 	code: string
 	streaming?: boolean
+	/** The copy button's text. Wins over `labels.copy`. */
 	copyLabel?: string
+	/** The copy button's text after a copy. Wins over `labels.copied`. */
 	copiedLabel?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<CodeBlockLabels>
 }
 
-export function CodeBlock({
-	lang,
-	code,
-	streaming = false,
-	copyLabel = "複製",
-	copiedLabel = "已複製 ✓",
-}: CodeBlockProps) {
+export function CodeBlock({ lang, code, streaming = false, copyLabel, copiedLabel, labels }: CodeBlockProps) {
+	const t = useStrings(strings, labels)
 	const { copied, copy } = useCopy()
 	return (
 		<div {...stylex.props(styles.block)}>
@@ -120,13 +138,13 @@ export function CodeBlock({
 					{...stylex.props(reset.control, styles.copy, copied && styles.copied)}
 				>
 					{!copied && <CopyIcon />}
-					{copied ? copiedLabel : copyLabel}
+					{copied ? (copiedLabel ?? t.copied) : (copyLabel ?? t.copy)}
 				</button>
 			</div>
 			<pre
 				tabIndex={0}
 				role="region"
-				aria-label={lang ? `${lang} 程式碼` : "程式碼"}
+				aria-label={lang ? t.codeIn(lang) : t.code}
 				{...stylex.props(styles.pre)}
 			>
 				<code {...stylex.props(styles.code)}>

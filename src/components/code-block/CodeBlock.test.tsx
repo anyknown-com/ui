@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { CodeBlock, InlineCode } from "./CodeBlock"
 
 const CODE = `export function useChildSession(callID: string) {\n  return null\n}`
@@ -35,5 +36,25 @@ describe("CodeBlock", () => {
 	test("inline code renders a code element", () => {
 		render(<InlineCode>turn.ts</InlineCode>)
 		expect(screen.getByText("turn.ts").tagName).toBe("CODE")
+	})
+
+	test("reads English under an en LocaleProvider", async () => {
+		Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+		render(
+			<LocaleProvider locale="en">
+				<CodeBlock lang="ts" code={CODE} />
+				<CodeBlock code="plain" />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("region", { name: "ts code" })).toBeInTheDocument()
+		expect(screen.getByRole("region", { name: "Code" })).toBeInTheDocument()
+		await userEvent.click(screen.getAllByRole("button", { name: "Copy" })[0] as HTMLElement)
+		expect(await screen.findByRole("button", { name: "Copied ✓" })).toBeInTheDocument()
+	})
+
+	test("copyLabel wins over labels.copy", () => {
+		render(<CodeBlock code="x" copyLabel="Prop" labels={{ copy: "Labels", code: "片段" }} />)
+		expect(screen.getByRole("button", { name: "Prop" })).toBeInTheDocument()
+		expect(screen.getByRole("region", { name: "片段" })).toBeInTheDocument()
 	})
 })
