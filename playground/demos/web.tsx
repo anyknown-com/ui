@@ -9,12 +9,16 @@ import {
 	Button,
 	CallBar,
 	type CallStatus,
+	Acts,
 	Detail,
 	Dot,
+	Expand,
 	FootNote,
 	Ghost,
 	Group,
 	GroupCell,
+	GroupItem,
+	GroupRow,
 	Help,
 	Hint,
 	IconTile,
@@ -23,7 +27,9 @@ import {
 	ListHead,
 	ListRow,
 	ListSort,
+	Mark,
 	MoreRow,
+	Note,
 	PageHead,
 	PageNumber,
 	PageSub,
@@ -133,7 +139,7 @@ function GroupDemo() {
 		<Demo
 			id="group"
 			title="group"
-			note="A grouped list for settings pages: a header, one layer3 card, a footer."
+			note="A grouped list for settings pages: a header, one sunken card with hairlines, a footer. A GroupRow with expands is a button that opens the Expand under it (aria-expanded); defaultOpen starts the first one open."
 		>
 			<div {...stylex.props(styles.column)}>
 				<Group
@@ -165,7 +171,7 @@ function GroupDemo() {
 						step={0.05}
 						value={handoff}
 						text={(v) => `${Math.round(v * 100)}%`}
-						onChange={setHandoff}
+						onValueChange={setHandoff}
 						onValueCommit={() => setSaves((n) => n + 1)}
 					/>
 				</Group>
@@ -178,6 +184,29 @@ function GroupDemo() {
 					<InputCell label="Name" placeholder="STRIPE_TEST_KEY" mono />
 					<TextCell placeholder="What the agent should know about it" aria-label="Description" />
 					<GroupCell icon={<ActionIcon icon={PlusGlyph} />} label="Save" tone="accent" onPress={() => {}} />
+				</Group>
+				<Group header="Connections">
+					<GroupItem defaultOpen>
+						<GroupRow mark={<Mark letter="F" tint="currentColor 12%" />} name="Figma" expands>
+							<Status warn>Needs attention</Status>
+						</GroupRow>
+						<Expand>
+							<Note>The Figma token expired yesterday. Reconnect to keep reading design files.</Note>
+							<Acts>
+								<Button size="sm">Reconnect</Button>
+							</Acts>
+						</Expand>
+					</GroupItem>
+					<GroupItem>
+						<GroupRow mark={<Mark letter="G" tint="currentColor 12%" />} name="GitHub" expands>
+							<Status dot="filled" tone="success">
+								Connected
+							</Status>
+						</GroupRow>
+						<Expand>
+							<Note faint>Read access to 3 repositories.</Note>
+						</Expand>
+					</GroupItem>
 				</Group>
 			</div>
 		</Demo>
@@ -256,7 +285,7 @@ function ListDemo() {
 		<Demo
 			id="list"
 			title="list"
-			note="The caller sets column widths with sx. The sorted column's name darkens and gets a ↓."
+			note="The caller sets column widths with sx. The sorted column's name darkens, gets a ↓, and its accessible name becomes “Status, sorted”. Each row is one button."
 		>
 			<div>
 				<ListHead sx={styles.memoryGrid}>
@@ -527,13 +556,13 @@ function CallBarDemo() {
 		<Demo
 			id="call-bar"
 			title="call-bar"
-			note="Controlled: the call session supplies the status, the seconds and the muted state."
+			note="Controlled: the call session supplies the status, the seconds and the muted state. The mute button is a toggle: its name stays “Mute” and aria-pressed says whether the mic is off."
 		>
 			<div ref={tick} {...stylex.props(styles.column)}>
 				<Segmented
 					label="Call status"
 					value={status}
-					onChange={setStatus}
+					onValueChange={setStatus}
 					options={STATUSES.map((value) => ({ value, label: value }))}
 				/>
 				<CallBar

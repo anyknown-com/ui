@@ -82,7 +82,7 @@ function TextareaDemo() {
 				autoGrow
 				maxRows={6}
 				value={note}
-				onChange={(event) => setNote(event.target.value)}
+				onValueChange={setNote}
 			/>
 			<Button variant="secondary" size="sm" onClick={() => setNote("")}>
 				Clear
@@ -96,7 +96,11 @@ function TextareaDemo() {
 
 function LabelDemo() {
 	return (
-		<Demo id="label" title="label / field">
+		<Demo
+			id="label"
+			title="label / field"
+			note="Field ties the label, help and error to its one control. required adds a red * that screen readers skip (the control says required); optional adds a muted word from the locale; an error marks the control invalid and is announced."
+		>
 			<Label htmlFor="pg-name">Display name</Label>
 			<Input id="pg-name" />
 			<Field label="Email" required>
@@ -180,9 +184,14 @@ function SwitchDemo() {
 function SelectDemo() {
 	const [model, setModel] = useState("")
 	const [memories, setMemories] = useState<string[]>([])
+	const [fallback, setFallback] = useState("")
 
 	return (
-		<Demo id="select" title="select">
+		<Demo
+			id="select"
+			title="select"
+			note="↓, Enter or Space opens the list; type to filter, ↑↓ move, Enter picks (a multiple select stays open), Escape closes and focus returns to the trigger. Inside a Field, the Field names the trigger, its help and error describe it, and required and invalid come from it."
+		>
 			<Select
 				aria-label="Choose a model"
 				value={model}
@@ -221,6 +230,23 @@ function SelectDemo() {
 					<SelectItem value="desktop-first">Desktop ships first</SelectItem>
 				</SelectGroup>
 			</Select>
+			<Field label="Default model" required help="New threads start on this model.">
+				<Select defaultValue="opus-5">
+					<SelectItem value="fable-5">Fable 5</SelectItem>
+					<SelectItem value="opus-5">Opus 5</SelectItem>
+					<SelectItem value="sonnet-5">Sonnet 5</SelectItem>
+				</Select>
+			</Field>
+			<Field
+				label="Fallback model"
+				required
+				error={fallback === "" ? "Choose a fallback model for when the default is busy." : undefined}
+			>
+				<Select value={fallback} onValueChange={setFallback as never} placeholder="Choose a model…">
+					<SelectItem value="sonnet-5">Sonnet 5</SelectItem>
+					<SelectItem value="gpt-5.4-mini">GPT-5.4 mini</SelectItem>
+				</Select>
+			</Field>
 		</Demo>
 	)
 }
@@ -232,15 +258,21 @@ function SliderDemo() {
 		<Demo
 			id="slider"
 			title="slider"
-			note="Continuous, with no stops. Arrow keys move 5%; Home and End jump to either end."
+			note="Continuous, with no stops. Arrow keys move 5% of the range, PageUp and PageDown move largeStep (10% unless set; 25% on the second slider), Home and End jump to either end."
 		>
 			<Slider
 				value={effort}
-				onChange={setEffort}
+				onValueChange={setEffort}
 				label={`Thinking · ${effortLabel(effort)}`}
 				valueText={() => effortLabel(effort)}
 			/>
-			<Slider value={0.4} onChange={() => {}} disabled aria-label="Thinking effort (disabled)" />
+			<Slider
+				defaultValue={0.5}
+				largeStep={0.25}
+				label="Handoff point"
+				valueText={(value) => `${Math.round(value * 100)}% of context`}
+			/>
+			<Slider defaultValue={0.4} disabled aria-label="Thinking effort (disabled)" />
 		</Demo>
 	)
 }
@@ -249,7 +281,11 @@ function DropdownDemo() {
 	const [receipts, setReceipts] = useState(false)
 
 	return (
-		<Demo id="dropdown" title="dropdown">
+		<Demo
+			id="dropdown"
+			title="dropdown"
+			note="Enter, Space or ↓ opens the menu; ↑↓ wrap, Home and End jump, typing a letter jumps to the item. → opens a submenu and ← closes it. Escape or Tab closes the menu and focus returns to the trigger. The checkbox item keeps the menu open."
+		>
 			<Row>
 				<DropdownMenu trigger={<Button variant="secondary">Thread actions</Button>}>
 					<DropdownGroup label="This thread">

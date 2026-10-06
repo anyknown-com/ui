@@ -181,12 +181,27 @@ function StackedSettings() {
 	)
 }
 
+function LoadingButton() {
+	const [loading, setLoading] = useState(false)
+	return (
+		<Button
+			loading={loading}
+			onClick={() => {
+				setLoading(true)
+				setTimeout(() => setLoading(false), 1500)
+			}}
+		>
+			Save handoff note
+		</Button>
+	)
+}
+
 function ButtonDemo() {
 	return (
 		<Demo
 			id="button"
 			title="button"
-			note="A pill, 40px tall by default. The primary action is solid ink, one per page; secondary is a sunken grey, ghost only shows a fill on hover. Pressing scales it to 0.98, except under reduced motion."
+			note="A pill, 40px tall by default. The primary action is solid ink, one per page; secondary is a sunken grey, ghost only shows a fill on hover. Pressing scales it to 0.98, except under reduced motion. loading swaps the label for a spinner and sets aria-busy; the button keeps focus but ignores clicks and form submits until it is done."
 		>
 			<Row>
 				<Button>New thread</Button>
@@ -217,6 +232,10 @@ function ButtonDemo() {
 					With icon
 				</Button>
 				<Button variant="secondary">A very long button label, to check it never breaks the pill</Button>
+			</Row>
+			<Row>
+				<LoadingButton />
+				<Label>Click it: it loads for 1.5 seconds</Label>
 			</Row>
 		</Demo>
 	)
@@ -295,10 +314,20 @@ function SegmentedDemo() {
 		<Demo
 			id="segmented"
 			title="segmented"
-			note="A few words on a sunken track; the chosen one is a sheet of paper raised on it."
+			note="A few words on a sunken track; the chosen one is a sheet of paper raised on it. It is a radio group: Tab lands on the chosen option, the arrow keys move the choice and wrap (mirrored right to left), Home and End go to either end, and disabled options are skipped."
 		>
-			<Segmented label="Memory scope" value={scope} onChange={setScope} options={[...SCOPES]} />
+			<Segmented label="Memory scope" value={scope} onValueChange={setScope} options={[...SCOPES]} />
 			<Label>Showing {scope} memories</Label>
+			<Segmented
+				label="Sync"
+				defaultValue="hourly"
+				options={[
+					{ value: "live", label: "Live", disabled: true },
+					{ value: "hourly", label: "Hourly" },
+					{ value: "daily", label: "Daily" },
+				]}
+			/>
+			<Label>Uncontrolled, with Live disabled</Label>
 		</Demo>
 	)
 }
@@ -311,7 +340,7 @@ function DialogDemo() {
 		<Demo
 			id="dialog"
 			title="dialog"
-			note="The second row uses the imperative dialog store, which needs one <Dialogs /> mounted in the app."
+			note="Focus stays inside an open dialog, Escape closes only the top one, and focus returns to what opened it. The second row uses the imperative dialog store, which needs one <Dialogs /> mounted in the app; its promise settles as the dialog starts to fade out. labels renames the built-in Cancel button."
 		>
 			<Row>
 				<Dialog>
@@ -376,6 +405,7 @@ function DialogDemo() {
 					description="“Deploys to Cloudflare” will be removed from the workspace. You can't undo this."
 					danger
 					confirmLabel="Delete memory"
+					labels={{ cancel: "Keep it" }}
 					onConfirm={() =>
 						toast("Deleted “Deploys to Cloudflare”", { action: { label: "Undo", onClick: () => {} } })
 					}
@@ -454,7 +484,7 @@ function ToastDemo() {
 		<Demo
 			id="toast"
 			title="toast"
-			note="The thin pill along the bottom is the countdown; hover, focus or switching tabs pauses it. Loading toasts don't count down; the same key updates in place and counts repeats."
+			note="The thin pill along the bottom is the countdown; hover, focus or switching tabs pauses it, and it is hidden under reduced motion. Danger toasts, toasts with an action and loading toasts wait to be dismissed. F8 moves focus to the toasts and Escape sends it back. The same key updates in place and counts repeats."
 		>
 			<Row>
 				<Button variant="secondary" onClick={() => toast("Handoff summary copied")}>
@@ -476,6 +506,18 @@ function ToastDemo() {
 				</Button>
 				<Button
 					variant="secondary"
+					onClick={() => toast.warning("Context at 45%", { description: "A handoff starts at 50%" })}
+				>
+					warning
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => toast.info("Opus 5 is now the default", { description: "Change it in settings" })}
+				>
+					info
+				</Button>
+				<Button
+					variant="secondary"
 					onClick={() => toast("Deleted “Prefers pnpm”", { action: { label: "Undo", onClick: () => {} } })}
 				>
 					with action
@@ -487,7 +529,7 @@ function ToastDemo() {
 					onClick={() =>
 						toast.promise(wait(1600, true), {
 							loading: "Syncing the vault…",
-							success: "Vault synced",
+							success: { title: "Vault synced", description: "12 memories up to date" },
 							error: "Sync failed",
 						})
 					}
@@ -523,6 +565,20 @@ function ToastDemo() {
 				>
 					update
 				</Button>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						toast.info("Handing off when this closes", {
+							timeout: 3000,
+							onAutoClose: () => toast.success("Handed off to a new session"),
+						})
+					}
+				>
+					onAutoClose
+				</Button>
+				<Button variant="secondary" onClick={() => toast.closeAll()}>
+					closeAll
+				</Button>
 			</Row>
 		</Demo>
 	)
@@ -530,7 +586,11 @@ function ToastDemo() {
 
 function TooltipDemo() {
 	return (
-		<Demo id="tooltip" title="tooltip" note="Hover or tab to a button; it opens after 400ms.">
+		<Demo
+			id="tooltip"
+			title="tooltip"
+			note="Hover a button for 400ms, or tab to it. Escape or moving away hides it. It describes the trigger; it is never the trigger's only name."
+		>
 			<Row>
 				<Tooltip content="Pin this memory">
 					<Button variant="secondary">top</Button>
@@ -554,7 +614,11 @@ function TooltipDemo() {
 
 function PopoverDemo() {
 	return (
-		<Demo id="popover" title="popover">
+		<Demo
+			id="popover"
+			title="popover"
+			note="A non-modal panel anchored to its trigger. Escape or a click outside closes it, and focus returns to the trigger."
+		>
 			<Row>
 				<Popover>
 					<PopoverTrigger>
@@ -613,7 +677,11 @@ function TabsDemo() {
 
 function BadgeDemo() {
 	return (
-		<Demo id="badge" title="badge">
+		<Demo
+			id="badge"
+			title="badge"
+			note="Badges are labels. A Chip is a badge you act on: onRemove adds a × button, and pressed or defaultPressed makes it a toggle button read out with aria-pressed."
+		>
 			<Row>
 				<Badge>Draft</Badge>
 				<Badge variant="accent">In progress</Badge>
@@ -640,6 +708,8 @@ function BadgeDemo() {
 				<Chip onRemove={() => {}} removeLabel="Remove filter: this week">
 					This week
 				</Chip>
+				<Chip defaultPressed>Pinned only</Chip>
+				<Chip defaultPressed={false}>Show archived</Chip>
 			</Row>
 		</Demo>
 	)

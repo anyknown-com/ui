@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
+import { breakpoint, color, corner, font, radius, space, type } from "@anyknown/ui/tokens.stylex"
 import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
 import { DEMO_GROUPS, DEMOS } from "./demos"
 
@@ -21,7 +21,7 @@ const styles = stylex.create({
 	},
 	title: {
 		fontFamily: font.display,
-		fontSize: text.lg,
+		fontSize: type.t4,
 		fontWeight: 600,
 		margin: 0,
 		marginBottom: { default: space.md, [breakpoint.tablet]: space.xs },
@@ -44,7 +44,7 @@ const styles = stylex.create({
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		textDecoration: "none",
-		fontSize: text.xs,
+		fontSize: type.t1,
 		paddingBlock: space.xxs,
 		paddingInline: space.xxs,
 		borderRadius: radius.sm,

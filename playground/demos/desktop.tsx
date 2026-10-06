@@ -117,10 +117,19 @@ function MessageDemo() {
 }
 
 function ToolCardDemo() {
+	const [open, setOpen] = useState(false)
+
 	return (
-		<Demo id="tool-card" title="tool-card">
+		<Demo
+			id="tool-card"
+			title="tool-card"
+			note="The row is a button: Enter or Space folds the detail open. shell, edit and write start open, a failed call opens itself, and a running call sweeps its bar until progress (0 to 1) fills it instead. The last card is controlled: open and onOpenChange belong to the page."
+		>
 			<ToolCard tool="search" state="running" subtitle="parentCallID" durationMs={2400}>
 				<ToolInput json={{ pattern: "parentCallID", path: "packages/contract" }} />
+			</ToolCard>
+			<ToolCard tool="fetch" state="running" subtitle="rent.example.com/list?max=25000" progress={0.62}>
+				<ToolInput json={{ url: "https://rent.example.com/list?max=25000", pages: 2 }} />
 			</ToolCard>
 			<ToolCard
 				tool="read"
@@ -173,13 +182,32 @@ function ToolCardDemo() {
 					</SubagentText>
 				</SubagentThread>
 			</ToolCard>
+			<Row>
+				<Button size="sm" variant="secondary" onClick={() => setOpen(!open)}>
+					{open ? "Fold the lint output" : "Show the lint output"}
+				</Button>
+			</Row>
+			<ToolCard
+				tool="shell"
+				state="completed"
+				subtitle="pnpm lint"
+				durationMs={2100}
+				open={open}
+				onOpenChange={setOpen}
+			>
+				<ToolOutput text={"Found 0 warnings and 0 errors.\nFinished in 412ms on 186 files."} />
+			</ToolCard>
 		</Demo>
 	)
 }
 
 function ReasoningFoldDemo() {
 	return (
-		<Demo id="reasoning-fold" title="reasoning-fold">
+		<Demo
+			id="reasoning-fold"
+			title="reasoning-fold"
+			note="The row is a button: Enter or Space opens and closes it. While streaming it shimmers and opens; a second after streaming ends it folds itself, unless you toggled it."
+		>
 			<ReasoningFold durationSec={12}>
 				The user wants only the newest assistant message per parentID. The reducer already groups messages by
 				sessionID, so this belongs in the selector layer.
@@ -197,7 +225,7 @@ function ActionBarDemo() {
 		<Demo
 			id="action-bar"
 			title="action-bar"
-			note="Its height is always reserved and hover only changes opacity, so the turn rhythm never jumps."
+			note="Its height is always reserved and hover only changes opacity, so the turn rhythm never jumps. It is a toolbar with one tab stop: Tab lands on its last-used button, ← and → move between buttons and wrap (mirrored right to left), Home and End jump to either end."
 		>
 			<Thread>
 				<UserMessage>Are the reducer tests done?</UserMessage>
@@ -259,7 +287,11 @@ function InteractionCardDemo() {
 	const [decision, setDecision] = useState<string | null>(null)
 
 	return (
-		<Demo id="interaction-card" title="interaction-card">
+		<Demo
+			id="interaction-card"
+			title="interaction-card"
+			note="PermissionCard: Enter activates the focused reply, ⌘/Ctrl+Enter always allows, Escape rejects. DecisionCard: the options are a radio group; once answered, each card collapses to a receipt."
+		>
 			<PermissionCard
 				verb="Run command"
 				subject="pnpm publish --access public"
@@ -303,7 +335,7 @@ function HandoffReceiptDemo() {
 		<Demo
 			id="handoff-receipt"
 			title="handoff-receipt"
-			note="A pill in the middle of a divider; open it to read the handoff summary."
+			note="A pill in the middle of a divider. The pill is a button: click it, or press Enter or Space, to read what was kept and handed over."
 		>
 			<HandoffReceipt
 				at="14:32"
@@ -326,11 +358,23 @@ function HandoffReceiptDemo() {
 
 function ComposerDemo() {
 	const [model, setModel] = useState("Fable 5")
+	const [draft, setDraft] = useState("")
 	const [sent, setSent] = useState<string | null>(null)
 
 	return (
-		<Demo id="composer" title="composer" note="Type @ for source suggestions. ⏎ sends, ⇧⏎ adds a new line.">
+		<Demo
+			id="composer"
+			title="composer"
+			note="Type @ for sources or / for commands; ↑↓ move through the list, Enter picks, Escape closes it. Enter sends, Shift+Enter adds a new line, and Enter that ends an IME composition never sends. Controlled here: value and onValueChange belong to the page, which gets an empty string after a send."
+		>
+			<Row>
+				<Button size="sm" variant="secondary" onClick={() => setDraft("Summarise today's handoffs")}>
+					Fill a draft
+				</Button>
+			</Row>
 			<Composer
+				value={draft}
+				onValueChange={setDraft}
 				placeholder="Message the agent. It only stops to ask when something costs money, publishes, or touches security."
 				models={["Fable 5", "Opus 5", "Sonnet 5", "GPT-5.4"]}
 				model={model}
@@ -344,7 +388,7 @@ function ComposerDemo() {
 				]}
 				onMicToggle={() => {}}
 				onSubmit={(value) => setSent(value)}
-				hint={sent ? `Sent: ${sent}` : "⏎ to send · ⇧⏎ for a new line"}
+				hint={sent ? `Sent: ${sent}` : `${draft.length} characters · ⏎ to send · ⇧⏎ for a new line`}
 			/>
 		</Demo>
 	)

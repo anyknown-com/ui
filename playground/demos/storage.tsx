@@ -123,7 +123,11 @@ function RecoveryKeyDemo() {
 	const [ack, setAck] = useState(false)
 
 	return (
-		<Demo id="recovery-key" title="recovery-key" note="Blurred by default; hover or click to reveal it.">
+		<Demo
+			id="recovery-key"
+			title="recovery-key"
+			note="Blurred until hovered, focused or revealed. Tab to the key box and the key shows, already selected for the system copy shortcut. Copy, download and the acknowledgement sit under it."
+		>
 			<RecoveryKey value="K7PQ-WM2X-9RDF-H4TN-ZC8B-JE6V-A3YS-UG5L" ack={ack} onAckChange={setAck} />
 		</Demo>
 	)
@@ -187,14 +191,18 @@ function FileRowDemo() {
 	const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
 
 	return (
-		<Demo id="file-row" title="file-row" note="The checkbox and actions show only on hover or when selected.">
-			<FileList label="Files">
+		<Demo
+			id="file-row"
+			title="file-row"
+			note="Click a row or press Space to select it; double-click or Enter opens it. The checkbox and actions show on hover and focus (always on touch screens). With selectedCount, a polite line under the list says how many are selected."
+		>
+			<FileList label="Files" selectedCount={selectedFiles.size}>
 				{FILES.map((item) => (
 					<FileRow
 						key={item.name}
 						item={item}
 						selected={selectedFiles.has(item.name)}
-						onSelectChange={(selected) =>
+						onSelectedChange={(selected) =>
 							setSelectedFiles((current) => {
 								const next = new Set(current)
 								if (selected) next.add(item.name)
@@ -231,10 +239,26 @@ function DiffViewerDemo() {
 	)
 }
 
-const COLUMNS: DataTableColumn<Entry>[] = [
+type Edit = (row: Entry, field: "memory" | "scope", next: string) => void
+
+const columnsFor = (edit: Edit): DataTableColumn<Entry>[] => [
 	{ id: "key", header: "key", mono: true, sortable: true, value: (row) => row.key },
-	{ id: "memory", header: "Memory", sortable: true, editable: true, value: (row) => row.memory },
-	{ id: "scope", header: "Scope", sortable: true, editable: true, value: (row) => row.scope },
+	{
+		id: "memory",
+		header: "Memory",
+		sortable: true,
+		editable: true,
+		value: (row) => row.memory,
+		onCommit: (row, next) => edit(row, "memory", next),
+	},
+	{
+		id: "scope",
+		header: "Scope",
+		sortable: true,
+		editable: true,
+		value: (row) => row.scope,
+		onCommit: (row, next) => edit(row, "scope", next),
+	},
 	{
 		id: "status",
 		header: "Status",
@@ -249,43 +273,57 @@ const COLUMNS: DataTableColumn<Entry>[] = [
 ]
 
 function DataTableDemo() {
+	const [entries, setEntries] = useState(ENTRIES)
 	const [filter, setFilter] = useState("")
 	const [sort, setSort] = useState<SortState>(null)
 	const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set())
 
+	const columns = useMemo(
+		() =>
+			columnsFor((row, field, next) =>
+				setEntries((current) =>
+					current.map((entry) => (entry.key === row.key ? { ...entry, [field]: next } : entry)),
+				),
+			),
+		[],
+	)
+
 	const rows = useMemo(() => {
 		const query = filter.toLowerCase()
-		const filtered = ENTRIES.filter((row) =>
+		const filtered = entries.filter((row) =>
 			[row.key, row.memory, row.scope].some((value) => value.toLowerCase().includes(query)),
 		)
 		if (!sort) return filtered
-		const column = COLUMNS.find((c) => c.id === sort.col)
+		const column = columns.find((c) => c.id === sort.col)
 		return [...filtered].sort((a, b) => {
 			const result = (column?.value?.(a) ?? "").localeCompare(column?.value?.(b) ?? "")
 			return sort.dir === "asc" ? result : -result
 		})
-	}, [filter, sort])
+	}, [entries, columns, filter, sort])
 
 	return (
 		<Demo
 			id="data-table"
 			title="data-table"
-			note="Sort by a column header, filter as you type, double-click a cell to edit it."
+			note="A header button cycles ascending, descending and none. Type to filter; the count updates for screen readers. Double-click a Memory or Scope cell, or press Enter or F2 on it, to edit; Enter or leaving the field saves, Escape cancels. The page filters and sorts the rows itself."
 		>
 			<DataTable
 				label="Memories"
 				rows={rows}
+				total={entries.length}
 				rowKey={(row) => row.key}
-				columns={COLUMNS}
+				columns={columns}
 				filter={filter}
 				onFilterChange={setFilter}
-				filterPlaceholder="Filter by key, memory or scope"
 				sort={sort}
 				onSortChange={setSort}
 				selected={selectedKeys}
 				onSelectedChange={setSelectedKeys}
 				onClearFilter={() => setFilter("")}
-				countLabel={(shown, total) => `${shown} of ${total} memories`}
+				labels={{
+					filterPlaceholder: "Filter by key, memory or scope",
+					count: (shown, total) => `${shown} of ${total} memories`,
+				}}
 			/>
 		</Demo>
 	)
