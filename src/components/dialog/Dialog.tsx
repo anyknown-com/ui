@@ -322,6 +322,11 @@ export type DialogEntry = {
 	id: string
 	render: DialogRender<never>
 	role: "dialog" | "alertdialog"
+	/**
+	 * Closed and already settled, but still fading out. `<Dialogs>` drops the entry when the
+	 * exit transition ends (at once under reduced motion, or when no host is mounted).
+	 */
+	closing: boolean
 }
 
 export type ConfirmOptions = {
@@ -353,6 +358,8 @@ export type DialogManager = {
 	alert: (options: AlertOptions) => Promise<void>
 	subscribe: (listener: () => void) => () => void
 	getSnapshot: () => readonly DialogEntry[]
+	/** @internal `<Dialogs>` calls it when a closed dialog has finished fading out. */
+	remove: (id: string) => void
 }
 
 let dialogSeq = 0
@@ -361,6 +368,8 @@ export function createDialogManager(): DialogManager {
 	const store = createStore<readonly DialogEntry[]>([])
 	// 結果的出口不放進 snapshot:畫面用不到
 	const settle = new Map<string, { resolve: (value: unknown) => void; dismiss: unknown }>()
+	// 有人訂閱(<Dialogs> 掛著)才有退場可等;沒有就關了直接拿掉,免得 closing 的那筆永遠留著
+	let listeners = 0
 
 	function push<T>(render: DialogRender<T>, role: DialogEntry["role"], dismiss: unknown): DialogHandle<T> {
 		dialogSeq += 1
@@ -368,15 +377,26 @@ export function createDialogManager(): DialogManager {
 		const result = new Promise<T | undefined>((resolve) => {
 			settle.set(id, { resolve: resolve as (value: unknown) => void, dismiss })
 		})
-		store.set((entries) => [...entries, { id, render: render as DialogRender<never>, role }])
+		store.set((entries) => [...entries, { id, render: render as DialogRender<never>, role, closing: false }])
 		return { id, close: (value) => close(id, value), result }
+	}
+
+	/** 拿掉 `id` 與疊在它上面、也在淡出的;淡出時才疊上來的新 dialog 留著。 */
+	function remove(id: string) {
+		store.set((entries) => {
+			const index = entries.findIndex((entry) => entry.id === id)
+			return index === -1 ? entries : entries.filter((entry, i) => i < index || !entry.closing)
+		})
 	}
 
 	function close(id: string, result?: unknown) {
 		const entries = store.getSnapshot()
 		const index = entries.findIndex((entry) => entry.id === id)
-		if (index === -1) return
-		store.set(entries.slice(0, index))
+		if (index === -1 || entries[index].closing) return
+		// 先標成 closing:Root 換成 open={false} 跑完退場,onOpenChangeComplete 才拿掉
+		if (listeners > 0)
+			store.set(entries.map((entry, i) => (i < index || entry.closing ? entry : { ...entry, closing: true })))
+		else store.set(entries.slice(0, index))
 		// 由上往下落定:疊在上面的先用各自的 dismiss 值
 		for (let i = entries.length - 1; i >= index; i -= 1) {
 			const entryId = entries[i].id
@@ -390,7 +410,7 @@ export function createDialogManager(): DialogManager {
 		open: (render, options = {}) => push(render, options.role ?? "dialog", undefined),
 		close,
 		closeAll() {
-			const [first] = store.getSnapshot()
+			const first = store.getSnapshot().find((entry) => !entry.closing)
 			if (first != null) close(first.id)
 		},
 		confirm({ title, description, confirmLabel, cancelLabel, tone = "default" }) {
@@ -428,8 +448,18 @@ export function createDialogManager(): DialogManager {
 			)
 			return handle.result.then(() => undefined)
 		},
-		subscribe: store.subscribe,
+		subscribe(listener) {
+			listeners += 1
+			const unsubscribe = store.subscribe(listener)
+			return () => {
+				unsubscribe()
+				listeners -= 1
+				// 最後一個 host 拆了:淡出到一半的沒人收尾,現在拿掉
+				if (listeners === 0) store.set((entries) => entries.filter((entry) => !entry.closing))
+			}
+		},
 		getSnapshot: store.getSnapshot,
+		remove,
 	}
 }
 
@@ -481,6 +511,9 @@ type StackedDialogProps = { entries: readonly DialogEntry[]; index: number; mana
  * 下一層要等這一層開好(`onOpenChangeComplete(true)`)才掛:兩層在同一個 commit 掛上時,
  * React 先跑子層的 effect,上一層隨後把「自己以外」全標成 aria-hidden,連上面那層一起蓋掉。
  * 所以 `render` 要回傳 DialogContent(或 Base UI Dialog 的 Popup),不然下一層永遠不會出現。
+ *
+ * 關掉的那層(`closing`)先換成 `open={false}`,跟 `<Dialog>` 一樣淡出;退場跑完
+ * (`onOpenChangeComplete(false)`)才從 store 拿掉。結果在關的當下就落定了。
  */
 function StackedDialog({ entries, index, manager }: StackedDialogProps) {
 	const [ready, setReady] = useState(false)
@@ -492,6 +525,7 @@ function StackedDialog({ entries, index, manager }: StackedDialogProps) {
 	}
 	const onOpenChangeComplete = (open: boolean) => {
 		if (open) setReady(true)
+		else manager.remove(entry.id)
 	}
 	const body = (
 		<>
@@ -499,12 +533,13 @@ function StackedDialog({ entries, index, manager }: StackedDialogProps) {
 			{next != null && <StackedDialog key={next.id} entries={entries} index={index + 1} manager={manager} />}
 		</>
 	)
+	const open = !entry.closing
 	return entry.role === "alertdialog" ? (
-		<AlertDialog.Root open onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
+		<AlertDialog.Root open={open} onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
 			{body}
 		</AlertDialog.Root>
 	) : (
-		<BaseDialog.Root open onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
+		<BaseDialog.Root open={open} onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
 			{body}
 		</BaseDialog.Root>
 	)

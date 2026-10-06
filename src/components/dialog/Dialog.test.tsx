@@ -399,3 +399,196 @@ describe("dialog store", () => {
 		act(() => scoped.closeAll())
 	})
 })
+
+/**
+ * jsdom has no animations, so Base UI finishes an exit at once. Hold every exit (an element
+ * with `data-ending-style`) until `finish()` to see the fading state.
+ */
+function holdExits() {
+	let finish!: () => void
+	const finished = new Promise<void>((resolve) => (finish = resolve))
+	const held = { finished, pending: false, playState: "running" }
+	Element.prototype.getAnimations = function (this: Element) {
+		return (this.hasAttribute("data-ending-style") ? [held] : []) as unknown as Animation[]
+	}
+	return {
+		finish: () => act(async () => finish()),
+		restore: () => delete (Element.prototype as Partial<Element>).getAnimations,
+	}
+}
+
+describe("dialog store exit", () => {
+	afterEach(() => act(() => dialogManager.closeAll()))
+
+	test("a confirm fades out: it settles and hands focus back when the exit starts, and leaves when it ends", async () => {
+		const exits = holdExits()
+		try {
+			let answer: Promise<boolean> = Promise.resolve(false)
+			render(
+				<Dialogs>
+					<Opener onOpen={(dialog) => (answer = dialog.confirm({ title: "刪除?", confirmLabel: "刪除" }))} />
+				</Dialogs>,
+			)
+			const opener = screen.getByRole("button", { name: "開啟" })
+			await userEvent.click(opener)
+			await userEvent.click(await screen.findByRole("button", { name: "刪除" }))
+			await expect(answer).resolves.toBe(true)
+
+			const popup = document.querySelector("[role='alertdialog']")
+			await waitFor(() => expect(popup).toHaveAttribute("data-ending-style"))
+			expect(popup).toBeInTheDocument()
+			expect(opener).toHaveFocus()
+			expect(dialogManager.getSnapshot()).toMatchObject([{ closing: true }])
+
+			await exits.finish()
+			await waitFor(() => expect(popup).not.toBeInTheDocument())
+			expect(dialogManager.getSnapshot()).toHaveLength(0)
+			expect(opener).toHaveFocus()
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("dialog.open fades out the same way", async () => {
+		const exits = holdExits()
+		try {
+			render(<Dialogs />)
+			let handle: DialogHandle<string> | undefined
+			act(() => void (handle = dialogManager.open<string>(({ close }) => <RenameForm close={close} />)))
+			const popup = await screen.findByRole("dialog")
+			act(() => handle?.close("新名稱"))
+			await expect(handle?.result).resolves.toBe("新名稱")
+			await waitFor(() => expect(popup).toHaveAttribute("data-ending-style"))
+			await exits.finish()
+			await waitFor(() => expect(popup).not.toBeInTheDocument())
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("a closing dialog cannot be closed again or change its result", async () => {
+		const exits = holdExits()
+		try {
+			render(<Dialogs />)
+			let handle: DialogHandle<string> | undefined
+			act(() => void (handle = dialogManager.open<string>(({ close }) => <RenameForm close={close} />)))
+			await screen.findByRole("dialog")
+			act(() => handle?.close("一"))
+			act(() => handle?.close("二"))
+			act(() => dialogManager.closeAll())
+			await expect(handle?.result).resolves.toBe("一")
+			expect(dialogManager.getSnapshot()).toHaveLength(1)
+			await exits.finish()
+			await waitFor(() => expect(dialogManager.getSnapshot()).toHaveLength(0))
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("unmounting the host drops dialogs that were still fading out", async () => {
+		const exits = holdExits()
+		try {
+			const { unmount } = render(<Dialogs />)
+			let handle: DialogHandle | undefined
+			act(() => void (handle = dialogManager.open(() => <DialogContent title="一" />)))
+			await screen.findByRole("dialog")
+			act(() => handle?.close())
+			expect(dialogManager.getSnapshot()).toHaveLength(1)
+			unmount()
+			expect(dialogManager.getSnapshot()).toHaveLength(0)
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("with no host mounted, close removes the entry at once", async () => {
+		const manager = createDialogManager()
+		const handle = manager.open(() => null)
+		manager.close(handle.id, "done")
+		await expect(handle.result).resolves.toBe("done")
+		expect(manager.getSnapshot()).toHaveLength(0)
+	})
+})
+
+function Stack() {
+	return (
+		<Dialogs>
+			<Opener
+				label="設定"
+				onOpen={(dialog) =>
+					dialog.open(() => (
+						<DialogContent title="設定">
+							<Opener
+								label="刪除工作區"
+								onOpen={(inner) => inner.confirm({ title: "真的要刪除?", confirmLabel: "刪除" })}
+							/>
+						</DialogContent>
+					))
+				}
+			/>
+		</Dialogs>
+	)
+}
+
+async function openStack() {
+	const page = screen.getByRole("button", { name: "設定" })
+	await userEvent.click(page)
+	await screen.findByRole("dialog", { name: "設定" })
+	const inner = screen.getByRole("button", { name: "刪除工作區" })
+	await userEvent.click(inner)
+	const top = await screen.findByRole("alertdialog", { name: "真的要刪除?" })
+	await waitFor(() => expect(top.contains(document.activeElement)).toBe(true))
+	return { page, inner }
+}
+
+describe("stacked dialogs and focus", () => {
+	afterEach(() => act(() => dialogManager.closeAll()))
+
+	test("Escape closes the top one and focus goes to its opener in the dialog below, then to the page", async () => {
+		render(<Stack />)
+		const { page, inner } = await openStack()
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument())
+		expect(screen.getByRole("dialog", { name: "設定" })).toBeInTheDocument()
+		await waitFor(() => expect(inner).toHaveFocus())
+
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+		await waitFor(() => expect(page).toHaveFocus())
+	})
+
+	test("closeAll on a stack hands focus to the element that opened the bottom one as the exit starts", async () => {
+		render(<Stack />)
+		const { page } = await openStack()
+		const exits = holdExits()
+		try {
+			act(() => dialogManager.closeAll())
+			const ending = "[role='dialog'][data-ending-style], [role='alertdialog'][data-ending-style]"
+			await waitFor(() => expect(document.querySelectorAll(ending)).toHaveLength(2))
+			expect(page).toHaveFocus()
+			await exits.finish()
+			await waitFor(() => expect(dialogManager.getSnapshot()).toHaveLength(0))
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+			expect(page).toHaveFocus()
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("Escape on the top one hands focus to its opener below as the exit starts", async () => {
+		render(<Stack />)
+		const { inner } = await openStack()
+		const exits = holdExits()
+		try {
+			await userEvent.keyboard("{Escape}")
+			await waitFor(() =>
+				expect(document.querySelector("[role='alertdialog']")).toHaveAttribute("data-ending-style"),
+			)
+			expect(inner).toHaveFocus()
+			await exits.finish()
+			await waitFor(() => expect(dialogManager.getSnapshot()).toHaveLength(1))
+		} finally {
+			exits.restore()
+		}
+	})
+})
