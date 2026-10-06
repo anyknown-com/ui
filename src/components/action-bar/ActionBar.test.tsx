@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { AssistantMessage, TextPart, Thread } from "../message/Message"
 import { ActionBar } from "./ActionBar"
 
@@ -71,6 +72,46 @@ describe("ActionBar", () => {
 		)
 		await userEvent.tab()
 		await waitFor(() => expect(screen.getByRole("button", { name: "複製" })).toHaveFocus())
+	})
+})
+
+describe("ActionBar words", () => {
+	test("reads English under an en LocaleProvider", async () => {
+		writeText(vi.fn().mockResolvedValue(undefined))
+		render(
+			<LocaleProvider locale="en">
+				<Thread>
+					<AssistantMessage>
+						<TextPart>reply</TextPart>
+						<ActionBar>
+							<ActionBar.Copy />
+							<ActionBar.Regenerate onRegenerate={() => {}} />
+						</ActionBar>
+					</AssistantMessage>
+				</Thread>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("toolbar", { name: "Message actions" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Regenerate" })).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Copy" }))
+		expect(await screen.findByRole("button", { name: "Copied ✓" })).toBeInTheDocument()
+	})
+
+	test("the bar's labels reach its actions, and an action's own label wins", () => {
+		render(
+			<Thread>
+				<AssistantMessage>
+					<TextPart>內容</TextPart>
+					<ActionBar labels={{ toolbar: "工具", copy: "拷貝", regenerate: "再來" }}>
+						<ActionBar.Copy />
+						<ActionBar.Regenerate onRegenerate={() => {}} label="重寫" />
+					</ActionBar>
+				</AssistantMessage>
+			</Thread>,
+		)
+		expect(screen.getByRole("toolbar", { name: "工具" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "拷貝" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "重寫" })).toBeInTheDocument()
 	})
 })
 

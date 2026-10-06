@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps, ReactNode } from "react"
+import { type ComponentProps, type ReactNode, createContext, use } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, focusRing, motion, space, type } from "../../tokens.stylex"
@@ -79,17 +80,38 @@ function RegenerateIcon() {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": { toolbar: "訊息動作", copy: "複製", copied: "已複製 ✓", regenerate: "重新生成" },
+	en: { toolbar: "Message actions", copy: "Copy", copied: "Copied ✓", regenerate: "Regenerate" },
+})
+
+/** The ActionBar's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type ActionBarLabels = StringsOf<typeof strings>
+
+// The bar's `labels` reach the built-in actions rendered inside it.
+const LabelsContext = createContext<Partial<ActionBarLabels> | undefined>(undefined)
+
 export type ActionBarProps = {
+	/** The toolbar's accessible name. Wins over `labels.toolbar`. */
 	label?: string
 	visible?: boolean
 	children: ReactNode
+	/** Overrides for the built-in words of the bar and of `ActionBar.Copy` / `ActionBar.Regenerate` inside it. */
+	labels?: Partial<ActionBarLabels>
 }
 
-export function ActionBar({ label = "訊息動作", visible = false, children }: ActionBarProps) {
+export function ActionBar({ label, visible = false, children, labels }: ActionBarProps) {
+	const t = useStrings(strings, labels)
 	return (
-		<div role="toolbar" aria-label={label} {...stylex.props(styles.bar, visible && hoverStyles.reveal)}>
-			{children}
-		</div>
+		<LabelsContext value={labels}>
+			<div
+				role="toolbar"
+				aria-label={label ?? t.toolbar}
+				{...stylex.props(styles.bar, visible && hoverStyles.reveal)}
+			>
+				{children}
+			</div>
+		</LabelsContext>
 	)
 }
 
@@ -106,11 +128,14 @@ function ActionBarButton({ icon, children, ...props }: ActionBarButtonProps) {
 
 export type CopyActionProps = {
 	text?: string
+	/** The button's text. Wins over `labels.copy` on the bar. */
 	label?: string
+	/** The button's text after a copy. Wins over `labels.copied` on the bar. */
 	copiedLabel?: string
 }
 
-function CopyAction({ text: value, label = "複製", copiedLabel = "已複製 ✓" }: CopyActionProps) {
+function CopyAction({ text: value, label, copiedLabel }: CopyActionProps) {
+	const t = useStrings(strings, use(LabelsContext))
 	const body = useMessageBody()
 	const { copied, copy } = useCopy()
 
@@ -128,17 +153,22 @@ function CopyAction({ text: value, label = "複製", copiedLabel = "已複製 �
 			{...stylex.props(reset.control, styles.button, copied && styles.done, press.button)}
 		>
 			{!copied && <CopyIcon />}
-			{copied ? copiedLabel : label}
+			{copied ? (copiedLabel ?? t.copied) : (label ?? t.copy)}
 		</button>
 	)
 }
 
-export type RegenerateActionProps = { onRegenerate: () => void; label?: string }
+export type RegenerateActionProps = {
+	onRegenerate: () => void
+	/** The button's text. Wins over `labels.regenerate` on the bar. */
+	label?: string
+}
 
-function RegenerateAction({ onRegenerate, label = "重新生成" }: RegenerateActionProps) {
+function RegenerateAction({ onRegenerate, label }: RegenerateActionProps) {
+	const t = useStrings(strings, use(LabelsContext))
 	return (
 		<ActionBarButton icon={<RegenerateIcon />} onClick={onRegenerate}>
-			{label}
+			{label ?? t.regenerate}
 		</ActionBarButton>
 	)
 }
