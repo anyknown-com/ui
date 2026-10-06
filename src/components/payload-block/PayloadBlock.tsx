@@ -24,6 +24,8 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t2,
 		lineHeight: type.snug,
+		// 放進 grid / flex 也是自己橫捲,不把外面撐寬
+		minWidth: 0,
 		position: "relative",
 	},
 	code: {
