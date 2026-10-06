@@ -29,7 +29,7 @@ const styles = stylex.create({
 		marginTop: "0.16rem",
 		borderWidth: 1.5,
 		borderStyle: "solid",
-		borderColor: color.borderStrong,
+		borderColor: color.borderControl,
 		borderRadius: corner.small,
 		backgroundColor: color.bg,
 		transitionProperty: "border-color, background-color",

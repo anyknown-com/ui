@@ -26,7 +26,7 @@ const styles = stylex.create({
 		height: "1.4rem",
 		marginTop: "0.1rem",
 		borderRadius: corner.pill,
-		backgroundColor: color.borderStrong,
+		backgroundColor: color.borderControl,
 		transitionProperty: "background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":has(:focus-visible)": `2px solid ${color.focusRing}` },

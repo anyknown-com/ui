@@ -50,8 +50,8 @@ dialog 的 backdrop 用中性墨色 32% 不加 blur。`backdrop-filter` 是 DESI
 ## 控制項
 
 - 按鈕：膠囊。高度 32 / 40 / 48,預設 40(觸控)。primary 墨色實心;secondary 是凹下去的 `accentSubtle` 底、無框;ghost 透明，hover 才有底;danger 紅底。按下時 `scale: 0.98`,120ms ease-out,reduced-motion 時不縮。
-- 輸入框:`surface` 底 + 1px `border` 框(邊界要 3:1 才看得到，只靠底色不夠)。focus 時框換 `signal` 加 2px 環。
-- checkbox / radio / switch:未選是 `borderStrong` 框;選中是墨色實心。switch 是膠囊軌道 + 白色圓鈕，鈕有 rest 陰影。
+- 輸入框:`surface` 底 + 1px `borderControl` 框(邊界對底色要 3:1 才看得到;`border` 只有 1.2:1,只能當分隔線)。focus 時框換 `signal` 加 2px 環。
+- checkbox / radio / switch:未選是 `borderControl` 框,switch 關的軌道也是;選中是墨色實心。switch 是膠囊軌道 + 白色圓鈕，鈕有 rest 陰影。
 - tabs / segmented:選中的那格是浮起來的白紙(rest 陰影)放在凹下去的 `surface` 軌道上。
 
 ## 字

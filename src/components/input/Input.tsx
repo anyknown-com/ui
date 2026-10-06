@@ -16,8 +16,7 @@ export const controlStyles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: {
-			default: color.border,
-			":hover:not(:disabled)": color.borderStrong,
+			default: color.borderControl,
 			":focus-visible": color.focusRing,
 		},
 		borderRadius: corner.control,
