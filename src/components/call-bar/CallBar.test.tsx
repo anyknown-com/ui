@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
-import { CallBar } from "./CallBar"
+import { expectNoAxeViolations } from "../../test/axe"
+import { CallBar, type CallStatus } from "./CallBar"
 
 describe("CallBar", () => {
 	test("說出通話在做什麼、跑了多久", () => {
@@ -53,6 +54,23 @@ describe("CallBar", () => {
 		expect(screen.getByText("On a call")).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Hang up" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "靜音" })).toBeInTheDocument()
+	})
+
+	test.each<CallStatus>([
+		"listening",
+		"user-speaking",
+		"transcribing",
+		"holding",
+		"thinking",
+		"speaking",
+		"interrupted",
+	])("沒有 axe 違規:%s,開著或靜音", async (status) => {
+		const { container, rerender } = render(
+			<CallBar status={status} seconds={42} muted={false} onMute={() => {}} onHangUp={() => {}} />,
+		)
+		await expectNoAxeViolations(container)
+		rerender(<CallBar status={status} seconds={42} muted onMute={() => {}} onHangUp={() => {}} />)
+		await expectNoAxeViolations(container)
 	})
 
 	test("follow the LocaleProvider; labels still win", () => {
