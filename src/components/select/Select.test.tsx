@@ -1,10 +1,13 @@
+import * as stylex from "@stylexjs/stylex"
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { layer } from "../../lib/popup"
+import { type StyleArg } from "../../lib/styled"
 import { expectNoAxeViolations } from "../../test/axe"
+import { color } from "../../tokens.stylex"
 import { Dialog, DialogContent } from "../dialog/Dialog"
 import { Field } from "../label/Field"
 import { Select, SelectGroup, SelectItem } from "./Select"
@@ -323,5 +326,26 @@ describe("Select inside a Field", () => {
 		const plan = screen.getByRole("combobox", { name: "Plan" })
 		expect(plan).not.toHaveAttribute("aria-invalid")
 		expect(plan).toHaveAccessibleDescription("Billed monthly.")
+	})
+})
+
+// textFaint is 3.75:1 on surface, below 4.5:1 for text; placeholders must be readable
+const placeholderProbe = stylex.create({
+	muted: { color: color.textMuted },
+	mutedPlaceholder: { "::placeholder": { color: color.textMuted } },
+})
+
+const atomOf = (style: StyleArg) =>
+	(stylex.props(style).className ?? "").split(" ").filter((name) => /^x[a-z0-9]+$/.test(name))
+
+describe("Select placeholder contrast", () => {
+	test("the trigger and search placeholders use textMuted", async () => {
+		render(<Models />)
+		const [muted] = atomOf(placeholderProbe.muted)
+		expect(screen.getByText("選擇模型…").classList).toContain(muted)
+		await userEvent.click(screen.getByRole("combobox", { name: "選擇模型" }))
+		const search = await screen.findByRole("combobox", { name: "搜尋選項" })
+		const [mutedPlaceholder] = atomOf(placeholderProbe.mutedPlaceholder)
+		expect(search.classList).toContain(mutedPlaceholder)
 	})
 })

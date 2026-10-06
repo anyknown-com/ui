@@ -146,7 +146,7 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
-		"::placeholder": { color: color.textFaint },
+		"::placeholder": { color: color.textMuted },
 	},
 	receipt: {
 		display: "flex",

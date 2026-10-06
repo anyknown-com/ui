@@ -1,8 +1,10 @@
+import * as stylex from "@stylexjs/stylex"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { expectNoAxeViolations } from "../../test/axe"
+import { color } from "../../tokens.stylex"
 import { type DecisionBlock, DecisionCard, PermissionCard } from "./InteractionCard"
 
 const BLOCKS: DecisionBlock[] = [
@@ -280,5 +282,18 @@ describe("DecisionCard 照建議", () => {
 			/>,
 		)
 		expect(screen.getByRole("button", { name: "照建議" })).toBeDisabled()
+	})
+})
+
+// textFaint is 3.75:1 on surface, below 4.5:1 for text; the placeholder must be readable
+const placeholderProbe = stylex.create({ muted: { "::placeholder": { color: color.textMuted } } })
+
+describe("DecisionCard placeholder contrast", () => {
+	test("the free-text placeholder uses textMuted", () => {
+		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
+		const [muted] = (stylex.props(placeholderProbe.muted).className ?? "")
+			.split(" ")
+			.filter((name) => /^x[a-z0-9]+$/.test(name))
+		expect(screen.getByRole("textbox", { name: "補充" }).classList).toContain(muted)
 	})
 })

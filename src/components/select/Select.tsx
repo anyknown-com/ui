@@ -93,7 +93,7 @@ const styles = stylex.create({
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		textAlign: "start",
 	},
-	placeholder: { color: color.textFaint },
+	placeholder: { color: color.textMuted },
 	caret: { marginInlineStart: "auto", color: color.textFaint, flex: "none" },
 	chip: {
 		display: "inline-flex",
@@ -138,7 +138,7 @@ const styles = stylex.create({
 		color: color.text,
 		// 打開就落在這裡,閃動的游標就是焦點;UA 的框會把搜尋列框成第二個輸入框
 		outline: "none",
-		"::placeholder": { color: color.textFaint },
+		"::placeholder": { color: color.textMuted },
 	},
 	srOnly: {
 		position: "absolute",
