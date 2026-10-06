@@ -138,6 +138,7 @@ const strings = defineStrings({
 		intro: "這是你的復原金鑰。忘記 passphrase 時,它是唯一能開回 vault 的東西 — 只會顯示這一次。",
 		warning: "我們沒有你的金鑰副本,遺失就無法復原。把它抄在紙上,或存進密碼管理器。",
 		ack: "我已把復原金鑰抄下並存放在安全的地方。",
+		key: "復原金鑰",
 		reveal: "顯示復原金鑰",
 		hide: "隱藏復原金鑰",
 		veil: "hover 或點一下顯示",
@@ -151,6 +152,7 @@ const strings = defineStrings({
 		warning:
 			"We don't keep a copy of your key, so if you lose it, it can't be recovered. Write it down on paper or save it in a password manager.",
 		ack: "I've written down my recovery key and stored it somewhere safe.",
+		key: "Recovery key",
 		reveal: "Show recovery key",
 		hide: "Hide recovery key",
 		veil: "Hover or tap to show",
@@ -162,7 +164,8 @@ const strings = defineStrings({
 
 /**
  * RecoveryKey's built-in words (follow `<LocaleProvider>`): the intro, warning and
- * acknowledgement, the reveal / copy / download buttons and the veil hint. Override any with `labels`.
+ * acknowledgement, the key box's name (`key`), the reveal / copy / download buttons and the veil
+ * hint. Override any with `labels`.
  */
 export type RecoveryKeyLabels = StringsOf<typeof strings>
 
@@ -197,7 +200,11 @@ export type RecoveryKeyProps = {
 	labels?: Partial<RecoveryKeyLabels>
 }
 
-/** Shows a one-time recovery key, blurred until hovered or revealed, with copy, download and an acknowledgement. */
+/**
+ * Shows a one-time recovery key, blurred until hovered, focused or revealed, with copy, download
+ * and an acknowledgement. The key box is a named, focusable region: Tab to it and the key shows
+ * and is selected, ready for the system copy shortcut.
+ */
 export function RecoveryKey({
 	value,
 	ack,
@@ -229,9 +236,19 @@ export function RecoveryKey({
 	return (
 		<div {...stylex.props(styles.card)}>
 			<p {...stylex.props(styles.intro)}>{intro ?? t.intro}</p>
-			<div {...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}>
-				{/* The key itself is plain text so screen readers can read it out; the
-				    blur is purely visual and the reveal is the button below. */}
+			{/* The key itself is plain text so screen readers can read it out; the blur is purely
+			    visual. Focus (Tab) unblurs it like hover does and selects the whole key. */}
+			{/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a focusable region; focus only selects its text */}
+			<div
+				role="region"
+				aria-label={t.key}
+				tabIndex={0}
+				onFocus={(event) => {
+					const groups = event.currentTarget.firstElementChild
+					if (groups) event.currentTarget.ownerDocument.getSelection()?.selectAllChildren(groups)
+				}}
+				{...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}
+			>
 				<div {...stylex.props(styles.groups)}>
 					{value.split("-").map((group, index) => (
 						<Fragment key={`${group}-${index}`}>

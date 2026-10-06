@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
@@ -25,6 +25,25 @@ describe("RecoveryKey", () => {
 		expect(screen.getByRole("button", { name: "隱藏復原金鑰" })).toHaveAttribute("aria-pressed", "true")
 		await userEvent.keyboard(" ")
 		expect(screen.getByRole("button", { name: "顯示復原金鑰" })).toHaveAttribute("aria-pressed", "false")
+	})
+
+	test("the key box is a named tab stop; focusing it selects the whole key", async () => {
+		render(<RecoveryKey value={KEY} />)
+		await userEvent.tab()
+		const box = screen.getByRole("region", { name: "復原金鑰" })
+		expect(box).toHaveFocus()
+		expect(box).toHaveTextContent("K7PQ")
+		await userEvent.tab()
+		expect(screen.getByRole("button", { name: "顯示復原金鑰" })).toHaveFocus()
+	})
+
+	test("focusing the key box selects the whole key, hyphens included", () => {
+		render(<RecoveryKey value={KEY} />)
+		// A focus event alone: jsdom's element.focus() collapses the selection after the focus
+		// handlers run, so the selection can only be read this way here.
+		fireEvent.focus(screen.getByRole("region", { name: "復原金鑰" }))
+		// jsdom's Selection#toString is empty; the range carries the text.
+		expect(document.getSelection()?.getRangeAt(0).toString()).toBe(KEY)
 	})
 
 	test("selecting the rendered key by hand still yields the hyphens", () => {
