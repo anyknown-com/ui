@@ -23,7 +23,7 @@ const styles = stylex.create({
 		position: "relative",
 		// 卡片裡凹下去的一塊,不加框
 		backgroundColor: color.surface,
-		borderRadius: corner.control,
+		borderRadius: corner.small,
 		padding: space.md,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -97,7 +97,7 @@ const styles = stylex.create({
 		gap: space.xs,
 		backgroundColor: color.warningSubtle,
 		color: color.text,
-		borderRadius: corner.control,
+		borderRadius: corner.small,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
 		fontSize: type.t2,

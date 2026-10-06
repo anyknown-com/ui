@@ -515,7 +515,7 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - 分段 mono(4 字一組)、預設模糊遮罩(hover / focus / 點擊才顯示)、一鍵複製(變 ✓)、
   下載 .txt、警告卡、「我已抄下」checkbox **gate 住主要按鈕**
 - 長相是 rest 卡片(`surfaceRaised` 底、`shadow.rest`、`corner.card`);金鑰區與警告是卡片裡凹下去
-  的塊,不畫框;動作鈕是 secondary 膠囊
+  的塊,不畫框、圓角 `corner.small`;動作鈕是 secondary 膠囊
 
 ### dropzone
 拖放上傳區:idle 是凹下去的 `surface` 底 + `borderStrong` 虛線(`corner.card`)、
