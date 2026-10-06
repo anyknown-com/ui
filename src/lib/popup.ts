@@ -38,7 +38,11 @@ export function returnFocusOnExit(node: HTMLElement | null) {
 		if (!node.hasAttribute("data-ending-style")) return
 		observer.disconnect()
 		if (!(before instanceof HTMLElement) || !before.isConnected || before === doc.body) return
-		if (node.contains(doc.activeElement)) before.focus({ preventScroll: true })
+		// 焦點在自己裡面,或在另一個也正在退場的浮層裡(疊著的 dialog、子選單一起關,
+		// 誰的 observer 先跑都一樣:最後落在最底下那層打開前的地方)
+		const active = doc.activeElement
+		if (node.contains(active) || active?.closest("[data-ending-style]") != null)
+			before.focus({ preventScroll: true })
 	})
 	observer.observe(node, { attributes: true, attributeFilter: ["data-ending-style"] })
 	return () => observer.disconnect()
