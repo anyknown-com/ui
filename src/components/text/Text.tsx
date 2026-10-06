@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ElementType } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, font, text } from "../../tokens.stylex"
+import { color, font, text, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -23,7 +23,8 @@ const styles = stylex.create({
 		fontWeight: 600,
 		lineHeight: text.leadingTight,
 	},
-	body: { fontSize: text.base },
+	// 內文 15px、行高 1.6 (docs/plans/02-tactile.md)
+	body: { fontSize: type.t3, lineHeight: type.body },
 	caption: { fontSize: text.sm, color: color.textMuted },
 	mono: { fontFamily: font.mono, fontSize: text.sm },
 })
