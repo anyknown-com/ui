@@ -183,7 +183,14 @@ export type GroupItemProps = {
  * One line of a `Group` with room under it: a `GroupRow`, and the `Expand` that row unfolds.
  * The item owns the open state; a row with `expands` toggles it and the `Expand` follows it.
  */
-export function GroupItem({ children, go = false, open, defaultOpen = false, onOpenChange, sx }: GroupItemProps) {
+export function GroupItem({
+	children,
+	go = false,
+	open,
+	defaultOpen = false,
+	onOpenChange,
+	sx,
+}: GroupItemProps) {
 	const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange)
 	const panelId = useId()
 	const disclosure = useMemo(() => ({ open: isOpen, setOpen, panelId }), [isOpen, setOpen, panelId])

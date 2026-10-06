@@ -108,10 +108,7 @@ describe("Segmented", () => {
 	test("arrow keys skip a disabled option", async () => {
 		const user = userEvent.setup()
 		render(
-			<Segmented
-				options={[LANGUAGES[0], { ...LANGUAGES[1], disabled: true }, LANGUAGES[2]]}
-				label="語言"
-			/>,
+			<Segmented options={[LANGUAGES[0], { ...LANGUAGES[1], disabled: true }, LANGUAGES[2]]} label="語言" />,
 		)
 		expect(screen.getByRole("radio", { name: "繁體中文" })).toBeDisabled()
 		await user.tab()

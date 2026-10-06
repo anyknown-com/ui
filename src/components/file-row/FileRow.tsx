@@ -386,7 +386,10 @@ export type FileListProps = {
 
 /** A multi-select grid of `FileRow`s on one rest card, with an optional live selection count. */
 export function FileList({ label, selectedCount, labels, selectedLabel, children }: FileListProps) {
-	const t = useStrings(strings, { ...labels, ...(selectedLabel !== undefined && { selected: selectedLabel }) })
+	const t = useStrings(strings, {
+		...labels,
+		...(selectedLabel !== undefined && { selected: selectedLabel }),
+	})
 	return (
 		<>
 			<div role="grid" aria-label={label} aria-multiselectable="true" {...stylex.props(styles.list)}>
