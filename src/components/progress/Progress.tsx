@@ -5,6 +5,9 @@ import { styled } from "../../lib/styled"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Forced colors drop backgrounds: the track keeps a border, the fill and arcs paint system
+// colours (Highlight for the reading, GrayText for an SVG track) and opt out of re-colouring.
+const FORCED = "@media (forced-colors: active)"
 
 const spinnerStrings = defineStrings({
 	"zh-TW": { loading: "載入中" },
@@ -61,6 +64,9 @@ const styles = stylex.create({
 		boxSizing: "border-box",
 		borderRadius: corner.pill,
 		backgroundColor: color.accentSubtle,
+		borderStyle: { default: null, [FORCED]: "solid" },
+		borderWidth: { default: null, [FORCED]: 1 },
+		borderColor: { default: null, [FORCED]: "CanvasText" },
 		overflow: "hidden",
 	},
 	fill: {
@@ -69,7 +75,8 @@ const styles = stylex.create({
 		bottom: 0,
 		insetInlineStart: 0,
 		borderRadius: corner.pill,
-		backgroundColor: color.signal,
+		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
+		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		transitionProperty: "width",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionTimingFunction: "linear",
@@ -94,10 +101,15 @@ const styles = stylex.create({
 		fontVariantNumeric: "tabular-nums",
 	},
 	ringWrap: { position: "relative", display: "inline-grid", placeItems: "center" },
-	ringTrack: { fill: "none", stroke: color.border },
+	ringTrack: {
+		fill: "none",
+		stroke: { default: color.border, [FORCED]: "GrayText" },
+		forcedColorAdjust: { default: null, [FORCED]: "none" },
+	},
 	ringArc: {
 		fill: "none",
-		stroke: color.accent,
+		stroke: { default: color.accent, [FORCED]: "Highlight" },
+		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		strokeLinecap: "round",
 		transform: "rotate(-90deg)",
 		transformBox: "fill-box",
