@@ -30,11 +30,15 @@ const styles = stylex.create({
 })
 
 export type TextProps = ComponentProps<"p"> & {
+	/** The element to render, such as `"h1"` or `"span"`. @default "p" */
 	as?: ElementType
+	/** The type style: `display` and `title` for headings, `body` for reading text, `caption` for muted small print, `mono` for code-like text. @default "body" */
 	variant?: "display" | "title" | "body" | "caption" | "mono"
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 
+/** Text in one of the library's type styles, rendered as any element. */
 export function Text({ as: Tag = "p", variant = "body", sx, ...props }: TextProps) {
 	return <Tag {...props} {...styled(props, styles.base, styles[variant], sx)} />
 }

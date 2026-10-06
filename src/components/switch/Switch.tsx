@@ -91,12 +91,17 @@ const styles = stylex.create({
 })
 
 export type SwitchProps = Omit<ComponentProps<"input">, "type" | "role" | "children"> & {
+	/** The switch's visible name, shown before it and used as its accessible name. */
 	label?: ReactNode
+	/** A muted line under the label, linked to the switch with `aria-describedby`. */
 	description?: ReactNode
+	/** The new on/off state on every toggle, next to the native `onChange`. */
 	onCheckedChange?: (checked: boolean) => void
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 
+/** An on/off toggle for a setting that takes effect at once. Use `checked` / `defaultChecked` as usual. */
 export function Switch({
 	label,
 	description,

@@ -192,6 +192,7 @@ const strings = defineStrings({
 /** FileRow's and FileList's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
 export type FileRowLabels = StringsOf<typeof strings>
 
+/** The file or folder a `FileRow` shows. */
 export type FileItem = {
 	/** A folder gets the folder glyph and no size. */
 	kind: "file" | "folder"
@@ -205,6 +206,7 @@ export type FileItem = {
 	mime?: string
 }
 
+/** An icon button at the end of a `FileRow`. */
 export type FileRowAction = {
 	/** The glyph on the button. */
 	icon: ReactNode

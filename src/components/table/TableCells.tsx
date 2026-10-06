@@ -96,12 +96,19 @@ const styles = stylex.create({
 	},
 })
 
-type Sx = { sx?: stylex.StyleXStyles }
+type Sx = {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
 export type TableCellProps = {
+	/** The cell's content. */
 	children?: ReactNode
+	/** Mono and truncated, with the full text on hover when it is a string: for ids and keys. */
 	mono?: boolean
+	/** A number: mono, on one line, aligned to the end of the column (to the start on a phone). */
 	num?: boolean
+	/** Small, muted and mono, for a secondary reading such as a time. */
 	faint?: boolean
 	/** Where the cell lands once the row wraps on a phone. */
 	order?: number
@@ -109,6 +116,7 @@ export type TableCellProps = {
 	prefixed?: boolean
 	/** On a phone the cell goes to the end of its line. */
 	pushed?: boolean
+	/** On a phone the cell takes the room left on its line. */
 	grow?: boolean
 	/** Not drawn on a phone. */
 	hidden?: boolean
@@ -117,6 +125,7 @@ export type TableCellProps = {
 /** @deprecated Use `TableCellProps`. */
 export type CellProps = TableCellProps
 
+/** One cell of a `Tr`, with options for mono ids, numbers, and where it lands when the row wraps on a phone. */
 export function TableCell({
 	children,
 	mono,
@@ -154,9 +163,13 @@ export function TableCell({
 export const Cell = TableCell
 
 export type StatusCellProps = {
+	/** The state, usually a mono code; leave it empty when all is fine. */
 	children?: ReactNode
+	/** Draws the state in the warning colour with a dot before it. @default false */
 	warn?: boolean
+	/** Where the cell lands once the row wraps on a phone. */
 	order?: number
+	/** On a phone the cell goes to the end of its line. */
 	pushed?: boolean
 } & Sx
 
@@ -178,7 +191,10 @@ export function StatusCell({ children, warn = false, order, pushed, sx }: Status
 	)
 }
 
-export type BreakProps = { order?: number }
+export type BreakProps = {
+	/** Where the break lands among the cells once the row wraps on a phone. */
+	order?: number
+}
 
 /** The line break a phone row wraps at; nothing on a desk. */
 export function Break({ order }: BreakProps) {
@@ -224,10 +240,15 @@ export function Toggle({ open, onOpenChange, onPress, label, controls, order, sx
 }
 
 export type SubjectProps = {
+	/** The identifier, in mono; truncates. */
 	children: ReactNode
+	/** Called when pressed, to filter by this identifier. */
 	onPress: () => void
+	/** The full text shown on hover; defaults to `children` when it is a string. */
 	title?: string
+	/** Where the cell lands once the row wraps on a phone. */
 	order?: number
+	/** On a phone the cell takes the room left on its line. */
 	grow?: boolean
 } & Sx
 

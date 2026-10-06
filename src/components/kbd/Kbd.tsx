@@ -3,6 +3,7 @@ import { type ComponentProps, Fragment, type ReactNode, createContext, useContex
 import { styled } from "../../lib/styled"
 import { color, corner, font, space, type } from "../../tokens.stylex"
 
+/** Set to `"inverted"` to draw the `Kbd`s inside on a dark or coloured surface, such as a tooltip. */
 export const KbdToneContext = createContext<"default" | "inverted">("default")
 
 const styles = stylex.create({
@@ -38,16 +39,20 @@ const styles = stylex.create({
 
 export type KbdProps = ComponentProps<"kbd">
 
+/** One keyboard key, drawn as a small keycap. Native `<kbd>` props pass through. */
 export function Kbd(props: KbdProps) {
 	const tone = useContext(KbdToneContext)
 	return <kbd {...props} {...styled(props, styles.key, tone === "inverted" && styles.inverted)} />
 }
 
 export type KbdGroupProps = Omit<ComponentProps<"span">, "children"> & {
+	/** The keys, in order, each drawn as a `Kbd`. */
 	keys: string[]
+	/** Put between the keys for a sequence pressed one after another ("then"); without it the keys read as a combination pressed together. */
 	separator?: ReactNode
 }
 
+/** A shortcut of several keys: a combination, or a sequence when `separator` is given. */
 export function KbdGroup({ keys, separator, ...props }: KbdGroupProps) {
 	return (
 		<span {...props} {...styled(props, separator == null ? styles.combo : styles.sequence)}>

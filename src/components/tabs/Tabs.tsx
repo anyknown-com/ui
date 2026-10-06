@@ -113,14 +113,21 @@ const styles = stylex.create({
 })
 
 export type TabsProps = {
+	/** The open tab's value, for controlled tabs. Pair it with `onValueChange`. */
 	value?: string
+	/** The tab open at first, for uncontrolled tabs. */
 	defaultValue?: string
+	/** The value of the tab the person opens. */
 	onValueChange?: (value: string) => void
+	/** `underline` marks the open tab with a sliding line; `pills` with a raised pill on a sunken track. @default "underline" */
 	variant?: "underline" | "pills"
+	/** A class name added to the root element. */
 	className?: string
+	/** A `TabsList` and its `TabsPanel`s. */
 	children: ReactNode
 }
 
+/** A set of panels where one shows at a time, switched by a row of tabs. */
 export function Tabs({ variant = "underline", children, ...props }: TabsProps) {
 	return (
 		<VariantContext value={variant}>
@@ -131,8 +138,16 @@ export function Tabs({ variant = "underline", children, ...props }: TabsProps) {
 	)
 }
 
-export type TabsListProps = { "aria-label": string; className?: string; children: ReactNode }
+export type TabsListProps = {
+	/** The tab row's accessible name: what the tabs switch between. */
+	"aria-label": string
+	/** A class name added to the list element. */
+	className?: string
+	/** The `TabsTab`s. */
+	children: ReactNode
+}
 
+/** The row of tabs inside `Tabs`; it draws the sliding indicator. */
 export function TabsList({ children, ...rest }: TabsListProps) {
 	const variant = useContext(VariantContext)
 
@@ -149,8 +164,16 @@ export function TabsList({ children, ...rest }: TabsListProps) {
 	)
 }
 
-export type TabsTabProps = { value: string; disabled?: boolean; children: ReactNode }
+export type TabsTabProps = {
+	/** The value that opens the `TabsPanel` with the same `value`. */
+	value: string
+	/** The tab cannot be opened and is drawn faded. */
+	disabled?: boolean
+	/** The tab's label. */
+	children: ReactNode
+}
 
+/** One tab in a `TabsList`. */
 export function TabsTab({ children, ...rest }: TabsTabProps) {
 	const variant = useContext(VariantContext)
 	return (
@@ -170,8 +193,16 @@ export function TabsTab({ children, ...rest }: TabsTabProps) {
 	)
 }
 
-export type TabsPanelProps = { value: string; children: ReactNode; className?: string }
+export type TabsPanelProps = {
+	/** The value of the tab that shows this panel. */
+	value: string
+	/** The panel's content. */
+	children: ReactNode
+	/** A class name added to the panel element. */
+	className?: string
+}
 
+/** The content shown while the tab with the same `value` is open. */
 export function TabsPanel({ children, ...rest }: TabsPanelProps) {
 	return (
 		<BaseTabs.Panel {...rest} {...styled(rest, styles.panel)}>

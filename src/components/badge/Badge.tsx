@@ -91,12 +91,17 @@ const DOT_TONES = {
 } as const
 
 export type BadgeProps = Omit<ComponentProps<"span">, "color"> & {
+	/** The badge's colour: `neutral` grey, `accent`, `success` green, `danger` red, `outline` bordered, `mono` grey in the mono face. @default "neutral" */
 	variant?: "neutral" | "accent" | "success" | "danger" | "outline" | "mono"
+	/** A small dot before the words, in this tone. */
 	dot?: keyof typeof DOT_TONES
+	/** A number after the words, in the mono face. */
 	count?: number
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 
+/** A small pill label for a status, category or count. Native `<span>` props pass through. */
 export function Badge({ variant = "neutral", dot, count, children, sx, ...props }: BadgeProps) {
 	return (
 		<span {...props} {...styled(props, styles.base, styles[variant], sx)}>
@@ -109,7 +114,20 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 
 /** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
 export type ChipProps = BadgeProps &
-	({ onRemove: () => void; removeLabel: string } | { onRemove?: undefined; removeLabel?: string }) & {
+	(
+		| {
+				/** Shows a × button that calls this, for removing the chip (a filter, a tag). */
+				onRemove: () => void
+				/** The × button's accessible name ("Remove filter"); required with `onRemove`. */
+				removeLabel: string
+		  }
+		| {
+				/** Shows a × button that calls this, for removing the chip (a filter, a tag). */
+				onRemove?: undefined
+				/** The × button's accessible name ("Remove filter"); required with `onRemove`. */
+				removeLabel?: string
+		  }
+	) & {
 		/** Makes the chip a real `<button>`; without it (or a pressed state) the chip is a label. */
 		onClick?: () => void
 		/** On or off, for a controlled toggle chip (`aria-pressed`). Pair it with `onPressedChange`. */

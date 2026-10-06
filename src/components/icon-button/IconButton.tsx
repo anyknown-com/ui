@@ -58,18 +58,25 @@ const styles = stylex.create({
 export type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
 	/** The only place the name is written: the tooltip and the accessible name. */
 	label: string
+	/** Which side of the button the tooltip opens on. @default "right" */
 	side?: "top" | "bottom" | "left" | "right"
 	/** `aria-current`: the page this button stands for is the one open. */
 	current?: boolean
 	/** Pressed open: the popover it owns is showing. */
 	open?: boolean
+	/** The circle's diameter: `md` 36px, `sm` 32px, `xs` 28px. @default "md" */
 	size?: "md" | "sm" | "xs"
+	/** A count in the corner; hidden when it is 0 or missing. */
 	badge?: number
+	/** The one icon the button shows. */
 	children: ReactNode
+	/** A ref to the `<button>` element. */
 	ref?: Ref<HTMLButtonElement>
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** A round button that holds one icon, named by a tooltip. Native `<button>` props pass through. */
 export function IconButton({
 	label,
 	side = "right",

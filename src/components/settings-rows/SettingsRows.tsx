@@ -47,21 +47,33 @@ const styles = stylex.create({
 	dot: { backgroundColor: color.accent, borderRadius: "50%", flex: "none", height: 6, width: 6 },
 })
 
-type Sx = { sx?: stylex.StyleXStyles }
+type Sx = {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
-export type SettingsRowsProps = { children: ReactNode } & Sx
+export type SettingsRowsProps = {
+	/** The `SettingsRow`s. */
+	children: ReactNode
+} & Sx
 
+/** A sunken panel of settings, one `SettingsRow` per line with hairlines between them. */
 export function SettingsRows({ children, sx }: SettingsRowsProps) {
 	return <div {...stylex.props(styles.rows, sx)}>{children}</div>
 }
 
 export type SettingsRowProps = {
+	/** The setting's name. */
 	label: ReactNode
+	/** One muted line of help under the name. */
 	help?: ReactNode
+	/** The control on the right, such as a `Switch` or a `SettingsValue`. */
 	children?: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** One setting: its name and help on the left, its control on the right. */
 export function SettingsRow({ label, help, children, sx }: SettingsRowProps) {
 	return (
 		<div {...stylex.props(styles.row, sx)}>
@@ -74,14 +86,20 @@ export function SettingsRow({ label, help, children, sx }: SettingsRowProps) {
 	)
 }
 
-export type HelpProps = { children: ReactNode } & Sx
+export type HelpProps = {
+	/** The muted reading. */
+	children: ReactNode
+} & Sx
 
 /** `.help` inline: a muted reading on a row's label line. */
 export function Help({ children, sx }: HelpProps) {
 	return <span {...stylex.props(styles.help, sx)}>{children}</span>
 }
 
-export type SettingsValueProps = { children: ReactNode } & Sx
+export type SettingsValueProps = {
+	/** The value as text. */
+	children: ReactNode
+} & Sx
 
 /** `.val`: a mono reading, like `•••• 9b7c`. */
 export function SettingsValue({ children, sx }: SettingsValueProps) {
@@ -93,6 +111,7 @@ export const Value = SettingsValue
 
 export type DotProps = Sx
 
+/** A 6px accent dot that marks a row's label, hidden from screen readers. */
 export function Dot({ sx }: DotProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.dot, sx)} />
 }

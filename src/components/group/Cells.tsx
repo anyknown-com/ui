@@ -130,6 +130,7 @@ const styles = stylex.create({
 export type GroupCellProps = {
 	/** An `IconTile`, a `LetterTile` or an `ActionIcon`. */
 	icon?: ReactNode
+	/** The cell's name. */
 	label: ReactNode
 	/** A muted second line under the label. */
 	detail?: ReactNode
@@ -147,9 +148,11 @@ export type GroupCellProps = {
 	mono?: boolean
 	/** The whole line is a button; unless it has a tone or is a choice, a chevron says it opens. */
 	onPress?: () => void
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** One line of a `Group`: a setting, a choice or an action, with an icon, a label and a value or control on the right. */
 export function GroupCell({
 	icon,
 	label,
@@ -193,6 +196,7 @@ export function GroupCell({
 export type InputCellProps = Omit<InputProps, "sx" | "size" | "aria-label"> & {
 	/** Written on the left and read as the field's name. */
 	label: string
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -206,7 +210,10 @@ export function InputCell({ label, sx, ...props }: InputCellProps) {
 	)
 }
 
-export type TextCellProps = Omit<TextareaProps, "sx"> & { sx?: stylex.StyleXStyles }
+export type TextCellProps = Omit<TextareaProps, "sx"> & {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
 /** A borderless text area that grows with what is written in it. */
 export function TextCell({ sx, ...props }: TextCellProps) {
@@ -238,6 +245,7 @@ export type SliderCellProps = {
 	onChange?: (value: number) => void
 	/** Once per gesture: save here. See `Slider`. */
 	onValueCommit?: (value: number) => void
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 

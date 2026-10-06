@@ -121,17 +121,23 @@ const styles = stylex.create({
 	faint: { color: color.textMuted },
 })
 
-type Sx = { sx?: stylex.StyleXStyles }
+type Sx = {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
 export type PageHeadProps = {
+	/** The page's name, rendered as its `<h1>`. */
 	title: ReactNode
 	/** The summary beside the title, before the spacer: `已連接 3 · 工具 49`. */
 	lead?: ReactNode
 	/** The summary on the right, after the spacer: `已設定 3 / 8`, a stat line. */
 	summary?: ReactNode
+	/** Buttons at the end of the line. */
 	actions?: ReactNode
 } & Sx
 
+/** The page's one heading line: the title, a summary beside it, another summary and actions on the right. */
 export function PageHead({ title, lead, summary, actions, sx }: PageHeadProps) {
 	return (
 		<div {...stylex.props(styles.head, sx)}>
@@ -144,7 +150,10 @@ export function PageHead({ title, lead, summary, actions, sx }: PageHeadProps) {
 	)
 }
 
-export type PageNumberProps = { children: ReactNode }
+export type PageNumberProps = {
+	/** The number. */
+	children: ReactNode
+}
 
 /** A number inside a summary or a stat line: mono, in the text colour. */
 export function PageNumber({ children }: PageNumberProps) {
@@ -154,8 +163,16 @@ export function PageNumber({ children }: PageNumberProps) {
 /** @deprecated Use `PageNumber`; the generic name will be removed in a future major. */
 export const B = PageNumber
 
-export type SectionLabelProps = { children: ReactNode; end?: ReactNode; first?: boolean } & Sx
+export type SectionLabelProps = {
+	/** The section's name. */
+	children: ReactNode
+	/** Something pushed to the end of the line, such as a count. */
+	end?: ReactNode
+	/** Less space above, for the first section on the page. @default false */
+	first?: boolean
+} & Sx
 
+/** The small mono label above a section of the page. */
 export function SectionLabel({ children, end, first = false, sx }: SectionLabelProps) {
 	return (
 		<div {...stylex.props(styles.slab, first && styles.slabFirst, sx)}>
@@ -165,8 +182,12 @@ export function SectionLabel({ children, end, first = false, sx }: SectionLabelP
 	)
 }
 
-export type PageSubProps = { children: ReactNode } & Sx
+export type PageSubProps = {
+	/** The sentence. */
+	children: ReactNode
+} & Sx
 
+/** A muted sentence under a group or section, with space above it. */
 export function PageSub({ children, sx }: PageSubProps) {
 	return <p {...stylex.props(styles.sub, sx)}>{children}</p>
 }
@@ -174,39 +195,68 @@ export function PageSub({ children, sx }: PageSubProps) {
 /** @deprecated Use `PageSub`; the generic name will be removed in a future major. */
 export const Sub = PageSub
 
-export type FootNoteProps = { children: ReactNode } & Sx
+export type FootNoteProps = {
+	/** The note. */
+	children: ReactNode
+} & Sx
 
+/** A muted note at the foot of a section, close under what it is about. */
 export function FootNote({ children, sx }: FootNoteProps) {
 	return <p {...stylex.props(styles.foot, sx)}>{children}</p>
 }
 
-export type HintProps = { children: ReactNode } & Sx
+export type HintProps = {
+	/** The hint. */
+	children: ReactNode
+} & Sx
 
+/** A muted sentence above what it explains. */
 export function Hint({ children, sx }: HintProps) {
 	return <p {...stylex.props(styles.hint, sx)}>{children}</p>
 }
 
-export type SnippetProps = { children: ReactNode } & Sx
+export type SnippetProps = {
+	/** The code or config text, shown as written. */
+	children: ReactNode
+} & Sx
 
+/** A small block of mono text, such as a command or config, that wraps instead of scrolling. */
 export function Snippet({ children, sx }: SnippetProps) {
 	return <pre {...stylex.props(styles.code, sx)}>{children}</pre>
 }
 
-export type PanelProps = { children: ReactNode; padded?: boolean } & Sx
+export type PanelProps = {
+	/** The rows or prose on the panel. */
+	children: ReactNode
+	/** Adds padding and a gap between children, for prose. @default false */
+	padded?: boolean
+} & Sx
 
 /** `.dpanel`: the sunken surface a section's rows sit on, no ring; `padded` when it holds prose. */
 export function Panel({ children, padded = false, sx }: PanelProps) {
 	return <div {...stylex.props(styles.panel, padded && styles.padded, sx)}>{children}</div>
 }
 
-export type StatLineProps = { children: ReactNode } & Sx
+export type StatLineProps = {
+	/** The readings, side by side; use `PageNumber` for the numbers. */
+	children: ReactNode
+} & Sx
 
+/** A muted line of readings that wraps, such as counts and a `StatBar`. */
 export function StatLine({ children, sx }: StatLineProps) {
 	return <span {...stylex.props(styles.stat, sx)}>{children}</span>
 }
 
-export type StatBarProps = { percent: number; label?: string; text?: string }
+export type StatBarProps = {
+	/** How full the bar is, from 0 to 100; values outside are clamped. */
+	percent: number
+	/** The bar's accessible name. */
+	label?: string
+	/** What a screen reader says for the value, in place of the percentage. */
+	text?: string
+}
 
+/** A thin 8rem bar that shows a percentage, read out as a progress bar. */
 export function StatBar({ percent, label, text }: StatBarProps) {
 	const value = Math.max(0, Math.min(100, percent))
 
@@ -245,6 +295,7 @@ export type BarsProps = {
 	to: string
 	/** Override built-in words for this chart; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<PageLabels>
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -273,8 +324,12 @@ export function Bars({ values, tip, from, to, labels, sx }: BarsProps) {
 	)
 }
 
-export type FaintProps = { children: ReactNode } & Sx
+export type FaintProps = {
+	/** The words to mute. */
+	children: ReactNode
+} & Sx
 
+/** Inline text in the muted colour. */
 export function Faint({ children, sx }: FaintProps) {
 	return <span {...stylex.props(styles.faint, sx)}>{children}</span>
 }

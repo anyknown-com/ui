@@ -64,11 +64,18 @@ const styles = stylex.create({
 })
 
 export type StatusChipProps = {
+	/**
+	 * `r` read-only, `w` writes, `d` destructive, `n` unmarked, `a` active (with a spinner), `f` failed
+	 * (with a red dot), `plain` a neutral chip.
+	 */
 	variant: "r" | "w" | "d" | "n" | "a" | "f" | "plain"
+	/** The chip's word. */
 	children: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** A short mono word in a small pill that marks what a tool call does or how it went. */
 export function StatusChip({ variant, children, sx }: StatusChipProps) {
 	return (
 		<span {...stylex.props(styles.root, styles[variant], sx)}>
@@ -84,7 +91,9 @@ export type PillProps = {
 	status?: "live" | "paused" | "done"
 	/** The sub thread's name: body face, text colour, truncates. */
 	title?: boolean
+	/** The pill's words. */
 	children: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 

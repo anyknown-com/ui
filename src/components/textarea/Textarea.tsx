@@ -32,6 +32,7 @@ export type TextareaProps = ComponentProps<"textarea"> & {
 	invalid?: boolean
 	/** The new text on every edit, next to the native `onChange`. Use `value` / `defaultValue` as usual. */
 	onValueChange?: (value: string) => void
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

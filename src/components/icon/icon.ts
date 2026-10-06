@@ -10,4 +10,5 @@ export const icon = stylex.create({
 	lg: { flexShrink: 0, height: iconSize.lg, pointerEvents: "none", width: iconSize.lg },
 })
 
+/** The stroke width every icon in the package is drawn with. */
 export const ICON_STROKE = 2

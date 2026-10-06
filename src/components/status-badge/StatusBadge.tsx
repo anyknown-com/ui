@@ -27,12 +27,15 @@ const styles = stylex.create({
 })
 
 export type StatusBadgeProps = {
+	/** `live` it is running (a breathing dot), `warn` it needs you, `plain` it is over. */
 	tone: "live" | "warn" | "plain"
 	/** The state in words; a live badge also says it to a screen reader as it changes. */
 	children: string
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** A state in a pill, for the head of something that runs on its own, such as a screen the AI drives. */
 export function StatusBadge({ tone, children, sx }: StatusBadgeProps) {
 	return (
 		<span {...stylex.props(styles.badge, styles[tone], sx)}>

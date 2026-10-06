@@ -92,6 +92,7 @@ export type SegmentedProps<T extends string> = {
 	label: string
 	/** No option can be chosen; the whole group is skipped by Tab. */
 	disabled?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 

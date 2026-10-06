@@ -141,17 +141,23 @@ const styles = stylex.create({
 	},
 })
 
-type Sx = { sx?: stylex.StyleXStyles }
+type Sx = {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
 export type GroupProps = {
 	/** A muted line above the card that names what the group is about. */
 	header?: ReactNode
 	/** A muted sentence under the card that says what the settings in it do. */
 	footer?: ReactNode
+	/** The lines of the group: `GroupItem`s or cells. */
 	children: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** A grouped list: an optional header, the lines on one sunken card with hairlines between them, an optional footer. */
 export function Group({ header, footer, children, sx }: GroupProps) {
 	return (
 		<div {...stylex.props(styles.group, sx)}>
@@ -204,7 +210,14 @@ export function GroupItem({
 /** @deprecated Use `GroupItem`; the generic name will be removed in a future major. */
 export const Item = GroupItem
 
-export type MarkProps = { letter: string; tint: string; sx?: stylex.StyleXStyles }
+export type MarkProps = {
+	/** The letter in the square, usually the first of the thing's name. */
+	letter: string
+	/** The square's colour as `<colour> <percent>%`, mixed into the surface. */
+	tint: string
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
 /** The 22px square with the first letter; `tint` is `<colour> <percent>%` for the mix. */
 export function Mark({ letter, tint, sx }: MarkProps) {
@@ -215,6 +228,7 @@ export function Mark({ letter, tint, sx }: MarkProps) {
 	)
 }
 
+/** The colour of a `Status`: `muted`, `success`, `warning` or `danger`. */
 export type StatusTone = "muted" | "success" | "warning" | "danger"
 
 const DOT_TONE = {
@@ -225,6 +239,7 @@ const DOT_TONE = {
 } as const
 
 export type StatusProps = {
+	/** The state in words; truncates, with the full text on hover when it is a string. */
 	children: ReactNode
 	/** `filled` settled, `hollow` waiting on someone, `dashed` gone stale. No dot without it. */
 	dot?: "filled" | "hollow" | "dashed"
@@ -235,6 +250,7 @@ export type StatusProps = {
 	tone?: StatusTone
 	/** Shorthand for `tone="warning"` with a filled dot. */
 	warn?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -265,6 +281,7 @@ export function Status(props: StatusProps) {
 	)
 }
 
+/** The faint `·` between a row's name and its state, hidden from screen readers. */
 export function Sep() {
 	return (
 		<span {...stylex.props(styles.sep)} aria-hidden="true">
@@ -291,6 +308,7 @@ export type GroupRowProps = {
 	expands?: boolean
 	/** A right-pointing chevron at the end: the row leads somewhere. */
 	chevron?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -362,6 +380,7 @@ export type ExpandProps = {
 	plain?: boolean
 	/** What unfolds; not rendered while shut. */
 	children: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -383,9 +402,13 @@ export function Expand({ open: ownOpen, plain = false, children, sx }: ExpandPro
 }
 
 export type NoteProps = {
+	/** The sentence. */
 	children: ReactNode
+	/** Draws the sentence in the muted colour, for a side remark. @default false */
 	faint?: boolean
+	/** Draws the sentence in red and announces it, for what went wrong. @default false */
 	err?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
@@ -401,21 +424,32 @@ export function Note({ children, faint = false, err = false, sx }: NoteProps) {
 	)
 }
 
-export type ActsProps = { children: ReactNode } & Sx
+export type ActsProps = {
+	/** The buttons, side by side. */
+	children: ReactNode
+} & Sx
 
+/** A row of actions inside an `Expand`, such as Save and Cancel. */
 export function Acts({ children, sx }: ActsProps) {
 	return <div {...stylex.props(styles.acts, sx)}>{children}</div>
 }
 
-export type EmptyProps = { children: ReactNode } & Sx
+export type EmptyProps = {
+	/** The one line that says there is nothing here yet. */
+	children: ReactNode
+} & Sx
 
 /** `.empty`: nothing here yet, said inside the group in one muted line. */
 export function Empty({ children, sx }: EmptyProps) {
 	return <p {...stylex.props(styles.empty, sx)}>{children}</p>
 }
 
-export type TagProps = { children: ReactNode } & Sx
+export type TagProps = {
+	/** The tag's word. */
+	children: ReactNode
+} & Sx
 
+/** A muted mono word after a row's name, such as a version or a kind. */
 export function Tag({ children, sx }: TagProps) {
 	return <span {...stylex.props(styles.tag, sx)}>{children}</span>
 }

@@ -120,6 +120,7 @@ export type ButtonProps = ComponentProps<"button"> & {
 	 * so it keeps focus and stays in the tab order.
 	 */
 	loading?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

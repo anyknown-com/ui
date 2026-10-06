@@ -205,8 +205,14 @@ const strings = defineStrings({
 export type DataTableLabels = StringsOf<typeof strings>
 
 /** The column a table is ordered by and which way, or `null` for the rows' own order. */
-export type SortState = { col: string; dir: "asc" | "desc" } | null
+export type SortState = {
+	/** The `id` of the column the rows are ordered by. */
+	col: string
+	/** `asc` smallest first, `desc` largest first. */
+	dir: "asc" | "desc"
+} | null
 
+/** One column of a `DataTable`: its header, how its cells read and draw, and whether it sorts or edits. */
 export type DataTableColumn<Row> = {
 	/** Unique among the columns; what `SortState.col` names. */
 	id: string
@@ -277,6 +283,7 @@ export type DataTableProps<Row> = {
 	maxHeight?: string | number
 	/** An end that scrolls with the rows: "load more" belongs inside the list, not under it. */
 	footer?: ReactNode
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

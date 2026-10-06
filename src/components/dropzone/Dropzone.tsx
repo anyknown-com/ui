@@ -213,7 +213,12 @@ const strings = defineStrings({
 export type DropzoneLabels = StringsOf<typeof strings>
 
 /** A file turned away, and why: over `maxSize`, outside `accept`, or a second file when `multiple` is off. */
-export type Rejection = { file: File; reason: "size" | "type" | "count" }
+export type Rejection = {
+	/** The file that was turned away. */
+	file: File
+	/** `size` over `maxSize`, `type` outside `accept`, `count` one file too many. */
+	reason: "size" | "type" | "count"
+}
 
 export type DropzoneProps = {
 	/** The files that passed the checks, from a drop or the picker. */
@@ -362,6 +367,7 @@ export function Dropzone({
 	)
 }
 
+/** One file's upload, as an `UploadList` line shows it. */
 export type UploadJob = {
 	/** Unique among the jobs; what `onCancel` gets. */
 	id: string

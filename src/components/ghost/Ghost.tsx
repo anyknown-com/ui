@@ -38,11 +38,15 @@ const styles = stylex.create({
 })
 
 export type GhostProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
+	/** Red words and a red hover, for an action that warns. @default false */
 	danger?: boolean
+	/** A ref to the `<button>` element. */
 	ref?: Ref<HTMLButtonElement>
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
+/** A quiet button that is just a word: 28px, muted until hovered. Native `<button>` props pass through. */
 export function Ghost({ danger = false, sx, ...props }: GhostProps) {
 	return (
 		<button
@@ -54,9 +58,13 @@ export function Ghost({ danger = false, sx, ...props }: GhostProps) {
 }
 
 export type GhostLinkProps = {
+	/** Where the link goes. */
 	href: string
+	/** The link's words. */
 	children: React.ReactNode
+	/** Opens the link in a new tab. @default false */
 	external?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 

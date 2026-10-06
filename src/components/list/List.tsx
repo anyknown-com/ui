@@ -64,9 +64,11 @@ const styles = stylex.create({
 export type ListHeadProps = Omit<HTMLAttributes<HTMLDivElement>, "className" | "style"> & {
 	/** Column names as plain spans, and a `ListSort` for each column the list can be ordered by. */
 	children: ReactNode
+	/** StyleX styles merged after the component's own; put the list's column grid here. */
 	sx?: stylex.StyleXStyles
 }
 
+/** The faint head row over a list's columns. */
 export function ListHead({ children, sx, ...props }: ListHeadProps) {
 	return (
 		<div {...props} {...stylex.props(styles.head, sx)}>
@@ -121,6 +123,7 @@ export type WeightDotProps = {
 	soon?: boolean
 	/** What the weight means, on hover. */
 	title?: string
+	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 

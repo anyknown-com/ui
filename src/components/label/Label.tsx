@@ -36,6 +36,7 @@ export type LabelProps = ComponentProps<"label"> & {
 	optionalLabel?: string
 	/** Override built-in words for this label; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<LabelLabels>
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

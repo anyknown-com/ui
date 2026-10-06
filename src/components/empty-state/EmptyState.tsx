@@ -30,13 +30,19 @@ const styles = stylex.create({
 })
 
 export type EmptyStateProps = {
+	/** A line icon above the title; decorative, hidden from screen readers. */
 	icon?: ReactNode
+	/** What is missing, said as a short heading. */
 	title: ReactNode
+	/** A muted sentence under the title: why it is empty or what to do. */
 	description?: ReactNode
+	/** A button or link under the text that fills the empty place. */
 	action?: ReactNode
+	/** The heading level the title renders as, to fit the page's outline. @default 3 */
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
 }
 
+/** A centred placeholder for a place with nothing in it yet: an icon, a title, a sentence and an action. */
 export function EmptyState({ icon, title, description, action, headingLevel = 3 }: EmptyStateProps) {
 	const Heading = `h${headingLevel}` as ElementType
 	return (

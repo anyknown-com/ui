@@ -12,8 +12,10 @@ type RadioGroupContextValue = {
 	select: (value: string) => void
 }
 
+/** Carries a `RadioGroup`'s name, value and state to the `Radio`s inside it. */
 export const RadioGroupContext = createContext<RadioGroupContextValue | null>(null)
 
+/** Reads the enclosing `RadioGroup`; throws when there is none. */
 export function useRadioGroup() {
 	const group = useContext(RadioGroupContext)
 	if (!group) throw new Error("Radio must be rendered inside a RadioGroup")
@@ -36,15 +38,23 @@ const styles = stylex.create({
 })
 
 export type RadioGroupProps = Omit<ComponentProps<"fieldset">, "onChange" | "defaultValue"> & {
+	/** The group's visible name, rendered as the fieldset's `<legend>`. */
 	legend?: ReactNode
+	/** The `name` every radio in the group shares; a unique one is made when omitted. */
 	name?: string
+	/** The picked option's value, for a controlled group. */
 	value?: string
+	/** The option picked at first, for an uncontrolled group. @default "" */
 	defaultValue?: string
+	/** `plain` lists bare options; `card` puts each option in a bordered card that highlights when picked. @default "plain" */
 	variant?: "plain" | "card"
+	/** The newly picked option's value. */
 	onValueChange?: (value: string) => void
+	/** The `Radio` options. */
 	children: ReactNode
 }
 
+/** A fieldset of `Radio` options where exactly one can be picked. */
 export function RadioGroup({
 	legend,
 	name,

@@ -7,6 +7,7 @@ import { useFieldControl } from "../label/fieldContext"
 // 輸入框是紙上凹下去的一格:surface 底 + 1px border(邊界要 3:1 才看得到,只靠底色不夠)。
 // focus 時框換 focusRing(= signal),外面再貼一圈 2px 實心的 focusRing:淡環對底色不到 3:1,
 // 看不出焦點在哪。invalid 的框留 danger,焦點環照樣是 focusRing。
+/** The shared text-control styles (`base`, `invalid`, `md`, `sm`) that `Input` and `Textarea` are built from. */
 export const controlStyles = stylex.create({
 	base: {
 		width: "100%",
@@ -78,6 +79,7 @@ export type InputProps = Omit<ComponentProps<"input">, "size"> & {
 	leadingIcon?: ReactNode
 	/** The new text on every edit, next to the native `onChange`. Use `value` / `defaultValue` as usual. */
 	onValueChange?: (value: string) => void
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

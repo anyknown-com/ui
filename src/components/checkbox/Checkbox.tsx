@@ -87,13 +87,19 @@ const styles = stylex.create({
 })
 
 export type CheckboxProps = Omit<ComponentProps<"input">, "type" | "children"> & {
+	/** Shows a dash instead of a tick, for a "some but not all" parent box. @default false */
 	indeterminate?: boolean
+	/** The box's visible name, shown beside it and used as its accessible name. */
 	label?: ReactNode
+	/** A muted line under the label, linked to the box with `aria-describedby`. */
 	description?: ReactNode
+	/** The new checked state on every toggle, next to the native `onChange`. */
 	onCheckedChange?: (checked: boolean) => void
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 
+/** A checkbox with an optional label and description. Use `checked` / `defaultChecked` as usual; inside a `Field` it is wired to the help and error. */
 export function Checkbox({
 	indeterminate = false,
 	label,

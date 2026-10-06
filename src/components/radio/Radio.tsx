@@ -93,11 +93,15 @@ const styles = stylex.create({
 })
 
 export type RadioProps = Omit<ComponentProps<"input">, "type" | "value" | "children"> & {
+	/** The value the group takes when this option is picked. */
 	value: string
+	/** The option's visible name, shown beside it and used as its accessible name. */
 	label?: ReactNode
+	/** A muted line under the label, linked to the option with `aria-describedby`. */
 	description?: ReactNode
 }
 
+/** One option in a `RadioGroup`; it must be rendered inside one. */
 export function Radio({ value, label, description, onChange, disabled, ...props }: RadioProps) {
 	const group = useRadioGroup()
 	const base = useId()

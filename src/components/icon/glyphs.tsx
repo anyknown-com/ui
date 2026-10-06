@@ -26,6 +26,7 @@ export function Glyph({ children, ...props }: GlyphProps & { children: ReactNode
 	)
 }
 
+/** A check mark. */
 export function CheckGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -34,6 +35,7 @@ export function CheckGlyph(props: GlyphProps) {
 	)
 }
 
+/** A sheet of paper with lines of text. */
 export function FileGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -46,6 +48,7 @@ export function FileGlyph(props: GlyphProps) {
 	)
 }
 
+/** Two overlapping squares, for copy. */
 export function CopyGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -55,6 +58,7 @@ export function CopyGlyph(props: GlyphProps) {
 	)
 }
 
+/** A plus sign. */
 export function PlusGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -64,6 +68,7 @@ export function PlusGlyph(props: GlyphProps) {
 	)
 }
 
+/** An X, for close or remove. */
 export function XGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -73,6 +78,7 @@ export function XGlyph(props: GlyphProps) {
 	)
 }
 
+/** A microphone. */
 export function MicGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -83,6 +89,7 @@ export function MicGlyph(props: GlyphProps) {
 	)
 }
 
+/** A struck-through microphone, for muted. */
 export function MicOffGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>
@@ -96,6 +103,7 @@ export function MicOffGlyph(props: GlyphProps) {
 	)
 }
 
+/** A struck-through phone handset, for hanging up. */
 export function PhoneOffGlyph(props: GlyphProps) {
 	return (
 		<Glyph {...props}>

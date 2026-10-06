@@ -86,15 +86,29 @@ const styles = stylex.create({
 	},
 })
 
-type Sx = { sx?: stylex.StyleXStyles }
+type Sx = {
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
-export type TableProps = { children: ReactNode } & Sx
+export type TableProps = {
+	/** A `TableHead` and the `Tr` rows under it. */
+	children: ReactNode
+} & Sx
 
+/** A full-width ledger of rows: a mono head, 34px rows with hairlines, numbers on the right. */
 export function Table({ children, sx }: TableProps) {
 	return <div {...stylex.props(styles.table, sx)}>{children}</div>
 }
 
-export type TableHeadProps = { columns: string; children: ReactNode; sticky?: boolean } & Sx
+export type TableHeadProps = {
+	/** The CSS grid template every row shares, such as `"1fr 6rem 4rem"`. */
+	columns: string
+	/** The column names, one element per column. */
+	children: ReactNode
+	/** Keeps the head at the top while the rows scroll under it. @default false */
+	sticky?: boolean
+} & Sx
 
 /** @deprecated Use `TableHeadProps`. */
 export type HeadProps = TableHeadProps
@@ -109,14 +123,28 @@ export function TableHead({ columns, children, sticky = false, sx }: TableHeadPr
 /** @deprecated Use `TableHead`; the generic name will be removed in a future major. */
 export const Head = TableHead
 
-export type TrProps = { columns: string; children: ReactNode; hover?: boolean } & Sx
+export type TrProps = {
+	/** The same CSS grid template as the `TableHead`. */
+	columns: string
+	/** The row's cells, one per column. */
+	children: ReactNode
+	/** Washes the row under the pointer. @default false */
+	hover?: boolean
+} & Sx
 
+/** One row of a `Table`; on a phone it wraps to two lines. */
 export function Tr({ columns, children, hover = false, sx }: TrProps) {
 	return <div {...stylex.props(styles.row, styles.cols(columns), hover && styles.hover, sx)}>{children}</div>
 }
 
-export type DetailProps = { id?: string; children: ReactNode } & Sx
+export type DetailProps = {
+	/** The element's id, for the `aria-controls` of the toggle that opens it. */
+	id?: string
+	/** What the row opens to show. */
+	children: ReactNode
+} & Sx
 
+/** The opened detail under a `Tr`, with a hairline under it. */
 export function Detail({ id, children, sx }: DetailProps) {
 	return (
 		<div {...(id ? { id } : {})} {...stylex.props(styles.detail, sx)}>
@@ -125,7 +153,12 @@ export function Detail({ id, children, sx }: DetailProps) {
 	)
 }
 
-export type MoreRowProps = { children: ReactNode; onPress: () => void } & Sx
+export type MoreRowProps = {
+	/** The button's words, such as "Show 20 more". */
+	children: ReactNode
+	/** Called when the row is pressed, to load or show more rows. */
+	onPress: () => void
+} & Sx
 
 /** `.moreRow`: the last line of a ledger that has more, 40px, centred. */
 export function MoreRow({ children, onPress, sx }: MoreRowProps) {
@@ -150,7 +183,10 @@ function fit(node: HTMLDivElement | null) {
 	return () => window.removeEventListener("resize", measure)
 }
 
-export type ListScrollProps = { children: ReactNode } & Sx
+export type ListScrollProps = {
+	/** The `Table` (with a sticky head) that scrolls. */
+	children: ReactNode
+} & Sx
 
 /**
  * `.listscroll`: a ledger that scrolls on its own to the bottom of the window, the head stuck to

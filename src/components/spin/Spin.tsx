@@ -24,8 +24,14 @@ const styles = stylex.create({
 	small: { borderWidth: 1.5, height: 9, width: 9 },
 })
 
-export type SpinProps = { small?: boolean; sx?: stylex.StyleXStyles }
+export type SpinProps = {
+	/** A 9px ring instead of 12px, for tight spots such as a chip. @default false */
+	small?: boolean
+	/** StyleX styles merged after the component's own. */
+	sx?: stylex.StyleXStyles
+}
 
+/** A small spinning ring in the current text colour, hidden from screen readers; shows that something is waiting. */
 export function Spin({ small = false, sx }: SpinProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.root, small && styles.small, sx)} />
 }

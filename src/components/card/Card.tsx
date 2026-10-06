@@ -15,8 +15,12 @@ const styles = stylex.create({
 	},
 })
 
-export type CardProps = ComponentProps<"div"> & { sx?: StyleArg }
+export type CardProps = ComponentProps<"div"> & {
+	/** StyleX styles merged after the component's own. */
+	sx?: StyleArg
+}
 
+/** A raised, padded card that sets a block of content apart from the page. Native `<div>` props pass through. */
 export function Card({ sx, ...props }: CardProps) {
 	return <div {...props} {...styled(props, styles.base, sx)} />
 }

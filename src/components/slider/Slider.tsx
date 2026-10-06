@@ -106,6 +106,7 @@ export type SliderProps = {
 	valueText?: (value: number) => string
 	/** Out of the tab order, deaf to pointer and keys, drawn faded. */
 	disabled?: boolean
+	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 

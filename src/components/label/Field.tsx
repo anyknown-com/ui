@@ -13,15 +13,23 @@ const styles = stylex.create({
 })
 
 export type FieldProps = Omit<ComponentProps<"div">, "children"> & {
+	/** The control's visible name, rendered as a `Label` tied to the control. */
 	label?: ReactNode
+	/** A muted hint under the control, linked to it with `aria-describedby`. */
 	help?: ReactNode
+	/** An error message under the control; when set, the control is marked invalid and the message is announced. */
 	error?: ReactNode
+	/** Marks the control as required and adds a red `*` to the label. @default false */
 	required?: boolean
+	/** Adds a muted "optional" after the label. */
 	optional?: boolean
+	/** Disables the control and dims the whole field. @default false */
 	disabled?: boolean
+	/** The one form control (`Input`, `Textarea`, …) the field labels and describes. */
 	children: ReactNode
 }
 
+/** Wraps one form control with its label, help text and error, and wires the ids and ARIA between them. */
 export function Field({
 	label,
 	help,
