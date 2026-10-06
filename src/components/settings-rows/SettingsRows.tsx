@@ -81,12 +81,15 @@ export function Help({ children, sx }: HelpProps) {
 	return <span {...stylex.props(styles.help, sx)}>{children}</span>
 }
 
-export type ValueProps = { children: ReactNode } & Sx
+export type SettingsValueProps = { children: ReactNode } & Sx
 
 /** `.val`: a mono reading, like `•••• 9b7c`. */
-export function Value({ children, sx }: ValueProps) {
+export function SettingsValue({ children, sx }: SettingsValueProps) {
 	return <span {...stylex.props(styles.value, sx)}>{children}</span>
 }
+
+/** @deprecated Use `SettingsValue`; the generic name will be removed in a future major. */
+export const Value = SettingsValue
 
 export type DotProps = Sx
 

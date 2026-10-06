@@ -161,11 +161,14 @@ export function Group({ header, footer, children, sx }: GroupProps) {
 	)
 }
 
-export type ItemProps = { children: ReactNode; go?: boolean } & Sx
+export type GroupItemProps = { children: ReactNode; go?: boolean } & Sx
 
-export function Item({ children, go = false, sx }: ItemProps) {
+export function GroupItem({ children, go = false, sx }: GroupItemProps) {
 	return <div {...stylex.props(styles.item, go && styles.go, sx)}>{children}</div>
 }
+
+/** @deprecated Use `GroupItem`; the generic name will be removed in a future major. */
+export const Item = GroupItem
 
 export type MarkProps = { letter: string; tint: string; sx?: stylex.StyleXStyles }
 
@@ -236,7 +239,7 @@ export function Sep() {
 	)
 }
 
-export type RowProps = {
+export type GroupRowProps = {
 	mark?: ReactNode
 	name: ReactNode
 	/** What follows the name after a `·`: a `Status`, a mono value, a tag. */
@@ -248,7 +251,10 @@ export type RowProps = {
 	sx?: stylex.StyleXStyles
 }
 
-export function Row({ mark, name, children, actions, onPress, chevron = false, sx }: RowProps) {
+/** @deprecated Use `GroupRowProps`. */
+export type RowProps = GroupRowProps
+
+export function GroupRow({ mark, name, children, actions, onPress, chevron = false, sx }: GroupRowProps) {
 	const inner = (
 		<>
 			{mark}
@@ -278,6 +284,9 @@ export function Row({ mark, name, children, actions, onPress, chevron = false, s
 		</div>
 	)
 }
+
+/** @deprecated Use `GroupRow`; the generic name will be removed in a future major. */
+export const Row = GroupRow
 
 export type ExpandProps = {
 	open: boolean

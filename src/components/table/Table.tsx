@@ -94,14 +94,20 @@ export function Table({ children, sx }: TableProps) {
 	return <div {...stylex.props(styles.table, sx)}>{children}</div>
 }
 
-export type HeadProps = { columns: string; children: ReactNode; sticky?: boolean } & Sx
+export type TableHeadProps = { columns: string; children: ReactNode; sticky?: boolean } & Sx
+
+/** @deprecated Use `TableHeadProps`. */
+export type HeadProps = TableHeadProps
 
 /** The one mono line above the rows; `columns` is the grid template every row shares. */
-export function Head({ columns, children, sticky = false, sx }: HeadProps) {
+export function TableHead({ columns, children, sticky = false, sx }: TableHeadProps) {
 	return (
 		<div {...stylex.props(styles.head, styles.cols(columns), sticky && styles.sticky, sx)}>{children}</div>
 	)
 }
+
+/** @deprecated Use `TableHead`; the generic name will be removed in a future major. */
+export const Head = TableHead
 
 export type TrProps = { columns: string; children: ReactNode; hover?: boolean } & Sx
 

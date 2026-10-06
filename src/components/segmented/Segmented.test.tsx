@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { expect, test, vi } from "vitest"
-import { Row } from "../group/Group"
+import { GroupRow } from "../group/Group"
 import { Segmented } from "./Segmented"
 
 test("a segmented control presses one word", async () => {
@@ -25,9 +25,9 @@ test("a segmented control presses one word", async () => {
 test("a row's press is the whole line", async () => {
 	const onPress = vi.fn<() => void>()
 	render(
-		<Row name="Notion" onPress={onPress} chevron>
+		<GroupRow name="Notion" onPress={onPress} chevron>
 			12 支工具
-		</Row>,
+		</GroupRow>,
 	)
 	await userEvent.click(screen.getByRole("button", { name: /Notion/ }))
 	expect(onPress).toHaveBeenCalledOnce()

@@ -87,7 +87,7 @@ const styles = stylex.create({
 
 type Sx = { sx?: stylex.StyleXStyles }
 
-export type CellProps = {
+export type TableCellProps = {
 	children?: ReactNode
 	mono?: boolean
 	num?: boolean
@@ -103,7 +103,21 @@ export type CellProps = {
 	hidden?: boolean
 } & Sx
 
-export function Cell({ children, mono, num, faint, order, prefixed, pushed, grow, hidden, sx }: CellProps) {
+/** @deprecated Use `TableCellProps`. */
+export type CellProps = TableCellProps
+
+export function TableCell({
+	children,
+	mono,
+	num,
+	faint,
+	order,
+	prefixed,
+	pushed,
+	grow,
+	hidden,
+	sx,
+}: TableCellProps) {
 	return (
 		<span
 			{...(mono === true && typeof children === "string" ? { title: children } : {})}
@@ -124,6 +138,9 @@ export function Cell({ children, mono, num, faint, order, prefixed, pushed, grow
 		</span>
 	)
 }
+
+/** @deprecated Use `TableCell`; the generic name will be removed in a future major. */
+export const Cell = TableCell
 
 export type StatusCellProps = {
 	children?: ReactNode

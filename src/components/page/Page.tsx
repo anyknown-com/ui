@@ -143,12 +143,15 @@ export function PageHead({ title, lead, summary, actions, sx }: PageHeadProps) {
 	)
 }
 
-export type BProps = { children: ReactNode }
+export type PageNumberProps = { children: ReactNode }
 
 /** A number inside a summary or a stat line: mono, in the text colour. */
-export function B({ children }: BProps) {
+export function PageNumber({ children }: PageNumberProps) {
 	return <b {...stylex.props(styles.b)}>{children}</b>
 }
+
+/** @deprecated Use `PageNumber`; the generic name will be removed in a future major. */
+export const B = PageNumber
 
 export type SectionLabelProps = { children: ReactNode; end?: ReactNode; first?: boolean } & Sx
 
@@ -161,11 +164,14 @@ export function SectionLabel({ children, end, first = false, sx }: SectionLabelP
 	)
 }
 
-export type SubProps = { children: ReactNode } & Sx
+export type PageSubProps = { children: ReactNode } & Sx
 
-export function Sub({ children, sx }: SubProps) {
+export function PageSub({ children, sx }: PageSubProps) {
 	return <p {...stylex.props(styles.sub, sx)}>{children}</p>
 }
+
+/** @deprecated Use `PageSub`; the generic name will be removed in a future major. */
+export const Sub = PageSub
 
 export type FootNoteProps = { children: ReactNode } & Sx
 
