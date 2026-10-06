@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId, useState } from "react"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -120,18 +121,9 @@ const REASON_LABEL: Record<string, string> = {
 
 function CheckIcon() {
 	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-			{...stylex.props(styles.checkIcon)}
-		>
+		<Glyph width={13} height={13} {...stylex.props(styles.checkIcon)}>
 			<path d="m5 13 4 4L19 7" />
-		</svg>
+		</Glyph>
 	)
 }
 
@@ -170,19 +162,9 @@ export function HandoffReceipt({
 			>
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 				<span {...stylex.props(styles.label)}>
-					<svg
-						width="13"
-						height="13"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						aria-hidden="true"
-						{...stylex.props(styles.link, open && styles.linkOpen)}
-					>
+					<Glyph width={13} height={13} {...stylex.props(styles.link, open && styles.linkOpen)}>
 						<path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" />
-					</svg>
+					</Glyph>
 					<span>
 						{"換班完成 · "}
 						<span {...stylex.props(styles.mono)}>{at}</span>
@@ -192,18 +174,9 @@ export function HandoffReceipt({
 						{" → 新 session"}
 					</span>
 				</span>
-				<svg
-					width="12"
-					height="12"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden="true"
-					{...stylex.props(styles.chevron, open && styles.chevronOpen)}
-				>
+				<Glyph width={12} height={12} {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
 					<path d="m6 9 6 6 6-6" />
-				</svg>
+				</Glyph>
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 			</button>
 			<div {...stylex.props(styles.bodyWrap, open && styles.bodyWrapOpen)}>

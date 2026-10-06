@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useEffect, useId, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
 import { color, corner, motion, space, text, type } from "../../tokens.stylex"
-import { ICON_STROKE } from "../icon/icon"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const AUTO_COLLAPSE_MS = 1000
@@ -70,18 +70,9 @@ const styles = stylex.create({
 
 function Chevron({ open }: { open: boolean }) {
 	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={ICON_STROKE}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			aria-hidden="true"
-			{...stylex.props(styles.chevron, open && styles.chevronOpen)}
-		>
+		<Glyph {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
 			<path d="m9 6 6 6-6 6" />
-		</svg>
+		</Glyph>
 	)
 }
 

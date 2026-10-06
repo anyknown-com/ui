@@ -3,6 +3,7 @@ import { Fragment, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
 import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -168,18 +169,9 @@ function Fold({ rows, label }: { rows: DiffRow[]; label: string }) {
 				onClick={() => setOpen((value) => !value)}
 				{...stylex.props(reset.control, styles.fold)}
 			>
-				<svg
-					width="10"
-					height="10"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden="true"
-					{...stylex.props(styles.chevron, open && styles.chevronOpen)}
-				>
+				<Glyph width={10} height={10} {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
 					<path d="m9 6 6 6-6 6" />
-				</svg>
+				</Glyph>
 				{label}
 			</button>
 			<div id={id} hidden={!open} {...stylex.props(open && styles.foldLines)}>

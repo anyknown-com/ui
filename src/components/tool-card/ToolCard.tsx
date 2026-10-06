@@ -4,7 +4,7 @@ import { reset } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
 import { color, corner, font, ink, shadow, space, text, type } from "../../tokens.stylex"
-import { ICON_STROKE } from "../icon/icon"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -314,22 +314,13 @@ const TOOL_PATHS: Record<string, string[]> = {
 
 const STATE_PATHS = { completed: ["M20 6 9 17l-5-5"], error: ["M18 6 6 18", "m6 6 12 12"] }
 
-function Glyph({ paths }: { paths: string[] }) {
+function ToolGlyph({ paths }: { paths: string[] }) {
 	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={ICON_STROKE}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			aria-hidden="true"
-			{...stylex.props(styles.glyph)}
-		>
+		<Glyph {...stylex.props(styles.glyph)}>
 			{paths.map((d) => (
 				<path key={d} d={d} />
 			))}
-		</svg>
+		</Glyph>
 	)
 }
 
@@ -337,18 +328,9 @@ const DEFAULT_OPEN_TOOLS = new Set(["shell", "edit", "write"])
 
 function Chevron({ open }: { open: boolean }) {
 	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={ICON_STROKE}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			aria-hidden="true"
-			{...stylex.props(styles.chevron, open && styles.chevronOpen)}
-		>
+		<Glyph {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
 			<path d="m6 9 6 6 6-6" />
-		</svg>
+		</Glyph>
 	)
 }
 
@@ -421,7 +403,9 @@ export function ToolCard({
 						state === "error" && styles.tileBad,
 					)}
 				>
-					<Glyph paths={state === "running" ? (TOOL_PATHS[tool] ?? TOOL_PATHS.tool) : STATE_PATHS[state]} />
+					<ToolGlyph
+						paths={state === "running" ? (TOOL_PATHS[tool] ?? TOOL_PATHS.tool) : STATE_PATHS[state]}
+					/>
 					{state !== "running" && <span {...stylex.props(styles.srOnly)}>{STATE_LABELS[state]}</span>}
 				</span>
 				<span {...stylex.props(styles.main)}>

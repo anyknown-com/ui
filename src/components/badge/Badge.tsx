@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
 import { color, corner, font, space, text, type } from "../../tokens.stylex"
+import { XGlyph } from "../icon/glyphs"
 
 const styles = stylex.create({
 	base: {
@@ -134,18 +135,7 @@ export function Chip({
 					onClick={onRemove}
 					{...stylex.props(reset.control, styles.remove)}
 				>
-					<svg
-						width="8"
-						height="8"
-						viewBox="0 0 8 8"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="1.5"
-						strokeLinecap="round"
-						aria-hidden="true"
-					>
-						<path d="m1 1 6 6M7 1 1 7" />
-					</svg>
+					<XGlyph width={12} height={12} />
 				</button>
 			)}
 		</>

@@ -12,6 +12,7 @@ import {
 	type SortState,
 	UploadList,
 	type UploadJob,
+	ICON_STROKE,
 } from "@anyknown/ui"
 import { useMemo, useState } from "react"
 import { Demo } from "../shell"
@@ -74,7 +75,17 @@ const FILES = [
 
 function ActionIcon({ d }: { d: string }) {
 	return (
-		<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+		<svg
+			width="13"
+			height="13"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth={ICON_STROKE}
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+		>
 			<path d={d} />
 		</svg>
 	)

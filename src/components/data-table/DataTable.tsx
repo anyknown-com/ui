@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
 import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -152,18 +153,10 @@ const styles = stylex.create({
 
 function SearchIcon() {
 	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-		>
+		<Glyph width={13} height={13}>
 			<circle cx="11" cy="11" r="7" />
 			<path d="m20 20-3.5-3.5" />
-		</svg>
+		</Glyph>
 	)
 }
 

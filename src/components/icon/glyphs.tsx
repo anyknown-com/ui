@@ -8,7 +8,8 @@ import { ICON_STROKE } from "./icon"
 
 type GlyphProps = SVGAttributes<SVGSVGElement>
 
-function Glyph({ children, ...props }: GlyphProps & { children: ReactNode }) {
+/** Every icon the package draws: a 24-unit box, stroke 2, round caps and joins, currentColor. */
+export function Glyph({ children, ...props }: GlyphProps & { children: ReactNode }) {
 	return (
 		<svg
 			viewBox="0 0 24 24"

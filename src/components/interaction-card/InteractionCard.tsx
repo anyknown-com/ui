@@ -5,6 +5,7 @@ import { Button } from "../button/Button"
 import { Checkbox } from "../checkbox/Checkbox"
 import { Radio } from "../radio/Radio"
 import { RadioGroup } from "../radio/RadioGroup"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -153,72 +154,40 @@ const styles = stylex.create({
 
 function LockIcon() {
 	return (
-		<svg
-			width="15"
-			height="15"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-			{...stylex.props(styles.headIconWarning)}
-		>
+		<Glyph width={15} height={15} {...stylex.props(styles.headIconWarning)}>
 			<rect x="4" y="10" width="16" height="10" rx="2" />
 			<path d="M8 10V7a4 4 0 0 1 8 0v3" />
-		</svg>
+		</Glyph>
 	)
 }
 
 function DecideIcon() {
 	return (
-		<svg
-			width="15"
-			height="15"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-			{...stylex.props(styles.headIconAccent)}
-		>
+		<Glyph width={15} height={15} {...stylex.props(styles.headIconAccent)}>
 			<path d="M9 18h6M10 21h4" />
 			<path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z" />
-		</svg>
+		</Glyph>
 	)
 }
 
 function InfoIcon() {
 	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-			{...stylex.props(styles.policyIcon)}
-		>
+		<Glyph width={13} height={13} {...stylex.props(styles.policyIcon)}>
 			<circle cx="12" cy="12" r="9" />
 			<path d="M12 8v4m0 4h.01" />
-		</svg>
+		</Glyph>
 	)
 }
 
 function ReceiptIcon({ rejected }: { rejected?: boolean }) {
 	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
+		<Glyph
+			width={14}
+			height={14}
 			{...stylex.props(styles.receiptIcon, rejected && styles.receiptIconRejected)}
 		>
 			<path d="m5 13 4 4L19 7" />
-		</svg>
+		</Glyph>
 	)
 }
 

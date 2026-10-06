@@ -34,6 +34,7 @@ import {
 	Tooltip,
 	useDialog,
 	useToast,
+	ICON_STROKE,
 } from "@anyknown/ui"
 import * as stylex from "@stylexjs/stylex"
 import { color, radius, space } from "@anyknown/ui/tokens.stylex"
@@ -74,8 +75,10 @@ function MemoryIcon() {
 			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"
-			strokeWidth="1.8"
+			strokeWidth={ICON_STROKE}
 			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
 		>
 			<path d="M11 12a1.5 1.5 0 1 0 1.5-1.5A4 4 0 1 0 16.5 15 6.5 6.5 0 1 1 10 5.6" />
 			<path d="M10 5.6C7.5 5 5.5 5.8 4 7.5" />

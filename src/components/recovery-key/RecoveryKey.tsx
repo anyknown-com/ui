@@ -3,6 +3,7 @@ import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, font, motion, shadow, space, text, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
+import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -107,52 +108,27 @@ const styles = stylex.create({
 
 function CopyIcon() {
 	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-		>
+		<Glyph width={13} height={13}>
 			<rect x="9" y="9" width="12" height="12" rx="2" />
 			<path d="M5 15V5a2 2 0 0 1 2-2h10" />
-		</svg>
+		</Glyph>
 	)
 }
 
 function DownloadIcon() {
 	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-		>
+		<Glyph width={13} height={13}>
 			<path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" />
-		</svg>
+		</Glyph>
 	)
 }
 
 function WarningIcon() {
 	return (
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-			{...stylex.props(styles.warningIcon)}
-		>
+		<Glyph width={14} height={14} {...stylex.props(styles.warningIcon)}>
 			<path d="m12 3 10 18H2L12 3Z" />
 			<path d="M12 10v4m0 3h.01" />
-		</svg>
+		</Glyph>
 	)
 }
 
