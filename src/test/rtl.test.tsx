@@ -6,6 +6,7 @@ import { ActionBar } from "../components/action-bar/ActionBar"
 import { Button } from "../components/button/Button"
 import { Composer } from "../components/composer/Composer"
 import { DropdownItem, DropdownMenu, DropdownSub } from "../components/dropdown/DropdownMenu"
+import { Segmented } from "../components/segmented/Segmented"
 import { Slider } from "../components/slider/Slider"
 import { Switch } from "../components/switch/Switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../components/tabs/Tabs"
@@ -27,8 +28,8 @@ import { DirectionProvider } from "../lib/direction"
 //
 // Two facts these tests pin:
 // - Base UI components (Tabs, the dropdown's submenu) read direction from our
-//   `<DirectionProvider>`, not from the `dir` attribute. An RTL app needs both. Slider reads
-//   either.
+//   `<DirectionProvider>`, not from the `dir` attribute. An RTL app needs both. Slider,
+//   Segmented and ActionBar read either.
 // - Portalled layers (toasts, menus) inherit direction from `<html>`, not from a `dir` on a
 //   wrapper, so the document is set to RTL here, as an RTL app would.
 
@@ -58,6 +59,12 @@ function Volume() {
 	const [value, setValue] = useState(0.5)
 	return <Slider aria-label="Volume" value={value} onChange={setValue} />
 }
+
+const VIEWS = [
+	{ value: "list", label: "List" },
+	{ value: "grid", label: "Grid" },
+	{ value: "table", label: "Table" },
+]
 
 describe("RTL", () => {
 	test("Switch: toggles from the keyboard and writes no physical inline side", async () => {
@@ -218,6 +225,49 @@ describe("RTL", () => {
 		expect(screen.getByRole("button", { name: "Two" })).toHaveFocus()
 		await userEvent.keyboard("{ArrowRight}{ArrowRight}")
 		expect(screen.getByRole("button", { name: "Three" })).toHaveFocus()
+	})
+
+	test("ActionBar: a DirectionProvider mirrors the keys even inside dir=ltr", async () => {
+		render(
+			<div dir="ltr">
+				<Rtl>
+					<ActionBar visible>
+						<ActionBar.Button>One</ActionBar.Button>
+						<ActionBar.Button>Two</ActionBar.Button>
+						<ActionBar.Button>Three</ActionBar.Button>
+					</ActionBar>
+				</Rtl>
+			</div>,
+		)
+		await userEvent.tab()
+		expect(screen.getByRole("button", { name: "One" })).toHaveFocus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(screen.getByRole("button", { name: "Two" })).toHaveFocus()
+	})
+
+	test("Segmented: reads the dir attribute; ArrowLeft checks the next option", async () => {
+		render(<Segmented label="View" options={VIEWS} />)
+		screen.getByRole("radio", { name: "List" }).focus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(screen.getByRole("radio", { name: "Grid" })).toHaveFocus()
+		expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(screen.getByRole("radio", { name: "List" })).toBeChecked()
+	})
+
+	test("Segmented: a DirectionProvider mirrors the keys even inside dir=ltr", async () => {
+		render(
+			<div dir="ltr">
+				<Rtl>
+					<Segmented label="View" options={VIEWS} />
+				</Rtl>
+			</div>,
+		)
+		screen.getByRole("radio", { name: "List" }).focus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked()
+		await userEvent.keyboard("{ArrowDown}")
+		expect(screen.getByRole("radio", { name: "Table" })).toBeChecked()
 	})
 
 	test("Composer: types and sends under RTL; no physical inline side", async () => {

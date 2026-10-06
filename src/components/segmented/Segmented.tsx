@@ -1,3 +1,4 @@
+import { useDirection } from "@base-ui/react/direction-provider"
 import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent } from "react"
 import { press } from "../../lib/styled"
@@ -99,7 +100,9 @@ export type SegmentedProps<T extends string> = {
 /**
  * One of a few short options, side by side: a radio group drawn as a segmented track. Tab
  * lands on the chosen option; the arrow keys move the choice (and focus) to the next or
- * previous option, wrapping; Home and End go to the first and last.
+ * previous option, wrapping; Home and End go to the first and last. ← / → follow the reading
+ * direction: mirrored under `<DirectionProvider direction="rtl">` or a computed CSS
+ * `direction: rtl` (`dir="rtl"`).
  */
 export function Segmented<T extends string>({
 	value,
@@ -120,6 +123,7 @@ export function Segmented<T extends string>({
 			onChange?.(next)
 		},
 	)
+	const providerRtl = useDirection() === "rtl"
 	const usable = (one: SegmentedOption<T>) => !disabled && !one.disabled
 	// 沒有選中(或選中的被停用)時,Tab 落在第一個能選的
 	const tabStop = options.some((one) => one.value === selected && usable(one))
@@ -135,7 +139,8 @@ export function Segmented<T extends string>({
 		const group = event.currentTarget.parentElement
 		if (enabled.length === 0 || group == null) return
 		const at = enabled.indexOf(from)
-		const rtl = getComputedStyle(group).direction === "rtl"
+		// A `"rtl"` DirectionProvider wins, else the computed CSS direction (`dir`), as in Slider
+		const rtl = providerRtl || getComputedStyle(group).direction === "rtl"
 		let next: number
 		switch (event.key) {
 			case "ArrowRight":

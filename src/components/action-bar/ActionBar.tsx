@@ -1,3 +1,4 @@
+import { useDirection } from "@base-ui/react/direction-provider"
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, type ReactNode, createContext, use } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
@@ -133,13 +134,15 @@ function roveOnChange(bar: HTMLDivElement | null) {
 	return () => observer.disconnect()
 }
 
-function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+function onKeyDown(event: KeyboardEvent<HTMLDivElement>, providerRtl: boolean) {
 	const bar = event.currentTarget
 	const list = items(bar)
 	const at = list.indexOf(event.target as HTMLElement)
 	if (at < 0) return
-	// Left and right follow the reading direction: in RTL, ArrowLeft is "next".
-	const step = bar.closest("[dir]")?.getAttribute("dir")?.toLowerCase() === "rtl" ? -1 : 1
+	// Left and right follow the reading direction: in RTL, ArrowLeft is "next". A `"rtl"`
+	// DirectionProvider wins, else the computed CSS direction (`dir`), as in Slider.
+	const rtl = providerRtl || getComputedStyle(bar).direction === "rtl"
+	const step = rtl ? -1 : 1
 	let next: number
 	if (event.key === "ArrowRight") next = at + step
 	else if (event.key === "ArrowLeft") next = at - step
@@ -152,11 +155,12 @@ function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
 
 /**
  * The row of actions under a message. A `role="toolbar"` with one tab stop: Tab lands on the
- * last-used button, ←/→ move between buttons (mirrored under `dir="rtl"`, wrapping at the ends),
- * Home/End jump to the first/last.
+ * last-used button, ←/→ move between buttons (mirrored under `<DirectionProvider direction="rtl">`
+ * or a computed CSS `direction: rtl`, wrapping at the ends), Home/End jump to the first/last.
  */
 export function ActionBar({ label, visible = false, children, labels }: ActionBarProps) {
 	const t = useStrings(strings, labels)
+	const providerRtl = useDirection() === "rtl"
 	return (
 		<LabelsContext value={labels}>
 			{/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- focus goes to the buttons (roving tabindex), not the bar */}
@@ -164,7 +168,7 @@ export function ActionBar({ label, visible = false, children, labels }: ActionBa
 				ref={roveOnChange}
 				role="toolbar"
 				aria-label={label ?? t.toolbar}
-				onKeyDown={onKeyDown}
+				onKeyDown={(event) => onKeyDown(event, providerRtl)}
 				onFocus={(event) => rove(event.currentTarget, event.target)}
 				{...stylex.props(styles.bar, visible && hoverStyles.reveal)}
 			>
