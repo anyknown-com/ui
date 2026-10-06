@@ -6,28 +6,45 @@ decision, and this list is that decision's backlog.
 
 Thresholds: text 4.5:1 (small text), UI boundaries and graphics 3:1, hit targets 24px.
 
-## Palette level (one change affects every product)
+Numbers are WCAG 2 contrast ratios computed from the hex values in `src/tokens.stylex.ts`
+(the 12-step neutral palette from `scripts/palette.mjs`), light / dark.
 
-Numbers are measured against the current output of `scripts/palette.mjs` (12-step neutral
-palette, light / dark), as pasted into `src/tokens.stylex.ts`.
-
-| Token pair | Measured | Threshold | Where |
-| --- | --- | --- | --- |
-| `textFaint` on `surface` | 3.75:1 (light) / 4.88:1 (dark) | 4.5:1 | placeholders in input, select search, composer, interaction-card, data-table filter |
-| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.15–1.23:1 | 3:1 | diff-viewer inline word highlight: "which words changed" rests on this background alone |
+## Open: text in `textFaint`
 
 `textFaint` is a 3:1 color, so the rule is: no text that has to be read. Icons, chevrons,
-placeholders, separators, the `—` in an empty cell, and disabled states may use it; all other
-text uses `textMuted` (≥ 5.36:1 on every background). The placeholder is the only "text"
-exception left. To reach 4.5:1, switch the placeholder to `textMuted`; do not retune `textFaint`.
+separators, the `—` in an empty cell, and disabled states may use it; all other text uses
+`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). These text uses are left:
 
-The diff word highlight is a fill step (step 5) on a subtle background (step 3); the two steps
-are close in lightness by design. To reach 3:1, add a non-color mark (underline or bold); do not
-hand-tune the `*Hl` values.
+| Where | Pair | Measured | Threshold |
+| --- | --- | --- | --- |
+| `Select` trigger placeholder ("Select…") | `textFaint` on `surface` | 3.75 / 4.88 | 4.5:1 |
+| `Select` search box placeholder ("Search…") | `textFaint` on `surfaceRaised` (the popup) | 3.95 / 4.53 | 4.5:1 |
+| `DecisionCard` free-text box placeholder | `textFaint` on `surface` | 3.75 / 4.88 | 4.5:1 |
+| `KbdGroup` separator in a sequence (the caller's "then") | `textFaint` on `bg` / `surface` / `surfaceRaised` | 3.75–3.95 / 4.53–5.15 | 4.5:1 |
 
-## Fixed: moved to the 12-step neutral palette
+All four pass in dark mode on these backgrounds and fail in light mode. The fix is the one
+`Input`, `Composer` and `DataTable` already took: switch these to `textMuted`. Do not retune
+`textFaint`.
 
-These rows from the old table pass under the new palette and were removed:
+## Intentional
+
+| Where | Value | Note |
+| --- | --- | --- |
+| scrollbar thumb visible width | 4px (10px minus 3px transparent border on each side) | deliberate, just thin |
+
+## Resolved in 0.10
+
+| Item | Before | Now |
+| --- | --- | --- |
+| Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter | `textFaint`: 3.75 / 4.88 | `textMuted`: 6.35 / 9.15 on `surface` |
+| `DiffViewer` changed words: the only signal was `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` (1.15–1.23:1) | color only | Added words are `<ins>` with an underline, removed words `<del>` with a strike-through, and `Mark` / `MarkText` under forced colors. Each line has a `+` / `−` sign in `text` and a visually hidden "Added line" / "Removed line" prefix. The fill difference is still 1.15–1.23:1, but it is no longer the only signal. |
+| `Checkbox` / `Radio` without a `label` | 16.8px target | a 24px native input over the 16.8px box |
+| `Switch` | 22.4px tall | a 24px tall native input over the 22.4px track |
+| `Dropzone` cancel button | 22.4px | 30.4px with an `::after` that does not affect layout |
+| `FileRow` checkbox | 16px | a 24px `<label>` around the 16px box |
+| `DataTable` row and select-all checkboxes | 13.6px | a 24px `<label>` around the box |
+
+## Resolved earlier: moved to the 12-step neutral palette
 
 | Token pair | Old | New (light / dark) | Fix |
 | --- | --- | --- | --- |
@@ -35,20 +52,3 @@ These rows from the old table pass under the new palette and were removed:
 | unchecked checkbox / radio border, switch track when off | 1.76 (`borderStrong`) | 3.75 / 3.80 (`borderControl` on `surface`) | control boundaries use `borderControl` |
 | `accent` on `accentSubtle` (Badge accent, pills tabs selected) | 4.18 (dark) | 15.31 / 13.62 | ink accent on neutral gray |
 | `danger` on `dangerSubtle` (Badge danger) | 4.48 (dark) | 4.59 / 7.47 | red step 9 (light) / step 11 (dark) on red step 3 |
-
-## Hit targets
-
-| Where | Measured | Threshold | Note |
-| --- | --- | --- | --- |
-| checkbox / radio | 16.8px | 24px | only when `label` is omitted; with a label the whole label is the target |
-| switch | 22.4px tall | 24px | same |
-| dropzone cancel button / file-row checkbox / data-table checkbox | 22.4 / 16 / 13.6px | 24px | none of these has a label around it to enlarge the target |
-
-Badge's chip `×` already reaches 24px with an `::after` that does not affect layout; the same
-trick applies to the three above.
-
-## Intentional
-
-| Where | Value | Note |
-| --- | --- | --- |
-| scrollbar thumb visible width | 4px (10px minus 3px transparent border on each side) | deliberate, just thin |
