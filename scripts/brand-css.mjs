@@ -15,7 +15,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const FONTS =
 	'@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap");'
 
-/** 宣告表寫回 CSS 行。值可能被 oxfmt 折成多行(字型),所以從解析過的 Map 重寫,不逐行抄。 */
+/** Write a declaration map back as CSS lines. oxfmt may fold a value onto several lines (fonts), so rebuild from the parsed Map instead of copying line by line. */
 const lines = (decls) => [...decls].map(([name, value]) => `\t${name}: ${value};`).join("\n")
 
 export function generate() {

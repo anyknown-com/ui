@@ -1,17 +1,17 @@
-// 對一次性 HTML 頁面數機械錯誤。有數字才知道 design.md 有沒有用(評估迴圈 §4.3)。
+// Count mechanical errors in one-off HTML pages. Only with numbers can we tell whether design.md helps (evaluation loop §4.3).
 //
-//   node scripts/design-lint.mjs a.html b.html ...   逐檔一列,最後一列總計
-//   node scripts/design-lint.mjs --json a.html ...   同樣的數字,給 eval 腳本吃
+//   node scripts/design-lint.mjs a.html b.html ...   one row per file, a total row last
+//   node scripts/design-lint.mjs --json a.html ...   the same numbers, for eval scripts
 //
-// 六個計數,全部是規則抓得到的、不需要判斷的:
-//   hex       自創色:#rgb / #rrggbb / #rrggbbaa 字面值(token 值也算,頁面該引用變數不該抄值)
-//   color     --ak-* 以外的顏色:rgb() / hsl() / oklch() / 具名色
-//   class     詞彙外的 class:class 屬性裡不在 brand.css 的名字
-//   font      非 token 字體:font-family 宣告裡沒有 var(--ak-font-*)
-//   easing    overshoot:cubic-bezier 的 y 值超出 0..1、spring / bounce / elastic、--ak-motion-spring
-//   inline    內聯 style 屬性
-//   stat      stat 濫用:一頁超過四個 ak-stat,或 ak-stat-value 的數字在下面的表格裡又出現一次
-//   table2    兩欄以下的滿版表:數字被推到最右邊,眼睛接不上(DESIGN.md §3)
+// Eight counts, all of them rule-detectable and needing no judgment:
+//   hex       invented colors: #rgb / #rrggbb / #rrggbbaa literals (token values count too; a page should reference the variable, not copy the value)
+//   color     colors other than --ak-*: rgb() / hsl() / oklch() / named colors
+//   class     out-of-vocabulary classes: names in class attributes that are not in brand.css
+//   font      non-token fonts: a font-family declaration without var(--ak-font-*)
+//   easing    overshoot: cubic-bezier y values outside 0..1, spring / bounce / elastic, --ak-motion-spring
+//   inline    inline style attributes
+//   stat      stat misuse: more than four ak-stat on a page, or an ak-stat-value number that appears again in a table below
+//   table2    full-width tables with two columns or fewer: the numbers get pushed to the far right and the eye cannot follow (DESIGN.md §3)
 import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { cssClasses } from "./design-check.mjs"
@@ -22,7 +22,7 @@ const NAMED_COLORS =
 	/\b(?:white|black|red|green|blue|gray|grey|orange|yellow|purple|pink|teal|indigo|violet|slate|zinc|stone|amber|emerald|cyan|sky|rose|lime|fuchsia|navy|maroon|olive|silver|aqua|beige|ivory|tan|coral|salmon|gold|crimson)\b/gi
 
 export function lint(html) {
-	// 只看會影響視覺的地方:style 區塊與 style 屬性;script 不算
+	// Only look at what affects visuals: style blocks and style attributes; scripts do not count
 	const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join("\n")
 	const inlineStyles = [...html.matchAll(/\sstyle\s*=\s*"([^"]*)"/gi)].map((m) => m[1])
 	const css = `${styleBlocks}\n${inlineStyles.join("\n")}`
@@ -40,7 +40,7 @@ export function lint(html) {
 	}
 	const inline = inlineStyles.length
 
-	// stat:超過四個算濫用;值跟任何 td 文字相同就是把表裡的數字再放大一次
+	// stat: more than four is misuse; a value equal to any td text re-enlarges a number already in a table
 	const strip = (t) =>
 		t
 			.replace(/<[^>]+>/g, "")
@@ -51,7 +51,7 @@ export function lint(html) {
 	)
 	const cells = new Set([...html.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => strip(m[1])))
 	const stat = Math.max(0, statValues.length - 4) + statValues.filter((v) => cells.has(v)).length
-	// table2:第一列的 th/td 數 ≤ 2
+	// table2: the first row has at most 2 th/td
 	let table2 = 0
 	for (const t of html.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)) {
 		const firstRow = t[1].match(/<tr[^>]*>([\s\S]*?)<\/tr>/i)?.[1] ?? ""
@@ -74,7 +74,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 	const json = args.includes("--json")
 	const files = args.filter((a) => !a.startsWith("--"))
 	if (files.length === 0) {
-		console.error("用法:node scripts/design-lint.mjs [--json] <html>...")
+		console.error("Usage: node scripts/design-lint.mjs [--json] <html>...")
 		process.exit(2)
 	}
 	const rows = files.map((file) => ({ file, ...lint(readFileSync(file, "utf8")) }))
@@ -87,7 +87,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 		for (const r of rows) {
 			console.log(`  ${r.file.slice(-32).padEnd(32)}${KEYS.map((k) => pad(r[k], 8)).join("")}`)
 			if (r.foreignClasses.length > 0)
-				console.log(`  ${"".padEnd(32)}詞彙外:${r.foreignClasses.slice(0, 12).join(" ")}`)
+				console.log(`  ${"".padEnd(32)}out of vocabulary: ${r.foreignClasses.slice(0, 12).join(" ")}`)
 		}
 		if (rows.length > 1) console.log(`  ${"total".padEnd(32)}${KEYS.map((k) => pad(total[k], 8)).join("")}`)
 	}

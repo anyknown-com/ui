@@ -1,15 +1,15 @@
-// themes.stylex.ts 從 tokens.stylex.ts 生成。
+// themes.stylex.ts is generated from tokens.stylex.ts.
 //
-// 手抄一份值必然會漂:新的 group 加進 tokens 之後沒有跟著加進 themes,結果手動切「亮」
-// 時只有一半的值跟著變。
-// 這支同時給 `pnpm gen:themes` 與 themes 的測試用,兩邊跑同一份推導。
+// A hand-copied set of values will inevitably drift: a new group added to tokens but not to themes
+// means that switching to light by hand changes only half of the values.
+// This script serves both `pnpm gen:themes` and the themes test, so both run the same derivation.
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 
-/** tokens.stylex.ts 裡每個 defineVars group 的 { key: [light, dark] };沒有 dark 變體的 group 不列入。 */
+/** For every defineVars group in tokens.stylex.ts, its { key: [light, dark] } entries; groups with no dark variant are left out. */
 export function readThemedGroups() {
 	const source = readFileSync(join(root, "src/tokens.stylex.ts"), "utf8")
 	const groups = []
@@ -35,7 +35,7 @@ export function renderThemes(groups) {
 					"\n})",
 			)
 			.join("\n\n")
-	// 輸出直接就是 oxfmt 的格式(測試會逐字元比對)
+	// The output is already in oxfmt format (the test compares it character by character)
 	const names = (mode) => groups.map((g) => `${mode}${cap(g.name)}`).join(", ")
 	return `// 這個檔案由 scripts/themes.mjs 從 tokens.stylex.ts 生成 —— 不要手改。
 // 重生成:pnpm gen:themes(themes.test.ts 會擋住不同步)

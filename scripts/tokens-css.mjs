@@ -1,11 +1,12 @@
-// src/tokens.css 從 tokens.stylex.ts 生成:給不用 StyleX 的消費端(desktop 的 Tailwind v4 @theme)。
+// src/tokens.css is generated from tokens.stylex.ts, for consumers that do not use StyleX (desktop's Tailwind v4 @theme).
 //
-// 手抄一份值必然會漂,跟 themes.mjs 同一思路。這支同時給 `pnpm gen:tokens-css` 與
-// tokens-css 的測試用:測試比的是「每個變數的值」,不比排版(排版交給 oxfmt)。
+// A hand-copied set of values will inevitably drift, the same reasoning as themes.mjs. This script serves both
+// `pnpm gen:tokens-css` and the tokens-css test: the test compares the value of every variable, not
+// the layout (layout is left to oxfmt).
 //
-// 命名:color 群直接 --ak-<key>,其他群帶群名(--ak-shadow-float、--ak-type-t2、--ak-z-index-popup)。
-// 標了 @deprecated 的 key 不輸出,除非它早就以 CSS 變數發佈過(PUBLISHED)。
-// breakpoint 不輸出:CSS 變數不能放進 @media。
+// Naming: the color group is plain --ak-<key>; other groups carry the group name (--ak-shadow-float, --ak-type-t2, --ak-z-index-popup).
+// Keys marked @deprecated are not emitted, unless they were already published as CSS variables (PUBLISHED).
+// Breakpoints are not emitted: CSS variables cannot be used inside @media.
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -13,16 +14,16 @@ import { fileURLToPath } from "node:url"
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
 
-/** 已經以 --ak-* 發佈過的舊名:拿掉會弄壞 CSS 消費端,下一個 major 再清。 */
+/** Old names already published as --ak-*: removing them would break CSS consumers; clean them up in the next major. */
 const PUBLISHED = new Set(["shadow.raised", "shadow.popover", "motion.spring"])
 
-/** 每個 group:{ name, vars: [{ key, light, dark? }] };dark 只有帶 [DARK] 變體的才有。 */
+/** Each group: { name, vars: [{ key, light, dark? }] }; dark exists only for entries with a [DARK] variant. */
 export function readGroups(source = readFileSync(join(root, "src/tokens.stylex.ts"), "utf8")) {
 	const groups = []
 	const re = /export const (\w+) = stylex\.define(?:Vars|Consts)\(\{(.*?)\n\}\)/gs
 	for (const [, name, body] of source.matchAll(re)) {
 		const vars = []
-		// 一個 entry = 一行 `\tkey:` 開頭,到下一個同層的 key / 註解為止
+		// An entry = a line starting with `\tkey:`, up to the next key / comment at the same level
 		const lines = body.split("\n")
 		let deprecated = false
 		let inDoc = false
@@ -56,10 +57,10 @@ export function readGroups(source = readFileSync(join(root, "src/tokens.stylex.t
 
 export const varName = (group, key) => `--ak-${group === "color" ? "" : `${kebab(group)}-`}${kebab(key)}`
 
-/** 值的寫法跟原本手寫的 tokens.css 一致:hex 小寫、字型名用雙引號。 */
+/** Value style matches the original hand-written tokens.css: lowercase hex, double quotes for font names. */
 const cssValue = (v) => v.replace(/#[0-9A-Fa-f]{3,8}\b/g, (h) => h.toLowerCase()).replaceAll("'", '"')
 
-/** 預期的變數表:{ light: Map, dark: Map };測試拿它跟 tokens.css 比。 */
+/** The expected variable table: { light: Map, dark: Map }; the test compares it with tokens.css. */
 export function expected(groups = readGroups()) {
 	const light = new Map()
 	const dark = new Map()
@@ -109,10 +110,10 @@ ${block("dark", "\t")}
 `
 }
 
-/** tokens.css 裡 `selector {` 到對應 `}` 之間的宣告:Map(name → value),值裡的換行與縮排壓成一個空格。 */
+/** Declarations between `selector {` and its matching `}` in tokens.css: Map(name -> value), with newlines and indentation in a value collapsed to one space. */
 export function declarations(css, selector) {
 	const start = css.indexOf(`${selector} {`)
-	if (start < 0) throw new Error(`tokens.css: 找不到 ${selector}`)
+	if (start < 0) throw new Error(`tokens.css: ${selector} not found`)
 	const open = css.indexOf("{", start)
 	let depth = 1
 	let i = open + 1
