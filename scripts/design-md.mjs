@@ -1,6 +1,7 @@
-// design.md = DESIGN.md 原文 + 生成附錄(token 表、brand.css 詞彙表)。
-// 數字永遠不手抄:token 從 tokens.stylex.ts 讀,class 從 brand.css 掃(用途在 css 註解裡)。
-// 跟 gen:themes 同一思路。由 llms-txt.mjs 呼叫,出 site/dist/design.md。
+// design.md = DESIGN.md as written + a generated appendix (token tables, brand.css vocabulary).
+// Numbers are never copied by hand: tokens are read from tokens.stylex.ts and classes are scanned
+// from brand.css (each class's purpose is the comment above it). Same idea as gen:themes.
+// Called by llms-txt.mjs; writes site/dist/design.md.
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -9,19 +10,22 @@ import { readThemedGroups } from "./themes.mjs"
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
 
-/** tokens.stylex.ts 裡沒有 dark 變體的 group:{ name, vars: [{ key, value }] }。 */
+/** Groups in tokens.stylex.ts without a dark variant: { name, vars: [{ key, value }] }. */
 function readPlainGroups() {
 	const source = readFileSync(join(root, "src/tokens.stylex.ts"), "utf8")
 	const groups = []
 	for (const group of source.matchAll(/export const (\w+) = stylex\.defineVars\(\{(.*?)\n\}\)/gs)) {
 		const [, name, body] = group
+		// a group whose JSDoc says @deprecated (the old `text` scale) is not offered to new pages
+		const doc = source.slice(0, group.index).match(/\/\*\*((?:(?!\*\/)[\s\S])*)\*\/\s*$/)
+		if (doc?.[1].includes("@deprecated")) continue
 		const vars = [...body.matchAll(/^\t(\w+):\s*"([^"]*)",?$/gm)].map((v) => ({ key: v[1], value: v[2] }))
 		if (vars.length > 0) groups.push({ name, vars })
 	}
 	return groups
 }
 
-/** brand.css 裡每個 class 的用途:緊貼在 selector 上一行的註解。 */
+/** What each brand.css class is for: the comment on the line right above its selector. */
 function readVocabulary(css) {
 	const rows = []
 	for (const m of css.matchAll(/\/\* (.*?) \*\/\n(?::root)?\.(ak-[\w-]+)/g))
@@ -34,12 +38,12 @@ export function generate(brandCss) {
 	const themed = readThemedGroups().filter((g) => g.name === "color" || g.name === "shadow")
 	const plain = readPlainGroups()
 
-	// tokens.css 的命名:color 群直接 --ak-<key>,其他群帶群名(--ak-shadow-popover)
+	// tokens.css naming: color keys are --ak-<key>, other groups carry the group name (--ak-shadow-float)
 	const varName = (g, key) => `--ak-${g.name === "color" ? "" : `${g.name}-`}${kebab(key)}`
 	const colorTable = themed
 		.map(
 			(g) =>
-				`| 變數 | light | dark |\n| --- | --- | --- |\n` +
+				`| Variable | light | dark |\n| --- | --- | --- |\n` +
 				g.vars.map((v) => `| \`${varName(g, v.key)}\` | \`${v.light}\` | \`${v.dark}\` |`).join("\n"),
 		)
 		.join("\n\n")
@@ -47,41 +51,41 @@ export function generate(brandCss) {
 	const plainTables = plain
 		.map(
 			(g) =>
-				`### ${g.name}\n\n| 名 | 值 |\n| --- | --- |\n` +
+				`### ${g.name}\n\n| Name | Value |\n| --- | --- |\n` +
 				g.vars.map((v) => `| \`${g.name}.${v.key}\` | \`${v.value}\` |`).join("\n"),
 		)
 		.join("\n\n")
 
 	const vocab = readVocabulary(brandCss)
-	const vocabTable = `| class | 用途 |\n| --- | --- |\n${vocab.map((r) => `| \`${r.cls}\` | ${r.note} |`).join("\n")}`
+	const vocabTable = `| Class | Purpose |\n| --- | --- |\n${vocab.map((r) => `| \`${r.cls}\` | ${r.note} |`).join("\n")}`
 
 	return `${design}
 
 ---
 
-## 附錄(生成,不要手改)
+## Appendix (generated; do not edit)
 
-以下由 \`scripts/design-md.mjs\` 在 build 時從 \`src/tokens.stylex.ts\` 與 \`brand.css\` 生成。
+Generated at build time by \`scripts/design-md.mjs\` from \`src/tokens.stylex.ts\` and \`brand.css\`.
 
-### 最短用法
+### Shortest usage
 
 \`\`\`html
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>usage 月報</title>
+<title>Monthly usage report</title>
 <link rel="stylesheet" href="https://ui.anyknown.com/brand.css">
 </head>
 <body>
 <main class="ak-page">
-  <h1 class="ak-display">八月 usage 月報</h1>
+  <h1 class="ak-display">August usage report</h1>
   <div class="ak-prose">
-    <p>本月 API 呼叫較上月成長 18%,成本持平。</p>
+    <p>API calls grew 18% over last month; cost held flat.</p>
   </div>
   <table class="ak-table">
-    <thead><tr><th>產品</th><th data-num>呼叫數</th><th data-num>成本(USD)</th></tr></thead>
+    <thead><tr><th>Product</th><th data-num>Calls</th><th data-num>Cost (USD)</th></tr></thead>
     <tbody>
       <tr><td>product</td><td data-num>1,204,311</td><td data-num>412.50</td></tr>
       <tr><td>call</td><td data-num>88,102</td><td data-num>3,120.00</td></tr>
@@ -92,20 +96,21 @@ export function generate(brandCss) {
 </html>
 \`\`\`
 
-### brand.css 詞彙(${vocab.length} 個 class,不在表上就是不准用)
+### brand.css vocabulary (${vocab.length} classes; anything not listed is not allowed)
 
 ${vocabTable}
 
-### 顏色 token(\`--ak-*\`)
+### Color tokens (\`--ak-*\`)
 
-light 為預設,dark 跟隨 OS;\`ak-theme-light\` / \`ak-theme-dark\` 手動鎖。
+Light is the default and dark follows the OS; \`ak-theme-light\` / \`ak-theme-dark\` lock one by hand.
 
 ${colorTable}
 
-### 字體、字級、間距、圓角、動效
+### Fonts, type, space, corners, motion
 
-CSS 變數只有 font / radius / motion 三組(\`--ak-font-body\`、\`--ak-radius-md\`、\`--ak-motion-ease-out\` 這種寫法);
-text 與 space 的階在 brand.css 裡已經用在 class 上,自己寫 css 時照這張表挑值,不要自創。
+Every group below is also a CSS variable, named \`--ak-<group>-<key>\` (\`--ak-space-md\`, \`--ak-type-t3\`,
+\`--ak-corner-card\`, \`--ak-motion-ease-out\`). brand.css already uses them in its classes; when you write your own
+CSS, pick values from these tables and do not invent new ones. Deprecated groups (the old \`text\` scale) are left out.
 
 ${plainTables}
 `
