@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { SubagentLine, SubagentSummary, ToolCard, ToolError, ToolInput, ToolOutput } from "./ToolCard"
 
 describe("ToolCard", () => {
@@ -199,6 +200,41 @@ describe("ToolCard progress", () => {
 	test("only while running", () => {
 		render(<ToolCard tool="fetch" state="completed" progress={1} />)
 		expect(screen.queryByRole("progressbar")).toBeNull()
+	})
+})
+
+describe("ToolCard locale", () => {
+	test("the card and its parts read English words under an en LocaleProvider", () => {
+		render(
+			<LocaleProvider locale="en">
+				<ToolCard tool="shell" state="error" retry={{ attempt: 1, max: 3, delayMs: 1000 }}>
+					<ToolInput json={{ cmd: "ls" }} />
+					<ToolOutput text="ok" />
+					<ToolError text="boom" />
+				</ToolCard>
+				<ToolCard tool="subagent" secondLine={<SubagentLine toolCount={1} />} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: /^Failed Run/ })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: /^Done Delegate/ })).toBeInTheDocument()
+		expect(screen.getAllByRole("status")[0]).toHaveTextContent("Failed · Retrying in 1s (attempt 1 of 3)")
+		expect(screen.getByRole("group", { name: "Input" })).toBeInTheDocument()
+		expect(screen.getByRole("group", { name: "Output" })).toBeInTheDocument()
+		expect(screen.getByRole("group", { name: "Error" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Copy error" })).toBeInTheDocument()
+		expect(screen.getByText("1 tool")).toBeInTheDocument()
+	})
+
+	test("the card's labels reach its parts; per-word props still win", () => {
+		render(
+			<ToolCard tool="read" defaultOpen labels={{ verbRead: "Open", input: "Args", output: "Result" }}>
+				<ToolInput json="a.ts" />
+				<ToolOutput text="x" label="Stdout" />
+			</ToolCard>,
+		)
+		expect(screen.getByRole("button", { name: /Open/ })).toBeInTheDocument()
+		expect(screen.getByRole("group", { name: "Args" })).toBeInTheDocument()
+		expect(screen.getByRole("group", { name: "Stdout" })).toBeInTheDocument()
 	})
 })
 

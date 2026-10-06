@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useId, useState } from "react"
+import { type ReactNode, createContext, use, useId, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { useCopy } from "../../lib/useCopy"
@@ -280,14 +281,71 @@ const styles = stylex.create({
 	},
 })
 
-const VERBS: Record<string, string> = {
-	read: "讀取",
-	edit: "編輯",
-	write: "寫入",
-	shell: "執行",
-	search: "搜尋",
-	fetch: "取得",
-	subagent: "委派",
+const strings = defineStrings({
+	"zh-TW": {
+		verbRead: "讀取",
+		verbEdit: "編輯",
+		verbWrite: "寫入",
+		verbShell: "執行",
+		verbSearch: "搜尋",
+		verbFetch: "取得",
+		verbSubagent: "委派",
+		running: "執行中",
+		completed: "完成",
+		failed: "失敗",
+		retry: (attempt: number, max: number, seconds: number) =>
+			`${seconds} 秒後重試(第 ${attempt} / ${max} 次)`,
+		input: "輸入",
+		output: "輸出",
+		error: "錯誤",
+		copyError: "複製錯誤",
+		copied: "已複製 ✓",
+		toolCount: (count: number) => `${count} 工具`,
+	},
+	en: {
+		verbRead: "Read",
+		verbEdit: "Edit",
+		verbWrite: "Write",
+		verbShell: "Run",
+		verbSearch: "Search",
+		verbFetch: "Fetch",
+		verbSubagent: "Delegate",
+		running: "Running",
+		completed: "Done",
+		failed: "Failed",
+		retry: (attempt: number, max: number, seconds: number) =>
+			`Retrying in ${seconds}s (attempt ${attempt} of ${max})`,
+		input: "Input",
+		output: "Output",
+		error: "Error",
+		copyError: "Copy error",
+		copied: "Copied ✓",
+		toolCount: (count: number) => `${count} ${count === 1 ? "tool" : "tools"}`,
+	},
+})
+
+/**
+ * The ToolCard family's built-in words (follow `<LocaleProvider>`). Override any with
+ * `<ToolCard labels={…}>`; ToolInput, ToolOutput, ToolError and SubagentLine inside the card
+ * read the same overrides.
+ */
+export type ToolCardLabels = StringsOf<typeof strings>
+
+const VERBS: Record<string, `verb${string}` & keyof ToolCardLabels> = {
+	read: "verbRead",
+	edit: "verbEdit",
+	write: "verbWrite",
+	shell: "verbShell",
+	search: "verbSearch",
+	fetch: "verbFetch",
+	subagent: "verbSubagent",
+}
+
+// The card's `labels`, handed down to the family parts rendered inside it
+const LabelsContext = createContext<Partial<ToolCardLabels> | undefined>(undefined)
+
+function useInheritedStrings() {
+	return useStrings(strings, use(LabelsContext))
 }
 
 // lucide 的路徑:file-text / pencil / file-plus / terminal / search / globe / bot,其他工具用 wrench
@@ -380,10 +438,18 @@ export type ToolCardProps = {
 	 */
 	progress?: number
 	retry?: ToolRetry
-	/** The retry line, shown and announced: when the next try starts and which try of how many it is. */
+	/** Override built-in words for this card and the family parts inside it; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ToolCardLabels>
+	/**
+	 * The retry line, shown and announced: when the next try starts and which try of how many it is.
+	 * Wins over `labels.retry`.
+	 */
 	retryLabel?: (attempt: number, max: number, seconds: number) => string
+	/** The running state's word. Wins over `labels.running`. */
 	runningLabel?: string
+	/** The completed state's word. Wins over `labels.completed`. */
 	completedLabel?: string
+	/** The error state's word. Wins over `labels.failed`. */
 	errorLabel?: string
 	secondLine?: ReactNode
 	footer?: ReactNode
@@ -402,14 +468,16 @@ export function ToolCard({
 	onOpenChange,
 	progress,
 	retry,
-	retryLabel = (attempt, max, seconds) => `${seconds} 秒後重試(第 ${attempt} / ${max} 次)`,
-	runningLabel = "執行中",
-	completedLabel = "完成",
-	errorLabel = "失敗",
+	labels,
+	retryLabel,
+	runningLabel,
+	completedLabel,
+	errorLabel,
 	secondLine,
 	footer,
 	children,
 }: ToolCardProps) {
+	const t = useStrings(strings, labels)
 	const detailId = useId()
 	// No onChange here: only the user's click reports through onOpenChange, not the error auto-open
 	const [open, setOpen] = useControllableState(
@@ -424,9 +492,13 @@ export function ToolCard({
 		setWasState(state)
 		if (state === "error" && defaultOpen == null && openProp === undefined) setOpen(true)
 	}
-	const STATE_LABELS = { running: runningLabel, completed: completedLabel, error: errorLabel }
+	const STATE_LABELS = {
+		running: runningLabel ?? t.running,
+		completed: completedLabel ?? t.completed,
+		error: errorLabel ?? t.failed,
+	}
 	const retryText =
-		retry != null ? retryLabel(retry.attempt, retry.max, Math.round(retry.delayMs / 1000)) : ""
+		retry != null ? (retryLabel ?? t.retry)(retry.attempt, retry.max, Math.round(retry.delayMs / 1000)) : ""
 	const time = durationLabel ?? (durationMs != null ? formatDuration(durationMs) : "")
 	const fraction =
 		state === "running" && progress != null && Number.isFinite(progress)
@@ -434,92 +506,104 @@ export function ToolCard({
 			: undefined
 
 	return (
-		<div {...stylex.props(styles.card, state === "error" && styles.cardError)}>
-			<button
-				type="button"
-				aria-expanded={open}
-				aria-controls={detailId}
-				onClick={() => {
-					setOpen(!open)
-					onOpenChange?.(!open)
-				}}
-				{...stylex.props(reset.control, styles.row)}
-			>
-				<span
-					{...stylex.props(
-						styles.tile,
-						state === "running" && styles.tileRunning,
-						state === "completed" && styles.tileOk,
-						state === "error" && styles.tileBad,
-					)}
+		<LabelsContext value={labels}>
+			<div {...stylex.props(styles.card, state === "error" && styles.cardError)}>
+				<button
+					type="button"
+					aria-expanded={open}
+					aria-controls={detailId}
+					onClick={() => {
+						setOpen(!open)
+						onOpenChange?.(!open)
+					}}
+					{...stylex.props(reset.control, styles.row)}
 				>
-					<ToolGlyph
-						paths={state === "running" ? (TOOL_PATHS[tool] ?? TOOL_PATHS.tool) : STATE_PATHS[state]}
-					/>
-					{state !== "running" && <span {...stylex.props(styles.srOnly)}>{STATE_LABELS[state]}</span>}
-				</span>
-				<span {...stylex.props(styles.main)}>
-					<span {...stylex.props(styles.line)}>
-						<span id={`${detailId}-title`} {...stylex.props(styles.title)}>
-							{title ?? VERBS[tool] ?? tool}
+					<span
+						{...stylex.props(
+							styles.tile,
+							state === "running" && styles.tileRunning,
+							state === "completed" && styles.tileOk,
+							state === "error" && styles.tileBad,
+						)}
+					>
+						<ToolGlyph
+							paths={state === "running" ? (TOOL_PATHS[tool] ?? TOOL_PATHS.tool) : STATE_PATHS[state]}
+						/>
+						{state !== "running" && <span {...stylex.props(styles.srOnly)}>{STATE_LABELS[state]}</span>}
+					</span>
+					<span {...stylex.props(styles.main)}>
+						<span {...stylex.props(styles.line)}>
+							<span id={`${detailId}-title`} {...stylex.props(styles.title)}>
+								{title ?? (Object.hasOwn(VERBS, tool) ? t[VERBS[tool]] : tool)}
+							</span>
+							{subtitle != null && (
+								<span
+									id={`${detailId}-subtitle`}
+									title={subtitle}
+									{...stylex.props(styles.subtitle, open && styles.subtitleOpen)}
+								>
+									{subtitle}
+								</span>
+							)}
 						</span>
-						{subtitle != null && (
-							<span
-								id={`${detailId}-subtitle`}
-								title={subtitle}
-								{...stylex.props(styles.subtitle, open && styles.subtitleOpen)}
-							>
-								{subtitle}
+						{state === "running" && (
+							<span aria-hidden="true" {...stylex.props(styles.track)}>
+								<span
+									{...stylex.props(
+										fraction != null ? styles.fill : styles.bar,
+										fraction != null && styles.fillWidth(fraction * 100),
+									)}
+								/>
 							</span>
 						)}
 					</span>
-					{state === "running" && (
-						<span aria-hidden="true" {...stylex.props(styles.track)}>
-							<span
-								{...stylex.props(
-									fraction != null ? styles.fill : styles.bar,
-									fraction != null && styles.fillWidth(fraction * 100),
-								)}
-							/>
-						</span>
-					)}
-				</span>
-				{time !== "" && <span {...stylex.props(styles.time)}>{time}</span>}
-				<Chevron open={open} />
-			</button>
-			{/* A button's children are presentational, so the progressbar sits beside it, visually hidden;
+					{time !== "" && <span {...stylex.props(styles.time)}>{time}</span>}
+					<Chevron open={open} />
+				</button>
+				{/* A button's children are presentational, so the progressbar sits beside it, visually hidden;
 			    the bar inside the row is its picture. */}
-			{fraction != null && (
-				<span
-					role="progressbar"
-					aria-labelledby={subtitle != null ? `${detailId}-title ${detailId}-subtitle` : `${detailId}-title`}
-					aria-valuemin={0}
-					aria-valuemax={100}
-					aria-valuenow={Math.round(fraction * 100)}
-					{...stylex.props(styles.srOnly)}
-				/>
-			)}
-			{secondLine}
-			{footer}
-			<div id={detailId} hidden={!open} {...stylex.props(styles.detail)}>
-				{children}
-			</div>
-			{retry != null && (
-				<div aria-hidden="true" {...stylex.props(styles.retryLine)}>
-					<span {...stylex.props(styles.spinner)} />
-					{retryText}
+				{fraction != null && (
+					<span
+						role="progressbar"
+						aria-labelledby={
+							subtitle != null ? `${detailId}-title ${detailId}-subtitle` : `${detailId}-title`
+						}
+						aria-valuemin={0}
+						aria-valuemax={100}
+						aria-valuenow={Math.round(fraction * 100)}
+						{...stylex.props(styles.srOnly)}
+					/>
+				)}
+				{secondLine}
+				{footer}
+				<div id={detailId} hidden={!open} {...stylex.props(styles.detail)}>
+					{children}
 				</div>
-			)}
-			<span role="status" {...stylex.props(styles.srOnly)}>
-				{[STATE_LABELS[state], retryText].filter(Boolean).join(" · ")}
-			</span>
-		</div>
+				{retry != null && (
+					<div aria-hidden="true" {...stylex.props(styles.retryLine)}>
+						<span {...stylex.props(styles.spinner)} />
+						{retryText}
+					</div>
+				)}
+				<span role="status" {...stylex.props(styles.srOnly)}>
+					{[STATE_LABELS[state], retryText].filter(Boolean).join(" · ")}
+				</span>
+			</div>
+		</LabelsContext>
 	)
 }
 
-export type ToolInputProps = { json: unknown; label?: string }
+export type ToolInputProps = {
+	/** The call's input: a string as-is, anything else as JSON. */
+	json: unknown
+	/** The pane's name. Wins over the card's `labels.input`. */
+	label?: string
+}
 
-export function ToolInput({ json, label = "輸入" }: ToolInputProps) {
+/** The tool call's input pane, for inside a ToolCard. */
+export function ToolInput({ json, label: labelProp }: ToolInputProps) {
+	const t = useInheritedStrings()
+	const label = labelProp ?? t.input
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
@@ -530,9 +614,17 @@ export function ToolInput({ json, label = "輸入" }: ToolInputProps) {
 	)
 }
 
-export type ToolOutputProps = { text: string; label?: string }
+export type ToolOutputProps = {
+	/** The call's output text. */
+	text: string
+	/** The pane's name. Wins over the card's `labels.output`. */
+	label?: string
+}
 
-export function ToolOutput({ text: value, label = "輸出" }: ToolOutputProps) {
+/** The tool call's output pane, for inside a ToolCard. */
+export function ToolOutput({ text: value, label: labelProp }: ToolOutputProps) {
+	const t = useInheritedStrings()
+	const label = labelProp ?? t.output
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
@@ -544,18 +636,20 @@ export function ToolOutput({ text: value, label = "輸出" }: ToolOutputProps) {
 }
 
 export type ToolErrorProps = {
+	/** The error text, also what the copy button copies. */
 	text: string
+	/** The pane's name. Wins over the card's `labels.error`. */
 	label?: string
+	/** The copy button's words. Wins over the card's `labels.copyError`. */
 	copyLabel?: string
+	/** The copy button's words right after copying. Wins over the card's `labels.copied`. */
 	copiedLabel?: string
 }
 
-export function ToolError({
-	text: value,
-	label = "錯誤",
-	copyLabel = "複製錯誤",
-	copiedLabel = "已複製 ✓",
-}: ToolErrorProps) {
+/** The tool call's error pane with a copy button, for inside a ToolCard. */
+export function ToolError({ text: value, label: labelProp, copyLabel, copiedLabel }: ToolErrorProps) {
+	const t = useInheritedStrings()
+	const label = labelProp ?? t.error
 	const { copied, copy } = useCopy()
 	return (
 		<>
@@ -564,7 +658,7 @@ export function ToolError({
 				{value}
 			</pre>
 			<button type="button" onClick={() => copy(value)} {...stylex.props(reset.control, styles.copyError)}>
-				{copied ? copiedLabel : copyLabel}
+				{copied ? (copiedLabel ?? t.copied) : (copyLabel ?? t.copyError)}
 			</button>
 		</>
 	)
@@ -577,13 +671,14 @@ export type SubagentLineProps = {
 }
 
 export function SubagentLine({ model, now, toolCount }: SubagentLineProps) {
+	const t = useInheritedStrings()
 	return (
 		<div {...stylex.props(styles.subLine)}>
 			{model != null && <span {...stylex.props(styles.chip)}>{model}</span>}
 			{now != null ? (
 				<span {...stylex.props(styles.now)}>{now}</span>
 			) : toolCount != null ? (
-				<span>{`${toolCount} 工具`}</span>
+				<span>{t.toolCount(toolCount)}</span>
 			) : null}
 		</div>
 	)
