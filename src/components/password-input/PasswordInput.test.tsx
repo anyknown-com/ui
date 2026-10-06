@@ -4,6 +4,16 @@ import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { PasswordInput, defaultScorer } from "./PasswordInput"
 
+function Pair() {
+	const [primary, setPrimary] = useState("")
+	return (
+		<>
+			<PasswordInput aria-label="passphrase" value={primary} onValueChange={setPrimary} />
+			<PasswordInput aria-label="再輸入一次" confirmOf={primary} />
+		</>
+	)
+}
+
 describe("defaultScorer", () => {
 	test("scores on length thresholds and character classes", () => {
 		expect(defaultScorer("")).toBe(0)
@@ -72,15 +82,6 @@ describe("PasswordInput", () => {
 	})
 
 	test("confirmOf only complains once something has been typed", async () => {
-		function Pair() {
-			const [primary, setPrimary] = useState("")
-			return (
-				<>
-					<PasswordInput aria-label="passphrase" value={primary} onValueChange={setPrimary} />
-					<PasswordInput aria-label="再輸入一次" confirmOf={primary} />
-				</>
-			)
-		}
 		render(<Pair />)
 		const confirm = screen.getByLabelText("再輸入一次")
 		expect(screen.queryByText("再輸入一次同樣的 passphrase。")).not.toBeInTheDocument()
