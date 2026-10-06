@@ -5,6 +5,8 @@ import { type StyleArg, styled } from "../../lib/styled"
 import { color, corner, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// 觸控裝置沒有 hover:只在 hover 才出現的東西要一直顯示
+const NO_HOVER = "@media (hover: none)"
 // 使用者泡泡的大角。軟材規格是 18 18 6 18,圓角 token 沒有 18 這一階
 const BUBBLE_CORNER = 18
 
@@ -40,7 +42,7 @@ const styles = stylex.create({
 		marginBottom: `calc(${space.xl} * -1)`,
 		contentVisibility: "auto",
 		containIntrinsicSize: "auto 200px",
-		"--ak-action-bar-opacity": { default: "0", ":hover": "1" },
+		"--ak-action-bar-opacity": { default: "0", ":hover": "1", [NO_HOVER]: "1" },
 	},
 	part: { margin: 0, fontSize: type.t3, lineHeight: type.body, color: color.text },
 	cursor: {

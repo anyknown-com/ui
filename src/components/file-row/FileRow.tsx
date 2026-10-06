@@ -5,6 +5,8 @@ import { formatBytes } from "../../lib/format"
 import { color, corner, font, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// 觸控裝置沒有 hover:checkbox 與動作鈕一直顯示
+const NO_HOVER = "@media (hover: none)"
 
 const spin = stylex.keyframes({ to: { rotate: "360deg" } })
 
@@ -42,7 +44,7 @@ const styles = stylex.create({
 		cursor: "default",
 		userSelect: "none",
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
-		"--ak-row-affordance": { default: "0", ":hover": "1", ":focus-within": "1" },
+		"--ak-row-affordance": { default: "0", ":hover": "1", ":focus-within": "1", [NO_HOVER]: "1" },
 		":last-child": { borderBottomWidth: 0 },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,

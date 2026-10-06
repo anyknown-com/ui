@@ -302,6 +302,7 @@ icon 是跟文字同色的線條,不墊圓底。
 - user 泡泡是凹下去的 `surface`、無框,圓角 18 18 6 18(右下是說話的人那一角)。18 沒有
   圓角 token,寫在元件裡的常數;agent 不加泡泡,直接排在紙上
 - 回覆中的點是 `signal`:agent 正在做事
+- assistant 的 action bar 平常 hover 才浮現;`(hover: none)` 的觸控裝置上一直顯示
 
 ### bubble
 product 殼的訊息泡泡(0.9):整寬、上下 12、`t3` / `body`。人說的是凹下去的 `surface`、
@@ -522,6 +523,8 @@ dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放
 ### file-row
 檔案列表的一列:類型圖示 + 檔名 + 大小(mono、tabular)+ 修改時間 + hover 才浮現的
 動作與選取 checkbox;另有資料夾列與加密中 / 上傳中的 busy 列。
+
+- 觸控裝置(`(hover: none)`)沒有 hover,checkbox 與動作鈕一直顯示
 
 - 檔名放不下時切成 `…`,`title` 帶全名(附件方塊的名字、`Group` 的列名與狀態、`Pill`、
   `Cell mono`、`Subject` 也一樣:切掉的字一律 hover 看得到全文)
