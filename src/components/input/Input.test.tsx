@@ -2,7 +2,10 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
+import { forcedCss } from "../../test/forcedCss"
 import { Field } from "../label/Field"
+import { Select, SelectItem } from "../select/Select"
+import { Textarea } from "../textarea/Textarea"
 import { Input } from "./Input"
 
 describe("Input", () => {
@@ -86,4 +89,29 @@ describe("Input regressions", () => {
 			render(<Input aria-label="名稱" />).container.querySelector("input")?.className,
 		)
 	})
+})
+
+test("forced-colors: invalid input, textarea and select keep a dashed 2px frame", () => {
+	render(
+		<>
+			<Input aria-label="ok" />
+			<Input aria-label="bad" invalid />
+			<Textarea aria-label="note" invalid />
+			<Field label="Model" error="Pick one.">
+				<Select>
+					<SelectItem value="a">A</SelectItem>
+				</Select>
+			</Field>
+		</>,
+	)
+	expect(forcedCss(screen.getByRole("textbox", { name: "ok" }))).not.toMatch(/dashed/)
+	for (const control of [
+		screen.getByRole("textbox", { name: "bad" }),
+		screen.getByRole("textbox", { name: "note" }),
+		screen.getByRole("combobox", { name: "Model" }),
+	]) {
+		const css = forcedCss(control)
+		expect(css).toMatch(/border-style: dashed/)
+		expect(css).toMatch(/border-width: 2px/)
+	}
 })

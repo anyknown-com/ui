@@ -4,6 +4,8 @@ import { type StyleArg, styled } from "../../lib/styled"
 import { breakpoint, color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
+const FORCED = "@media (forced-colors: active)"
+
 // 輸入框是紙上凹下去的一格:surface 底 + 1px border(邊界要 3:1 才看得到,只靠底色不夠)。
 // focus 時框換 focusRing(= signal),外面再貼一圈 2px 實心的 focusRing:淡環對底色不到 3:1,
 // 看不出焦點在哪。invalid 的框留 danger,焦點環照樣是 focusRing。
@@ -41,6 +43,10 @@ export const controlStyles = stylex.create({
 	},
 	invalid: {
 		borderColor: { default: color.danger, ":hover:not(:disabled)": color.danger },
+		// Forced colors repaint danger as the plain frame colour: a thicker dashed frame keeps
+		// the error visible without colour.
+		borderStyle: { default: "solid", [FORCED]: "dashed" },
+		borderWidth: { default: 1, [FORCED]: 2 },
 	},
 	// 跟 button 的 40 / 32 對齊
 	md: { minHeight: "2.5rem", paddingBlock: space.xs, paddingInline: space.sm },

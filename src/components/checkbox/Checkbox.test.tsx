@@ -139,6 +139,20 @@ describe("Checkbox in forced-colors", () => {
 		expect(forcedCss(box("off"))).toMatch(/border-color: graytext/i)
 		expect(forcedCss(box("on"))).toMatch(/background-color: graytext/i)
 	})
+
+	test("invalid is a dashed ButtonText frame, not the raw danger colour", () => {
+		render(
+			<>
+				<Checkbox label="ok" />
+				<Checkbox label="bad" aria-invalid="true" />
+			</>,
+		)
+		expect(forcedCss(box("ok"))).not.toMatch(/dashed/)
+		const css = forcedCss(box("bad"))
+		expect(css).toMatch(/border-style: dashed/)
+		expect(css).toMatch(/border-width: 2px/)
+		expect(css).toMatch(/border-color: buttontext/i)
+	})
 })
 
 describe("Checkbox target and a11y", () => {

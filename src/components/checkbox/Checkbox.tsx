@@ -62,7 +62,13 @@ const styles = stylex.create({
 		borderColor: { default: color.accent, [FORCED]: "Highlight" },
 		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
 	},
-	boxInvalid: { borderColor: color.danger },
+	// The box opts out of forced colours, so danger would show as is: use ButtonText and mark
+	// the error with a thicker dashed frame instead of colour.
+	boxInvalid: {
+		borderColor: { default: color.danger, [FORCED]: "ButtonText" },
+		borderStyle: { default: "solid", [FORCED]: "dashed" },
+		borderWidth: { default: 1.5, [FORCED]: 2 },
+	},
 	boxDisabled: { borderColor: { default: color.borderControl, [FORCED]: "GrayText" } },
 	boxOnDisabled: {
 		borderColor: { default: color.accent, [FORCED]: "GrayText" },
