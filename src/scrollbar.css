@@ -1,6 +1,8 @@
-/* @anyknown/ui — 客製 scrollbar(Ledger)
- * 細、圓、安靜:thumb 是一條線(borderStrong),hover 才加深;track 透明。
- * Chromium/Safari 走 ::-webkit-scrollbar;Firefox 走標準屬性(兩者互斥,用 @supports 分流)。 */
+/* @anyknown/ui — custom scrollbars (tactile)
+ * Thin, round and quiet: the thumb is a line in borderStrong that darkens to textFaint on hover;
+ * the track and the corner are transparent. Chromium and Safari use ::-webkit-scrollbar, Firefox
+ * the standard properties (the two are exclusive, split with @supports). StyleX cannot express
+ * these pseudo-elements, which is why this is a plain CSS file. */
 
 ::-webkit-scrollbar {
 	width: 10px;
