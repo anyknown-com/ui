@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Kbd, KbdGroup, KbdToneContext } from "./Kbd"
 
 describe("Kbd", () => {
@@ -29,4 +30,18 @@ describe("Kbd", () => {
 		)
 		expect(plain.querySelector("kbd")?.className).not.toBe(inverted.querySelector("kbd")?.className)
 	})
+})
+
+test("axe: a key, a combo, a sequence, an inverted key", async () => {
+	const { container } = render(
+		<p>
+			按 <Kbd>Esc</Kbd> 關閉,
+			<KbdGroup keys={["⌘", "K"]} /> 搜尋,
+			<KbdGroup keys={["G", "H"]} separator="然後" /> 回首頁,
+			<KbdToneContext value="inverted">
+				<Kbd>F8</Kbd>
+			</KbdToneContext>
+		</p>,
+	)
+	await expectNoAxeViolations(container)
 })

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { StatusBadge } from "./StatusBadge"
 
 describe("StatusBadge", () => {
@@ -19,4 +20,15 @@ describe("StatusBadge", () => {
 		expect(screen.queryByRole("status")).toBeNull()
 		expect(screen.getByText("需要處理")).toBeInTheDocument()
 	})
+})
+
+test("axe: live, warn and plain", async () => {
+	const { container } = render(
+		<p>
+			<StatusBadge tone="live">執行中</StatusBadge>
+			<StatusBadge tone="warn">需要處理</StatusBadge>
+			<StatusBadge tone="plain">結束</StatusBadge>
+		</p>,
+	)
+	await expectNoAxeViolations(container)
 })

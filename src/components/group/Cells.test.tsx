@@ -171,6 +171,8 @@ describe("cells axe", () => {
 				<GroupCell label="自動" checked onPress={() => {}} />
 				<GroupCell label="刪除" tone="danger" onPress={() => {}} />
 				<GroupCell label="帳號" detail="solemnis" icon={<IconTile icon={Glyph} />} />
+				<GroupCell label="Notion" icon={<LetterTile name="notion" />} />
+				<GroupCell label="新增" tone="accent" icon={<ActionIcon icon={Glyph} />} onPress={() => {}} />
 				<InputCell label="名稱" placeholder="STRIPE_KEY" />
 				<InputCell label="停用" disabled />
 				<TextCell aria-label="說明" />

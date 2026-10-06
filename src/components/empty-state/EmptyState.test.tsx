@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { Button } from "../button/Button"
+import { expectNoAxeViolations } from "../../test/axe"
 import { EmptyState } from "./EmptyState"
 
 describe("EmptyState", () => {
@@ -31,4 +32,20 @@ describe("EmptyState", () => {
 		render(<EmptyState title="這一天沒有紀錄" description="8 月 26 日工作區是安靜的。" />)
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})
+})
+
+test("axe: with icon, description and action, and bare", async () => {
+	const { container } = render(
+		<>
+			<EmptyState
+				icon={<svg />}
+				title="還沒有檔案"
+				description="把檔案拖進來,或按下面的按鈕。"
+				action={<Button>上傳</Button>}
+				headingLevel={2}
+			/>
+			<EmptyState title="沒有結果" />
+		</>,
+	)
+	await expectNoAxeViolations(container)
 })

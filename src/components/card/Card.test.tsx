@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { type StyleArg } from "../../lib/styled"
 import { space } from "../../tokens.stylex"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Card } from "./Card"
 
 const probe = stylex.create({
@@ -24,4 +25,14 @@ describe("Card", () => {
 		expect(classes).toContain(atom(probe.tightPadding))
 		expect(classes).not.toContain(atom(probe.basePadding))
 	})
+})
+
+test("axe: a card holding a heading and a control", async () => {
+	const { container } = render(
+		<Card aria-labelledby="card-title" role="region">
+			<h2 id="card-title">方案</h2>
+			<button type="button">升級</button>
+		</Card>,
+	)
+	await expectNoAxeViolations(container)
 })

@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { type StyleArg } from "../../lib/styled"
 import { color } from "../../tokens.stylex"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Text } from "./Text"
 
 // StyleX 在同一次 props() 內按 property 合併,勝出的那個 property 只會留一個 atomic
@@ -58,4 +59,21 @@ describe("Text", () => {
 		expect(classes).toContain(atom(probe.muted))
 		expect(classes).toContain(atom(probe.text))
 	})
+})
+
+test("axe: every variant, as headings and paragraphs", async () => {
+	const { container } = render(
+		<>
+			<Text as="h1" variant="display">
+				AnyKnown
+			</Text>
+			<Text as="h2" variant="title">
+				設定
+			</Text>
+			<Text>內文</Text>
+			<Text variant="caption">說明</Text>
+			<Text variant="mono">npm i</Text>
+		</>,
+	)
+	await expectNoAxeViolations(container)
 })
