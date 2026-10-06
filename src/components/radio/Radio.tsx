@@ -6,6 +6,7 @@ import { useFieldControl } from "../label/fieldContext"
 import { useRadioGroup } from "./RadioGroup"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const HIT = "max(24px, 1.5rem)"
 
 const styles = stylex.create({
 	root: {
@@ -27,8 +28,19 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	cardOn: { borderColor: color.accent, backgroundColor: color.accentSubtle },
-	input: { position: "absolute", opacity: 0, width: "1.05rem", height: "1.05rem", margin: 0 },
+	// 看得到的圓 17px,可以按的原生 input 是蓋在上面、置中的 24px(WCAG 2.5.8),不影響版面
+	input: {
+		position: "absolute",
+		opacity: 0,
+		width: HIT,
+		height: HIT,
+		insetBlockStart: `calc((100% - ${HIT}) / 2)`,
+		insetInlineStart: `calc((100% - ${HIT}) / 2)`,
+		margin: 0,
+		cursor: "inherit",
+	},
 	dot: {
+		position: "relative",
 		flex: "none",
 		boxSizing: "border-box",
 		display: "grid",

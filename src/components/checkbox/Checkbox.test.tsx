@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Checkbox } from "./Checkbox"
 
 describe("Checkbox", () => {
@@ -95,5 +96,37 @@ describe("Checkbox description", () => {
 		await userEvent.click(box)
 		expect(box.indeterminate).toBe(false)
 		expect(box).toBeChecked()
+	})
+})
+
+describe("Checkbox target and a11y", () => {
+	test("the hit area is 24×24 even though the box is drawn smaller", () => {
+		render(<Checkbox aria-label="選取" />)
+		expect(screen.getByRole("checkbox")).toHaveStyle({ width: "24px", height: "24px" })
+	})
+
+	test("uncontrolled: defaultChecked starts it, onCheckedChange hears each toggle", async () => {
+		const onCheckedChange = vi.fn()
+		render(<Checkbox label="記住" defaultChecked onCheckedChange={onCheckedChange} />)
+		const box = screen.getByRole("checkbox", { name: "記住" })
+		expect(box).toBeChecked()
+		await userEvent.click(box)
+		expect(box).not.toBeChecked()
+		expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(false)
+	})
+
+	test("axe: unchecked, checked, indeterminate, invalid, disabled, described", async () => {
+		const { container } = render(
+			<>
+				<Checkbox label="一" />
+				<Checkbox label="二" defaultChecked />
+				<Checkbox label="三" indeterminate />
+				<Checkbox label="四" aria-invalid="true" />
+				<Checkbox label="五" disabled defaultChecked />
+				<Checkbox label="六" description="說明" />
+				<Checkbox aria-label="七" />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })

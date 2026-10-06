@@ -115,7 +115,10 @@ const styles = stylex.create({
 	},
 	jobError: { backgroundColor: color.dangerSubtle },
 	name: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+	// 看起來 22px、可以按 24px 以上(WCAG 2.5.8):::after 往外撐,不影響版面
 	cancel: {
+		position: "relative",
+		"::after": { content: '""', position: "absolute", inset: "-0.25rem" },
 		cursor: "pointer",
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },

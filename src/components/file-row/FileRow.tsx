@@ -56,6 +56,14 @@ const styles = stylex.create({
 	busy: { color: color.textMuted, cursor: "progress" },
 	checkCell: { display: "grid", placeItems: "center", gridRow: { default: "auto", [NARROW]: "1 / 3" } },
 	iconCell: { gridRow: { default: "auto", [NARROW]: "1 / 3" } },
+	// 方框 16px,外面包一層 24px 的 label 當可以按的範圍(WCAG 2.5.8)
+	hit: {
+		display: "grid",
+		placeItems: "center",
+		minWidth: "max(24px, 1.5rem)",
+		minHeight: "max(24px, 1.5rem)",
+		cursor: "pointer",
+	},
 	check: {
 		justifySelf: "center",
 		width: "1rem",
@@ -323,6 +331,8 @@ export function FileRow({
 			onClick={(event) => {
 				// The second click of a double-click must not undo the first's toggle.
 				if (event.detail > 1) return
+				// A click on the checkbox's label is the checkbox's own; it toggles through the input.
+				if (event.target instanceof Element && event.target.closest("label")) return
 				setSelected(!selected)
 			}}
 			onDoubleClick={() => onOpen?.()}
@@ -330,14 +340,16 @@ export function FileRow({
 			{...stylex.props(styles.row, selected && styles.selected)}
 		>
 			<span role="gridcell" {...stylex.props(styles.checkCell)}>
-				<input
-					type="checkbox"
-					checked={selected}
-					aria-label={t.select(item.name)}
-					onClick={(event) => event.stopPropagation()}
-					onChange={(event) => setSelected(event.currentTarget.checked)}
-					{...stylex.props(styles.check)}
-				/>
+				<label {...stylex.props(styles.hit)}>
+					<input
+						type="checkbox"
+						checked={selected}
+						aria-label={t.select(item.name)}
+						onClick={(event) => event.stopPropagation()}
+						onChange={(event) => setSelected(event.currentTarget.checked)}
+						{...stylex.props(styles.check)}
+					/>
+				</label>
 			</span>
 			<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 				{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}

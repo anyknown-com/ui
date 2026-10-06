@@ -137,7 +137,17 @@ const styles = stylex.create({
 		backgroundColor: color.surface,
 		color: color.text,
 	},
+	// 方框 14px,外面包一層 24px 的 label 當可以按的範圍(WCAG 2.5.8),點 label 就是點方框
+	hit: {
+		display: "inline-grid",
+		placeItems: "center",
+		minWidth: "max(24px, 1.5rem)",
+		minHeight: "max(24px, 1.5rem)",
+		verticalAlign: "middle",
+		cursor: "pointer",
+	},
 	checkbox: {
+		margin: 0,
 		accentColor: color.accent,
 		width: "0.85rem",
 		height: "0.85rem",
@@ -430,14 +440,16 @@ export function DataTable<Row>({
 						<tr>
 							{selected != null && (
 								<th scope="col" {...stylex.props(styles.th, styles.thCheck)}>
-									<input
-										ref={selectAll}
-										type="checkbox"
-										checked={allSelected}
-										aria-label={t.selectAll}
-										onChange={(event) => toggleAll(event.currentTarget.checked)}
-										{...stylex.props(styles.checkbox)}
-									/>
+									<label {...stylex.props(styles.hit)}>
+										<input
+											ref={selectAll}
+											type="checkbox"
+											checked={allSelected}
+											aria-label={t.selectAll}
+											onChange={(event) => toggleAll(event.currentTarget.checked)}
+											{...stylex.props(styles.checkbox)}
+										/>
+									</label>
 								</th>
 							)}
 							{columns.map((column) => (
@@ -499,18 +511,20 @@ export function DataTable<Row>({
 									<tr key={key} {...stylex.props(styles.row, isSelected && styles.rowSelected)}>
 										{selected != null && (
 											<td {...stylex.props(styles.td, styles.tdCheck)}>
-												<input
-													type="checkbox"
-													checked={isSelected}
-													aria-label={t.select(key)}
-													onChange={(event) => {
-														const next = new Set(selected)
-														if (event.currentTarget.checked) next.add(key)
-														else next.delete(key)
-														setSelected(next)
-													}}
-													{...stylex.props(styles.checkbox)}
-												/>
+												<label {...stylex.props(styles.hit)}>
+													<input
+														type="checkbox"
+														checked={isSelected}
+														aria-label={t.select(key)}
+														onChange={(event) => {
+															const next = new Set(selected)
+															if (event.currentTarget.checked) next.add(key)
+															else next.delete(key)
+															setSelected(next)
+														}}
+														{...stylex.props(styles.checkbox)}
+													/>
+												</label>
 											</td>
 										)}
 										{columns.map((column) => {

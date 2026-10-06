@@ -17,7 +17,17 @@ const styles = stylex.create({
 		opacity: { default: 1, ":has(:disabled)": 0.5 },
 		fontFamily: font.body,
 	},
-	input: { position: "absolute", opacity: 0, width: "2.75rem", height: "1.4rem", margin: 0 },
+	// 軌道只有 22px 高:可以按的原生 input 上下各多一點,湊滿 24px(WCAG 2.5.8),不影響版面
+	input: {
+		position: "absolute",
+		opacity: 0,
+		width: "100%",
+		height: "max(24px, 1.5rem)",
+		insetBlockStart: "calc((100% - max(24px, 1.5rem)) / 2)",
+		insetInlineStart: 0,
+		margin: 0,
+		cursor: "inherit",
+	},
 	track: {
 		flex: "none",
 		position: "relative",

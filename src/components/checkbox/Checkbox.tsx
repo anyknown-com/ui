@@ -7,6 +7,7 @@ import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const HIT = "max(24px, 1.5rem)"
 
 const CHECK_D = "M6 12.4 L10.2 16.6 L18.2 7.4"
 const DASH_D = "M6.5 12 L17.5 12"
@@ -20,8 +21,19 @@ const styles = stylex.create({
 		opacity: { default: 1, ":has(:disabled)": 0.5 },
 		fontFamily: font.body,
 	},
-	input: { position: "absolute", opacity: 0, width: "1.05rem", height: "1.05rem", margin: 0 },
+	// 看得到的方框 17px,可以按的原生 input 是蓋在上面、置中的 24px(WCAG 2.5.8),不影響版面
+	input: {
+		position: "absolute",
+		opacity: 0,
+		width: HIT,
+		height: HIT,
+		insetBlockStart: `calc((100% - ${HIT}) / 2)`,
+		insetInlineStart: `calc((100% - ${HIT}) / 2)`,
+		margin: 0,
+		cursor: "inherit",
+	},
 	box: {
+		position: "relative",
 		flex: "none",
 		boxSizing: "border-box",
 		width: "1.05rem",

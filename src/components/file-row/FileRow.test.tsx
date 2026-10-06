@@ -100,6 +100,16 @@ describe("FileRow", () => {
 		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "false")
 	})
 
+	test("the checkbox's 24px label toggles the row exactly once", async () => {
+		const onSelectedChange = vi.fn()
+		render(<FileRow item={FILE} onSelectedChange={onSelectedChange} />)
+		const hit = screen.getByRole("checkbox").closest("label") as HTMLElement
+		expect(hit).toHaveStyle({ minWidth: "24px", minHeight: "24px" })
+		await userEvent.click(hit)
+		expect(onSelectedChange).toHaveBeenCalledExactlyOnceWith(true)
+		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "true")
+	})
+
 	test("folders show a dash instead of a size", () => {
 		render(<FileRow item={FOLDER} />)
 		expect(screen.getByText("—")).toBeInTheDocument()

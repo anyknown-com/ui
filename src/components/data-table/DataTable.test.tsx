@@ -257,6 +257,18 @@ describe("DataTable uncontrolled state", () => {
 	})
 })
 
+describe("DataTable checkbox targets", () => {
+	test("each checkbox sits in a 24px label, and clicking the label toggles it once", async () => {
+		render(<Dictionary />)
+		const box = screen.getByRole("checkbox", { name: "選取 nav.projects" })
+		const hit = box.closest("label") as HTMLElement
+		expect(hit).toHaveStyle({ minWidth: "24px", minHeight: "24px" })
+		expect(screen.getByRole("checkbox", { name: "全選" }).closest("label")).toHaveStyle({ minHeight: "24px" })
+		await userEvent.click(hit)
+		expect(box).toBeChecked()
+	})
+})
+
 describe("DataTable words", () => {
 	test("follow the LocaleProvider, and labels override one of them", async () => {
 		render(

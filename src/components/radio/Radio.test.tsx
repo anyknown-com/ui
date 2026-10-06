@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Radio } from "./Radio"
 import { RadioGroup } from "./RadioGroup"
 
@@ -78,5 +79,32 @@ describe("RadioGroup uncontrolled", () => {
 		expect(screen.getByRole("radio", { name: "Claude" })).toBeChecked()
 		await userEvent.click(screen.getByRole("radio", { name: "ChatGPT" }))
 		expect(screen.getByRole("radio", { name: "ChatGPT" })).toBeChecked()
+	})
+})
+
+describe("Radio target and a11y", () => {
+	test("the hit area is 24×24 even though the dot is drawn smaller", () => {
+		render(
+			<RadioGroup legend="來源">
+				<Radio value="a" label="A" />
+			</RadioGroup>,
+		)
+		expect(screen.getByRole("radio")).toHaveStyle({ width: "24px", height: "24px" })
+	})
+
+	test("axe: plain and card groups, checked, described, disabled", async () => {
+		const { container } = render(
+			<>
+				<Threshold />
+				<RadioGroup legend="方案" variant="card" defaultValue="pro">
+					<Radio value="free" label="Free" description="免費" />
+					<Radio value="pro" label="Pro" />
+				</RadioGroup>
+				<RadioGroup legend="停用" disabled defaultValue="x">
+					<Radio value="x" label="X" />
+				</RadioGroup>
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })

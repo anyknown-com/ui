@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Switch } from "./Switch"
 
 describe("Switch", () => {
@@ -50,5 +51,35 @@ describe("Switch in a Field", () => {
 			</Field>,
 		)
 		expect(screen.getByRole("switch", { name: "語音喚醒" })).toBeDisabled()
+	})
+})
+
+describe("Switch target and a11y", () => {
+	test("the hit area is at least 24px tall although the track is 22px", () => {
+		render(<Switch aria-label="喚醒" />)
+		expect(screen.getByRole("switch")).toHaveStyle({ height: "24px", width: "100%" })
+	})
+
+	test("uncontrolled: defaultChecked starts it on", async () => {
+		const onCheckedChange = vi.fn()
+		render(<Switch label="喚醒" defaultChecked onCheckedChange={onCheckedChange} />)
+		const control = screen.getByRole("switch", { name: "喚醒" })
+		expect(control).toBeChecked()
+		await userEvent.click(control)
+		expect(control).not.toBeChecked()
+		expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(false)
+	})
+
+	test("axe: off, on, described, invalid, disabled", async () => {
+		const { container } = render(
+			<>
+				<Switch label="一" />
+				<Switch label="二" defaultChecked />
+				<Switch label="三" description="說明" />
+				<Switch label="四" aria-invalid="true" />
+				<Switch label="五" disabled defaultChecked />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
