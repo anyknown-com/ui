@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Skeleton, SkeletonGroup, ThreadSkeleton } from "./Skeleton"
 
 describe("Skeleton", () => {
@@ -33,6 +34,22 @@ describe("Skeleton", () => {
 		const status = screen.getByRole("status", { name: "thread 載入中" })
 		// first child is the visually-hidden label the live region announces
 		expect(status.children).toHaveLength(4)
+	})
+
+	test("bones, a group and the thread preset have no axe violations", async () => {
+		const { container } = render(
+			<>
+				<Skeleton />
+				<Skeleton shape="circle" size={36} />
+				<Skeleton shape="block" height="4rem" />
+				<SkeletonGroup label="清單載入中">
+					<Skeleton />
+					<Skeleton width="60%" />
+				</SkeletonGroup>
+				<ThreadSkeleton />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("the thread preset's label follows the LocaleProvider; label and labels override it", () => {
