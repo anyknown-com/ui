@@ -1,49 +1,54 @@
-# 已知的 a11y 偏差
+# Known a11y gaps
 
-a11y review 量測兩個主題的 token 組合後,列出低於門檻的項目。實作**不自行更動 palette**
-—— 改與不改是設計決策,這份清單是它的待辦。
+An a11y review measured the token pairs in both themes and listed the ones below threshold. The
+implementation **does not change the palette on its own**: whether to change it is a design
+decision, and this list is that decision's backlog.
 
-門檻:文字 4.5:1(小字)、UI 邊界與圖形 3:1、命中區 24px。
+Thresholds: text 4.5:1 (small text), UI boundaries and graphics 3:1, hit targets 24px.
 
-## palette 層(改一次影響全站)
+## Palette level (one change affects every product)
 
-數字對 `scripts/palette.mjs` 目前的輸出量(12 階中性 palette,light / dark)。
+Numbers are measured against the current output of `scripts/palette.mjs` (12-step neutral
+palette, light / dark), as pasted into `src/tokens.stylex.ts`.
 
-| Token 組合 | 實測 | 門檻 | 出現處 |
+| Token pair | Measured | Threshold | Where |
 | --- | --- | --- | --- |
-| `textFaint` on `surface` | 3.75:1(light)/ 4.88:1(dark) | 4.5:1 | input、select 搜尋、composer、interaction-card、data-table 篩選的 placeholder |
-| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.15–1.23:1 | 3:1 | diff-viewer 行內字級 highlight ——「哪幾個字變了」目前只靠這層底色 |
+| `textFaint` on `surface` | 3.75:1 (light) / 4.88:1 (dark) | 4.5:1 | placeholders in input, select search, composer, interaction-card, data-table filter |
+| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.15–1.23:1 | 3:1 | diff-viewer inline word highlight: "which words changed" rests on this background alone |
 
-`textFaint` 只有 3:1,規則是不放要讀的字:icon、chevron、placeholder、分隔符、空格的 `—`
-與 disabled 態可以用它,其他文字一律 `textMuted`(在所有底色上 ≥ 5.36:1)。placeholder
-是唯一還算「字」的例外;要過 4.5:1 就把 placeholder 改成 `textMuted`,不是調 `textFaint`。
+`textFaint` is a 3:1 color, so the rule is: no text that has to be read. Icons, chevrons,
+placeholders, separators, the `—` in an empty cell, and disabled states may use it; all other
+text uses `textMuted` (≥ 5.36:1 on every background). The placeholder is the only "text"
+exception left. To reach 4.5:1, switch the placeholder to `textMuted`; do not retune `textFaint`.
 
-diff 的字級 highlight 是填色階(5 階)疊在 subtle 底(3 階)上,兩階的明度差本來就小;
-要過 3:1 就另外加非顏色的記號(底線或粗體),不手調 `*Hl` 的值。
+The diff word highlight is a fill step (step 5) on a subtle background (step 3); the two steps
+are close in lightness by design. To reach 3:1, add a non-color mark (underline or bold); do not
+hand-tune the `*Hl` values.
 
-## 已修:換成 12 階中性 palette
+## Fixed: moved to the 12-step neutral palette
 
-舊表上的這幾列在新 palette 下都過門檻,已經拿掉:
+These rows from the old table pass under the new palette and were removed:
 
-| Token 組合 | 舊 | 新(light / dark) | 怎麼修的 |
+| Token pair | Old | New (light / dark) | Fix |
 | --- | --- | --- | --- |
-| `textFaint` 當文字(select 群組標題與 hint、dropdown 快捷鍵、label「選填」、list 欄名、diff 行號) | 2.44–3.16 | 改用 `textMuted`:≥ 5.36 / ≥ 7.30 | 讀得到的字全部移到 `textMuted` |
-| checkbox / radio 未勾邊框、switch 關的軌道 | 1.76(`borderStrong`) | 3.75 / 3.80(`borderControl` on `surface`) | 控制項邊界改用 `borderControl` |
-| `accent` on `accentSubtle`(Badge accent、pills tabs 選取態) | 4.18(dark) | 15.31 / 13.62 | 墨色 accent 在中性灰上 |
-| `danger` on `dangerSubtle`(Badge danger) | 4.48(dark) | 4.59 / 7.47 | red 9 階(light)/ 11 階(dark)on red 3 階 |
+| `textFaint` as text (select group titles and hints, dropdown shortcuts, label "optional", list column names, diff line numbers) | 2.44–3.16 | now `textMuted`: ≥ 5.36 / ≥ 7.30 | all readable text moved to `textMuted` |
+| unchecked checkbox / radio border, switch track when off | 1.76 (`borderStrong`) | 3.75 / 3.80 (`borderControl` on `surface`) | control boundaries use `borderControl` |
+| `accent` on `accentSubtle` (Badge accent, pills tabs selected) | 4.18 (dark) | 15.31 / 13.62 | ink accent on neutral gray |
+| `danger` on `dangerSubtle` (Badge danger) | 4.48 (dark) | 4.59 / 7.47 | red step 9 (light) / step 11 (dark) on red step 3 |
 
-## 命中區
+## Hit targets
 
-| 位置 | 實測 | 門檻 | 說明 |
+| Where | Measured | Threshold | Note |
 | --- | --- | --- | --- |
-| checkbox / radio | 16.8px | 24px | 只在省略 `label` 時會踩到 —— 有 label 時整條 label 是命中區 |
-| switch | 高 22.4px | 24px | 同上 |
-| dropzone 取消鈕 / file-row checkbox / data-table checkbox | 22.4 / 16 / 13.6px | 24px | 這三個沒有 label 包住可以放大命中區 |
+| checkbox / radio | 16.8px | 24px | only when `label` is omitted; with a label the whole label is the target |
+| switch | 22.4px tall | 24px | same |
+| dropzone cancel button / file-row checkbox / data-table checkbox | 22.4 / 16 / 13.6px | 24px | none of these has a label around it to enlarge the target |
 
-Badge 的 chip `×` 已經用 `::after` 補到 24px 而不影響版面,同一招可以套到上面三個。
+Badge's chip `×` already reaches 24px with an `::after` that does not affect layout; the same
+trick applies to the three above.
 
-## 刻意的
+## Intentional
 
-| 位置 | 值 | 說明 |
+| Where | Value | Note |
 | --- | --- | --- |
-| scrollbar thumb 可見寬 | 4px(10px 減 3px 透明邊距) | 明訂的設計,只是很細 |
+| scrollbar thumb visible width | 4px (10px minus 3px transparent border on each side) | deliberate, just thin |

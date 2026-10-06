@@ -1,44 +1,49 @@
-# 元件決定紀錄
+# Component decision log
 
-36 個元件的**定案理由、走過的彎路、踩過的坑** —— 只留程式碼與型別裡看不出來的東西。
-API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)。
+Why each component ended up the way it did, the dead ends, and the traps: only what the code and
+the types don't already show. For the API read `dist/index.d.ts` (or each folder's `README.md`);
+for the look open the [playground](https://ui.anyknown.com).
 
-對比與命中區的已知偏差在 [A11Y-DEBT.md](./A11Y-DEBT.md)。
+Known contrast and hit-target gaps are in [A11Y-DEBT.md](./A11Y-DEBT.md).
 
 ---
 
-## 表單
+## Forms
 
 ### input / textarea
-單行與多行文字輸入,共用 border / focus / error 的樣式語言(`controlStyles`)。
+Single- and multi-line text entry. Both share one style language for border, focus and error
+(`controlStyles`).
 
-- 紙上凹下去的一格:`surface` 底 + 1px `border`(邊界要 3:1 才看得到,只靠底色不夠),
-  `corner.control`(12px)。focus 時框換 `focusRing`(= `signal`),外面再一圈 2px 實心的
-  `focusRing`(`outlineOffset: 1`)。以前是 32% 的淡環,對底色不到 3:1,看不出焦點;
-  invalid 時框留 `danger`,focus 的環照樣是實心 `focusRing`。Select / Textarea /
-  PasswordInput 都吃同一份 `controlStyles`
+- A sunken cell in the paper: `surface` background plus a 1px `borderControl` frame (a boundary
+  needs 3:1 to be seen; background alone isn't enough), `corner.control` (12px). On focus the
+  frame turns `focusRing` (= `signal`) with a 2px solid `focusRing` outline around it
+  (`outlineOffset: 1`). Earlier it was a 32% pale ring, under 3:1 against the background, so
+  focus was invisible. When invalid the frame stays `danger` and the focus outline is still
+  solid `focusRing`. Select, Textarea and PasswordInput all use the same `controlStyles`
+- **The control sets `boxSizing: border-box` itself**. `<input>` / `<textarea>` get the
+  browser's default content-box, so `minHeight` becomes the *content* height plus padding and
+  border (the old 36px md actually grew to 54px, and `width: 100%` overflowed the container by
+  26px). Don't count on the app happening to have `*{box-sizing:border-box}`. The same trap was
+  fixed in Select's multiple trigger (it is a div, so it doesn't get the UA border-box)
+- **Single-line controls use `type.dense` line height** (earlier `text.leadingTight`, now
+  deprecated). A taller line height pushes md above the button's height and they stop lining up
+  side by side. Textarea sets `type.body` back so multi-line text stays readable
+- Sizes: md / sm = 40 / 32px, matching the button's default and small; textarea 72px
+- **On phones (`breakpoint.phone`, `max-width: 45rem`) field text is `type.phoneInput`
+  (16px)** (earlier `text.base`). iOS Safari zooms the whole page when a field under 16px gets
+  focus; we don't block it with `maximum-scale`, which would also block the user's own zoom.
+  Select's search row, InputCell / TextCell and Composer follow the same rule
+- **`autoGrow` tries three paths in order**:
+  1. `field-sizing: content` is supported (Chrome / Edge 123, Safari 26.2, Firefox 152 and
+     later) → pure CSS, no inline height
+  2. Not supported, but the app registered a text layout engine → Pretext computes the height
+     from the computed font, line height, padding, border and content width
+  3. Neither → the classic `height: auto`, then set to `scrollHeight`
 
-- **控件自己要寫 `boxSizing: border-box`**。`<input>` / `<textarea>` 拿的是瀏覽器預設的
-  content-box,`minHeight` 會變成「內容」的高再加 padding + border(舊的 36px md 實際
-  長到 54px,還會因為 `width: 100%` 超出容器 26px)。不能靠 app 端剛好有
-  `*{box-sizing:border-box}`。同一個坑也修了 Select 的 multiple trigger(那顆是 div,
-  拿不到 UA 的 border-box)
-- **單行控件行高用 `leadingTight`**。行高一大就會把 md 撐得比 button 高,並排時對不齊。
-  Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
-- 尺寸:md / sm = 40 / 32px,跟 button 的預設與小顆對齊;textarea 72px
-- **手機上(`max-width: 45rem`)欄位字一律 `text.base`(16px)**。iOS Safari 在 16px 以下的
-  欄位 focus 時會把整頁放大;不用 `maximum-scale` 擋,那會連使用者自己的縮放一起擋掉。
-  Select 的搜尋列、InputCell / TextCell、Composer 也照這條
-- **`autoGrow` 依序走三條路**:
-  1. 支援 `field-sizing: content`(Chrome / Edge 123、Safari 26.2、Firefox 152 起)→ 純 CSS,
-     不寫 inline height
-  2. 不支援,但 app 註冊了文字排版引擎 → 用 Pretext 從 computed 的字型、行高、padding、
-     border、內容寬算高度
-  3. 都沒有 → 傳統的 `height: auto` 再設成 `scrollHeight`
-
-  2 和 3 在 input、受控 `value` 改變、寬度改變(`ResizeObserver`)時重量,夾在 `maxRows`
-  以內,不給拉把(`resize: none`)
-- **Pretext 是 optional peer dependency**,這個套件不 import 它。要用就在 app 進入點註冊一次:
+  Paths 2 and 3 re-measure on input, on a controlled `value` change and on width change
+  (`ResizeObserver`), clamp to `maxRows`, and show no resize handle (`resize: none`)
+- **Pretext is an optional peer dependency**; this package doesn't import it. To use it,
+  register it once at the app entry point:
 
   ```ts
   import * as pretext from "@chenglou/pretext"
@@ -47,642 +52,879 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
   setTextLayoutEngine(pretext)
   ```
 
-  `lib/textLayout.ts` 是唯一碰 Pretext API 的地方(`prepare` / `layout` / `clearCache`),
-  Pretext 改 API 只改那個檔。`measureTextHeight(text, { font, width, lineHeight, whiteSpace })`
-  也一起輸出,沒註冊引擎時回 `null`
-- 坑:**字型載完之前量的寬是 fallback 字型的**,Pretext 會照 font 字串把它快取住。字型還在
-  載(`document.fonts.status === "loading"`)時先用 scrollHeight,`fonts.ready` 與每次
-  `loadingdone`(Noto Sans TC 是 unicode-range 切片,打到那個字才載)都清快取重量
-- 坑:Pretext 照 block 的規則排版,**結尾的換行不算一行、空字串是 0 行**;textarea 兩者都
-  佔一行,所以量之前補一個空白(pre-wrap 的行尾空白不佔寬)
+  `lib/textLayout.ts` is the only place that touches the Pretext API (`prepare` / `layout` /
+  `clearCache`); if Pretext changes its API, only that file changes.
+  `measureTextHeight(text, { font, width, lineHeight, whiteSpace })` is exported too and
+  returns `null` when no engine is registered
+- Trap: **widths measured before the font loads are the fallback font's**, and Pretext caches
+  them by font string. While fonts are loading (`document.fonts.status === "loading"`) we use
+  scrollHeight; on `fonts.ready` and on every `loadingdone` (Noto Sans TC is split by
+  unicode-range, so a slice loads only when a character in it appears) we clear the cache and
+  re-measure
+- Trap: Pretext lays out by block rules: **a trailing newline isn't a line and an empty string
+  is 0 lines**. A textarea gives both a line, so we append a space before measuring (trailing
+  spaces under pre-wrap take no width)
 
 ### label
-表單標籤,含 required / optional 標記。連同 `Field`(label + control + help/error 的組合
-容器)一起用,自動接好 `for` / `aria-describedby`。
+Form label with required / optional markers. Used together with `Field` (the container for
+label + control + help/error), which wires `for` / `aria-describedby` automatically.
 
-- `Field` 擁有它那顆控件的 `id`(控件自己傳的 `id` 會被忽略),所以**一個 Field 只放
-  一顆控件**。Checkbox / Radio / Switch 自帶 label,放進 Field 時只給 `help` / `error`
-  / `disabled`
+- `Field` owns its control's `id` (an `id` the control passes itself is ignored), so **one Field
+  holds one control**. Checkbox / Radio / Switch bring their own label; inside a Field give them
+  only `help` / `error` / `disabled`
+- Field renders the error line with `role="alert"`
+- Not every control reads the Field context: Select doesn't (no id, invalid, describedby or
+  disabled from the Field), and Radio drops the Field's `invalid`, so an invalid radio never
+  shows it
 
 ### checkbox
-原生 `<input type="checkbox">` 隱藏 + 自繪 box。
+A hidden native `<input type="checkbox">` plus a drawn box.
 
-- 未勾是 `bg` 上一圈 1.5px `borderStrong`;勾選 / indeterminate 是 `accent`(墨色)實心方塊,
-  上面一筆 `accentText` 的勾(或一橫),`stroke-dashoffset` 160ms 畫出來。圓角 `corner.small`
-- dasharray(32)要比路徑(約 18)長:曾用 24 配 28 的路徑,unchecked 時會漏出尾巴
-- field context 的 `invalid` 畫成 `danger` 邊框
+- Unchecked is a 1.5px `borderControl` ring (earlier `borderStrong`, which was 1.76:1; see
+  [A11Y-DEBT.md](./A11Y-DEBT.md)). Checked / indeterminate is a solid `accent` (ink) square with
+  an `accentText` check (or dash), drawn with `stroke-dashoffset` in 160ms. Corner `corner.small`
+- The dasharray (32) has to be longer than the path (about 18): an earlier 24 with a 28 path
+  leaked a tail when unchecked
+- The field context's `invalid` draws a `danger` border
 
 ### radio
-原生 `<input type="radio">` + `fieldset/legend`。`variant="card"` 選中時亮整張。
+Native `<input type="radio">` plus `fieldset/legend`. `variant="card"` lights up the whole card
+when selected.
 
-- 未選是 `bg` 上一圈 1.5px `borderStrong`;選中是 `accent`(墨色)實心圓,中間一顆
-  `accentText` 的點(跟 checkbox 的勾同一組配色),點 scale 0 → 1 160ms ease-out,不過衝
-- `card` 的框是 `corner.control`
+- Unselected is a 1.5px `borderControl` ring (earlier `borderStrong`). Selected is a solid
+  `accent` (ink) circle with an `accentText` dot (same pairing as the checkbox check); the dot
+  scales 0 → 1 in 160ms ease-out, no overshoot
+- The `card` frame is `corner.control`
 
 ### switch
-即時生效的開關(相對於 Checkbox 的「提交後生效」)。原生 checkbox + `role="switch"`。
+An on/off that takes effect immediately (versus Checkbox, which takes effect on submit). Native
+checkbox plus `role="switch"`.
 
-- 軌道是實心膠囊:關 `borderStrong`、開 `accent`(墨色)。thumb 是浮在軌道上的圓鈕,帶
-  `shadow.rest`。關的時候永遠是白的(用 `bg` 在暗色下會變成黑鈕),開的時候是 `accentText`
-  —— 淺色是白;暗色的墨是淺色,鈕跟著反成深色,不然白鈕放在近白的軌道上分不出來
-- thumb 滑動 180ms ease-out,**不過衝** —— 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳,
-  過衝一律不要
-- 鈕移動的是 `inset-inline-start`,不是 `translate`:translate 的 x 是物理方向,`dir="rtl"`
-  時鈕會往軌道外面跑
-- 設定列的慣用排版:文字在左、開關在右
+- The track is a solid pill: off `borderControl` (earlier `borderStrong`, under 3:1), on `accent`
+  (ink). The thumb is a round knob floating on the track, with `shadow.rest`. Off, it is always
+  white (`bg` would turn it black in dark mode); on, it is `accentText`: white in light mode; in
+  dark mode the ink is light, so the knob flips to dark, otherwise a white knob on a near-white
+  track can't be told apart
+- The thumb slides in 180ms ease-out, **no overshoot**. A double bounce with
+  `cubic-bezier(.34,1.56,.64,1)` was tried; overshoot is always out
+- The knob moves `inset-inline-start`, not `translate`: translate's x is physical, so under
+  `dir="rtl"` the knob would run off the track
+- The usual settings-row layout: text on the left, switch on the right
 
 ### slider
-一條連續的量(思考多少、門檻)。**沒有節點** —— 有節點就該是 Radio 或 Select。
+One continuous quantity (how much thinking, a threshold). **No stops**: if it has stops it
+should be a Radio or Select.
 
-- **刻意不用 Base UI**:它的方向鍵一次走 `step`,要「拖曳連續、方向鍵 5%」就得跟它搶
-  keydown;一顆單向的 `role="slider"` 自己寫比較誠實
-- 方向鍵 ±5%(range 的,不是 step 的)、Home / End 到底,值一律 clamp 再 snap 回 step
-- 軌道 `layer4`、填滿 `borderStrong`、握把是膠囊形的 `surfaceRaised` + `shadow.rest`
-- 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)。填滿的寬度
-  用同一個時長與曲線一起動、拖曳時一起關;只有握把在動的話,點軌道時填滿先跳到位,兩個對不上
-- `valueText` 唸的是標籤不是數字:0.62 要唸成「多」
-- 存檔接 `onValueCommit` 不接 `onChange`:拖曳放開(含 pointercancel)給一次、方向鍵 / Home / End
-  每動一次給一次;值沒變就不給。拖一下 PATCH 一次就是接錯了事件
+- **Deliberately not Base UI**: its arrow keys move one `step`, and "continuous drag, 5% per
+  arrow key" would mean fighting it for keydown. A hand-written one-way `role="slider"` is more
+  honest
+- Arrow keys ±5% (of the range, not the step), Home / End to the ends; values always clamp,
+  then snap back to the step
+- Track `layer4`, fill `accent`, thumb a 1.5rem `accentText` circle with a 0.2rem `accent` ring
+  and no shadow (same colors as the switch knob when on). Earlier: `borderStrong` fill and a
+  pill-shaped `surfaceRaised` thumb with `shadow.rest`
+- Thumb moves in `motion.normal` (200ms) `easeOut`, and **the transition is off while
+  dragging** (otherwise the finger leads and the thumb lags). The fill width moves with the same
+  duration and curve and is also off while dragging; if only the thumb animated, clicking the
+  track would jump the fill into place first and the two wouldn't match
+- `valueText` reads a label, not a number: 0.62 reads as "more" (多)
+- Save on `onValueCommit`, not `onChange`: once on drag release (including pointercancel), once
+  per arrow / Home / End press; nothing if the value didn't change. A PATCH on every drag frame
+  means the wrong event is wired
 
 ### select
-觸發鈕 + popover(頂部搜尋框 + 分組列表)。觸發鈕直接套 input 的 `controlStyles`(底色、框、
-focus 跟輸入框是同一個),浮層是 float 階(見 popover);選項內角 12 = 浮層 16 − 4 padding。
-群組標題是句首大寫的小字,不是全大寫 mono。
+Trigger plus popover (search box on top, grouped list). The trigger uses input's
+`controlStyles` directly (background, frame and focus are the input's); the popup is the float
+tier (see popover); option inner corner 12 = popup 16 − 4 padding. Group titles are small
+sentence-case text, not uppercase mono.
 
-- 定案要有:text search filter(空結果顯示帶查詢字的 empty state)、multiple
-  (trigger 內顯示可個別移除的 chips)、options grouping(過濾後空群組自動隱藏)
+- Settled requirements: text search filter (an empty result shows an empty state with the
+  query), multiple (the trigger shows chips that can be removed one by one), option grouping
+  (groups left empty by the filter hide)
+- The trigger is fixed at md size; Select doesn't read Field context (see label)
 
 ### dropdown
-動作選單(相對於 Select 的「選值」)。浮層是 float 階(見 popover),項目內角 12。
+Action menu (versus Select, which picks a value). The popup is the float tier (see popover);
+item inner corner 12.
 
-- 定案要有:多層 submenu(不限一層)、group label、separator、checkbox item、
-  快捷鍵提示、danger item
+- Settled requirements: nested submenus (any depth), group label, separator, checkbox item,
+  shortcut hint, danger item
 
 ---
 
-## 基礎
+## Basics
 
 ### button
-膠囊(`corner.pill`)。高度 lg / md / sm = 48 / 40 / 32,預設 md 40 是觸控的高;xs 28 只給
-擠的工具列,不在三階裡。`icon` 是正圓,直徑跟著那一階的高。hover:實心的往頁面底色混 14%,
-secondary 深一階(`layer5`),ghost 類是透明 → `accentSubtle` / `dangerSubtle`。
-按下去 `scale: 0.98`,120ms ease-out;reduced motion 不縮。
+Pill (`corner.pill`). Heights lg / md / sm = 48 / 40 / 32; the default md 40 is the touch
+height. xs 28 is only for crowded toolbars and isn't one of the three steps. `icon` is a circle
+whose diameter follows that step's height. Hover: solid variants mix 14% toward the page
+background, secondary goes one step deeper (`layer5`), ghost variants go transparent →
+`accentSubtle` / `dangerSubtle`. Pressing scales to `0.98` in 120ms ease-out; no scaling under
+reduced motion.
 
-- **按下去的回饋只有一份**:`lib/styled.ts` 的 `press.button`(`:active:not(:disabled)` 縮
-  0.98,連同 transition 一起接手)。Button、IconButton、Ghost、ActionBar 的鈕、Composer 的
-  送出、Segmented 的格、Toast 的動作與關閉、Dropzone 的選檔都套它,放在元件樣式後面、`sx`
-  前面。新的按鈕照套,不要自己再寫一次 `scale`。例外是滿版的 GroupCell 列:縮了兩邊會離開卡緣,
-  所以蓋回 `scale: 1`
-| variant | 底 | 標籤色 | 用在 |
+- **There is one press feedback**: `press.button` in `lib/styled.ts` (`:active:not(:disabled)`
+  scales 0.98 and takes over the transition too). Button, IconButton, Ghost, ActionBar buttons,
+  Composer's send, Segmented's segments, Toast's action and close, and Dropzone's file picker all
+  use it, placed after the component's own styles and before `sx`. New buttons use it too;
+  don't write `scale` again. The exception is the full-width GroupCell row: scaling would pull
+  both sides off the card edge, so it sets `scale: 1` back
+
+| variant | background | label color | used for |
 | --- | --- | --- | --- |
-| `primary` | `accent`(墨色) | `accentText` | 主要動作,一個畫面一顆 |
-| `secondary` | `accentSubtle`(凹下去,無框) | `text` | 次要動作 |
-| `ghost` | 透明 | `textMuted` | 安靜的第三選項 |
-| `danger` | `dangerSolid` | `onDangerSolid` | 不可逆的刪除,一個畫面最多一顆 |
-| `dangerGhost` | 透明 | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
+| `primary` | `accent` (ink) | `accentText` | the main action, one per screen |
+| `secondary` | `accentSubtle` (sunken, no frame) | `text` | secondary actions |
+| `ghost` | transparent | `textMuted` | a quiet third option |
+| `danger` | `dangerSolid` | `onDangerSolid` | irreversible deletion, at most one per screen |
+| `dangerGhost` | transparent | `danger` | "red text on white": the meaning shows without the weight |
 
-- children 包在 `position: relative` 的 span 裡
+- children are wrapped in a `position: relative` span
 
 ### dialog
-模態對話框:scale+fade 進場、Esc / backdrop 關閉。
-danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
+Modal dialog: scale + fade in, closes on Esc / backdrop. The danger confirm variant is for
+irreversible actions (delete a memory, clear a thread).
 
-- 長相是 modal 階:`surfaceRaised` 底、`shadow.modal`、`corner.modal`(24)、28px padding,
-  不畫框。backdrop 是 `color.scrim`(中性墨 32%,暗色是黑 32%),**不加 blur** ——
-  `backdrop-filter` 是 DESIGN.md 的反模式。ConfirmContent 的取消鈕是 secondary
-- popup 是 `border-box`:`size` 的寬度含 padding,375 寬時不會比視窗寬
-- 退場走 Base UI 的 `[data-ending-style]`:popup 淡到 0、縮到 0.98,backdrop 淡到 0,
-  120ms ease-out,reduced motion 時沒有。Base UI 等 transition 跑完才拆,也要拆了才還焦點;
-  popup 掛著 `lib/popup.ts` 的 `returnFocusOnExit`,`data-ending-style` 一出現就先把焦點還給
-  打開前的地方,不等淡出。命令式 `dialog.open` 那一套是 store 拿掉就拆,沒有退場
-
-- ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
-- **`confirmLabel` 必填,沒有預設**(ConfirmDialog 與 `dialog.confirm` 都是)。「確認」說不出
-  按下去會怎樣;要動詞開頭、說出後果:「刪除記憶」「封存 thread」。只有呼叫端知道後果,所以
-  不給預設。`dialog.alert` 只有一顆「知道了」,不改變任何東西,保留預設
-- 寬度三階 `size`:`sm`(預設 24rem)/ `md`(40rem)/ `full`(64rem 寬、46rem 高的沉浸式)。
-  **原本刻意不給 `size`**,理由是尺寸的組合無限;改口是因為「沉浸式」那個組合(寬 + 高 +
-  不自己捲)每個使用端都抄一次同一段 `sx`,那就是一個階不是一個偏好。階外的仍然走 `sx`
-- `body` 是會捲的那一段:給了 `body`,popup 自己不再捲(`overflow: hidden` + flex column),
-  標頭與 `children`(篩選 chips 那排)釘住,只有 `body` 捲 —— 沉浸式清單捲起來標頭不能跟著跑
-- **命令式的那一套跟 toast 同形**:`dialog.open(({ close }) => <DialogContent …/>, { role? })`
-  回傳 `{ id, close(result?), result }`;`dialog.close(id, result?)`、`dialog.closeAll()`;
-  `dialog.confirm({ title, description?, confirmLabel, cancelLabel?, tone? })` → `Promise<boolean>`、
-  `dialog.alert(…)` → `Promise<void>`,長相就是 ConfirmDialog 那張卡(共用 `ConfirmContent`)。
-  畫面要在 app 裡掛一個 `<Dialogs />`;`createDialogManager()` + `<Dialogs manager>` 做 scope,
-  包在裡面的 `useDialog()` 拿到那個 manager,外面拿到預設的 `dialog`。受控的 `Dialog` 照舊
-- 狀態在 `lib/store.ts`,焦點陷阱、inert、Esc、scroll lock 仍然交給 Base UI Dialog ——
-  只有「現在開著哪些」是我們養的
-- Esc / backdrop / `closeAll` 關掉的 `result` 是 `undefined`,confirm 是 `false`。
-  關掉一個 dialog 會連同疊在它上面的一起關(由上往下落定)
-- **疊放是巢狀渲染**:上一層的 Root 包住下一層,Base UI 才知道誰在最上面(Esc 只關頂層)。
-  走過的坑:兩層在同一個 commit 掛上時,React 先跑子層的 effect,上一層隨後把自己以外的
-  portal 全標 `aria-hidden` —— 上面那層看得到卻被讀屏蓋掉。所以下一層等這一層
-  `onOpenChangeComplete(true)` 才掛,`render` 因此要回傳 DialogContent(含 Popup)
+- It is the modal tier: `surfaceRaised` background, `shadow.modal`, `corner.modal` (24), 28px
+  padding, no frame. The backdrop is `color.scrim` (black at 32% in both themes), **no blur**:
+  `backdrop-filter` is an anti-pattern in DESIGN.md. ConfirmContent's cancel button is secondary
+- The popup is `border-box`: the `size` width includes padding, so at 375px it is never wider
+  than the viewport
+- Exit uses Base UI's `[data-ending-style]`: the popup fades to 0 and shrinks to 0.98, the
+  backdrop fades to 0, 120ms ease-out, none under reduced motion. Base UI waits for the
+  transition before unmounting, and only returns focus after unmounting; the popup carries
+  `returnFocusOnExit` from `lib/popup.ts`, which returns focus to where it was before opening
+  as soon as `data-ending-style` appears, without waiting for the fade. The imperative
+  `dialog.open` path unmounts as soon as the store drops it; no exit animation
+- ConfirmDialog inherits Button for free: Base UI's render prop merges children in
+- **`confirmLabel` is required, with no default** (ConfirmDialog and `dialog.confirm`).
+  "Confirm" doesn't say what happens; start with a verb and name the outcome: "Delete memory",
+  "Archive thread". Only the caller knows the outcome, so there is no default. `dialog.alert`
+  has a single "Got it" (知道了) that changes nothing, so it keeps a default
+- ConfirmDialog, `dialog.confirm` and `dialog.alert` render as `alertdialog`: a backdrop click
+  does nothing, only Esc or a button closes them. A danger confirm puts initial focus on the
+  cancel button
+- Three widths via `size`: `sm` (default, 28rem) / `md` (44rem) / `full` (68rem wide, 46rem
+  tall, immersive), each capped at `calc(100vw - 2rem)` (height at `calc(100vh - 2rem)`).
+  **At first `size` was deliberately left out**, since size combinations are endless; it was
+  added because the "immersive" combination (width + height + no self-scroll) was copied as the
+  same `sx` by every consumer, which makes it a step, not a preference. Anything off the steps
+  still goes through `sx`
+- `body` is the part that scrolls: given `body`, the popup stops scrolling itself (`overflow:
+  hidden` + flex column), the header and `children` (the row of filter chips) stay pinned, and
+  only `body` scrolls. In an immersive list the header must not scroll away
+- **The imperative API has the same shape as toast**: `dialog.open(({ close }) =>
+  <DialogContent …/>, { role? })` returns `{ id, close(result?), result }`;
+  `dialog.close(id, result?)`, `dialog.closeAll()`;
+  `dialog.confirm({ title, description?, confirmLabel, cancelLabel?, tone? })` →
+  `Promise<boolean>`, `dialog.alert(…)` (also takes `tone`) → `Promise<void>`; both look like
+  the ConfirmDialog card (shared `ConfirmContent`). The app mounts one `<Dialogs />`;
+  `createDialogManager()` + `<Dialogs manager>` gives a scope, and `useDialog()` inside it gets
+  that manager, outside it the default `dialog`. The controlled `Dialog` is unchanged
+- State lives in `lib/store.ts`; the focus trap, inert, Esc and scroll lock are still Base UI
+  Dialog's job. Only "which dialogs are open" is ours
+- A `result` closed by Esc / backdrop / `closeAll` is `undefined`; for confirm it is `false`.
+  Closing a dialog also closes every dialog stacked above it (settled top-down)
+- **Stacking is nested rendering**: each layer's Root wraps the next one, so Base UI knows which
+  is on top (Esc closes only the top). Trap we hit: when two layers mount in the same commit,
+  React runs the child's effects first, and then the outer layer marks every portal but its own
+  `aria-hidden`, so the top layer is visible but hidden from screen readers. So the next layer
+  mounts only after this one's `onOpenChangeComplete(true)`, which is why `render` has to return
+  a DialogContent (with the Popup)
 
 ### toast
-非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作
-按鈕(「已刪除 · 復原」)。danger / success 用色點區分。**有動作鈕或 danger 的那則不自動消失**,
-等使用者自己關 —— 鍵盤使用者要 Tab 過整頁才到得了,5 秒不夠(WCAG 2.2.1);呼叫端明確給
-`timeout` 才倒數。
+Non-blocking notices: stacked bottom-right by default (`Toaster`'s `position` takes any of the
+four corners), slide + fade in, auto-dismiss after 5 seconds (paused on hover), optionally one
+action button ("Deleted · Undo"). danger / success are told apart by a color dot. **A toast
+with an action button, or a danger toast, doesn't auto-dismiss**; it waits for the user to close
+it. A keyboard user has to Tab through the whole page to reach it, and 5 seconds isn't enough
+(WCAG 2.2.1). It counts down only if the caller passes `timeout` explicitly.
 
-- 長相是 float 階的白紙:`surfaceRaised` 底、`shadow.float`、`corner.float`(16)、不畫框。
-  左邊一個 20px 的槽放色點(default 墨色、success 綠、danger 紅)或 loading 的轉圈
-  (`signal` 色,`toast.promise` 等待中),換狀態時標題不跳。有說明的那則標題 500 字重、
-  點與按鈕對齊第一行。去重計數是標題右邊的膠囊,只顯示數字(讀屏仍念「×N」)。
-  動作鈕與關閉鈕都是膠囊;倒數是內距裡貼著底邊的一條細膠囊,填充往起點退
-
-- **狀態自己養,不靠 Base UI toast**。`createToastManager()` 跑在 `lib/store.ts`
-  (`subscribe` / `getSnapshot` / `set`,React 端走 `useSyncExternalStore`),計時器也在
-  manager 裡。改這裡之前要知道:live region、暫停、limit 現在都是我們的責任,沒有人替我們兜
-- API:`toast(title, opts)` / `toast.success` / `toast.danger` 回傳 id;
-  `toast.update(id, patch)`、`toast.close(id)`、
-  `toast.promise(promise, { loading, success, error })`(`success` / `error` 可以是字串或
-  拿到值 / 錯誤的函式,回傳原本的 promise)。`toastManager.add({ title, type, ... })` 的形狀
-  沿用 Base UI 的 `type` 欄位名,舊的呼叫端不用改
-- **loading 不倒數**,落定才換成 success / danger 並從頭倒數。`update` 也從頭倒數 ——
-  內容換了就是新訊息,要給完整的時間讀
-- **同 key 去重就是全部的「分組」**:同一個 `key` 還在畫面上時,不疊新的一則,原地換內容、
-  重新倒數、計數 +1,標題後面一個 `×N`(tabular 數字)。沒有更精巧的分組
-- `limit`(預設 3)超過就**丟掉最舊的**,不是藏起來排隊
-- **退場在 store 裡**:`close` 先把那則標成 `leaving`(`aria-hidden` + `inert`,淡出 120ms),
-  時間到才從 `toasts` 拿掉。`leaving` 的那則不算進 limit、不再被同 key 更新、F8 不會跳過去。
-  Toaster 在 reduced motion 時把退場設成 0,直接拿掉。焦點在關的當下就移走,不等淡出
-- 暫停有三個來源,任何一個在就停:viewport 上 hover、viewport 內有 focus、`document.hidden`。
-  倒數線是 CSS 動畫,`animationPlayState` 跟著同一個 `paused` 走;重新倒數靠 `epoch` 換 key
-  重播。全部關掉時順手清掉 hover / focus —— viewport 縮成 0,mouseleave 不一定會來,
-  不清的話下一則會永遠停住
-- **F8 把焦點跳到通知區**(`aria-keyshortcuts="F8"`,沒有通知時不搶鍵),Tab 進去按動作或
-  關閉;Esc 把焦點還給按 F8 之前的地方。用鍵盤關掉一則時焦點留在通知區,關掉最後一則就還回去
-- 無障礙:viewport 是常駐的 `role="region"` + `aria-live="polite"`;每則是
-  `role="status"`(`aria-atomic`,去重 / promise 更新時整則重念),danger 是 `role="alert"`。
-  色點之外有視覺隱藏的「成功:/ 錯誤:」;每則都有一顆「關閉通知」
-- viewport 的 hover / focus / visibility 監聽掛在 ref callback 裡(含 cleanup),不用 `useEffect`
+- It is a float-tier sheet: `surfaceRaised` background, `shadow.float`, `corner.float` (16), no
+  frame. On the left a 20px slot holds the color dot (default ink, success green, danger red) or
+  the loading spinner (`signal`, while `toast.promise` is pending), so the title doesn't jump
+  when the state changes. A toast with a description has a 500-weight title, with the dot and
+  buttons aligned to the first line. The dedupe count is a pill right of the title showing only
+  the number (the `×` is visually hidden, so screen readers still hear "×N"). Action and close
+  buttons are pills; the countdown is a thin pill inside the padding along the bottom edge, its
+  fill retreating toward the start. Under reduced motion the countdown line is hidden (the timer
+  still runs)
+- **We own the state; it isn't Base UI toast**. `createToastManager()` runs on `lib/store.ts`
+  (`subscribe` / `getSnapshot` / `set`; React reads it through `useSyncExternalStore`), and the
+  timers live in the manager. Before changing this, know that the live region, pausing and the
+  limit are now our responsibility; nobody backs us up
+- API: `toast(title, opts)` / `toast.success` / `toast.danger` return an id;
+  `toast.update(id, patch)`, `toast.close(id)`,
+  `toast.promise(promise, { loading, success, error })` (`success` / `error` may be a string or
+  a function of the value / error; returns the original promise). The
+  `toastManager.add({ title, type, ... })` shape keeps Base UI's `type` field name, so old
+  callers needn't change
+- **Loading doesn't count down**; once settled it becomes success / danger and counts from the
+  start. `update` also restarts the countdown: new content is a new message and gets the full
+  time to read
+- **Same-key dedupe is all the "grouping" there is**: while a toast with the same `key` is on
+  screen, a new one doesn't stack; it replaces the content in place, restarts the countdown and
+  increments the count (tabular digits). No fancier grouping
+- `limit` (default 3): over the limit, **the oldest is dropped**, not hidden in a queue
+- **Exit lives in the store**: `close` first marks the toast `leaving` (`aria-hidden` + `inert`,
+  fades out in 120ms) and removes it from `toasts` only when time is up. A `leaving` toast
+  doesn't count toward the limit, isn't updated by a same-key toast, and F8 skips it. Under
+  reduced motion the Toaster sets the exit to 0 and removes it at once. Focus moves away the
+  moment it closes, without waiting for the fade
+- Pausing has three sources, any one of which pauses: hover over the viewport, focus inside the
+  viewport, `document.hidden`. The countdown line is a CSS animation whose
+  `animationPlayState` follows the same `paused`; restarting swaps the key via `epoch` to
+  replay it. When everything closes, hover / focus are cleared too: the viewport shrinks to 0
+  and mouseleave may never fire, so without clearing, the next toast would stay paused forever
+- **F8 jumps focus to the notification region** (`aria-keyshortcuts="F8"`; it doesn't take the
+  key when there are no toasts); Tab in to press an action or close. Esc returns focus to where
+  it was before F8. Closing a toast with the keyboard keeps focus in the region; closing the
+  last one returns it
+- Accessibility: the viewport is a permanent `role="region"` + `aria-live="polite"`; each toast
+  is `role="status"` (`aria-atomic`, so dedupe / promise updates re-read the whole toast), and
+  danger is `role="alert"`. Besides the dot there is a visually hidden "Success:" / "Error:"
+  prefix; every toast has a "Dismiss notification" button
+- Built-in words go through `lib/i18n.tsx` (the first component migrated): `region`,
+  `dismiss`, `success`, `danger`, in `zh-TW` and `en`. They follow `<LocaleProvider>`, and
+  `<Toaster labels>` overrides single words (`ToastLabels`)
+- The viewport's hover / focus / visibility listeners hang off a ref callback (with cleanup),
+  not `useEffect`
 
 ### tooltip
-純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,只放一行文字(可附 Kbd)。
-**絕不放互動內容**。長相跟 popover 同一階(float:`surfaceRaised` 底、`shadow.float`),
-不再是反色氣泡;尺寸小,圓角用 `corner.control`(12)而不是 16。
+Plain hint popup: appears after a 400ms delay on hover and keyboard focus (0 under reduced
+motion), holds a single line of text (optionally a Kbd). **Never interactive content**. It is
+the same tier as popover (float: `surfaceRaised` background, `shadow.float`), no longer an
+inverted bubble; it is small, so its corner is `corner.control` (12), not 16.
 
 ### popover
-定位浮層基礎件:trigger 錨定的 surface 卡片。select / dropdown / combobox 都疊在它上面,
-也直接承載富內容(記憶詳情、成員卡片)。
+The positioned-popup base: a surface card anchored to a trigger. select / dropdown / combobox
+sit on top of it, and it also carries rich content directly (memory details, member cards).
 
-- 長相是 float 階,集中在 `lib/popup.ts` 的 `popupStyles.surface`:`surfaceRaised` 底
-  (暗色因此升一階)、`shadow.float`、`corner.float`(16),不畫框。框是 1px 透明的 ——
-  forced-colors 下陰影會消失,透明框會被換成系統色,浮層才有邊。Composer 的浮層也吃這一份
-- 退場也在這一份:Base UI 關的時候掛 `[data-ending-style]`,surface 淡到 0(120ms ease-out,
-  reduced motion 時沒有),跑完才拆。Base UI 要拆了才還焦點,所以 popup 要掛
-  `ref={returnFocusOnExit}`,退場一開始就還(Select 與 dialog 已經掛了)。Composer 的浮層不是
-  Base UI,沒有退場
-- popover 面板 16px padding,寬度上限 `min(22rem, 100vw − 2rem)`,窄螢幕上長說明會折行
+- It is the float tier, defined once in `popupStyles.surface` in `lib/popup.ts`:
+  `surfaceRaised` background (so it rises one step in dark mode), `shadow.float`,
+  `corner.float` (16), no frame. The border is 1px transparent: under forced-colors the shadow
+  disappears and the transparent border is replaced with a system color, so the popup still
+  has an edge. Composer's popups use the same styles
+- Exit is in the same styles: when Base UI closes it sets `[data-ending-style]`, the surface
+  fades to 0 (120ms ease-out, none under reduced motion), and it unmounts after. Base UI returns
+  focus only after unmounting, so a popup should carry `ref={returnFocusOnExit}` to return it as
+  the exit starts. Select and Dialog do; `PopoverContent` and the dropdown don't yet, so keyboard
+  focus can sit in a fading popover or menu for 120ms. Composer's popups aren't Base UI and have
+  no exit
+- Popover panel padding 16px, max width `min(22rem, 100vw − 2rem)`, so long text wraps on
+  narrow screens
 
-疊層值集中在 `lib/popup.ts` 的 `layer`,元件不自己寫 magic number —— Base UI 的浮層一律
-portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會出洞:
+Stacking values live in the `zIndex` consts in `tokens.stylex.ts` (`lib/popup.ts` re-exports
+them as `layer`); components don't write magic numbers. Base UI popups always portal to body and
+compete by z-index with dialog / toast at that level, so per-component numbers leave holes:
 
-| 層 | 值 | 為什麼在這個位置 |
-| --- | --- | --- |
-| dialog backdrop | 70 | |
-| dialog viewport | 71 | |
-| popup(select / dropdown / popover) | 75 | 浮層是當下互動的最上層,要壓過 dialog |
-| tooltip | 78 | popup 裡的元素也能有 tooltip |
-| toast | 80 | 非阻斷通知不能被 modal 蓋掉 |
+| Layer | `zIndex` key | Value | Why here |
+| --- | --- | --- | --- |
+| dialog backdrop | `dialogBackdrop` | 70 | |
+| dialog viewport | `dialog` | 71 | |
+| popup (select / dropdown / popover) | `popup` | 75 | the popup is what you're using right now, so it must be above the dialog |
+| tooltip | `tooltip` | 78 | elements inside a popup can have tooltips |
+| toast | `toast` | 80 | a non-blocking notice must never be covered by a modal |
 
-- 跨檔案 import 的值在 `stylex.create()` 裡不能靜態求值(只吃同檔內的常數),所以 `layer`
-  之外另配一份做好的 `layerStyles`,dialog / tooltip / toast 套樣式而不是讀數字
-- 走過的彎路:popup 曾是 40,低於 dialog 的 71 —— dialog 裡的 Select 打開後,選項其實有
-  渲染(accessibility tree 看得到、鍵盤也能操作)卻被 dialog 蓋住,對滑鼠使用者等於壞掉。
-  popup 抬到 dialog 之上對非 dialog 情境無影響:popup 是 portal 到 body 的暫態層,modal
-  打開時 Base UI 會關掉外面的 popup
-- Composer 的來源/指令浮層是 `position: absolute` 的 `zIndex: 10`,活在自己的堆疊脈絡裡,
-  不吃這張表
+- Earlier the values were plain JS numbers in `lib/popup.ts`, which `stylex.create()` can't
+  evaluate across files, so a prebuilt `layerStyles` existed for dialog / tooltip / toast. Now
+  they are `stylex.defineConsts`, inlined at build time, so `zIndex: zIndex.popup` works in any
+  `stylex.create`; `layerStyles` stays as a convenience
+- Dead end: popup used to be 40, below the dialog's 71. A Select inside a dialog rendered its
+  options (visible in the accessibility tree, keyboard-operable) but the dialog covered them;
+  for mouse users it was simply broken. Raising popup above dialog doesn't affect non-dialog
+  cases: a popup is a transient layer portalled to body, and Base UI closes outside popups when
+  a modal opens
+- Composer's sources / commands popup is `position: absolute` with `zIndex: 10`, inside its own
+  stacking context; it is not part of this table
 
 ### tabs
-同層內容切換。underline 為預設,pills 用於篩選型切換。
+Switches content at the same level. Underline is the default; pills are for filter-style
+switching.
 
-- Base UI 1.7 走 **manual activation**(方向鍵移動焦點,Enter/Space 才切換),
-  disabled tab 保持可聚焦不被跳過 —— 這是 APG 預設。可見的 disabled 樣式要用
-  `state.disabled`,寫 `:disabled` 永遠不會命中
-- underline 240ms `cubic-bezier(.16,1,.3,1)`,兩邊各自單調往目標走,**無倒退無過衝**
-- pills:軌道是凹下去的 `surface`(`corner.control`,不加框),選中的那格是浮起來的一張紙
-  (`surfaceRaised` + `shadow.rest`)在 tab 底下滑。內層圓角 = 12 − 內距 4 = 8。白紙對軌道
-  只有 1.09:1,所以那張紙外圈再一條 1px `borderControl` 環(3:1 以上),選中的是哪格才看得出來
-- indicator 位置不自己量:Base UI 的 `Tabs.Indicator` 本來就把 `--active-tab-*` 寫成
-  inline style,藥丸的 `width` / `height` / `translate` 直接吃那些變數
-- `--active-tab-left` 是從清單左緣量的物理距離,RTL 也一樣,所以底線與藥丸錨在 `left: 0`,
-  不是 `insetInlineStart`(那樣 RTL 會從右緣起算,指示條跑到反方向)
-- 走過的彎路:底線的「鬆緊彈性」(雙彈簧 + 拉伸下垂)——「太誇張了」;
-  x 與 width 各拆一條曲線的組合會衝過再收回,違反「任何邊不得倒退」
+- Base UI 1.7 uses **manual activation** (arrow keys move focus, Enter/Space switch), and a
+  disabled tab stays focusable instead of being skipped; that's the APG default. A visible
+  disabled style must use `state.disabled`; `:disabled` never matches
+- Underline moves in 240ms `cubic-bezier(.16,1,.3,1)`; both edges move monotonically toward the
+  target, **no backtracking, no overshoot**
+- pills: the track is a sunken `surface` (`corner.control`, no frame); the selected tab is a
+  raised sheet (`surfaceRaised` + `shadow.rest`) that slides under the tab. Inner corner = 12 −
+  4 inset = 8. A white sheet on the track is only 1.09:1, so the sheet gets an extra 1px
+  `borderControl` ring (over 3:1) to show which tab is selected
+- The indicator position isn't measured by us: Base UI's `Tabs.Indicator` already writes
+  `--active-tab-*` as inline style, and the pill's `width` / `height` / `translate` read those
+  variables
+- `--active-tab-left` is a physical distance from the list's left edge, RTL included, so the
+  underline and pill anchor at `left: 0`, not `insetInlineStart` (under RTL that would count
+  from the right edge and the indicator would run the wrong way)
+- Dead ends: a "stretchy" underline (double spring + stretch-and-sag): "way too much". Splitting
+  x and width onto separate curves overshoots and pulls back, breaking "no edge may backtrack"
 
 ### badge / chip
-badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位,同一家族。
+A badge is a read-only semantic label; a chip is an interactive filter unit (removable,
+pressable). Same family.
 
-- 膠囊(`corner.pill`)。`neutral` / `mono` 是凹下去的 `accentSubtle` 底、不加框;框只留給
-  `outline` 這一種
-- chip 的 `×`:負 block margin 讓圓鈕不撐高 chip,`::after` 補到 24px 命中區
-  (WCAG 2.2)而不影響版面 —— 這一招可以套到其他小命中區
-- `removeLabel` 只在給了 `onRemove` 時必填;沒有 × 就沒有要唸的東西
-- 給 `onClick` 就渲染成真的 `<button aria-pressed>`(沒給就是 `<span>`)。
-  選取態是**反白**(text 底、bg 字),不是加一圈邊框 —— 一排篩選 chip 掃過去要一眼看出開哪幾個。
-  可按的 chip 不轉發 `ref`(那會是 button 的 ref,不是 span 的)
+- Pill (`corner.pill`). `neutral` / `mono` are a sunken `accentSubtle` background with no frame;
+  a frame is reserved for `outline`
+- The chip `×`: a negative block margin keeps the round button from making the chip taller, and
+  `::after` extends the hit target to 24px (WCAG 2.2) without affecting layout. The same trick
+  applies to other small targets
+- `removeLabel` is required only when `onRemove` is given; no × means nothing to read
+- Given `onClick`, it renders a real `<button aria-pressed>` (otherwise a `<span>`). Selected is
+  **inverted** (text background, bg text), not an added ring: scanning a row of filter chips,
+  you must see at a glance which are on. A pressable chip doesn't forward `ref` (it would be the
+  button's ref, not the span's)
 
 ### kbd
-快捷鍵標示:surface 底 + border + 1px 下緣陰影做出按鍵感,`corner.small`,Geist Mono,
-單鍵 / 組合 / 序列三種排法。
+Shortcut key: `surface` background + border + a 1px bottom shadow for a key-cap feel,
+`corner.small`, Geist Mono. Three arrangements: single key, combination, sequence.
 
 ### skeleton
-載入骨架:占位形狀 + shimmer,形狀要對齊實際內容的排版(thread 骨架就長得像 thread),
-避免載入完成時跳版。
+Loading skeleton: placeholder shapes plus shimmer. Shapes must match the real layout (a thread
+skeleton looks like a thread) so nothing jumps when loading finishes.
 
 ### progress
-進度條說的是「agent 正在做事」,所以填充用 `signal`;ring / ball 是讀數(context 用量),
-不是工作中,留墨色 `accent`。
+A progress bar says "the agent is working", so its fill is `signal`; ring / ball are readouts
+(context usage), not work in progress, so they stay ink `accent`.
 
-1. **bar(determinate)** — 6px 的 `accentSubtle` 膠囊軌 + `signal` 實心填充,寬度跟著 value 走
-   (進度更新頻繁,用短的 linear transition,expo 會拖在後面)
-2. **bar(indeterminate)** — 40% 的一段 1.8s linear 滑過去;底下一行 mono 說現在在做什麼。
-   reduced motion 時停在原地
-3. **ring(context 用量)** — `border` 的軌圓 + `accent` 的弧(`stroke-dasharray`)。精確讀數
-4. **spinner** — 一段 `currentColor` 的弧 0.8s linear 在轉
-5. **ball** — 跟 ring 同一張圖,只是尺寸不同;API 留著
+1. **bar (determinate)** — a 6px `accentSubtle` pill track with a solid `signal` fill whose
+   width follows the value (updates are frequent, so a short `motion.fast` linear transition;
+   expo would lag behind)
+2. **bar (indeterminate)** — a 40% segment slides across in 1.8s linear; under it a mono line
+   says what is happening. Stays put under reduced motion
+3. **ring (context usage)** — a `border` track circle plus an `accent` arc
+   (`stroke-dasharray`), with a centered `%` readout. Exact reading
+4. **spinner** — a `currentColor` arc spinning at 0.8s linear
+5. **ball** — similar to ring but its own drawing: no `%` readout, a band proportional to size
+   (`size × 0.12`), default size 48 (ring: fixed band, default 60)
 
-- 坑:軌是 `<span>`,要自己寫 `display: block`。determinate 外層是 block 的 div,span 留在
-  inline 時寬高都不生效,整條看不見(indeterminate 外層是 grid,子元素自動 blockify 才沒事)
-- **零 rAF**:determinate 靠 CSS transition,indeterminate 靠 CSS animation
-- indeterminate **不設 `aria-valuenow`、不顯示百分比** —— 沒有真實進度可報
-- spinner 用 `role=status`;它不從內容取名,所以 `aria-label` 與視覺隱藏的內文都要
+- Trap: the track is a `<span>` and must set `display: block` itself. The determinate wrapper
+  is a block div, so an inline span ignores width and height and the whole bar is invisible
+  (the indeterminate wrapper is a grid, whose children blockify automatically, which hid the
+  bug there)
+- **Zero rAF**: determinate uses a CSS transition, indeterminate a CSS animation
+- Indeterminate **sets no `aria-valuenow` and shows no percentage**: there is no real progress
+  to report
+- spinner uses `role=status`; it doesn't take its name from content, so it needs both
+  `aria-label` and visually hidden text
 
 ### empty-state
-空狀態 = 行動邀請:icon + 一句說明 + 主要動作。文案永遠說「下一步做什麼」,
-不只陳述「沒有東西」。長相是紙裡凹下去的一塊(`surface` 底、`corner.card`),不框虛線;
-icon 是跟文字同色的線條,不墊圓底。
+An empty state is a call to action: icon + one line + the main action. The copy always says
+"what to do next", not just "there's nothing here". It is a sunken block in the paper
+(`surface` background, `corner.card`), no dashed frame; the icon is a line drawing in the text
+color, with no round backing.
 
 ### scrollbar
-不是元件,是一份全域 CSS(`@anyknown/ui/scrollbar.css`)。StyleX 做不了
-`::-webkit-scrollbar` 偽元素。
+Not a component: a global stylesheet (`@anyknown/ui/scrollbar.css`). StyleX can't style the
+`::-webkit-scrollbar` pseudo-elements.
 
-- thumb 是 `borderStrong` 圓角線,外圍 3px 透明邊距(`background-clip: padding-box`)
-  讓它浮在內容旁;hover 轉 `textFaint`。寬 10px,實際可見約 4px
-- 容器建議加 `scrollbar-gutter: stable` 防止內容因捲軸出現而跳動
+- The thumb is a rounded `borderStrong` line with a 3px transparent border
+  (`background-clip: padding-box`) so it floats beside the content; hover turns it `textFaint`.
+  10px wide, about 4px visible
+- Firefox gets `scrollbar-width: thin` and `scrollbar-color` under
+  `@supports not selector(::-webkit-scrollbar)`
+- Containers should add `scrollbar-gutter: stable` so content doesn't jump when the scrollbar
+  appears (`tokens.css` sets it on `html`)
 
 ---
 
-## Desktop AI-native
+## Agent & chat (desktop AI-native)
 
 ### message
-過去區的訊息節奏:user 右對齊氣泡、assistant 全寬純文字。turn 24px / part 8px,
-內文 `t3` / `body`(15 / 1.6)。
+Message rhythm in the past area: user messages are right-aligned bubbles, assistant messages are
+full-width plain text. turn 24px / part 8px, body `type.t3` / `type.body` (15 / 1.6).
 
-- user 泡泡是凹下去的 `surface`、無框,圓角 18 18 6 18(右下是說話的人那一角)。18 沒有
-  圓角 token,寫在元件裡的常數;agent 不加泡泡,直接排在紙上
-- 回覆中的點是 `signal`:agent 正在做事
-- assistant 的 action bar 平常 hover 才浮現;`(hover: none)` 的觸控裝置上一直顯示
+- The user bubble is a sunken `surface`, no frame, corners 18 18 6 18 (the small corner is the
+  speaker's). 18 has no corner token and is a constant in the component; the 6 is
+  `corner.small`, set with a logical property (`borderEndEndRadius`), so it flips under RTL. The
+  agent gets no bubble and sits directly on the paper
+- The replying dot is `signal`: the agent is working
+- The assistant action bar normally appears only on hover; on `(hover: none)` touch devices it
+  is always shown
 
 ### bubble
-product 殼的訊息泡泡(0.9):整寬、上下 12、`t3` / `body`。人說的是凹下去的 `surface`、
-左右 16、圓角 18 18 6 18,照打的字顯示;回覆不加泡泡(沒有底、左右不留白),
-`Markdown tables="ruled"`。
+The product shell's message bubble (0.9): full width, 12 top and bottom, `type.t3` /
+`type.body`. The human's message is a sunken `surface`, 16 left and right, corners 18 18 6 18,
+shown exactly as typed; the reply has no bubble (no background, no side padding) and uses
+`Markdown tables="ruled"`.
 
-- 跟 `UserMessage` / `AssistantMessage` 不是同一個版面:那組是 desktop 的 turn(靠右 85%
-  的泡泡、全寬的回覆、串流游標、action bar),這個是殼的一列一泡泡。位置與寬度交給 thread
-- prop 叫 `from` 不叫 `role`:`role` 是 ARIA 的字,給一個不是 ARIA role 的值 lint 會擋
+- Not the same layout as `UserMessage` / `AssistantMessage`: those are the desktop turn (an 85%
+  right-aligned bubble, full-width reply, streaming cursor, action bar); this is the shell's one
+  bubble per row. Position and width belong to the thread
+- The prop is `from`, not `role`: `role` is an ARIA word, and lint blocks a value that isn't an
+  ARIA role
 
 ### attachment
-訊息帶的檔案(0.9,product 殼搬來):`AttachmentGrid` 一排會折行、間距 16 的 150px
-方塊;`AttachmentTile` 是 rest 卡片(`surfaceRaised` 底、`shadow.rest`、`corner.card`),上面一段名字 + 一個字的種類
-(`PDF`)。有 `preview` 就是圖,`object-fit: cover` 鋪滿,說明變白字加陰影;沒有就在左下角
-畫 28px 的檔案 glyph。
+Files attached to a message (0.9, moved from the product shell): `AttachmentGrid` is a wrapping
+row of 150px squares with gap 16; `AttachmentTile` is a rest card (`surfaceRaised` background,
+`shadow.rest`, `corner.card`) with the name and a one-word kind (`PDF`) on top. With `preview`
+it is the image, `object-fit: cover`, and the caption turns white with a shadow; without, a
+28px file glyph sits in the bottom-left corner.
 
-- 不是 `FileRow`:那是檔案管理的一列(勾選、動作),這是訊息裡看得到的附件
-- 圖的 `alt=""`:名字已經寫在 `figcaption`,再唸一次是重複
+- Not `FileRow`: that is a row in file management (selection, actions); this is an attachment
+  visible in a message
+- The image has `alt=""`: the name is already in the `figcaption`, and reading it twice is
+  redundant
 
 ### tool-card
-工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,
-展開看輸入/輸出。**subagent 是它的變體,不是新元件家族**。
+The receipt of a tool call: one row of icon + title (verb) + subtitle (main argument) +
+duration + chevron; expand to see input / output. **A subagent is a variant of it, not a new
+component family**.
 
-- rest 卡片:`surfaceRaised` 底、`shadow.rest`、`corner.card`,不畫框。失敗時 rest 的環上
-  再疊一圈偏紅的 1px 環
-- 左邊 36px 圖示底。執行中是 `signalSubtle` 底、`signal` 色的工具圖示(read / edit / write /
-  shell / search / fetch / subagent 各一個 lucide 路徑,其他用 wrench),標題下一條膠囊進度條;
-  沒有進度值,所以是一段 40% 的 `signal` 用 transform 等速滑過,reduced-motion 停住。
-  完成是 `surface` 底的綠勾、失敗是 `dangerSubtle` 底的紅叉 —— 形狀不同,不只靠顏色
-- 為什麼完成就換成勾:`signal` 只代表 agent 正在做事,做完了圖示底就退回中性;工具是什麼
-  標題的動詞已經說了
-- 輸入 / 輸出 / 錯誤是凹下去的 `surface`(錯誤是 `dangerSubtle`),無框,`corner.small`
-  (卡片圓角減 padding 已經 ≤ 0,取最小階)
-- 展開內容(io 標籤與輸入 / 輸出)、重試列、subagent 的第二行都從標題那條邊開始
-  (卡片 padding + 36px 圖示底 + 間距),不各自對齊卡片左緣
-- subtitle 一行放不下時切成 `…`,`title` 帶全文;展開後整段折行顯示,不切
-- 重試列一句話講完「什麼時候、第幾次、最多幾次」:「3 秒後重試(第 2 / 3 次)」,畫面與
-  live region 同一句。句子是 `retryLabel(attempt, max, seconds)`;不寫「重試中…3 秒後」這種
-  自相矛盾的說法
+- Rest card: `surfaceRaised` background, `shadow.rest`, `corner.card`, no frame. On failure a
+  reddish 1px ring is layered over the rest ring
+- A 36px icon tile on the left. While running: `signalSubtle` background with the tool icon in
+  `signal` (one lucide path each for read / edit / write / shell / search / fetch / subagent,
+  a wrench for others), and a pill progress bar under the title; there is no progress value, so
+  a 40% `signal` segment slides at constant speed via transform, stopping under reduced motion.
+  Done is a green check on `surface`, failed a red cross on `dangerSubtle`: different shapes,
+  not color alone
+- Why it switches to a check when done: `signal` means only "the agent is working", so when
+  the work is done the tile goes back to neutral; the title's verb already says what the tool
+  was
+- Input / output / error are a sunken `surface` (error is `dangerSubtle`), no frame,
+  `corner.small` (card corner minus padding is already ≤ 0, so the smallest step)
+- Expanded content (io labels and input / output), the retry row and the subagent's second line
+  all start from the title's edge (card padding + 36px tile + gap), not each from the card's
+  left edge
+- A subtitle that doesn't fit is cut with `…`, with the full text in `title`; expanded, it wraps
+  in full, uncut
+- The retry row says "when, which attempt, how many max" in one sentence: "Retrying in 3 s
+  (attempt 2 / 3)" (「3 秒後重試(第 2 / 3 次)」), the same sentence on screen and in the live
+  region. The sentence is `retryLabel(attempt, max, seconds)`; never the self-contradicting
+  "Retrying… in 3 s"
+- Opens by default for `shell` / `edit` / `write` and for any error, including a later change
+  from running to error
 
 ### reasoning-fold
-思考過程的摺疊列:預設收合只留「思考了 N 秒」,串流中撐開、標籤 shimmer「思考中…」。
-內容永遠是 muted 斜體的配角。
+The fold row for the reasoning process: collapsed by default to just "Thought for N s"
+(「思考了 N 秒」), expanded while streaming with a shimmering "Thinking…" label. The content is
+always muted italic, a supporting voice.
 
-- 觸發鈕是膠囊:32px 高、`surface` 底、無框,hover 深一階(`accentSubtle`)
-- 展開的內容左邊一條 2px 線,對齊膠囊裡 chevron 的中線
+- The trigger is a pill: 32px tall, `surface` background, no frame, hover one step deeper
+  (`accentSubtle`)
+- Expanded content has a 2px line on the left, aligned to the center of the chevron in the pill
+- Collapses itself 1 s after streaming ends, unless the user toggled it; if focus was inside
+  the body it moves back to the trigger. This timer is one of the three remaining `useEffect`s
 
 ### action-bar
-assistant 訊息底部的 hover 動作列。**高度永遠保留**(pb + 負 mb 技法),hover 只切
-opacity —— turn 節奏零跳動。每顆是 ghost 膠囊,hover 才有 `accentSubtle` 底。
+The hover action row under an assistant message. **Its height is always reserved** (padding-
+bottom + negative margin-bottom trick); hover only toggles opacity, so the turn rhythm never
+jumps. Each button is a ghost pill with an `accentSubtle` background only on hover.
 
 ### code-block
-header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
-超寬**只在 block 內橫向捲動**,不讓頁面橫捲。
+Header (language label + copy button) plus a `type.code` / `type.snug` (13 / 1.45) mono body.
+The language label shows `lang` as passed. Overflow **scrolls horizontally only inside the
+block**; the page never scrolls sideways.
 
-- 凹下去的 `surface`、`corner.card`,無框;標頭與本體同一塊底,中間不畫線。複製鈕是膠囊
-- `InlineCode` 同樣是 `surface` 底、`corner.small`、無框
+- Sunken `surface`, `corner.card`, no frame; header and body share one background with no line
+  between. The copy button is a pill
+- `InlineCode` is likewise `surface`, `corner.small`, no frame
 
 ### markdown
-一則訊息裡的 markdown:GFM 表格、fenced code、TeX 數學、任務清單。
-`marked` 只用 `lexer()` 拿 token 樹,每個 token 自己轉成 React element ——
-**整個元件沒有一處走 `innerHTML`**,模型吐 `<script>` 就顯示原始碼,不會執行。
+Markdown inside one message: GFM tables, fenced code, TeX math, task lists. `marked` is used
+only for `lexer()` to get the token tree, and each token is turned into a React element
+itself: **nothing in the component goes through `innerHTML`**, so a model that emits
+`<script>` shows the source, never runs it.
 
-- **根節點一定要自己寫 `color` / `fontSize` / `lineHeight`**。第一版漏了 `color`,
-  段落與表格就繼承宿主的 `body`,而 playground / site 的 `main.css` 把 `@stylex;`
-  擺在 `@import` 前面,postcss 丟掉 @import、`--ak-text` 是空字串 —— 深色主題下
-  變成黑字配 `rgb(32,29,24)` 的底。同一個元件裡的 CodeBlock 沒事,因為它自己寫了
-- 任務清單用 `Checkbox`,不是原生 `<input type=checkbox>`(後者用 OS 的 accent
-  color 畫自己,完全不看主題)
-- 表格**照內容寬度**,不 `minWidth: 100%`:兩欄表格拉滿訊息寬只會把字推到左右兩端。
-  外層 wrapper 才是捲動的那一層
-- `tables="ruled"` 是泡泡裡的表格:沒有框、沒有底,表頭下與列之間一條 `border` 細線、
-  最後一列下面沒有;表頭 13px `textMuted` 500,格子 `8px 24px 8px 0`。預設 `grid` 不變
-  (記憶的附件內文還在用)。以前 product 靠 `[data-bubble] th/td { … !important }` 蓋掉,
-  現在不用了
-- `breaks: true`。這是訊息不是文件 —— 單獨一個換行是寫的人真的想換行
-- 內文 `t3` / `body`(15 / 1.6),段落與清單項同一個行高;圖片 `corner.card`
-- 圖表不做:mermaid 光 unpack 就 84MB,設計系統不該讓每個裝它的 app 背。
-  留 `renderBlock({lang, code})` 這個口子給 shell 自己接,沒接就退回 code block
-- 自己的 `Marked` 實例,不用 module-level 的 `marked`:`marked.use()` 是全域的,
-  會污染宿主 app 解析的其他東西
+- **The root must set its own `color` / `fontSize` / `lineHeight`**. The first version forgot
+  `color`, so paragraphs and tables inherited the host's `body`; the playground / site
+  `main.css` put `@stylex;` before `@import`, postcss dropped the @import, and `--ak-text` was an
+  empty string: in the dark theme that became black text on an `rgb(32,29,24)` background.
+  CodeBlock in the same component was fine because it sets its own
+- Task lists use `Checkbox`, not a native `<input type=checkbox>` (which draws itself with the
+  OS accent color and ignores the theme)
+- Tables **size to their content**, not `minWidth: 100%`: stretching a two-column table to the
+  message width just pushes the text to the far edges. The outer wrapper is the scrolling layer
+- `tables="ruled"` is the in-bubble table: no frame, no background, a thin `border` line under
+  the header and between rows, none under the last row; header 13px `textMuted` 500, cells
+  `8px 24px 8px 0`. The default `grid` is unchanged (memory attachment bodies still use it).
+  Earlier the product overrode it with `[data-bubble] th/td { … !important }`; no longer needed
+- `breaks: true`. This is a message, not a document: a lone newline means the writer really
+  wanted a line break
+- Body `type.t3` / `type.body` (15 / 1.6), paragraphs and list items at the same line height;
+  images `corner.card`
+- No diagrams: mermaid alone unpacks to 84MB, and a design system shouldn't make every app that
+  installs it carry that. `renderBlock({lang, code})` is the hook for a shell to plug in its
+  own; without it, it falls back to a code block
+- Its own `Marked` instance, not the module-level `marked`: `marked.use()` is global and would
+  pollute anything else the host app parses
 
 ### formula
-TeX → MathML,交給瀏覽器排版。**選 Temml 不選 KaTeX**:輸出 MathML 就不需要
-樣式表也不需要 web font,而 KaTeX 會逼每個消費端多引一支 CSS 加 1MB 字體。
-螢幕閱讀器拿到的也是真的數學而不是一堆定位過的 span。
+TeX → MathML, typeset by the browser. Lives in `markdown/Formula.tsx`. **Temml, not KaTeX**:
+MathML output needs no stylesheet and no web font, while KaTeX forces every consumer to add a
+CSS file plus 1MB of fonts. Screen readers also get real math rather than a pile of positioned
+spans.
 
-- Temml 是動態 import 的(~250KB,多數訊息沒有數學),還沒到之前畫面上先顯示原始 TeX,
-  所以載入失敗也不會留一塊空白
-- `temml.render(node)` 直接寫進 DOM,不經過字串 —— 這個 package 沒有一處用
-  `dangerouslySetInnerHTML`,數學不該是第一個
-- `$` 同時是錢。`$5 漲到 $10` 不是公式:開頭 `$` 後不能是空白、結尾 `$` 前不能是
-  空白且後面不能接數字
-- marked extension 的 `start()` **是 marked 下刀的位置**,不是「下一個 `$`」。
-  block 層的 hint 指到行內數學的 `$`,就會把整個句子從中間切成兩段(`breaks: true`
-  之下前半的尾隨空白還會變成 `<br>`)。所以 block 與 inline 各有各的 hint
+- Temml is imported dynamically (~250KB; most messages have no math). Until it arrives the raw
+  TeX is shown (currently in the same mono / `danger` style as a parse error), so a failed load
+  never leaves a blank. This lazy import is one of the three remaining `useEffect`s
+- `temml.render(node)` writes straight into the DOM, never through a string: nothing in this
+  package uses `dangerouslySetInnerHTML`, and math shouldn't be the first
+- `$` is also money. "$5 rose to $10" is not a formula: the opening `$` can't be followed by a
+  space, and the closing `$` can't be preceded by a space or followed by a digit
+- A marked extension's `start()` **is where marked cuts**, not "the next `$`". If the block-level
+  hint points at an inline math `$`, it splits the sentence in two (and under `breaks: true` the
+  first half's trailing space becomes a `<br>`). So block and inline each have their own hint
 
 ### payload-block
-工具被呼叫時帶的參數、回來的結果(0.9,product 殼搬來):凹下去的 `surface`、無框、`corner.card`、
-mono `t2` / `snug`,內容左 16 右 48 上下 12、橫向捲動,右上角一顆 32px 的複製鈕
-(`IconButton`,1.5 秒後從勾變回複製)。沒有語言標頭,這是它跟 `CodeBlock` 的差別。
+Arguments a tool was called with and the result it returned (0.9, moved from the product
+shell): sunken `surface`, no frame, `corner.card`, mono `type.t2` / `type.snug`, content padded
+16 left, 48 right, 12 top and bottom, scrolling horizontally, with a 32px copy button in the
+top-right (`IconButton`, switching from check back to copy after 1.5 s). No language header;
+that's the difference from `CodeBlock`.
 
-- **不帶語法高亮**。shiki 一裝就是幾 MB 的語法與主題,設計系統不該讓每個 app 背;
-  也不收 HTML 字串 —— 整個套件不走 `innerHTML`。要上色的殼傳 `highlight(code)`,
-  回一個 React node 放在原本 `<pre>` 的位置(shiki 的 `codeToHast` + `toJsxRuntime`,
-  或殼自己決定要不要 `dangerouslySetInnerHTML`);沒傳就是純文字的 `<pre>`
-- 複製的永遠是 `code` 原文,不是畫出來的東西
+- **No syntax highlighting**. shiki alone is several MB of grammars and themes, and a design
+  system shouldn't make every app carry it; it also takes no HTML string: the whole package
+  avoids `innerHTML`. A shell that wants color passes `highlight(code)`, returning a React node
+  that takes the place of the `<pre>` (shiki's `codeToHast` + `toJsxRuntime`, or the shell
+  decides for itself whether to `dangerouslySetInnerHTML`); without it, it is a plain `<pre>`
+- Copy always copies the original `code`, not what is drawn
 
 ### interaction-card
-agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)。
-pending 是可操作物,回覆後收成過去區的不可改收據。
+The two cards where the agent waits for you: Permission (a permission request) and Decision (you
+must decide). Pending, it is actionable; after the reply it shrinks into an unchangeable receipt
+in the past area.
 
-- 卡面是 rest 卡片(`surfaceRaised`、`shadow.rest`、`corner.card`)。「邊框」是疊在 rest 上的
-  1px box-shadow 環,不是 border;指令框與補充欄是凹下去的 `surface`
-- Permission:warning 環、mono 顯示指令 / 對象、允許一次(⏎)/ 總是允許(⌘⏎)/
-  拒絕(Esc)、底部 policy 說明列(解釋為何問、規則活過 rotation)
-- Decision:同一種卡分 blocking(墨色 `accent` 環、「等你才能繼續」)與 non-blocking
-  (只有 rest、「等你 · deadlineAt 倒數」);內容走 block DSL(markdown / options /
-  text / table / image / diff);必填未選時送出 disabled,有 recommended 時多一顆「照建議」
-- 三顆回覆鈕:允許一次 `primary`、總是允許 `secondary`、拒絕 `dangerGhost`。
-  拒絕不給整塊實心 danger(一整塊紅會蓋過 primary),但語意要看得出來 ——
-  這個元件自己的 token 語彙裡 danger 本來就是「拒絕」的顏色(收據列 rejected 的 ✓
-  用的就是 `color.danger`)
-- 複選 options 是**無框列**:Checkbox 沒有 card variant,外框也無法從外面套
-  (caller 的 className 會落到 input 上)
-- 快捷鍵**只攔 Esc 與 ⌘⏎**,單獨的 ⏎ 留給被聚焦的按鈕自己 —— 否則 tab 到「拒絕」
-  按 ⏎ 會變成允許
-- 收據的 `aria-live="polite"` 區塊**常駐**(pending 時是空的視覺隱藏節點),回覆後才
-  填字 —— region 跟文字一起掛上是不會播報的
+- The card is a rest card (`surfaceRaised`, `shadow.rest`, `corner.card`). Its "border" is a 1px
+  box-shadow ring layered on rest, not a border; the command box is a sunken `surface`. The
+  supplementary text field is the exception: 1px `border` frame, `corner.control`
+- Permission: warning ring, command / target in mono, Allow once (⏎) / Always allow (⌘⏎) /
+  Deny (Esc), and a policy line at the bottom (why it asks; the rule outlives rotation)
+- Decision: the same card comes as blocking (ink `accent` ring, "Waiting on you to continue",
+  「等你才能繼續」) and non-blocking (rest only, `deadlineLabel` or the default "Waiting on you",
+  「等你」; no countdown). Content is a block DSL with three kinds: `markdown` (currently drawn as
+  a plain paragraph, not through `Markdown`) / `options` / `text`. Submit is disabled while a
+  required block is empty; with a recommended option there is one more button, "Go with the
+  recommendation"
+- The three reply buttons: Allow once `primary`, Always allow `secondary`, Deny `dangerGhost`.
+  Deny doesn't get solid danger (a block of red would outweigh primary), but its meaning still
+  has to show: in this component's own token vocabulary danger already means "denied" (the
+  rejected ✓ in the receipt row uses `color.danger`)
+- Multi-select options are **frameless rows**: Checkbox has no card variant, and a frame can't
+  be added from outside (the caller's className lands on the input)
+- Shortcuts **intercept only Esc and ⌘⏎**; a bare ⏎ is left to the focused button. Otherwise
+  tabbing to "Deny" and pressing ⏎ would allow
+- The receipt's `aria-live="polite"` region is **always mounted** (an empty visually hidden
+  node while pending) and gets its text only after the reply: a region mounted together with its
+  text isn't announced
+- Words are Chinese default props for now (Allow once / Always allow / Deny / Replied are not
+  overridable yet)
 
 ### handoff-receipt
-rotation 分隔線:thread 過去區裡一條安靜的細列「換班完成 · 時間 · ctx 50% → 新
-session」,可展開看交接摘要。用戶不管理 session,**這是他唯一看見換班的地方**。
+The rotation divider: a quiet thin row in the thread's past area, "Handoff complete · time ·
+ctx 50% → new session", expandable to show the handoff summary. Users don't manage sessions;
+**this is the only place they see a handoff**.
 
-- collapsed 為預設,左右虛線把它嵌進時間軸;展開(同列 toggle,不開 dialog)看三項
-  核對:記憶(「3 則記憶已存下(…)。」)/ 摘要(「交接摘要已交給新 session,讀過就刪除。」)/
-  紀錄(「這一輪的 42 筆紀錄還查得到,不會帶進新 session。」)。用跟其他地方一樣的「記憶」,
-  不寫「耐久事實」「落盤」「Ledger」這種內部詞。三項的名字與句子都是 prop(`memoryTitle` /
-  `memoryLabel(count, items)`、`summaryTitle` / `summaryLabel`、`ledgerTitle` / `ledgerLabel(count)`)
-- **是收據不是控制**:不可改、無任何動作按鈕
-- 沒有卡面,直接畫在紙上:左右虛線中間一顆 `surface` 膠囊(窄螢幕時字折行、膠囊變高);
-  展開的摘要是凹下去的 `surface`、`corner.card`。展開時虛線變實線、連結 icon 轉 `accent`
-- 收合狀態用 `inert` 不能用 `hidden` —— 一樣離開 a11y tree 與 tab 序,但留在版面上
-  讓 0fr→1fr 跑得動
-- 走過的彎路:`display: none` 硬切 + 單向 fade 被打回「死板」;展開讓頁面長高 →
-  scrollbar 出現 → 置中內容左移(修法是 `html { scrollbar-gutter: stable }`,已進 `tokens.css`)
+- Collapsed by default, with dashed lines on both sides setting it into the timeline. Expanding
+  (an inline toggle, not a dialog) shows three checks: memory ("3 memories saved (…)."), summary
+  ("The handoff summary went to the new session and is deleted once read."), log ("This round's
+  42 log entries are still searchable and won't carry into the new session."). It uses "memory"
+  like everywhere else, never internal words like "durable facts", "flushed to disk" or
+  "Ledger". All three names and sentences are props (`memoryTitle` /
+  `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel`, `ledgerTitle` /
+  `ledgerLabel(count)`); "Handoff complete" and "→ new session" are not yet
+- **A receipt, not a control**: unchangeable, no action buttons
+- No card: drawn straight on the paper, a `surface` pill between dashed lines (on narrow screens
+  the text wraps and the pill grows taller); the expanded summary is a sunken `surface`,
+  `corner.card`. When expanded the dashes turn solid and the link icon turns `accent`
+- The collapsed state uses `inert`, not `hidden`: both leave the a11y tree and the tab order,
+  but `inert` stays in layout so the 0fr → 1fr transition can run
+- Dead ends: a hard `display: none` cut plus a one-way fade was rejected as "stiff"; expanding
+  made the page taller → a scrollbar appeared → centered content shifted left (fixed with
+  `html { scrollbar-gutter: stable }`, now in `tokens.css`)
 
 ### composer
-釘在現在線上的 prompt bar:**說話發生在現在** —— 送出後上方多一條收據、下方未來區
-當場重排。永遠可用,不被 pending 卡阻塞。
+The prompt bar pinned to the present line: **speaking happens in the present**. After sending,
+a receipt appears above and the future area below reflows on the spot. Always usable, never
+blocked by a pending card.
 
-- 多行 textarea 自動長高(max-height 後內捲);⏎ 送出、⇧⏎ 換行
-- **長高跟 `Textarea autoGrow` 是同一套**(field-sizing → Pretext → scrollHeight):Composer
-  用 ref callback 掛 `textarea/Textarea` 輸出的 `autoGrow`,不自己量。送出清空不會觸發
-  input 事件,所以 ref callback 依 `value` 換一個,重掛時重量
-- 沒有 `useEffect`:移游標在 handler 裡 `flushSync` 先 commit 再 `setSelectionRange`;
-  `sources` 查詢在改字 / 移游標的 handler 裡發,用遞增 id 丟掉過期的回應
-- 外觀:凹下去的 `surface` 紙、無框、`corner.sheet`(20)、`t3` / `body`;送出是 40px 的
-  墨色圓鈕(空值退成 `accentSubtle`),圖示鈕與 model picker 是膠囊
-- focus 時整張紙外圈 2px `focusRing`(`:focus-within`)
+- A multi-line textarea that grows (scrolls inside after max-height); ⏎ sends, ⇧⏎ adds a line
+- **Growth is the same machinery as `Textarea autoGrow`** (field-sizing → Pretext →
+  scrollHeight): Composer attaches the `autoGrow` exported from `textarea/Textarea` with a ref
+  callback and doesn't measure on its own. Clearing on send fires no input event, so the ref
+  callback is keyed on `value` and re-measures when it re-attaches
+- No `useEffect`: moving the caret uses `flushSync` in the handler to commit first, then
+  `setSelectionRange`; `sources` queries fire from the edit / caret handlers, and an
+  incrementing id discards stale responses
+- Look: a sunken `surface` sheet, no frame, `corner.sheet` (20), `type.t3` / `type.body`; send
+  is a 40px ink round button (falls back to `accentSubtle` when empty), and icon buttons and
+  the model picker are pills
+- On focus the whole sheet gets a 2px `focusRing` outline (`:focus-within`)
 
 ### attach-button / pending-files
-chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `IconButton`(18px 的
-`+`),按了開檔案選擇器;`PendingFiles` 是選好還沒送的檔,一檔一個 outline `Chip`、`×`
-拿掉,間距 6、會折行。
+Chatbox attachments (0.9, moved from the product shell). `AttachButton` is a 36px `IconButton`
+(an 18px `+`) that opens the file picker; `PendingFiles` shows files picked but not yet sent,
+one outline `Chip` per file with `×` to remove, gap 6, wrapping.
 
-- 鍵盤與讀屏摸到的是按鈕;真正的 `<input type="file">` 是 `hidden`、`tabIndex -1`,
-  只給 `.click()` 打開選擇器。選完把 `value` 清掉,同一個檔可以再選一次
-- 不是 `Dropzone` / `UploadList`:那是整塊虛線拖放區與帶進度條的上傳清單,
-  chatbox 只要一顆鈕跟一排 chip
+- Keyboard and screen readers reach the button; the real `<input type="file">` is `hidden` with
+  `tabIndex -1`, used only via `.click()` to open the picker. After picking, its `value` is
+  cleared so the same file can be picked again
+- Not `Dropzone` / `UploadList`: those are a whole dashed drop area and an upload list with
+  progress bars; the chatbox needs only a button and a row of chips
 
 ### call-bar
-通話時 chatbox 換成的那一條(0.9,product 殼搬來):跟 Composer 同一張凹下的 `surface`、`corner.sheet`、左 16 其他 8;
-呼吸的點、狀態字、mono 的 `mm:ss`、靜音、紅色的掛斷。
+What the chatbox turns into during a call (0.9, moved from the product shell): the same sunken
+`surface` sheet as Composer, `corner.sheet`, 16 on the left and 8 elsewhere; a breathing dot,
+status text, mono `mm:ss`, mute, and a red hang-up.
 
-- **受控,自己不存任何狀態**:`status` / `seconds` / `muted` 都從通話 session 來,
-  `onMute(next)` 交出要切到的值。舊版在元件裡自己 `setInterval` 數秒、自己記靜音,
-  換頁重掛就歸零
-- `status` 跟 product contract 的 `CallStatus` 同一組七個值。字是預設的中文,
-  `labels` 換;稿只畫了 `listening`「通話中」與靜音「已靜音」,其他五個是先給的字
-- 狀態變化**不做 live region**:通話中讀屏插嘴會蓋掉對方的聲音。整條是
-  `role="group"`(名字「通話」),點是裝飾
+- **Controlled; it stores no state**: `status` / `seconds` / `muted` all come from the call
+  session, and `onMute(next)` hands over the value to switch to. The old version ran its own
+  `setInterval` to count seconds and remembered mute itself, so both reset on remount
+- `status` uses the same seven values as the product contract's `CallStatus`. The words are
+  Chinese defaults, overridden through `labels` (`CallBarLabels`, merged over a local table;
+  not yet `defineStrings`, so `<LocaleProvider>` doesn't switch them). The design only drew
+  `listening` "In call" (通話中) and muted "Muted" (已靜音); the other five are placeholders
+- Status changes **are not a live region**: a screen reader talking over the call would cover
+  the other person's voice. The bar is a `role="group"` (named "Call"), and the dot is
+  decorative
 
 ### voice-indicator
-一眼看出 agent 現在是在聽你、在想、還是在說 —— 對應 STT → runtime LLM → TTS 的三段。
+Shows at a glance whether the agent is listening to you, thinking, or speaking, mapping the
+three stages STT → runtime LLM → TTS.
 
-- 四態:`idle`(靜態灰 bar)/ `listening`(5 條音量 bar 起伏)/ `thinking`(單點脈動)
-  / `speaking`(波形依序起伏)
-- 視覺化區**固定寬高**,換態不跳版;文案標明可插話(「說話中…插話會打斷」= barge-in)
-- 外框是 `surface` 膠囊、無框;動起來的纖維是 `signal`(聽、想、說都是 agent 在做事)
-- reduced-motion:全部動畫關閉,bar 停在中段靜態高度,改顯示 mono uppercase 靜態文字標
+- Four states, one SVG stroke (`lib/voice.ts`, `voicePath`): `idle` a flat line / `listening`
+  a sine wave scaled by the mic `level` / `thinking` a rolling coil (a telephone cord) /
+  `speaking` a travelling wave. Earlier it was bars and a pulsing dot
+- The drawing area has **a fixed size**, so changing state never shifts layout; the copy says
+  you can interrupt ("Speaking… interrupting will cut in" = barge-in)
+- The frame is a `surface` pill, no frame line; the moving line is `signal` (listening,
+  thinking and speaking are all the agent working). Idle is `textFaint`
+- Reduced motion: all animation off, the path freezes at a fixed frame, and a static uppercase
+  mono text label appears instead
 
 ### live-dot
-「還在跑」的一顆呼吸點。給工具紀錄的當前動作、sub thread 的進行中狀態。
+One breathing dot for "still running": the current action in a tool log, the in-progress
+state of a sub thread.
 
-- 點是 `signal`:「還在跑」就是 agent 正在做事
-- 呼吸只到 0.35 就回來:淡到底會變成閃爍,那是警報不是「還在跑」
-- 1.6s `ease-in-out` 無限循環,`prefers-reduced-motion` 直接停住(點還在,只是不動)
-- 預設 `aria-hidden` —— 一顆點沒有要唸的東西;給 `label` 才升成 `role="status"`
+- The dot is `signal`: "still running" is the agent working
+- It breathes only down to 0.35 and back: fading to nothing reads as blinking, which is an
+  alarm, not "still running"
+- 1.6 s `ease-in-out`, infinite; `prefers-reduced-motion` stops it (the dot stays, just still)
+- `aria-hidden` by default: a dot has nothing to read. Given `label`, it becomes `role="status"`
 
 ---
 
-## Storage / 資料
+## Storage & data
 
 ### password-input
-密碼與 vault passphrase 欄:顯示 / 隱藏切換、四段強度計(長度 + 字元類別評分)、
-Caps Lock 警告、confirm 欄不一致錯誤。
+Password and vault passphrase field: show / hide toggle, a four-segment strength meter (scored
+on length + character classes), a Caps Lock warning, and a mismatch error for the confirm field.
 
-- 要求寫在看得到、唸得到的地方,不放 placeholder(一打字就不見,讀屏也不一定唸)。強度計
-  空的時候說「至少 12 個字元。」、弱的時候說「弱，至少要 12 個字元。」—— 說目標,不只說不夠;
-  confirm 欄不一致說「再輸入一次同樣的 passphrase。」。表單裡把要求放在 Field 的 `help`
+- Requirements go where they can be seen and read, not in the placeholder (it disappears as soon
+  as you type, and screen readers may not read it). The meter says, when empty, "At least 12
+  characters." and, when weak, "Weak, needs at least 12 characters.": state the goal, not just
+  "not enough". A mismatched confirm says "Enter the same passphrase again.". In a form, put the
+  requirement in the Field's `help`
 
 ### recovery-key
-復原金鑰展示卡,建立 vault 或重發金鑰時**顯示一次**。
+Recovery key card, **shown once** when a vault is created or its key reissued.
 
-- 分段 mono(4 字一組)、預設模糊遮罩(hover / focus / 點擊才顯示)、一鍵複製(變 ✓)、
-  下載 .txt、警告卡、「我已抄下」checkbox **gate 住主要按鈕**
-- 長相是 rest 卡片(`surfaceRaised` 底、`shadow.rest`、`corner.card`);金鑰區與警告是卡片裡凹下去
-  的塊,不畫框、圓角 `corner.small`;動作鈕是 secondary 膠囊
+- Mono groups (split on `-`), blurred by default (shown on hover or with the show / hide
+  button), one-click copy (turns into ✓), download as .txt, a warning card, and an "I've written
+  it down" checkbox (`ack` / `onAckChange`) that the caller uses to **gate the primary button**;
+  the component itself has no primary button
+- It is a rest card (`surfaceRaised` background, `shadow.rest`, `corner.card`); the key area and
+  warning are sunken blocks inside it, no frame, `corner.small`; action buttons are secondary
+  pills
 
 ### dropzone
-拖放上傳區:idle 是凹下去的 `surface` 底 + `borderStrong` 虛線(`corner.card`)、
-dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放不是 agent 在做事,不用藍)、
-**選檔按鈕 fallback**(drag 永遠不是唯一入口,膠囊、`accentSubtle` 底、無框)、
-上傳中列表(檔名 + 膠囊進度條 + 取消,跟檔案列一樣是 rest 卡片)、失敗列。
+Drag-and-drop upload area: idle is a sunken `surface` background with a `borderStrong` dashed
+line (`corner.card`); on dragover the dash turns `accent`, the icon `text` and the background
+`accentSubtle` (dropping isn't the agent working, so no blue). **A file-picker button fallback**
+(drag is never the only way in; a pill, `accentSubtle` background, no frame). An uploading list
+(file name + pill progress bar + cancel; card-like, background `tone.railLayer2`, same value as
+`surfaceRaised`), and failed rows.
 
-- 失敗列的字照原因說,不要每種失敗都說「太大」。因為大小被擋的那則帶 `limit`(Dropzone 的
-  `maxSize`),寫「超過 10 MB 上限，沒有上傳。換一個小於 10 MB 的檔案。」,槽裡是上限不是檔案
-  大小;其他失敗是「上傳失敗。再試一次，或換一個檔案。」;`error` 給了就用呼叫端的字
-- 播報走清單外面一個視覺隱藏的 `role="status"`,裡面只有「檔名:狀態」的字。清單本身不是
-  live region:包住取消鈕的話,modal 開著時那些鈕還是露在無障礙樹上
-- 虛線是 SVG `rect`,內縮 1.5px,所以它的 `rx` 用 CSS 算成 `corner.card − 1.5px`,
-  圓角跟著 token 走,不寫死
+- A failed row says the actual reason; not every failure is "too big". A rejection for size
+  carries `limit` (the Dropzone's `maxSize`) and reads "Over the 10 MB limit, not uploaded. Pick
+  a file under 10 MB." (the slot holds the limit, not the file size); other failures read
+  "Upload failed. Try again, or pick another file."; a caller-supplied `error` wins
+- Announcements go through a visually hidden `role="status"` outside the list, holding only
+  "file name: state" text. The list itself isn't a live region: wrapped around the cancel
+  buttons, those buttons would stay exposed in the accessibility tree while a modal is open
+- The dashed line is an SVG `rect` inset 1.5px, so its `rx` is computed in CSS as
+  `corner.card − 1.5px`; the corner follows the token instead of being hard-coded
 
 ### file-row
-檔案列表的一列:類型圖示 + 檔名 + 大小(mono、tabular)+ 修改時間 + hover 才浮現的
-動作與選取 checkbox;另有資料夾列與加密中 / 上傳中的 busy 列。
+One row of a file list: type icon + name + size (mono, tabular) + modified time + actions and
+a select checkbox that appear on hover; plus folder rows and busy rows (encrypting /
+uploading).
 
-- 觸控裝置(`(hover: none)`)沒有 hover,checkbox 與動作鈕一直顯示
-
-- 檔名放不下時切成 `…`,`title` 帶全名(附件方塊的名字、`Group` 的列名與狀態、`Pill`、
-  `Cell mono`、`Subject` 也一樣:切掉的字一律 hover 看得到全文)
-- `FileList` 是紙上的 rest 卡片:`surfaceRaised` 底、`shadow.rest` 的環就是唯一的邊、`corner.card`,
-  列與列之間髮線
+- Touch devices (`(hover: none)`) have no hover, so the checkbox and action buttons are always
+  shown
+- A name that doesn't fit is cut with `…`, with the full name in `title` (the same goes for
+  attachment tile names, `Group` row names and status, `Pill`, `Cell mono`, `Subject`: cut text
+  is always visible in full on hover)
+- `FileList` is a rest card on the paper: `surfaceRaised` background, the `shadow.rest` ring as
+  its only edge, `corner.card`, hairlines between rows
 
 ### diff-viewer
-行級 unified diff + 行內字級 highlight。給 plan 審查 takeover 與 i18n 譯文對照用。
+Line-level unified diff plus inline word-level highlight. For plan review takeovers and i18n
+translation comparison.
 
-- 行級增刪用 success / danger 的 **subtle 底**(不是飽和色),sign 與 stat 用對應 text 色
-- 行內 highlight 只標變動的字(`<mark>`,比行底再深一階的 hl 色)
-- mono 13px、雙欄行號(before / after),行號 `textMuted`、不可選取
-- 凹下去的 `surface`、`corner.card`,無框;標題列與行之間不畫線
-- 收合未變動區段:「⋯ N 行未變動」列可展開收合,`layer4` 底(hover `layer5`)不畫上下線
-- 檔案標題列:kind 色點(modified 黃 / added 綠 / deleted 紅)+ path + `+N −N` 統計;
-  added = 只有 after,deleted = 只有 before
+- Added / removed lines use the success / danger **subtle background** (not saturated colors);
+  signs and stats use the matching text color
+- Inline highlight marks only the changed words (`<mark>`, an `*Hl` color one step deeper than
+  the line background)
+- Code in mono `type.code` (13px); two line-number columns (before / after) in `type.t1`
+  (11px) `textMuted`, not selectable
+- Sunken `surface`, `corner.card`, no frame; no line between the title bar and the lines
+- Collapsed unchanged runs: a "⋯ N unchanged lines" row expands and collapses, `layer4`
+  background (hover `layer5`), no top or bottom line
+- File title bar: kind dot (modified yellow / added green / deleted red) + path + `+N −N`
+  stats; added = after only, deleted = before only
 
 ### data-table
-排序、過濾、選取、inline edit 的資料表。第一個消費者是 i18n 字典編輯。
+Data table with sorting, filtering, selection and inline edit. First consumer: the i18n
+dictionary editor.
 
-- 欄頭點擊排序 asc → desc,`aria-sort` + accent 箭頭,一次只排一欄
-- 頂部 filter 即時過濾(key 與各 locale 都比對),右側 `N / M keys` 計數(mono、`aria-live`)
-- inline edit:雙擊 cell → 輸入框,Enter 確認、Esc 取消、**blur 視同確認**;
-  空值顯示 faint 的 `—`
-- 選取列 checkbox,header checkbox 全選 / 半選(indeterminate)
-- 表格滿版放在自己的段落裡,**不包進卡片**:捲動區沒有框、沒有底。表頭是凹下去的
-  `surface` 條(兩端 `corner.small`),欄名是 mono 小寫,不做全大寫加字距;列與列之間一條
-  `border` 髮線(畫在每格底部),hover 升到 `layer3`
-- `border-collapse: separate` + `border-spacing: 0`:表頭條的圓角要畫在 th 上,collapse 下
-  cell 的圓角不算數;separate 下 sticky 的表頭也不用再靠 `inset box-shadow` 假裝底線
-- 窄螢幕時表格在捲動區裡橫向捲,不撐寬頁面
-- 空結果:置中訊息帶查詢字 + 「清除過濾」動作
-- 捲動區高度 `maxHeight`(預設 20rem),`footer` 渲染在列之後、**捲動區之內** ——
-  「載入更多」待在清單裡才跟得上捲動
+- Clicking a header sorts asc → desc → none, with `aria-sort` and an accent arrow; one column
+  at a time
+- A filter box on top; the table doesn't filter itself. The caller owns `filter` /
+  `onFilterChange`, passes the filtered `rows` and `total`, and the counter on the right reads
+  `countLabel(shown, total)` (default `N / M`; mono, `aria-live`)
+- Inline edit: double-click a cell → input; Enter commits, Esc cancels, **blur counts as
+  commit**; an empty value shows a faint `—`
+- Row selection checkboxes; the header checkbox selects all / some (indeterminate, set in one of
+  the three remaining `useEffect`s)
+- The table runs full width in its own section, **not inside a card**: the scroll area has no
+  frame and no background. The header is a sunken `surface` strip (`corner.small` at both ends);
+  column names are lowercase mono, never uppercase with tracking; a `border` hairline between
+  rows (drawn at the bottom of each cell), hover rises to `layer3`
+- `border-collapse: separate` + `border-spacing: 0`: the header strip's corners are drawn on
+  `th`, and under collapse cell corners don't count; under separate the sticky header also no
+  longer needs an `inset box-shadow` to fake its bottom line
+- On narrow screens the table scrolls horizontally inside its scroll area and never widens the
+  page
+- Empty result: a centered message with the query plus a "Clear filter" action
+- Scroll area height is `maxHeight` (default 20rem); `footer` renders after the rows, **inside
+  the scroll area**, so "Load more" stays in the list and scrolls with it
 
 ### ghost / icon-button / segmented / spin / status-chip
-小控件,從 product 的 ui-next 搬來:`Ghost` / `GhostLink` 是沒有底的文字膠囊(hover 才有底),
-`IconButton` 一定帶 Tooltip(名字就是 tooltip),`Segmented` 是 `aria-pressed` 的按鈕組不是
-tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字母的狀態碼
-(`r` `w` `d` `n` `a` `f` `plain`),`Pill` 是 fold 第一行的 22px mono 藥丸。
+Small controls moved from the product's ui-next: `Ghost` / `GhostLink` are text pills with no
+background (background only on hover); `IconButton` carries a Tooltip (its name is the tooltip)
+except while `open` (the popover it owns is showing); `Segmented` is a group of `aria-pressed`
+buttons, not tabs; `Spin` is the 12px ring inside a button (9px `small`); `StatusChip`'s variant
+is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`); `Pill` is the 22px mono pill on a
+fold's first line.
 
-- `IconButton` 是正圓(`corner.pill`),按下去 0.98,focus 環是 `focusRing`
-- `Segmented` 跟 pills tabs 同一個語言:凹下去的 `surface` 軌道(`corner.control`,不加框),
-  選中的那格是 `surfaceRaised` + `shadow.rest` 的一張紙,外圈 1px `borderControl` 環(跟 pills
-  tabs 一樣,對軌道 3:1 以上)。在 grid 裡也只包住自己的選項
-- `StatusChip` 的 `a`(執行中)與 `Pill` 的 `live` 點用 `signal`:那是 agent 正在做事
+- `IconButton` is a circle (`corner.pill`), presses to 0.98, focus ring `focusRing`, hover
+  `ink.n8`
+- `Segmented` speaks the same language as pills tabs: a sunken `surface` track
+  (`corner.control`, no frame), the selected segment a `surfaceRaised` + `shadow.rest` sheet
+  with a 1px `borderControl` ring (as in pills tabs, over 3:1 against the track). In a grid it
+  still wraps only its own options
+- `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`: the agent is working
+
+### card
+`Card` is a rest card on the paper: `surfaceRaised` background, `corner.card` (14px),
+`shadow.rest`, `color.text`, padding `space.lg`. No variants. Props are `div` props plus `sx`.
+
+- No border: the `shadow.rest` ring is its only edge
+- To divide a card, use sunken `surface` blocks inside it; never a card inside a card
+
+### text
+`Text` sets running text and headings from the `type` scale. Props: `as` (default `p`),
+`variant` (default `body`), `sx`. Base: `font.body`, `color.text`, `type.snug`, margin 0.
+
+| variant | size | details |
+| --- | --- | --- |
+| `display` | `type.t7` (36px) | `font.display`, 600, `type.dense`, −0.01em tracking |
+| `title` | `type.t5` (22px) | `font.display`, 600, `type.dense` |
+| `body` | `type.t3` (15px) | line height `type.body` (1.6), per `docs/plans/02-tactile.md` |
+| `caption` | `type.t2` (13px) | `textMuted` |
+| `mono` | `type.t2` (13px) | `font.mono` |
+
+### icon
+Not a component but the icon conventions: `icon.ts` exports `icon` (StyleX sizes from the
+`iconSize` tokens: `xs` 12 / `sm` 14 / `md` 16 / `base` 18 / `lg` 20px, each `flexShrink: 0`,
+`pointerEvents: none`) and `ICON_STROKE = 2`.
+
+- `glyphs.tsx` exports `Glyph`: 24×24 viewBox, no fill, `currentColor` stroke at
+  `ICON_STROKE`, round caps and joins, `aria-hidden` by default. Named glyphs: `CheckGlyph`,
+  `FileGlyph`, `CopyGlyph`, `PlusGlyph`, `XGlyph`, `MicGlyph`, `MicOffGlyph`, `PhoneOffGlyph`
+- The paths are copied from lucide so moved components look the same, but **the package doesn't
+  depend on lucide**; components that take an icon (e.g. `IconTile`) accept a lucide component
+  from the app
+- `Chevron.tsx` exports `Chevron` (`direction: "right" | "down"`), drawn on `Glyph`
 
 ### group / page / settings-rows / table
-頁面骨架的零件:`Group` + `Row` / `Item` 是一張清單卡(見下一節),`PageHead` / `SectionLabel` /
-`Panel` / `Snippet` 是頁面的字與面,`SettingsRows` + `SettingsRow` 是設定頁左標籤右控件的列,
-`Table` + `Tr` + `Cell` 是低階的表格零件(要排序、分頁用 `DataTable`)。字級用 `type`、
-圓角用 `corner`、hover 用 `ink`。
+Page skeleton parts: `Group` + `GroupRow` / `GroupItem` form a list card (see the next section);
+`PageHead` / `SectionLabel` / `Panel` / `Snippet` are the page's text and surfaces;
+`SettingsRows` + `SettingsRow` are settings rows with the label on the left and the control on
+the right; `Table` + `Tr` + `TableCell` are low-level table parts (for sorting and paging use
+`DataTable`). Type from `type`, corners from `corner`. Hover rises a layer: `Tr`, `MoreRow` and
+`ListRow` go to `layer3`, Group rows to `layer4`; only the table `Toggle` and `IconButton` use
+an `ink` wash. The old names `Row`, `Item`, `Head`, `Cell` are deprecated aliases of
+`GroupRow`, `GroupItem`, `TableHead`, `TableCell`.
 
-- 頁面是桌面(`layer1`),內容放在白色主紙(`layer2`、`corner.sheet`)上;主紙是殼的事,
-  這些零件都假設自己在紙上
-- `SettingsRows`、`Panel` 是紙上凹下去的 `surface` 區塊(`corner.card`),**不加框**;
-  列與列之間一條髮線
-- `Table` 滿版、不進卡片:沒有底、沒有框。`Head` 是凹下去的 `surface` 條(`corner.small`),
-  每一列底下一條髮線(最後一列沒有),`Detail` 同樣畫在底下
-- `Card` 是紙上的 rest 卡片:`surfaceRaised` 底、`shadow.rest` 的環 + `corner.card`,沒有另外的邊框。卡片裡要分區
-  用凹下去的 `surface`,不要卡片裡再放卡片
+- The page is the desk (`layer1`); content sits on the white main sheet (`layer2`,
+  `corner.sheet`). The main sheet is the shell's job; these parts all assume they are on paper
+- `SettingsRows` and `Panel` are sunken `surface` blocks in the paper (`corner.card`), **no
+  frame**; a hairline between rows
+- `Table` runs full width, not in a card: no background, no frame. `TableHead` is a sunken
+  `surface` strip (`corner.small`), a hairline under every row (not the last), and `Detail` is
+  drawn under it the same way
+- For cards, see `card`
 
-### group(分組清單)
-設定頁的分組清單,照 product 殼對過稿的 `ios/` 原樣搬來(0.9)。`Group` 上面一行 muted 的
-`header`、中間一塊紙上凹下去的 `surface` 區塊(`corner.card`、沒有邊框、沒有陰影)、
-下面一段 muted 的 `footer`;
-0.8 的有框 `surface` 卡沒有人用,直接換掉。
+### group (grouped list)
+The settings page's grouped list, moved as-is from the product shell's design-reviewed `ios/`
+(0.9). `Group` has a muted `header` above, a sunken `surface` block in the paper in the middle
+(`corner.card`, no frame, no shadow), and a muted `footer` below. The 0.8 framed `surface` card
+had no users and was replaced outright.
 
-- 卡裡的列是 cell:`GroupCell`(字、第二行 `detail`、右邊 `value` / `control`)、
-  `InputCell`(96px 的名字欄 + 沒框的 Input)、`TextCell`(會長高的 Textarea)、
-  `SliderCell`(名字與讀數一行、slider 在下)。44px、左右 16px、`t3`
-- `InputCell` / `TextCell` 裡的欄位拿掉了自己的框與環,焦點由整列畫:`:focus-within` 時底升到
-  `layer4`,再加一圈 2px `focusRing`(`outlineOffset: -2`,畫在卡的圓角裡面)。只有底色的話
-  對比 1.09:1,看不出焦點在哪
-- 列與列之間的細線是 cell 自己的 `background-image`,寬 `100% - 16px` 靠右,
-  **不是**卡的 `gap` 或 `border`:第一列沒有線,線從左邊 16px 起
-- `GroupCell` 有 `onPress` 就整列是一顆 `Ghost`;沒有 `tone`、不是選項(`checked`)才畫
-  chevron —— 「新增」「刪除」這種動作列與單選的選項都不是「點進去」
-- 列前面的東西:`IconTile`(28px `layer4` 方塊、`corner.small` + 16px glyph)、`LetterTile`(同一塊寫
-  第一個字母)、`ActionIcon`(沒有方塊的 18px glyph,動作列用)。glyph 收 lucide 的元件,
-  這個套件不依賴 lucide
-- 0.8 的 `Item` / `Row` 還在,放進新的卡裡:`Item` 自己把字級壓回 `t2`,hover 升到 `layer4`
-- `Status` 是點 + 字:`dot` 給 `filled`(定了)/ `hollow`(等人確認)/ `dashed`(過期了)
-  三種 7px 的點,`tone` 給點的顏色;`warning` / `danger` 連字一起染,`success` / `muted`
-  字留 muted —— 平靜的狀態不搶眼。沒給 `dot` 就只有字。`warn` 是 `tone="warning"` +
-  實心點的簡寫(0.8 的 API)
+- Rows in the card are cells: `GroupCell` (text, a second `detail` line, `value` / `control` on
+  the right), `InputCell` (a 96px name column + a frameless Input), `TextCell` (a growing
+  Textarea), `SliderCell` (name and reading on one line, slider below). 44px, 16px left and
+  right, `type.t3`
+- Fields inside `InputCell` / `TextCell` drop their own frame and ring; the whole row draws
+  focus: on `:focus-within` the background rises to `layer4`, plus a 2px `focusRing` outline
+  (`outlineOffset: -2`, drawn inside the card's corners). Background alone would be 1.09:1, and
+  you couldn't tell where focus is
+- The divider between rows is the cell's own `background-image`, `100% - 16px` wide, aligned
+  right; **not** the card's `gap` or `border`: the first row has no line, and the line starts
+  16px from the left. Currently only `GroupCell` and `InputCell` draw it; `TextCell` and
+  `SliderCell` don't
+- A `GroupCell` with `onPress` is a whole-row `Ghost`; it draws a chevron only when it has no
+  `tone` and isn't an option (`checked`): action rows like "Add" or "Delete" and single-choice
+  options aren't "go in"
+- Leading items: `IconTile` (a 28px `layer4` square, `corner.small`, with a 16px glyph),
+  `LetterTile` (the same square with a first letter), `ActionIcon` (an 18px glyph with no square,
+  for action rows). Glyphs take a lucide component; this package doesn't depend on lucide
+- The 0.8 `Item` / `Row` still work inside the new card but are deprecated in favor of
+  `GroupItem` / `GroupRow`: `Item` drops its own text back to `type.t2`, and with `go` hovers
+  to `layer4`
+- `Status` is dot + text: `dot` takes `filled` (settled) / `hollow` (awaiting confirmation) /
+  `dashed` (expired), three 7px dots, and `tone` colors the dot; `warning` / `danger` tint the
+  text too, `success` / `muted` keep the text muted (calm states don't call attention). Without
+  `dot` it is text only. `warn` is shorthand for `tone="warning"` + a filled dot (the 0.8 API)
 
 ### status-badge
-一個東西自己在跑時(AI 在操作的畫面)放在它頭上的狀態藥丸:`t2`、上下 4 左右 10、
-膠囊。`live` 是 `signalSubtle` 底配 `signal` 字 + 呼吸的 `LiveDot`(AI 在做事)、`warn` 是
-`warningSubtle` 底配 `warning` 字、`plain` 是 `accentSubtle` 底配 muted 字。
+The status pill placed over something that is running by itself (a screen the AI is operating):
+`type.t2`, 4 top and bottom, 10 left and right, pill. `live` is `signalSubtle` background with
+`signal` text plus a breathing `LiveDot` (the AI is working), `warn` is `warningSubtle` with
+`warning` text, `plain` is `accentSubtle` with muted text.
 
-- 不是 `Pill`(fold 第一行 22px 的 mono 藥丸),也不是 `StatusChip`(16px 的工具狀態碼)
-- `live` 的字只唸一次:`LiveDot` 帶 `role="status"` 唸狀態,看得到的字 `aria-hidden`
+- Not `Pill` (the 22px mono pill on a fold's first line), nor `StatusChip` (the 16px tool status
+  code)
+- `live` text is read once: the `LiveDot` carries `role="status"` and reads the state, and the
+  visible text is `aria-hidden`
 
 ### list
-一張「點開來看」的清單(記憶、問題):`ListHead` 一行 `t1` `textMuted` 的欄名、底下一條細線;
-`ListRow` 每列是一顆 `Ghost`,40px、`t3`、hover `layer3`、圓角 `corner.control`,沒有框。
-跟 `Table` 不同:`Table` 是 mono 的帳本,這裡一個 mono 都沒有。
+A "click to open" list (memories, questions): `ListHead` is one line of `type.t1` `textMuted`
+column names with a thin line under it; each `ListRow` is a `Ghost`, 40px, `type.t3`, hover
+`layer3`, corner `corner.control`, no frame. Unlike `Table`: `Table` is a mono ledger; here
+there is no mono at all.
 
-- **欄寬是呼叫端的**:同一個 grid template 用 `sx` 給表頭與每一列。手機上怎麼排
-  (藏表頭、一列折兩行、列上下各 10px)也寫在同一個 `sx` 裡 —— 元件不帶 breakpoint,
-  殼的 640px 與這個套件的 45rem 才不會打架
-- 列是 `minHeight: 40` 不是 `height: 40`:折兩行時自己長高
-- 列不繼承 `Ghost` 的 `nowrap`:格子裡的字在自己那欄折行(`overflow-wrap: anywhere`),
-  窄的時候不會蓋到隔壁欄。中間那欄給 `minmax(0, 1fr)`,手機上把旁邊幾欄縮窄讓它拿到寬度
-- 能排序的欄名用 `ListSort`(`t1` 的 `Ghost`),`active` 變深色、後面跟一個 ` ↓`
-- `WeightDot`:問題前面 8px 的點。`light` 灰色實心(沒人回答就照建議做)、`soon` 紅色實心
-  (快到期了)、`heavy` 1.5px 橘色空心環(一定要人決定)。不是 `Dot`(設定列 6px accent)
-
+- **Column widths belong to the caller**: the same grid template goes to the header and every
+  row through `sx`. How it lays out on phones (hide the header, wrap a row onto two lines, 10px
+  above and below each row) goes in the same `sx`: the component carries no breakpoint, so the
+  shell's 640px and this package's 45rem never fight
+- Rows are `minHeight: 40`, not `height: 40`: they grow when wrapping to two lines
+- Rows don't inherit `Ghost`'s `nowrap`: text in a cell wraps within its column
+  (`overflow-wrap: anywhere`) and never runs into the next column when narrow. The middle column
+  gets `minmax(0, 1fr)`; on phones, narrow the other columns so it gets the width
+- A sortable column name uses `ListSort` (a `type.t1` `Ghost`); `active` turns dark and is
+  followed by ` ↓`
+- `WeightDot`: the 8px dot in front of a question. `light` solid gray (no answer means the
+  recommendation is followed), `soon` solid red (due soon), `heavy` a 1.5px orange hollow ring (a
+  person must decide). Not `Dot` (the 6px accent dot in settings rows)

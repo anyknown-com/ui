@@ -1,81 +1,125 @@
 # Components
 
-36 個元件,全部已實作。每個 folder 含:
+Every folder here is one component (or a small family), and all of them are implemented. A
+folder holds:
 
-- `<Name>.tsx` — StyleX 實作
-- `<Name>.test.tsx` — vitest + testing-library
+- `<Name>.tsx` — the StyleX implementation
+- `<Name>.test.tsx` — vitest + testing-library (most folders; a few small ones, such as
+  `button`, `ghost`, `icon-button`, `spin`, `page`, `table`, have none yet)
+- `README.md` — per-component docs: usage, props, examples
 
-視覺的真相是**實作本身**:`pnpm playground` 或 <https://ui.anyknown.com> 直接操作。
-決定與理由集中在 [COMPONENTS.md](./COMPONENTS.md)。
+The source of truth for the look is **the implementation itself**: run `pnpm playground` or open
+<https://ui.anyknown.com>. Decisions and their reasons live in [COMPONENTS.md](./COMPONENTS.md).
 
-`scrollbar` 沒有元件檔,它就是 `src/scrollbar.css`。
+`scrollbar` has no folder: it is `src/scrollbar.css`.
 
 ```bash
-pnpm playground   # http://localhost:5199,用打包後的 dist 渲染全部元件
+pnpm playground   # http://localhost:5199, renders every component from the built dist
 ```
 
-playground 與文檔站用同一組 section id。
+The playground and the docs site use the same section ids.
 
-## 清單
+## List
 
-- **表單** — `input` `textarea` `label` `checkbox` `radio` `switch` `slider` `select` `dropdown`
-- **基礎** — `button` `dialog` `toast` `tooltip` `popover` `tabs` `badge` `kbd` `skeleton` `progress` `empty-state` `scrollbar`
-- **Desktop AI-native** — `message` `tool-card` `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt` `composer` `voice-indicator` `live-dot`
-- **Storage / 資料** — `password-input` `recovery-key` `dropzone` `file-row` `diff-viewer` `data-table`
-- **Web 殼** — `group`(分組清單與 cell)`status-badge` `list` `bubble` `attachment` `payload-block`
-  `attach-button` `pending-files` `call-bar`
+- **Forms** — `input` `textarea` `label` (with `Field`) `checkbox` `radio` `switch` `slider`
+  `select` `dropdown` `password-input` `segmented`
+- **Basics** — `button` `icon-button` `ghost` `card` `text` `icon` `dialog` `toast` `tooltip`
+  `popover` `tabs` `badge` `kbd` `skeleton` `progress` `spin` `empty-state` (`scrollbar` is CSS)
+- **Agent & chat (desktop AI-native)** — `message` `markdown` (with `Formula`) `tool-card`
+  `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt` `composer`
+  `voice-indicator` `live-dot`
+- **Storage & data** — `recovery-key` `dropzone` `file-row` `diff-viewer` `data-table`
+- **Web shell** — `group` (grouped lists and cells) `page` `settings-rows` `table` `list`
+  `status-badge` `status-chip` `bubble` `attachment` `payload-block` `attach-button`
+  `pending-files` `call-bar`
 
-## 其他文件
+## Other docs
 
-- [COMPONENTS.md](./COMPONENTS.md) — 34 個元件的定案理由、走過的彎路、踩過的坑。
-  改任何一個元件之前先讀它那一節,免得把已經被否決的路再走一次
-  **適配新元件前必讀**,參數照抄不要重 tune
-- [A11Y-DEBT.md](./A11Y-DEBT.md) — 已知的對比與命中區偏差,等設計決策
+- [COMPONENTS.md](./COMPONENTS.md) — why each component ended up the way it did, the dead ends,
+  and the traps. Read a component's section before changing it, so you don't walk a path that
+  was already rejected. **Required reading before porting a new component**: copy the numbers,
+  don't retune them
+- [A11Y-DEBT.md](./A11Y-DEBT.md) — known contrast and hit-target gaps, waiting on a design
+  decision
+- `<folder>/README.md` — how to use each component
 
-## 共同決策
+## Common decisions
 
-1. **Headless 層用 Base UI**(`@base-ui/react`),StyleX 上皮。理由:combobox
-   (filter/multi/grouping)與 menu(巢狀 submenu、safe polygon)只有 Base UI 有完整
-   primitive。簡單控件(input/textarea/checkbox/radio/switch/label)用原生元素即可,
-   不必套 primitive
-2. 所有顏色/間距/圓角/動效引用 `tokens.stylex.ts`,不寫死值
-3. **動畫不回彈**:滑動類 240ms `cubic-bezier(.16,1,.3,1)`,進度類 120ms linear;
-   任何邊不得倒退或過衝
-4. **禁用 `useEffect`**:用 ref callback + cleanup(React 19)。量尺寸一律
-   ref callback + `ResizeObserver`
-5. 一律包 `prefers-reduced-motion`
-6. focus ring 統一:`focus-visible` 2px `color.focusRing`,offset 2(嵌在框內的用 -1)
-7. 表單錯誤:控件設 `aria-invalid` + `aria-describedby`,訊息由 Field 層渲染
-8. **StyleX 0.19 會靜默丟掉簡寫**(`all: unset`、`border: 0`、`background: none`)—— 
-   編不出任何 CSS,原生控件的 UA 外觀會留在畫面上。用 `lib/styled.ts` 的
-   `reset.control`,放在 `stylex.props` 的第一個參數
-9. **尺寸類元件自己寫 `boxSizing: border-box`**,不要靠 app 端有沒有 reset
-10. **佈局交給使用端:`sx`**。元件負責自己長什麼樣,不負責它在頁面上的位置與尺寸。
-    需要外部調整的元件收一個 `sx?: StyleArg`,接在自己的樣式後面(`styled(props, ...own, sx)`)。
-    不要靠 caller 傳 `className` —— StyleX 是 atomic class,字串接在後面不保證勝出,
-    要覆蓋就得在同一次 `stylex.props` 裡排在後面
-11. **theme 要整組套**。`themes.stylex.ts` 的 `light` / `dark` 是一組 theme(color +
-    shadow + tone),用 `stylex.props(...light)` 展開。只套其中一個 var group 會讓
-    另外兩組停在另一個主題。
-    那個檔由 `pnpm gen:themes` 從 tokens 生成,不要手改
-12. **面靠分層,不靠邊框**。`color.layer1`–`layer5` 是 rail → main → 訊息 → fold → 列
-    五階底色,數字越大越深。**hover 升一階**:`layerUp.layer3` 就是 `layer3` 的 hover 底色
-    (`lib/layers.ts`)。layer5 是最深的一階,它的上一階沒有名字,`layerUp` 給 `borderStrong`
+1. **The headless layer is Base UI** (`@base-ui/react`); StyleX is the skin. Reason: only Base
+   UI has complete primitives for combobox (filter, multiple, grouping) and menu (nested
+   submenus, safe polygon). Simple controls (input, textarea, checkbox, radio, switch, label)
+   use native elements; no primitive needed. Today Base UI backs dialog, popover, tooltip,
+   select, dropdown and tabs. Slider is deliberately hand-written (see COMPONENTS.md)
+2. Every color, space, corner, type size and motion value comes from `tokens.stylex.ts`; no
+   hard-coded values. Deprecated token groups (`text.*`, `radius.*`, the pre-tactile `corner`
+   names, `shadow.raised`/`popover`/…) stay only for published API; new code uses the
+   replacements their JSDoc names
+3. **Type comes from the `type` scale**: `type.t1`–`t4` (11 / 13 / 15 / 17px) for UI,
+   `t5`–`t7` (22 / 28 / 36px) for headings, `type.code` for mono blocks, and the line heights
+   `body` / `snug` / `tight` / `dense`. Phone-size inputs use `type.phoneInput` (16px) under
+   `breakpoint.phone`. The old `text.*` scale is deprecated
+4. **Motion never bounces**: things that slide use `motion.slide` (240ms) with `motion.easeOut`
+   (`cubic-bezier(.16,1,.3,1)`); progress uses `motion.fast` (120ms) linear. No edge may move
+   backward or overshoot. `motion.spring` is deprecated and unused
+5. **No `useEffect`**: use a ref callback with cleanup (React 19). Measure sizes with a ref
+   callback plus `ResizeObserver`. Three components still have one (`Formula`'s lazy Temml
+   import, `ReasoningFold`'s auto-collapse timer, `DataTable`'s indeterminate header checkbox);
+   don't add more
+6. Always honor `prefers-reduced-motion`
+7. One focus ring: `:focus-visible` gives a 2px (`focusRing.width`) outline in
+   `color.focusRing` (= `signal`), `outlineOffset` 2; controls that sit inside a frame use −1
+   or −2
+8. Form errors: the control sets `aria-invalid` and `aria-describedby`; the Field renders the
+   message (`role="alert"`)
+9. **StyleX 0.19 silently drops shorthands** (`all: unset`, `border: 0`, `background: none`):
+   no CSS comes out, and the native control's UA look stays on screen. Use `reset.control` from
+   `lib/styled.ts` as the first argument to `stylex.props`
+10. **Sized components set `boxSizing: border-box` themselves**; don't rely on the app having a
+    reset
+11. **Layout belongs to the caller: `sx`**. A component owns how it looks, not where it sits or
+    how big it is on the page. A component that needs outside adjustment takes `sx?: StyleArg`
+    and applies it after its own styles (`styled(props, ...own, sx)`). Don't rely on the caller
+    passing `className`: StyleX classes are atomic, and a class string appended later is not
+    guaranteed to win; to override, a style must come later in the same `stylex.props` call
+12. **Apply a theme whole**. `light` / `dark` in `themes.stylex.ts` are each a set (color +
+    shadow + tone), spread with `stylex.props(...light)`. Applying one var group leaves the
+    other two on the other theme. That file is generated from tokens by `pnpm gen:themes`;
+    don't edit it by hand
+13. **Surfaces separate by layer, not border**. `color.layer1`–`layer5` are the five background
+    steps rail → main → message → fold → row; higher numbers are darker. **Hover goes up one
+    step**: `layerUp.layer3` is the hover background for `layer3` (`lib/layers.ts`). `layer5` is
+    the darkest step; the step above it has no name, so `layerUp` gives `borderStrong`
+14. **Stacking comes from the `zIndex` consts** in `tokens.stylex.ts` (dialog backdrop 70,
+    dialog 71, popup 75, tooltip 78, toast 80). They are `defineConsts`, so `zIndex:
+    zIndex.popup` works in any `stylex.create`. `lib/popup.ts` re-exports them as `layer` and
+    ships ready-made `layerStyles`. Stacking inside one component (`zIndex: 1`) stays local
+15. **Built-in words go through `lib/i18n.tsx`**. A component declares its words with
+    `defineStrings({ "zh-TW": …, en: … })` and reads them with `useStrings(strings, labels)`;
+    the app sets the language once with `<LocaleProvider locale>` (default `zh-TW`, unknown
+    locales fall back to `en`), and each instance can override single words through its
+    `labels` prop. `toast` is migrated; most other components still take Chinese defaults as
+    individual props (`call-bar` merges a plain `labels` object), and should move to this
+    pattern when touched
+16. **External state goes through `lib/store.ts`**: `createStore(initial)` plus
+    `useStore(store, selector?, isEqual?)` on `useSyncExternalStore`. A `selector` subscribes
+    to one slice; pass a shallow `isEqual` when it builds a new object or array. The toast and
+    dialog managers use it
 
-## Field 的使用範圍
+## Field scope
 
-`Field` 擁有它那顆控件的 `id`(控件自己傳的 `id` 在 Field 內會被忽略),所以一個
-`Field` 只放一顆控件。`Checkbox` / `Radio` / `Switch` 自帶 label,放進 `Field` 時只給
-`help` / `error` / `disabled`,不要再給 `label`。
+`Field` owns its control's `id` (an `id` the control passes itself is ignored inside a Field),
+so one `Field` holds one control. `Checkbox` / `Radio` / `Switch` bring their own label; inside
+a `Field` give them only `help` / `error` / `disabled`, not `label`.
 
-## 引擎橋接
+## Engine bridge
 
-`@anyknown/ui` 輸出兩種形式:
+`@anyknown/ui` ships tokens in two forms:
 
-1. `tokens.stylex.ts` — StyleX 使用端(desktop / accounts / storage / i18n)
-2. `tokens.css` — 純 CSS variables(同一組值),給非 StyleX 的使用端。desktop
-   自己是純 StyleX,只有 streamdown 那個第三方 markdown 元件 ship 了 Tailwind utility
-   class,它的 `@theme inline` 引用這些 `--ak-*`
+1. `tokens.stylex.ts` — for StyleX consumers (desktop / accounts / storage / i18n)
+2. `tokens.css` — plain CSS variables (`--ak-*`, same values) for non-StyleX consumers. Desktop
+   is pure StyleX itself; only streamdown, the third-party markdown component, ships Tailwind
+   utility classes, and its `@theme inline` points at these `--ak-*`
 
-Token 值以 `tokens.stylex.ts` 為唯一真相,`tokens.css` 由它同步(先手動,之後可加
-codegen)。另有 `scrollbar.css`(客製捲軸,全域套用)。
+`tokens.stylex.ts` is the single source of truth. `tokens.css` is generated from it
+(`pnpm gen:tokens-css`), and `src/tokens-css.test.ts` fails when the two drift. There is also
+`scrollbar.css` (custom scrollbars, applied globally).
