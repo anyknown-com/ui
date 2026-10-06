@@ -137,6 +137,15 @@ export type HandoffReceiptProps = {
 	ledgerCount: number
 	handoffSummary?: ReactNode
 	defaultOpen?: boolean
+	/** The three checks' names. */
+	memoryTitle?: string
+	summaryTitle?: string
+	ledgerTitle?: string
+	/** What was kept: the memory count and, when given, the items in brackets. */
+	memoryLabel?: (count: number, items: string[]) => string
+	summaryLabel?: string
+	/** What stays behind: this round's records, still searchable, not carried over. */
+	ledgerLabel?: (count: number) => string
 }
 
 export function HandoffReceipt({
@@ -147,6 +156,12 @@ export function HandoffReceipt({
 	ledgerCount,
 	handoffSummary,
 	defaultOpen = false,
+	memoryTitle = "記憶",
+	summaryTitle = "摘要",
+	ledgerTitle = "紀錄",
+	memoryLabel = (count, items) => `${count} 則記憶已存下${items.length > 0 ? `(${items.join("、")})` : ""}。`,
+	summaryLabel = "交接摘要已交給新 session,讀過就刪除。",
+	ledgerLabel = (count) => `這一輪的 ${count} 筆紀錄還查得到,不會帶進新 session。`,
 }: HandoffReceiptProps) {
 	const bodyId = useId()
 	const [open, setOpen] = useState(defaultOpen)
@@ -184,23 +199,18 @@ export function HandoffReceipt({
 					<div id={bodyId} inert={!open} {...stylex.props(styles.body, open && styles.bodyOpen)}>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>記憶</b>
-							<span {...stylex.props(styles.checkText)}>
-								{`${memory.count} 筆耐久事實已落盤`}
-								{memory.items?.length ? `(${memory.items.join("、")})` : ""}。
-							</span>
+							<b {...stylex.props(styles.checkTitle)}>{memoryTitle}</b>
+							<span {...stylex.props(styles.checkText)}>{memoryLabel(memory.count, memory.items ?? [])}</span>
 						</p>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>摘要</b>
-							<span {...stylex.props(styles.checkText)}>handoff 已交給下一輪,讀後即銷毀。</span>
+							<b {...stylex.props(styles.checkTitle)}>{summaryTitle}</b>
+							<span {...stylex.props(styles.checkText)}>{summaryLabel}</span>
 						</p>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>Ledger</b>
-							<span
-								{...stylex.props(styles.checkText)}
-							>{`本輪 ${ledgerCount} 條收據可查,不進新 context。`}</span>
+							<b {...stylex.props(styles.checkTitle)}>{ledgerTitle}</b>
+							<span {...stylex.props(styles.checkText)}>{ledgerLabel(ledgerCount)}</span>
 						</p>
 						{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
 					</div>

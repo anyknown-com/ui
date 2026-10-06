@@ -4,7 +4,7 @@ import { styled } from "../../lib/styled"
 import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
-const STAGES = ["掃描對話", "挑出耐久事實", "合併重複", "落盤固定"]
+const STAGES = ["掃描對話", "挑出要記的事", "合併重複", "存成記憶"]
 
 // 進度 = 一條膠囊軌加一段填充:軌是凹下去的 accentSubtle 6px 帶,填充是實心 signal
 // (進度條說的是 agent 正在做事),寬度就是讀數。不定量時同一段填充在軌上等速滑過。

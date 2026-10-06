@@ -433,7 +433,10 @@ rotation 分隔線:thread 過去區裡一條安靜的細列「換班完成 · �
 session」,可展開看交接摘要。用戶不管理 session,**這是他唯一看見換班的地方**。
 
 - collapsed 為預設,左右虛線把它嵌進時間軸;展開(同列 toggle,不開 dialog)看三項
-  核對:記憶落盤幾筆 / 摘要已交給下一輪(讀後銷毀)/ 本輪收據數
+  核對:記憶(「3 則記憶已存下(…)。」)/ 摘要(「交接摘要已交給新 session,讀過就刪除。」)/
+  紀錄(「這一輪的 42 筆紀錄還查得到,不會帶進新 session。」)。用跟其他地方一樣的「記憶」,
+  不寫「耐久事實」「落盤」「Ledger」這種內部詞。三項的名字與句子都是 prop(`memoryTitle` /
+  `memoryLabel(count, items)`、`summaryTitle` / `summaryLabel`、`ledgerTitle` / `ledgerLabel(count)`)
 - **是收據不是控制**:不可改、無任何動作按鈕
 - 沒有卡面,直接畫在紙上:左右虛線中間一顆 `surface` 膠囊(窄螢幕時字折行、膠囊變高);
   展開的摘要是凹下去的 `surface`、`corner.card`。展開時虛線變實線、連結 icon 轉 `accent`

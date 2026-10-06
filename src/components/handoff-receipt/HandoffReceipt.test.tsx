@@ -26,10 +26,37 @@ describe("HandoffReceipt", () => {
 		await userEvent.click(screen.getByRole("button"))
 		expect(screen.getByText("記憶")).toBeInTheDocument()
 		expect(screen.getByText("摘要")).toBeInTheDocument()
-		expect(screen.getByText("Ledger")).toBeInTheDocument()
-		expect(screen.getByText(/3 筆耐久事實已落盤/)).toBeInTheDocument()
-		expect(screen.getByText(/本輪 42 條收據可查/)).toBeInTheDocument()
+		expect(screen.getByText("紀錄")).toBeInTheDocument()
+		expect(screen.getByText("3 則記憶已存下(偏好 pnpm、部署走 Cloudflare)。")).toBeInTheDocument()
+		expect(screen.getByText("交接摘要已交給新 session,讀過就刪除。")).toBeInTheDocument()
+		expect(screen.getByText("這一輪的 42 筆紀錄還查得到,不會帶進新 session。")).toBeInTheDocument()
 		expect(screen.getByText(/landing 定價區塊/)).toBeInTheDocument()
+	})
+
+	test("the three checks take their words from props", async () => {
+		render(
+			<HandoffReceipt
+				{...props}
+				defaultOpen
+				memoryTitle="Memory"
+				summaryTitle="Summary"
+				ledgerTitle="Records"
+				memoryLabel={(count, items) => `${count} kept: ${items.join(", ")}`}
+				summaryLabel="Handed to the new session."
+				ledgerLabel={(count) => `${count} records stay searchable.`}
+			/>,
+		)
+		expect(screen.getByText("Memory")).toBeInTheDocument()
+		expect(screen.getByText("Summary")).toBeInTheDocument()
+		expect(screen.getByText("Records")).toBeInTheDocument()
+		expect(screen.getByText("3 kept: 偏好 pnpm, 部署走 Cloudflare")).toBeInTheDocument()
+		expect(screen.getByText("Handed to the new session.")).toBeInTheDocument()
+		expect(screen.getByText("42 records stay searchable.")).toBeInTheDocument()
+	})
+
+	test("no items, no brackets", async () => {
+		render(<HandoffReceipt {...props} memory={{ count: 2 }} defaultOpen />)
+		expect(screen.getByText("2 則記憶已存下。")).toBeInTheDocument()
 	})
 
 	test("Enter and Space toggle the row", async () => {
@@ -45,7 +72,7 @@ describe("HandoffReceipt", () => {
 	test("the row controls the body it expands", async () => {
 		render(<HandoffReceipt {...props} defaultOpen />)
 		const row = screen.getByRole("button")
-		expect(document.getElementById(row.getAttribute("aria-controls") as string)).toHaveTextContent("Ledger")
+		expect(document.getElementById(row.getAttribute("aria-controls") as string)).toHaveTextContent("紀錄")
 	})
 
 	test("hard-limit is marked in the row text, not only by colour", () => {
