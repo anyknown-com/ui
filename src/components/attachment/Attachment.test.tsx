@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { AttachmentGrid, AttachmentTile } from "./Attachment"
 
 describe("AttachmentTile", () => {
@@ -16,5 +17,15 @@ describe("AttachmentTile", () => {
 		expect(file?.querySelector("img")).toBeNull()
 		expect(file?.querySelector("svg")).toHaveAttribute("aria-hidden", "true")
 		expect(container.firstElementChild?.children).toHaveLength(2)
+	})
+
+	test("has no axe violations for a picture tile and a file tile", async () => {
+		const { container } = render(
+			<AttachmentGrid>
+				<AttachmentTile name="收據.png" label="PNG" preview="blob:receipt" />
+				<AttachmentTile name="合約.pdf" label="PDF" />
+			</AttachmentGrid>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
