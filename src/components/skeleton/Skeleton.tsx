@@ -50,13 +50,19 @@ const styles = stylex.create({
 })
 
 export type SkeletonProps = Omit<ComponentProps<"div">, "children" | "width" | "height"> & {
+	/** `line` is a text-height bar, `block` takes the height you give, `circle` is round. Defaults to `line`. */
 	shape?: "line" | "block" | "circle"
+	/** CSS width. Defaults to 100% (2.25rem for a circle). */
 	width?: string | number
+	/** CSS height. A line is 0.8rem; a block needs one. */
 	height?: string | number
+	/** A circle's diameter; wins over width and height. */
 	size?: string | number
+	/** Extra StyleX styles for the bone. */
 	sx?: StyleArg
 }
 
+/** One placeholder bone, hidden from screen readers; wrap bones in `SkeletonGroup` to announce loading. */
 export function Skeleton({ shape = "line", width, height, size, sx, ...props }: SkeletonProps) {
 	const resolvedWidth = shape === "circle" ? (size ?? width ?? "2.25rem") : (width ?? "100%")
 	const resolvedHeight = shape === "circle" ? (size ?? height ?? "2.25rem") : (height ?? "")
@@ -76,8 +82,14 @@ export function Skeleton({ shape = "line", width, height, size, sx, ...props }: 
 	)
 }
 
-export type SkeletonGroupProps = ComponentProps<"div"> & { label: string; sx?: StyleArg }
+export type SkeletonGroupProps = ComponentProps<"div"> & {
+	/** What is loading; the group's `role="status"` reads it once. */
+	label: string
+	/** Extra StyleX styles for the group. */
+	sx?: StyleArg
+}
 
+/** A polite status region that announces its label once over the bones inside it. */
 export function SkeletonGroup({ label, children, sx, ...props }: SkeletonGroupProps) {
 	return (
 		<div role="status" aria-label={label} {...props} {...styled(props, styles.group, sx)}>
