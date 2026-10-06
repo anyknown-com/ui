@@ -239,7 +239,8 @@ export function PasswordInput({
 		meter ? meterId : null,
 		capsLockWarning && capsOn ? capsId : null,
 		mismatched ? errorId : null,
-		field["aria-describedby"],
+		// Inside a Field this is the caller's or the field's ids; outside one, the caller's own
+		field["aria-describedby"] ?? props["aria-describedby"],
 	]
 		.filter(Boolean)
 		.join(" ")

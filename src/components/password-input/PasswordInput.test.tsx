@@ -102,6 +102,18 @@ describe("PasswordInput", () => {
 		expect(input).not.toHaveAttribute("onpaste")
 	})
 
+	test("outside a Field, the caller's aria-describedby joins the meter's id", () => {
+		render(
+			<>
+				<p id="vault-hint">Twelve characters or more.</p>
+				<PasswordInput aria-label="Vault passphrase" aria-describedby="vault-hint" meter />
+			</>,
+		)
+		const ids = screen.getByLabelText("Vault passphrase").getAttribute("aria-describedby")?.split(" ") ?? []
+		expect(ids).toContain("vault-hint")
+		expect(ids).toHaveLength(2)
+	})
+
 	test("confirmOf only complains once something has been typed", async () => {
 		render(<Pair />)
 		const confirm = screen.getByLabelText("再輸入一次")
