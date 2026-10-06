@@ -59,6 +59,8 @@ const strings = defineStrings({
  */
 export type CallBarLabels = StringsOf<typeof strings>
 
+const FORCED = "@media (forced-colors: active)"
+
 const styles = stylex.create({
 	// 取代 chatbox 的位置,所以跟 Composer 同一張凹下去的 surface 紙
 	box: {
@@ -73,6 +75,8 @@ const styles = stylex.create({
 		lineHeight: type.snug,
 		padding: 8,
 		paddingInlineStart: 16,
+		// Forced colors drop the surface paper; an outline keeps the bar's edge.
+		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	dot: { marginInlineEnd: 2 },
 	timer: {
@@ -81,6 +85,12 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t2,
 		fontVariantNumeric: "tabular-nums",
+	},
+	// The pressed wash is a background, which forced colors drop: draw a ring instead.
+	mutedButton: {
+		borderStyle: { default: "none", [FORCED]: "solid" },
+		borderWidth: { default: 0, [FORCED]: 1 },
+		borderColor: { default: null, [FORCED]: "ButtonText" },
 	},
 	hangUp: { color: { default: color.danger, ":hover": color.danger } },
 	icon: { flexShrink: 0, height: 18, pointerEvents: "none", width: 18 },
@@ -113,7 +123,12 @@ export function CallBar({ status, seconds, muted, onMute, onHangUp, labels, sx }
 			<LiveDot sx={styles.dot} />
 			<span>{muted ? words.muted : words[status]}</span>
 			<span {...stylex.props(styles.timer)}>{formatClock(seconds)}</span>
-			<IconButton label={muted ? words.unmute : words.mute} open={muted} onClick={() => onMute(!muted)}>
+			<IconButton
+				label={muted ? words.unmute : words.mute}
+				open={muted}
+				onClick={() => onMute(!muted)}
+				sx={muted && styles.mutedButton}
+			>
 				<Glyph {...stylex.props(styles.icon)} strokeWidth={ICON_STROKE} />
 			</IconButton>
 			<IconButton label={words.hangUp} onClick={onHangUp} sx={styles.hangUp}>
