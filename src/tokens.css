@@ -80,6 +80,10 @@ html {
 	--ak-motion-normal: 200ms;
 	--ak-motion-slide: 240ms;
 	--ak-motion-slow: 400ms;
+	--ak-motion-loop-fast: 0.8s;
+	--ak-motion-blink: 1s;
+	--ak-motion-loop: 1.2s;
+	--ak-motion-loop-slow: 1.6s;
 	--ak-motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
 	--ak-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 	--ak-motion-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);

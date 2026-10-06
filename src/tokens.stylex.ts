@@ -161,7 +161,8 @@ export const radius = stylex.defineVars({
 
 /**
  * Durations and curves. Five durations, shortest first: pick by how far the thing travels,
- * not by taste. Nothing bounces.
+ * not by taste. Nothing bounces. Four more are loop periods, for animations that repeat while
+ * something is going on (spinners, a blinking caret, pulses, shimmers).
  *
  * Old literals map as: 120ms, 140ms → `fast`; 160ms, 180ms → `quick`; 200ms → `normal`;
  * 240ms, 300ms → `slide`. Keyword `ease-out` → `easeOut`, `ease-in-out` → `easeInOut`,
@@ -178,6 +179,14 @@ export const motion = stylex.defineVars({
 	slide: "240ms",
 	/** 400ms: large surfaces and deliberate reveals. */
 	slow: "400ms",
+	/** 0.8s loop: spinners. Pair with `linear`. */
+	loopFast: "0.8s",
+	/** 1s loop: a blinking text caret, with `steps(2, start)`. */
+	blink: "1s",
+	/** 1.2s loop: a pending pulse. Pair with `easeInOut`. */
+	loop: "1.2s",
+	/** 1.6s loop: the live dot's breath, shimmers and indeterminate sweeps. */
+	loopSlow: "1.6s",
 	ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
 	/** The default curve for enters and for anything that moves. */
 	easeOut: "cubic-bezier(0.16, 1, 0.3, 1)",

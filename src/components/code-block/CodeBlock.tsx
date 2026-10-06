@@ -74,7 +74,7 @@ const styles = stylex.create({
 		verticalAlign: "text-bottom",
 		marginInlineStart: 1,
 		animationName: { default: blink, [REDUCED]: "none" },
-		animationDuration: "1s",
+		animationDuration: motion.blink,
 		animationTimingFunction: "steps(2, start)",
 		animationIterationCount: "infinite",
 	},

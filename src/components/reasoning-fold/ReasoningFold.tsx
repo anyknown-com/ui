@@ -64,7 +64,7 @@ const styles = stylex.create({
 		backgroundClip: { default: "text", [REDUCED]: "border-box" },
 		color: { default: "transparent", [REDUCED]: color.textMuted },
 		animationName: { default: shimmer, [REDUCED]: "none" },
-		animationDuration: "1.6s",
+		animationDuration: motion.loopSlow,
 		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},

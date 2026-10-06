@@ -122,7 +122,7 @@ test("the documented exceptions still exist and are still exceptional", async ()
 	expect(toast).toContain("{!reduced && record.duration > 0 && (")
 
 	const toolCard = await readFile(join(SRC, "components/tool-card/ToolCard.tsx"), "utf8")
-	expect(toolCard).toContain('animationDuration: { default: "0.8s", [REDUCED]: "1.6s" }')
+	expect(toolCard).toContain("animationDuration: { default: motion.loopFast, [REDUCED]: motion.loopSlow }")
 
 	expect(JS_GATED.size + SLOWED.size).toBe(2)
 })

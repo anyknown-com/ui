@@ -28,7 +28,7 @@ const styles = stylex.create({
 		},
 		backgroundSize: "220% 100%",
 		animationName: { default: shimmer, [REDUCED]: "none" },
-		animationDuration: { default: "1.6s", [REDUCED]: "2.4s" },
+		animationDuration: { default: motion.loopSlow, [REDUCED]: `calc(${motion.loopSlow} * 1.5)` },
 		animationTimingFunction: { default: motion.linear, [REDUCED]: motion.easeInOut },
 		animationIterationCount: "infinite",
 	},

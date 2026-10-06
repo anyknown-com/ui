@@ -20,7 +20,7 @@ const styles = stylex.create({
 		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
 		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		animationName: { default: breathe, [REDUCED]: "none" },
-		animationDuration: "1.6s",
+		animationDuration: motion.loopSlow,
 		animationIterationCount: "infinite",
 		animationTimingFunction: motion.easeInOut,
 	},
