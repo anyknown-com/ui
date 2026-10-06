@@ -14,6 +14,8 @@ export const color = stylex.defineVars({
 	surfaceRaised: { default: "#FFFFFF", [DARK]: "#24272B" },
 	border: { default: "#E0E2E6", [DARK]: "#303338" },
 	borderStrong: { default: "#C6C9CE", [DARK]: "#454950" },
+	// 控制項邊界(input、checkbox、radio、switch 關):對底色要 3:1 才算看得到
+	borderControl: { default: "#81858C", [DARK]: "#6F737A" },
 	text: { default: "#161A1F", [DARK]: "#EFF0F3" },
 	textMuted: { default: "#5B5F67", [DARK]: "#B7BBC1" },
 	textFaint: { default: "#7C8088", [DARK]: "#83868C" },
