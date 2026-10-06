@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, tone } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -14,19 +14,21 @@ const styles = stylex.create({
 		display: "grid",
 		justifyItems: "center",
 		gap: space.xs,
-		borderRadius: radius.lg,
+		borderRadius: corner.card,
 		paddingBlock: space.xl,
 		paddingInline: space.lg,
 		textAlign: "center",
 		fontFamily: font.body,
-		backgroundColor: "transparent",
+		backgroundColor: color.surface,
 		transitionProperty: "background-color",
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
-	over: { backgroundColor: color.accentSubtle },
+	over: { backgroundColor: color.signalSubtle },
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
 	stitch: { position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" },
+	// The stitch runs 1.5px inside the zone, so its corner is the zone's less that.
 	seam: {
+		rx: `calc(${corner.card} - 1.5px)`,
 		fill: "none",
 		stroke: color.borderStrong,
 		strokeWidth: 2,
@@ -35,7 +37,7 @@ const styles = stylex.create({
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
 	seamOver: {
-		stroke: color.accent,
+		stroke: color.signal,
 		animationName: { default: sew, [REDUCED]: "none" },
 		animationDuration: "0.5s",
 		animationTimingFunction: "linear",
@@ -46,22 +48,20 @@ const styles = stylex.create({
 		transitionProperty: "color",
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
-	iconOver: { color: color.accent },
+	iconOver: { color: color.signal },
 	title: { margin: 0, fontSize: text.sm, color: color.text },
 	hint: { color: color.textMuted, fontSize: "0.78rem" },
 	pick: {
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong },
-		borderRadius: radius.md,
+		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		borderWidth: 0,
+		borderRadius: corner.pill,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: "0.82rem",
 		fontWeight: 500,
 		lineHeight: 1,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
+		paddingBlock: space.xs,
+		paddingInline: space.md,
 		cursor: "pointer",
 		marginTop: space.xxs,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -82,11 +82,9 @@ const styles = stylex.create({
 		listStyle: "none",
 		margin: 0,
 		padding: 0,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		backgroundColor: color.surface,
+		borderRadius: corner.card,
+		backgroundColor: tone.railLayer2,
+		boxShadow: shadow.rest,
 		overflow: "hidden",
 		fontFamily: font.body,
 	},
@@ -124,14 +122,14 @@ const styles = stylex.create({
 		height: "1.4rem",
 		display: "grid",
 		placeItems: "center",
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		justifySelf: "end",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 	},
 	track: {
 		gridColumn: "1 / -1",
 		height: "0.25rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.border,
 		overflow: "hidden",
 	},
@@ -140,7 +138,7 @@ const styles = stylex.create({
 		display: "block",
 		height: "100%",
 		backgroundColor: color.accent,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: "linear",
@@ -266,7 +264,6 @@ export function Dropzone({
 					y="1.5"
 					width="calc(100% - 3px)"
 					height="calc(100% - 3px)"
-					rx="11"
 					{...stylex.props(styles.seam, over && styles.seamOver)}
 				/>
 			</svg>
