@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { formatBytes } from "../../lib/format"
@@ -165,6 +166,24 @@ function FileIcon() {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		select: (name: string) => `選取 ${name}`,
+		encrypting: "加密中",
+		uploading: (name: string, percent: number) => `${name} 上傳中 ${percent}%`,
+		selected: (count: number) => `已選取 ${count} 個項目`,
+	},
+	en: {
+		select: (name: string) => `Select ${name}`,
+		encrypting: "Encrypting",
+		uploading: (name: string, percent: number) => `Uploading ${name}, ${percent}%`,
+		selected: (count: number) => `${count} selected`,
+	},
+})
+
+/** FileRow's and FileList's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type FileRowLabels = StringsOf<typeof strings>
+
 export type FileItem = {
 	/** A folder gets the folder glyph and no size. */
 	kind: "file" | "folder"
@@ -208,6 +227,8 @@ export type FileRowProps = {
 	progress?: number
 	/** Replaces the file or folder glyph. */
 	icon?: ReactNode
+	/** Override built-in words for this row; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<FileRowLabels>
 	/** @deprecated Use `labels={{ select }}`. */
 	selectLabel?: (name: string) => string
 }
@@ -227,9 +248,12 @@ export function FileRow({
 	state = "idle",
 	progress = 0,
 	icon,
-	selectLabel = (name) => `選取 ${name}`,
+	labels,
+	selectLabel,
 }: FileRowProps) {
+	const t = useStrings(strings, { ...labels, ...(selectLabel !== undefined && { select: selectLabel }) })
 	const busy = state !== "idle"
+	const percent = Math.round(progress)
 	const [selected, setSelected] = useControllableState(selectedProp, defaultSelected, (next: boolean) => {
 		onSelectedChange?.(next)
 		onSelectChange?.(next)
@@ -257,7 +281,7 @@ export function FileRow({
 				aria-selected={selected}
 				{...stylex.props(styles.row, styles.busy)}
 			>
-				<span role="gridcell" aria-label={selectLabel(item.name)} {...stylex.props(styles.checkCell)} />
+				<span role="gridcell" aria-label={t.select(item.name)} {...stylex.props(styles.checkCell)} />
 				<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 					{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
 				</span>
@@ -268,21 +292,22 @@ export function FileRow({
 					{state === "encrypting" ? (
 						<>
 							<span aria-hidden="true" {...stylex.props(styles.spinner)} />
-							加密中
+							{t.encrypting}
 						</>
 					) : (
 						<>
 							<span
 								role="progressbar"
+								aria-label={item.name}
 								aria-valuemin={0}
 								aria-valuemax={100}
-								aria-valuenow={Math.round(progress)}
-								aria-valuetext={`${item.name} 上傳中 ${Math.round(progress)}%`}
+								aria-valuenow={percent}
+								aria-valuetext={t.uploading(item.name, percent)}
 								{...stylex.props(styles.track)}
 							>
 								<b {...stylex.props(styles.bar, styles.fill(progress))} />
 							</span>
-							<span {...stylex.props(styles.percent)}>{`${Math.round(progress)}%`}</span>
+							<span {...stylex.props(styles.percent)}>{`${percent}%`}</span>
 						</>
 					)}
 				</span>
@@ -308,7 +333,7 @@ export function FileRow({
 				<input
 					type="checkbox"
 					checked={selected}
-					aria-label={selectLabel(item.name)}
+					aria-label={t.select(item.name)}
 					onClick={(event) => event.stopPropagation()}
 					onChange={(event) => setSelected(event.currentTarget.checked)}
 					{...stylex.props(styles.check)}
@@ -347,18 +372,21 @@ export function FileRow({
 }
 
 export type FileListProps = {
+	/** The grid's accessible name ("Files in Taxes"). */
 	label: string
+	/** How many rows are selected; given, a polite live line under the list says so. */
 	selectedCount?: number
+	/** Override built-in words for this list; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<FileRowLabels>
+	/** @deprecated Use `labels={{ selected }}`. */
 	selectedLabel?: (count: number) => string
+	/** The `FileRow`s. */
 	children: ReactNode
 }
 
-export function FileList({
-	label,
-	selectedCount,
-	selectedLabel = (count) => `已選取 ${count} 個項目`,
-	children,
-}: FileListProps) {
+/** A multi-select grid of `FileRow`s on one rest card, with an optional live selection count. */
+export function FileList({ label, selectedCount, labels, selectedLabel, children }: FileListProps) {
+	const t = useStrings(strings, { ...labels, ...(selectedLabel !== undefined && { selected: selectedLabel }) })
 	return (
 		<>
 			<div role="grid" aria-label={label} aria-multiselectable="true" {...stylex.props(styles.list)}>
@@ -366,7 +394,7 @@ export function FileList({
 			</div>
 			{selectedCount != null && (
 				<p aria-live="polite" {...stylex.props(styles.count)}>
-					{selectedCount > 0 ? selectedLabel(selectedCount) : ""}
+					{selectedCount > 0 ? t.selected(selectedCount) : ""}
 				</p>
 			)}
 		</>

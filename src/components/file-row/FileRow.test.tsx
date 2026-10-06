@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { FileList, FileRow } from "./FileRow"
 
 const FILE = { kind: "file" as const, name: "護照掃描.pdf", size: 2_400_000, mtime: "8月26日" }
@@ -122,6 +124,45 @@ describe("FileRow", () => {
 		expect(row).toHaveAttribute("aria-selected", "false")
 		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument()
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
+	})
+
+	test("words follow the LocaleProvider; labels and the deprecated props override", () => {
+		render(
+			<LocaleProvider locale="en">
+				<FileList label="Files" selectedCount={2}>
+					<FileRow item={FILE} />
+					<FileRow item={FOLDER} labels={{ select: (name) => `Tick ${name}` }} />
+					<FileRow item={FILE} state="encrypting" />
+					<FileRow item={{ ...FILE, name: "a.txt" }} state="uploading" progress={12.4} />
+				</FileList>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("checkbox", { name: "Select 護照掃描.pdf" })).toBeInTheDocument()
+		expect(screen.getByRole("checkbox", { name: "Tick 稅務文件" })).toBeInTheDocument()
+		expect(screen.getByText("Encrypting")).toBeInTheDocument()
+		expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "Uploading a.txt, 12%")
+		expect(screen.getByText("2 selected")).toBeInTheDocument()
+	})
+
+	test("the deprecated selectedLabel still words the count", () => {
+		render(
+			<FileList label="檔案" selectedCount={3} selectedLabel={(count) => `${count} 個`}>
+				<FileRow item={FILE} />
+			</FileList>,
+		)
+		expect(screen.getByText("3 個")).toBeInTheDocument()
+	})
+
+	test("axe: idle, selected, encrypting, uploading rows in a list", async () => {
+		const { container } = render(
+			<FileList label="檔案" selectedCount={1}>
+				<FileRow item={FILE} defaultSelected actions={[{ icon: <svg />, label: "刪除", onAction() {} }]} />
+				<FileRow item={FOLDER} />
+				<FileRow item={FILE} state="encrypting" />
+				<FileRow item={FILE} state="uploading" progress={40} />
+			</FileList>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("an uploading row exposes progress", () => {
