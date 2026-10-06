@@ -174,7 +174,7 @@ All deprecated names still work and will be removed in a future major release.
 - Control boundaries reach 3:1 contrast (`color.borderControl`); selected tab pills are ringed at 3:1.
 - Small checkboxes, radios, switches, ActionBar and CodeBlock buttons have 24px hit areas.
 - Controls, overlays, ToolCard, LiveDot, Skeleton, Progress, CallBar, Bubble and Message stay distinguishable in forced-colors mode.
-- Readable text moved from `textFaint` to `textMuted`, including the `Select` trigger and search placeholders and the `DecisionCard` free-text placeholder; only the `KbdGroup` sequence separator is left (listed in A11Y-DEBT).
+- Readable text moved from `textFaint` to `textMuted`, including the `Select` trigger and search placeholders, the `DecisionCard` free-text placeholder and the `KbdGroup` sequence separator.
 - F8 moves focus to the toast region and Escape returns it; every toast has a named close button; the viewport is a polite live region and `danger` toasts are alerts.
 - Dialog, ConfirmDialog, Select, Dropdown and Popover return focus to the trigger as the exit starts.
 - Segmented follows the WAI-ARIA radio group pattern; ActionBar follows the toolbar pattern.

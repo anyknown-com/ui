@@ -34,7 +34,7 @@ const styles = stylex.create({
 		color: "inherit",
 	},
 	combo: { display: "inline-flex", gap: "0.2rem", alignItems: "center" },
-	sequence: { display: "inline-flex", gap: space.xxs, alignItems: "center", color: color.textFaint },
+	sequence: { display: "inline-flex", gap: space.xxs, alignItems: "center", color: color.textMuted },
 })
 
 export type KbdProps = ComponentProps<"kbd">

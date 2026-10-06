@@ -9,20 +9,12 @@ Thresholds: text 4.5:1 (small text), UI boundaries and graphics 3:1, hit targets
 Numbers are WCAG 2 contrast ratios computed from the hex values in `src/tokens.stylex.ts`
 (the 12-step neutral palette from `scripts/palette.mjs`), light / dark.
 
-## Open: text in `textFaint`
+## Resolved: text in `textFaint`
 
 `textFaint` is a 3:1 color, so the rule is: no text that has to be read. Icons, chevrons,
 separators, the `—` in an empty cell, and disabled states may use it; all other text uses
-`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). This text use is left:
-
-| Where | Pair | Measured | Threshold |
-| --- | --- | --- | --- |
-| `KbdGroup` separator in a sequence (the caller's "then") | `textFaint` on `bg` / `surface` / `surfaceRaised` | 3.75–3.95 / 4.53–5.15 | 4.5:1 |
-
-It passes in dark mode on these backgrounds and fails in light mode. A glyph separator ("+",
-"→") counts as a separator and may stay; a word such as "then" is text. The fix, if the
-separator stays a word, is the one the placeholders took: switch it to `textMuted`. Do not
-retune `textFaint`.
+`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). No text uses `textFaint`
+any more; the last one, the `KbdGroup` separator, moved to `textMuted` in 0.10.
 
 ## Intentional
 
