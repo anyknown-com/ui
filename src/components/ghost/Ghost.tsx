@@ -11,7 +11,7 @@ const styles = stylex.create({
 	root: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: corner.sm,
+		borderRadius: corner.pill,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -26,7 +26,7 @@ const styles = stylex.create({
 		margin: 0,
 		minHeight: { default: 0, [PHONE]: 40 },
 		opacity: { default: 1, ":disabled": 0.4 },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.accent}` },
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 		paddingBlock: 0,
 		paddingInline: space.xs,
