@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { PendingFiles } from "./PendingFiles"
 
 describe("PendingFiles", () => {
@@ -46,5 +47,20 @@ describe("PendingFiles", () => {
 		)
 		expect(screen.getByRole("button", { name: "Remove receipt.pdf" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Drop photo.png" })).toBeInTheDocument()
+	})
+
+	test("has no axe violations, with files and with none", async () => {
+		const { container, rerender } = render(
+			<PendingFiles
+				files={[
+					{ id: "a", name: "receipt.pdf" },
+					{ id: "b", name: "photo.png" },
+				]}
+				onRemove={() => {}}
+			/>,
+		)
+		await expectNoAxeViolations(container)
+		rerender(<PendingFiles files={[]} onRemove={() => {}} />)
+		await expectNoAxeViolations(container)
 	})
 })
