@@ -3,8 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactElement, type ReactNode, useId, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
-import { KbdToneContext } from "../kbd/Kbd"
+import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -16,10 +15,15 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xs,
 		maxWidth: "18rem",
-		backgroundColor: color.text,
-		color: color.bg,
-		borderRadius: radius.sm,
-		paddingBlock: "0.32rem",
+		// float 階,跟 popover 同一張紙;不再是反色氣泡。透明的框只為了 forced-colors
+		backgroundColor: color.surfaceRaised,
+		color: color.text,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "transparent",
+		borderRadius: corner.control,
+		boxShadow: shadow.float,
+		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		fontFamily: font.body,
 		fontSize: "0.75rem",
@@ -71,10 +75,8 @@ export function Tooltip({
 					{...stylex.props(layerStyles.tooltip)}
 				>
 					<BaseTooltip.Popup id={id} role="tooltip" {...stylex.props(styles.bubble)}>
-						<KbdToneContext value="inverted">
-							{content}
-							{shortcut}
-						</KbdToneContext>
+						{content}
+						{shortcut}
 					</BaseTooltip.Popup>
 				</BaseTooltip.Positioner>
 			</BaseTooltip.Portal>
