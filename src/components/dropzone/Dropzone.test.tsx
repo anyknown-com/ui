@@ -101,13 +101,13 @@ describe("Dropzone", () => {
 
 const JOBS: UploadJob[] = [
 	{ id: "1", name: "護照掃描.pdf", size: 2_400_000, state: "uploading", progress: 45 },
-	{ id: "2", name: "big.mov", size: 40_000_000, state: "failed", error: "超過 10 MB 上限,沒有上傳。" },
+	{ id: "2", name: "big.mov", size: 40_000_000, state: "failed", limit: 10 * 1024 * 1024 },
 ]
 
 describe("UploadList", () => {
-	test("announces changes politely and labels each cancel", () => {
+	test("labels the list and each cancel", () => {
 		render(<UploadList jobs={JOBS} onCancel={() => {}} />)
-		expect(screen.getByRole("list", { name: "上傳中的檔案" })).toHaveAttribute("aria-live", "polite")
+		expect(screen.getByRole("list", { name: "上傳中的檔案" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "取消上傳 護照掃描.pdf" })).toBeInTheDocument()
 	})
 
@@ -118,18 +118,38 @@ describe("UploadList", () => {
 		expect(bar).toHaveAttribute("aria-valuetext", "護照掃描.pdf 上傳中 45%")
 	})
 
-	test("a failed job shows its reason as text and has no progress bar", () => {
+	test("a size rejection names the real limit, not the file's size", () => {
 		render(<UploadList jobs={[JOBS[1]]} />)
-		expect(screen.getByText("超過 10 MB 上限,沒有上傳。")).toBeInTheDocument()
+		const list = screen.getByRole("list")
+		expect(list).toHaveTextContent("超過 10 MB 上限，沒有上傳。換一個小於 10 MB 的檔案。")
+		expect(list).not.toHaveTextContent("38 MB")
 		expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
 	})
 
+	test("any other failure says so without blaming the size", () => {
+		render(<UploadList jobs={[{ id: "3", name: "notes.exe", size: 1200, state: "failed" }]} />)
+		expect(screen.getByRole("list")).toHaveTextContent("上傳失敗。再試一次，或換一個檔案。")
+		expect(screen.getByRole("list")).not.toHaveTextContent("上限")
+	})
+
+	test("the caller's own error wins", () => {
+		render(
+			<UploadList jobs={[{ id: "4", name: "a.txt", size: 10, state: "failed", error: "伺服器忙線。" }]} />,
+		)
+		expect(screen.getByRole("list")).toHaveTextContent("伺服器忙線。")
+	})
+
 	// The live region has to be mounted before the first job arrives, or the
-	// first upload is never announced.
-	test("the live region exists while the queue is empty, but shows nothing", () => {
-		render(<UploadList jobs={[]} />)
-		const list = screen.getByRole("list", { name: "上傳中的檔案" })
-		expect(list).toHaveAttribute("aria-live", "polite")
-		expect(list).toBeEmptyDOMElement()
+	// first upload is never announced. It holds status words only: no buttons
+	// inside it, so nothing interactive is exposed while a modal is open.
+	test("a separate status region announces states and holds no controls", () => {
+		const { rerender } = render(<UploadList jobs={[]} onCancel={() => {}} />)
+		const status = screen.getByRole("status")
+		expect(status).toBeEmptyDOMElement()
+		expect(screen.getByRole("list", { name: "上傳中的檔案" })).not.toHaveAttribute("aria-live")
+		rerender(<UploadList jobs={JOBS} onCancel={() => {}} />)
+		expect(status).toHaveTextContent("護照掃描.pdf:上傳中。")
+		expect(status).toHaveTextContent("big.mov:超過 10 MB 上限")
+		expect(status.querySelector("button")).toBeNull()
 	})
 })

@@ -88,7 +88,7 @@ const styles = stylex.create({
 		overflow: "hidden",
 		fontFamily: font.body,
 	},
-	empty: {
+	srOnly: {
 		position: "absolute",
 		width: 1,
 		height: 1,
@@ -306,7 +306,10 @@ export type UploadJob = {
 	size: number
 	state: "queued" | "encrypting" | "uploading" | "done" | "failed"
 	progress?: number
+	/** Why it failed, in words; replaces the default copy. */
 	error?: string
+	/** On a job turned away for its size: the byte limit it went over (the Dropzone's `maxSize`). */
+	limit?: number
 }
 
 const JOB_STATE_LABEL: Record<UploadJob["state"], string> = {
@@ -323,48 +326,59 @@ export type UploadListProps = {
 	label?: string
 }
 
+function failure(job: UploadJob) {
+	if (job.error != null) return job.error
+	if (job.limit == null) return "上傳失敗。再試一次，或換一個檔案。"
+	const limit = formatBytes(job.limit)
+	return `超過 ${limit} 上限，沒有上傳。換一個小於 ${limit} 的檔案。`
+}
+
 export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: UploadListProps) {
 	return (
-		<ul
-			aria-live="polite"
-			aria-label={label}
-			{...stylex.props(styles.jobs, jobs.length === 0 && styles.empty)}
-		>
-			{jobs.map((job) => {
-				const failed = job.state === "failed"
-				return (
-					<li key={job.id} {...stylex.props(styles.job, failed && styles.jobError)}>
-						<span {...stylex.props(styles.name)}>{job.name}</span>
-						{onCancel != null && job.state !== "done" && (
-							<button
-								type="button"
-								aria-label={`取消上傳 ${job.name}`}
-								onClick={() => onCancel(job.id)}
-								{...stylex.props(reset.control, styles.cancel)}
-							>
-								✕
-							</button>
-						)}
-						{!failed && job.progress != null && (
-							<div
-								role="progressbar"
-								aria-valuemin={0}
-								aria-valuemax={100}
-								aria-valuenow={Math.round(job.progress)}
-								aria-valuetext={`${job.name} ${JOB_STATE_LABEL[job.state]} ${Math.round(job.progress)}%`}
-								{...stylex.props(styles.track)}
-							>
-								<b {...stylex.props(styles.bar, styles.fill(job.progress))} />
-							</div>
-						)}
-						<span {...stylex.props(styles.status, failed && styles.statusError)}>
-							{failed
-								? (job.error ?? `超過上限(${formatBytes(job.size)}),沒有上傳。`)
-								: `${JOB_STATE_LABEL[job.state]} · ${formatBytes(job.size)}`}
-						</span>
-					</li>
-				)
-			})}
-		</ul>
+		<>
+			{/* 只唸狀態字。live region 包住整張清單的話,裡面的取消鈕在 modal 開著時也還露在外面 */}
+			<p role="status" {...stylex.props(styles.srOnly)}>
+				{jobs.map((job) => (
+					<span key={job.id}>
+						{`${job.name}:${job.state === "failed" ? failure(job) : `${JOB_STATE_LABEL[job.state]}。`}`}
+					</span>
+				))}
+			</p>
+			<ul aria-label={label} {...stylex.props(styles.jobs, jobs.length === 0 && styles.srOnly)}>
+				{jobs.map((job) => {
+					const failed = job.state === "failed"
+					return (
+						<li key={job.id} {...stylex.props(styles.job, failed && styles.jobError)}>
+							<span {...stylex.props(styles.name)}>{job.name}</span>
+							{onCancel != null && job.state !== "done" && (
+								<button
+									type="button"
+									aria-label={`取消上傳 ${job.name}`}
+									onClick={() => onCancel(job.id)}
+									{...stylex.props(reset.control, styles.cancel)}
+								>
+									✕
+								</button>
+							)}
+							{!failed && job.progress != null && (
+								<div
+									role="progressbar"
+									aria-valuemin={0}
+									aria-valuemax={100}
+									aria-valuenow={Math.round(job.progress)}
+									aria-valuetext={`${job.name} ${JOB_STATE_LABEL[job.state]} ${Math.round(job.progress)}%`}
+									{...stylex.props(styles.track)}
+								>
+									<b {...stylex.props(styles.bar, styles.fill(job.progress))} />
+								</div>
+							)}
+							<span {...stylex.props(styles.status, failed && styles.statusError)}>
+								{failed ? failure(job) : `${JOB_STATE_LABEL[job.state]} · ${formatBytes(job.size)}`}
+							</span>
+						</li>
+					)
+				})}
+			</ul>
+		</>
 	)
 }

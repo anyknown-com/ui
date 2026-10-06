@@ -58,6 +58,8 @@ export function MemoryPanel() {
 }
 `
 
+const MAX_UPLOAD = 10 * 1024 * 1024
+
 type Entry = { key: string; zh: string; en: string; status: "ok" | "missing" | "review" }
 
 const ENTRIES: Entry[] = [
@@ -102,7 +104,7 @@ export function StorageDemos() {
 			name: "raw-video.mov",
 			size: 40_000_000,
 			state: "failed",
-			error: "超過 10 MB 上限,沒有上傳。",
+			limit: MAX_UPLOAD,
 		},
 	])
 	const [filter, setFilter] = useState("")
@@ -161,7 +163,7 @@ export function StorageDemos() {
 
 			<Demo id="dropzone" title="dropzone" note="拖檔案進來時,虛線變紫並開始流動,底色換成淡紫。">
 				<Dropzone
-					maxSize={10 * 1024 * 1024}
+					maxSize={MAX_UPLOAD}
 					onFiles={(files) =>
 						setJobs((current) => [
 							...current,
@@ -182,7 +184,8 @@ export function StorageDemos() {
 								name: rejection.file.name,
 								size: rejection.file.size,
 								state: "failed" as const,
-								error: "超過 10 MB 上限,沒有上傳。",
+								// 只有太大的那幾個說上限;型別、數量不對的走通用的失敗句
+								limit: rejection.reason === "size" ? MAX_UPLOAD : undefined,
 							})),
 						])
 					}

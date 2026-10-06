@@ -527,8 +527,13 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 拖放上傳區:idle 是凹下去的 `surface` 底 + `borderStrong` 虛線(`corner.card`)、
 dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放不是 agent 在做事,不用藍)、
 **選檔按鈕 fallback**(drag 永遠不是唯一入口,膠囊、`accentSubtle` 底、無框)、
-上傳中列表(檔名 + 膠囊進度條 + 取消,跟檔案列一樣是 rest 卡片)、超限錯誤列。
+上傳中列表(檔名 + 膠囊進度條 + 取消,跟檔案列一樣是 rest 卡片)、失敗列。
 
+- 失敗列的字照原因說,不要每種失敗都說「太大」。因為大小被擋的那則帶 `limit`(Dropzone 的
+  `maxSize`),寫「超過 10 MB 上限，沒有上傳。換一個小於 10 MB 的檔案。」,槽裡是上限不是檔案
+  大小;其他失敗是「上傳失敗。再試一次，或換一個檔案。」;`error` 給了就用呼叫端的字
+- 播報走清單外面一個視覺隱藏的 `role="status"`,裡面只有「檔名:狀態」的字。清單本身不是
+  live region:包住取消鈕的話,modal 開著時那些鈕還是露在無障礙樹上
 - 虛線是 SVG `rect`,內縮 1.5px,所以它的 `rx` 用 CSS 算成 `corner.card − 1.5px`,
   圓角跟著 token 走,不寫死
 
