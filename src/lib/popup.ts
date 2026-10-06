@@ -1,33 +1,22 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, motion, shadow } from "../tokens.stylex"
+import { color, corner, motion, shadow, zIndex } from "../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 /**
- * 全站疊層表。Base UI 的浮層一律 portal 到 body,跟 dialog / toast 同在一層比 z-index,
- * 各元件各寫一個數字就會出現「dialog 裡的 select 打不開」這種洞,所以值集中在這裡。
- *
- * 順序的理由:popup 壓過 dialog(浮層是當下互動的最上層);tooltip 壓過 popup
- * (popup 裡的元素也能有 tooltip);toast 永遠最上(非阻斷通知不能被 modal 蓋掉)。
+ * 全站疊層表,值在 `tokens.stylex.ts` 的 `zIndex`(順序的理由也寫在那裡)。
+ * Base UI 的浮層一律 portal 到 body,跟 dialog / toast 同在一層比 z-index,
+ * 各元件各寫一個數字就會出現「dialog 裡的 select 打不開」這種洞。
  */
-export const layer = {
-	dialogBackdrop: 70,
-	dialog: 71,
-	popup: 75,
-	tooltip: 78,
-	toast: 80,
-} as const
+export const layer = zIndex
 
-/**
- * `layer` 的 stylex 版。跨檔案 import 的值在 `stylex.create()` 裡不能靜態求值,
- * 所以疊層要以「做好的樣式」而不是數字提供給其他元件。
- */
+/** `zIndex` 做好的樣式,給只想掛一層的元件;自己寫 `zIndex: zIndex.popup` 也可以。 */
 export const layerStyles = stylex.create({
-	dialogBackdrop: { zIndex: layer.dialogBackdrop },
-	dialog: { zIndex: layer.dialog },
-	popup: { zIndex: layer.popup },
-	tooltip: { zIndex: layer.tooltip },
-	toast: { zIndex: layer.toast },
+	dialogBackdrop: { zIndex: zIndex.dialogBackdrop },
+	dialog: { zIndex: zIndex.dialog },
+	popup: { zIndex: zIndex.popup },
+	tooltip: { zIndex: zIndex.tooltip },
+	toast: { zIndex: zIndex.toast },
 })
 
 export const growIn = stylex.keyframes({
