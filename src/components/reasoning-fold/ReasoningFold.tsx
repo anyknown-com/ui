@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
@@ -77,18 +78,44 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 export type ReasoningFoldProps = {
+	/** The model is still thinking: the row shimmers and, uncontrolled, the fold opens. */
 	streaming?: boolean
+	/** How long it thought, in whole seconds, shown in the row once streaming ends. */
 	durationSec?: number
+	/**
+	 * Whether the reasoning is shown. Pass it to control the fold; the fold then neither opens
+	 * for streaming nor collapses after it, since you own the state. Pair it with `onOpenChange`.
+	 */
+	open?: boolean
+	/**
+	 * Whether the reasoning starts shown when `open` is not passed. Collapsed by default; it
+	 * also starts open while `streaming`.
+	 */
 	defaultOpen?: boolean
+	/**
+	 * Called with the new state when the user opens or closes the fold. The automatic open
+	 * while streaming and the collapse a second after it are not reported.
+	 */
+	onOpenChange?: (open: boolean) => void
+	/** The row's words while streaming. */
 	streamingLabel?: string
+	/** @deprecated Use onOpenChange. */
 	onToggle?: (open: boolean) => void
+	/** The reasoning text. */
 	children: ReactNode
 }
 
+/**
+ * The model's reasoning, folded under one row. It opens while the model is streaming and
+ * collapses itself a second after, unless the user has toggled it. The row is a real button:
+ * Enter and Space toggle it.
+ */
 export function ReasoningFold({
 	streaming = false,
 	durationSec,
+	open: openProp,
 	defaultOpen = false,
+	onOpenChange,
 	streamingLabel = "思考中…",
 	onToggle,
 	children,
@@ -96,27 +123,32 @@ export function ReasoningFold({
 	const bodyId = useId()
 	const row = useRef<HTMLButtonElement>(null)
 	const [userToggled, setUserToggled] = useState(false)
-	const [open, setOpen] = useState(defaultOpen || streaming)
+	const controlled = openProp !== undefined
+	// 不傳 onChange:自動開合不回報,只有使用者按的那一下才叫 onOpenChange
+	const [open, setOpen] = useControllableState(openProp, defaultOpen || streaming)
 	const [wasStreaming, setWasStreaming] = useState(streaming)
 	const [justFinished, setJustFinished] = useState(false)
 
 	if (wasStreaming !== streaming) {
 		setWasStreaming(streaming)
 		setJustFinished(!streaming)
-		if (streaming && !userToggled) setOpen(true)
+		if (streaming && !userToggled && !controlled) setOpen(true)
 	}
 
 	// 串流剛結束、使用者沒動過:一秒後自己收起。計時器掛在 body 的 ref callback 上 ——
 	// 條件不成立時 ref 換成 undefined,React 會跑 cleanup 清掉計時器(卸載時也是)
-	const collapseLater = useCallback((node: HTMLDivElement) => {
-		const timer = setTimeout(() => {
-			setOpen(false)
-			if (node.contains(document.activeElement)) row.current?.focus()
-			setJustFinished(false)
-		}, AUTO_COLLAPSE_MS)
-		return () => clearTimeout(timer)
-	}, [])
-	const collapsing = justFinished && !userToggled && !streaming
+	const collapseLater = useCallback(
+		(node: HTMLDivElement) => {
+			const timer = setTimeout(() => {
+				setOpen(false)
+				if (node.contains(document.activeElement)) row.current?.focus()
+				setJustFinished(false)
+			}, AUTO_COLLAPSE_MS)
+			return () => clearTimeout(timer)
+		},
+		[setOpen],
+	)
+	const collapsing = justFinished && !userToggled && !streaming && !controlled
 
 	const label = streaming ? (
 		<span {...stylex.props(styles.shimmer)}>{streamingLabel}</span>
@@ -135,7 +167,8 @@ export function ReasoningFold({
 				aria-controls={bodyId}
 				onClick={() => {
 					setUserToggled(true)
-					setOpen((value) => !value)
+					setOpen(!open)
+					onOpenChange?.(!open)
 					onToggle?.(!open)
 				}}
 				{...stylex.props(reset.control, styles.row)}
