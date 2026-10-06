@@ -1,6 +1,7 @@
 import { Combobox } from "@base-ui/react/combobox"
 import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
@@ -233,39 +234,84 @@ function OptionRow({ option }: { option: Option }) {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		placeholder: "選擇…",
+		searchPlaceholder: "搜尋…",
+		searchLabel: "搜尋選項",
+		remove: (item: string) => `移除 ${item}`,
+		empty: (query: string) => `找不到「${query}」。`,
+	},
+	en: {
+		placeholder: "Select…",
+		searchPlaceholder: "Search…",
+		searchLabel: "Search options",
+		remove: (item: string) => `Remove ${item}`,
+		empty: (query: string) => `No results for “${query}”.`,
+	},
+})
+
+/**
+ * The Select's built-in words (follow `<LocaleProvider>`): the placeholder, the search box's
+ * placeholder and name, a chip's remove button (`remove(itemText)`) and the empty state
+ * (`empty(query)`). Override any with `<Select labels={…}>`.
+ */
+export type SelectLabels = StringsOf<typeof strings>
+
 export type SelectProps = {
+	/** The selected value (a string, or an array with `multiple`). Controlled. */
 	value?: string | string[]
+	/** The initial value when uncontrolled. */
 	defaultValue?: string | string[]
+	/** Called with the new value: a string, or a string array with `multiple`. */
 	onValueChange?: (value: never) => void
+	/** Shown in the trigger while nothing is selected. @default the locale's `placeholder` */
 	placeholder?: string
+	/** The search box's placeholder. @default the locale's `searchPlaceholder` */
 	searchPlaceholder?: string
+	/** The search box's accessible name. @default the locale's `searchLabel` */
 	searchLabel?: string
+	/** What the list shows when the search matches nothing. @default the locale's `empty(query)` */
 	emptyLabel?: (query: string) => ReactNode
+	/** Pick any number of options; they show as removable chips. @default false */
 	multiple?: boolean
+	/** Show a search box at the top of the list. @default true */
 	searchable?: boolean
+	/** Disables the trigger. */
 	disabled?: boolean
+	/** The form field name; the value is submitted with the form. */
 	name?: string
+	/** The trigger's name when there is no visible label. */
 	"aria-label"?: string
+	/** The id of a visible label that names the trigger. */
 	"aria-labelledby"?: string
+	/** Override built-in words for this instance; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<SelectLabels>
+	/** `SelectItem` and `SelectGroup` elements. */
 	children: ReactNode
 }
 
+/** A single or multiple choice from a searchable list, with the APG select-only combobox semantics. */
 export function Select({
 	value,
 	defaultValue,
 	onValueChange,
-	placeholder = "選擇…",
-	searchPlaceholder = "搜尋…",
-	searchLabel = "搜尋選項",
+	placeholder: placeholderProp,
+	searchPlaceholder,
+	searchLabel: searchLabelProp,
 	emptyLabel,
 	multiple = false,
 	searchable = true,
 	disabled,
 	name,
+	labels,
 	children,
 	"aria-label": ariaLabel,
 	"aria-labelledby": ariaLabelledBy,
 }: SelectProps) {
+	const t = useStrings(strings, labels)
+	const placeholder = placeholderProp ?? t.placeholder
+	const searchLabel = searchLabelProp ?? t.searchLabel
 	const base = useId()
 	const labelId = `${base}label`
 	const triggerId = `${base}trigger`
@@ -333,7 +379,7 @@ export function Select({
 								{option.label}
 								<button
 									type="button"
-									aria-label={`移除 ${option.text}`}
+									aria-label={t.remove(option.text)}
 									onPointerDown={(event) => event.stopPropagation()}
 									onMouseDown={(event) => event.stopPropagation()}
 									onClick={(event) => {
@@ -372,7 +418,7 @@ export function Select({
 									<SearchIcon />
 								</span>
 								<Combobox.Input
-									placeholder={searchPlaceholder}
+									placeholder={searchPlaceholder ?? t.searchPlaceholder}
 									aria-label={searchLabel}
 									{...stylex.props(reset.control, styles.searchInput)}
 								/>
@@ -399,7 +445,7 @@ export function Select({
 								: (option: Option) => <OptionRow key={option.value} option={option} />}
 						</Combobox.List>
 						<Combobox.Empty {...stylex.props(styles.empty)}>
-							{emptyLabel ? emptyLabel(query) : `找不到「${query}」。`}
+							{emptyLabel ? emptyLabel(query) : t.empty(query)}
 						</Combobox.Empty>
 					</Combobox.Popup>
 				</Combobox.Positioner>

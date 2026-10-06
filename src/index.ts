@@ -18,6 +18,7 @@ export {
 	type SelectProps,
 	type SelectGroupProps,
 	type SelectItemProps,
+	type SelectLabels,
 } from "./components/select/Select"
 export {
 	DropdownMenu,

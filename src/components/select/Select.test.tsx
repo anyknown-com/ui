@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { layer } from "../../lib/popup"
 import { Dialog, DialogContent } from "../dialog/Dialog"
 import { Select, SelectGroup, SelectItem } from "./Select"
@@ -111,6 +112,33 @@ describe("Select", () => {
 		expect(screen.getByRole("listbox")).toBeInTheDocument()
 		await userEvent.click(screen.getByRole("button", { name: "移除 偏好 pnpm" }))
 		await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith([]))
+	})
+})
+
+describe("Select words", () => {
+	test("follow the LocaleProvider, and labels override one of them", async () => {
+		render(
+			<LocaleProvider locale="en">
+				<Select aria-label="Memories" multiple defaultValue={["pnpm"]} labels={{ searchLabel: "Find" }}>
+					<SelectItem value="pnpm">Prefer pnpm</SelectItem>
+				</Select>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Remove Prefer pnpm" })).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("combobox", { name: "Memories" }))
+		const search = await screen.findByRole("combobox", { name: "Find" })
+		expect(search).toHaveAttribute("placeholder", "Search…")
+		await userEvent.type(search, "zzz")
+		expect(await screen.findByText("No results for “zzz”.")).toBeInTheDocument()
+	})
+
+	test("zh-TW is the default", () => {
+		render(
+			<Select aria-label="模型">
+				<SelectItem value="opus-5">Opus 5</SelectItem>
+			</Select>,
+		)
+		expect(screen.getByRole("combobox", { name: "模型" })).toHaveTextContent("選擇…")
 	})
 })
 
