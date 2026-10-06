@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { LiveDot } from "./LiveDot"
 
 describe("LiveDot", () => {
@@ -14,5 +15,15 @@ describe("LiveDot", () => {
 		const live = screen.getByRole("status")
 		expect(live).toHaveTextContent("還在跑")
 		expect(live.querySelector("[aria-hidden='true']")).not.toBeNull()
+	})
+
+	test("沒有 axe 違規,裝飾跟 status 兩種都是", async () => {
+		const { container } = render(
+			<>
+				<LiveDot />
+				<LiveDot label="還在跑" />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
