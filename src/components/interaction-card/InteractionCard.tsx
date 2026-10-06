@@ -9,6 +9,7 @@ import { RadioGroup } from "../radio/RadioGroup"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
 	// rest 卡片;等你回覆時外圈的環換成 warning(權限)或墨色(要你決定)
@@ -25,8 +26,15 @@ const styles = stylex.create({
 		transitionDuration: { default: "180ms", [REDUCED]: "0s" },
 		transitionTimingFunction: "ease-out",
 	},
-	permissionPending: { boxShadow: `0 0 0 1px ${color.warning}, ${shadow.rest}` },
-	decisionPending: { boxShadow: `0 0 0 1px ${color.accent}, ${shadow.rest}` },
+	// forced colors 下陰影和環都會消失:等你回覆的卡片改畫一圈 CanvasText
+	permissionPending: {
+		boxShadow: `0 0 0 1px ${color.warning}, ${shadow.rest}`,
+		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+	},
+	decisionPending: {
+		boxShadow: `0 0 0 1px ${color.accent}, ${shadow.rest}`,
+		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+	},
 	head: { display: "flex", alignItems: "center", gap: space.xs },
 	headIconWarning: { flex: "none", color: color.warning },
 	headIconAccent: { flex: "none", color: color.accent },
@@ -187,7 +195,8 @@ function ReceiptIcon({ rejected }: { rejected?: boolean }) {
 			height={14}
 			{...stylex.props(styles.receiptIcon, rejected && styles.receiptIconRejected)}
 		>
-			<path d="m5 13 4 4L19 7" />
+			{/* 拒絕不能只靠紅色分辨:換成叉,forced colors 下也看得出來 */}
+			<path d={rejected ? "M18 6 6 18M6 6l12 12" : "m5 13 4 4L19 7"} />
 		</Glyph>
 	)
 }

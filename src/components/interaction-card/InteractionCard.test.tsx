@@ -173,6 +173,18 @@ describe("PermissionCard regressions", () => {
 		expect(screen.getByRole("button", { name: "拒絕" })).toHaveAttribute("aria-keyshortcuts", "Escape")
 	})
 
+	test("a rejected receipt draws a different mark, not only a different colour", () => {
+		const { container, rerender } = render(
+			<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已允許一次" }} />,
+		)
+		const allowed = container.querySelector("[aria-live='polite'] path")?.getAttribute("d")
+		rerender(
+			<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已拒絕", rejected: true }} />,
+		)
+		const rejected = container.querySelector("[aria-live='polite'] path")?.getAttribute("d")
+		expect(rejected).not.toBe(allowed)
+	})
+
 	test("the receipt region exists before it is filled, so the change is announced", () => {
 		const { rerender } = render(<PermissionCard verb="執行指令" subject="pnpm publish" />)
 		const region = document.querySelector("[aria-live='polite']")
