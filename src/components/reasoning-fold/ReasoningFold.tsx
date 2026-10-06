@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useId, useRef, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, motion, space, type } from "../../tokens.stylex"
@@ -77,6 +78,22 @@ function Chevron({ open }: { open: boolean }) {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		streaming: "思考中…",
+		thoughtFor: (seconds: number) => `思考了 ${seconds} 秒`,
+		reasoning: "思考過程",
+	},
+	en: {
+		streaming: "Thinking…",
+		thoughtFor: (seconds: number) => `Thought for ${seconds} ${seconds === 1 ? "second" : "seconds"}`,
+		reasoning: "Reasoning",
+	},
+})
+
+/** ReasoningFold's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type ReasoningFoldLabels = StringsOf<typeof strings>
+
 export type ReasoningFoldProps = {
 	/** The model is still thinking: the row shimmers and, uncontrolled, the fold opens. */
 	streaming?: boolean
@@ -97,7 +114,9 @@ export type ReasoningFoldProps = {
 	 * while streaming and the collapse a second after it are not reported.
 	 */
 	onOpenChange?: (open: boolean) => void
-	/** The row's words while streaming. */
+	/** Override built-in words for this fold; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ReasoningFoldLabels>
+	/** The row's words while streaming. Wins over `labels.streaming`. */
 	streamingLabel?: string
 	/** @deprecated Use onOpenChange. */
 	onToggle?: (open: boolean) => void
@@ -116,10 +135,12 @@ export function ReasoningFold({
 	open: openProp,
 	defaultOpen = false,
 	onOpenChange,
-	streamingLabel = "思考中…",
+	labels,
+	streamingLabel,
 	onToggle,
 	children,
 }: ReasoningFoldProps) {
+	const t = useStrings(strings, labels)
 	const bodyId = useId()
 	const row = useRef<HTMLButtonElement>(null)
 	const [userToggled, setUserToggled] = useState(false)
@@ -151,11 +172,11 @@ export function ReasoningFold({
 	const collapsing = justFinished && !userToggled && !streaming && !controlled
 
 	const label = streaming ? (
-		<span {...stylex.props(styles.shimmer)}>{streamingLabel}</span>
+		<span {...stylex.props(styles.shimmer)}>{streamingLabel ?? t.streaming}</span>
 	) : durationSec != null ? (
-		`思考了 ${durationSec} 秒`
+		t.thoughtFor(durationSec)
 	) : (
-		"思考過程"
+		t.reasoning
 	)
 
 	return (

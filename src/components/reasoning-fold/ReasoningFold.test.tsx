@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { ReasoningFold } from "./ReasoningFold"
 
 describe("ReasoningFold", () => {
@@ -134,6 +135,44 @@ describe("ReasoningFold open state", () => {
 		expect(row).toHaveAttribute("aria-expanded", "true")
 		await userEvent.keyboard(" ")
 		expect(row).toHaveAttribute("aria-expanded", "false")
+	})
+})
+
+describe("ReasoningFold locale", () => {
+	test("reads English words under an en LocaleProvider", () => {
+		const { rerender } = render(
+			<LocaleProvider locale="en">
+				<ReasoningFold streaming>內容</ReasoningFold>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Thinking…" })).toBeInTheDocument()
+		rerender(
+			<LocaleProvider locale="en">
+				<ReasoningFold durationSec={1}>內容</ReasoningFold>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Thought for 1 second" })).toBeInTheDocument()
+		rerender(
+			<LocaleProvider locale="en">
+				<ReasoningFold>內容</ReasoningFold>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Reasoning" })).toBeInTheDocument()
+	})
+
+	test("labels override words; streamingLabel wins over labels", () => {
+		const { rerender } = render(
+			<ReasoningFold durationSec={5} labels={{ thoughtFor: (s) => `${s}s of thought` }}>
+				內容
+			</ReasoningFold>,
+		)
+		expect(screen.getByRole("button", { name: "5s of thought" })).toBeInTheDocument()
+		rerender(
+			<ReasoningFold streaming labels={{ streaming: "from labels" }} streamingLabel="from prop">
+				內容
+			</ReasoningFold>,
+		)
+		expect(screen.getByRole("button", { name: "from prop" })).toBeInTheDocument()
 	})
 })
 
