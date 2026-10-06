@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { type StyleArg } from "../../lib/styled"
 import { Button } from "../button/Button"
 import {
@@ -159,6 +160,28 @@ describe("ConfirmDialog", () => {
 		await screen.findByRole("alertdialog")
 		expect(screen.getByRole("button", { name: "封存 thread" })).toBeInTheDocument()
 		expect(screen.queryByRole("button", { name: "確認" })).not.toBeInTheDocument()
+	})
+
+	test("the cancel word follows the LocaleProvider and labels override it", async () => {
+		const { unmount } = render(
+			<LocaleProvider locale="en">
+				<ConfirmDialog defaultOpen title="Delete?" confirmLabel="Delete memory" onConfirm={() => {}} />
+			</LocaleProvider>,
+		)
+		expect(await screen.findByRole("button", { name: "Cancel" })).toBeInTheDocument()
+		unmount()
+		render(
+			<LocaleProvider locale="en">
+				<ConfirmDialog
+					defaultOpen
+					title="Archive?"
+					confirmLabel="Archive"
+					labels={{ cancel: "Keep it" }}
+					onConfirm={() => {}}
+				/>
+			</LocaleProvider>,
+		)
+		expect(await screen.findByRole("button", { name: "Keep it" })).toBeInTheDocument()
 	})
 
 	test("danger confirm starts focused on cancel", async () => {
@@ -339,6 +362,23 @@ describe("dialog store", () => {
 		act(() => dialogManager.closeAll())
 		await expect(answer).resolves.toBe(false)
 		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+	})
+
+	test("confirm and alert words follow the LocaleProvider; host labels override one", async () => {
+		render(
+			<LocaleProvider locale="en">
+				<Dialogs labels={{ acknowledge: "Got it" }} />
+			</LocaleProvider>,
+		)
+		let answer: Promise<boolean> = Promise.resolve(true)
+		act(() => void (answer = dialogManager.confirm({ title: "Archive?", confirmLabel: "Archive thread" })))
+		await userEvent.click(await screen.findByRole("button", { name: "Cancel" }))
+		await expect(answer).resolves.toBe(false)
+
+		let done: Promise<void> = Promise.resolve()
+		act(() => void (done = dialogManager.alert({ title: "Limit reached" })))
+		await userEvent.click(await screen.findByRole("button", { name: "Got it" }))
+		await expect(done).resolves.toBeUndefined()
 	})
 
 	test("a scoped manager renders in its own host and useDialog reaches it", async () => {

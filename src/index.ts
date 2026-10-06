@@ -53,6 +53,7 @@ export type {
 	DialogActionsProps,
 	DialogCloseProps,
 	ConfirmDialogProps,
+	DialogLabels,
 	DialogsProps,
 	DialogManager,
 	DialogHandle,

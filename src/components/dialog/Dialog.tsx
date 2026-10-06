@@ -2,6 +2,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog"
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import * as stylex from "@stylexjs/stylex"
 import { createContext, type ReactElement, type ReactNode, useContext, useRef, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { layerStyles, returnFocusOnExit } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
@@ -89,6 +90,21 @@ const styles = stylex.create({
 	actions: { display: "flex", justifyContent: "flex-end", gap: space.xs, marginTop: space.lg },
 })
 
+const strings = defineStrings({
+	"zh-TW": { cancel: "取消", acknowledge: "知道了" },
+	en: { cancel: "Cancel", acknowledge: "OK" },
+})
+
+/**
+ * The dialogs' built-in words: `cancel` labels the cancel button of a confirm, `acknowledge`
+ * the only button of an alert. They follow `<LocaleProvider>`; override any with the `labels`
+ * prop of `<Dialogs>` or `<ConfirmDialog>`.
+ */
+export type DialogLabels = StringsOf<typeof strings>
+
+/** The `labels` of the nearest `<Dialogs>`, for the confirm and alert cards it renders. */
+const DialogLabelsContext = createContext<Partial<DialogLabels> | undefined>(undefined)
+
 export type DialogProps = {
 	open?: boolean
 	defaultOpen?: boolean
@@ -169,27 +185,40 @@ export function DialogContent({
 }
 
 export type ConfirmDialogProps = {
+	/** Controlled open state. */
 	open?: boolean
+	/** Initial open state when uncontrolled. */
 	defaultOpen?: boolean
+	/** Called when the dialog opens or closes, from the trigger, a button or Escape. */
 	onOpenChange?: (open: boolean) => void
+	/** The element that opens the dialog; omit it when `open` is controlled. */
 	trigger?: ReactElement
+	/** The question; it names the dialog. */
 	title: ReactNode
+	/** What happens if the user confirms; it describes the dialog. */
 	description?: ReactNode
+	/** A red confirm button, and focus starts on cancel. @default false */
 	danger?: boolean
 	/** Verb first and names the consequence: 「刪除記憶」, not 「確認」. No default. */
 	confirmLabel: string
+	/** The cancel button's text. @default the locale's `cancel` word (取消 / Cancel) */
 	cancelLabel?: string
+	/** Called when the confirm button is pressed. */
 	onConfirm: () => void
+	/** Override built-in words for this dialog; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DialogLabels>
 }
 
+/** A yes / no question in an `alertdialog`: a cancel button and a confirm button that names the action. */
 export function ConfirmDialog({
 	trigger,
 	title,
 	description,
 	danger = false,
 	confirmLabel,
-	cancelLabel = "取消",
+	cancelLabel,
 	onConfirm,
+	labels,
 	...props
 }: ConfirmDialogProps) {
 	return (
@@ -202,6 +231,7 @@ export function ConfirmDialog({
 				confirmLabel={confirmLabel}
 				cancelLabel={cancelLabel}
 				onConfirm={onConfirm}
+				labels={labels}
 			/>
 		</AlertDialog.Root>
 	)
@@ -211,11 +241,13 @@ type ConfirmContentProps = {
 	title: ReactNode
 	description?: ReactNode
 	danger: boolean
-	confirmLabel: string
-	/** null = 只有一顆按鈕(alert) */
-	cancelLabel: string | null
+	/** undefined = 語系的 `acknowledge`(alert 用) */
+	confirmLabel?: string
+	/** null = 只有一顆按鈕(alert);undefined = 語系的 `cancel` */
+	cancelLabel?: string | null
 	onConfirm: () => void
 	onCancel?: () => void
+	labels?: Partial<DialogLabels>
 }
 
 /** ConfirmDialog 與 `dialog.confirm` / `dialog.alert` 共用的那張卡;要放在 AlertDialog.Root 裡。 */
@@ -227,7 +259,11 @@ function ConfirmContent({
 	cancelLabel,
 	onConfirm,
 	onCancel,
+	labels,
 }: ConfirmContentProps) {
+	const host = useContext(DialogLabelsContext)
+	const t = useStrings(strings, { ...host, ...labels })
+	const cancel = cancelLabel === undefined ? t.cancel : cancelLabel
 	const cancelRef = useRef<HTMLButtonElement>(null)
 	return (
 		<AlertDialog.Portal>
@@ -235,7 +271,7 @@ function ConfirmContent({
 			<AlertDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
 				<AlertDialog.Popup
 					ref={returnFocusOnExit}
-					initialFocus={danger && cancelLabel != null ? cancelRef : undefined}
+					initialFocus={danger && cancel != null ? cancelRef : undefined}
 					{...stylex.props(styles.popup)}
 				>
 					<AlertDialog.Title {...stylex.props(styles.title)}>{title}</AlertDialog.Title>
@@ -245,16 +281,16 @@ function ConfirmContent({
 						</AlertDialog.Description>
 					)}
 					<div {...stylex.props(styles.actions)}>
-						{cancelLabel != null && (
+						{cancel != null && (
 							<AlertDialog.Close render={<Button ref={cancelRef} variant="secondary" />} onClick={onCancel}>
-								{cancelLabel}
+								{cancel}
 							</AlertDialog.Close>
 						)}
 						<AlertDialog.Close
 							render={<Button variant={danger ? "danger" : "primary"} />}
 							onClick={onConfirm}
 						>
-							{confirmLabel}
+							{confirmLabel ?? t.acknowledge}
 						</AlertDialog.Close>
 					</div>
 				</AlertDialog.Popup>
@@ -293,7 +329,7 @@ export type ConfirmOptions = {
 	description?: ReactNode
 	/** Verb first and names the consequence: 「封存 thread」, not 「確認」. No default. */
 	confirmLabel: string
-	/** @default "取消" */
+	/** The cancel button's text. @default the locale's `cancel` word (取消 / Cancel) */
 	cancelLabel?: string
 	/** `danger`:紅色確認鈕,焦點先落在取消。 @default "default" */
 	tone?: "default" | "danger"
@@ -302,7 +338,7 @@ export type ConfirmOptions = {
 export type AlertOptions = {
 	title: ReactNode
 	description?: ReactNode
-	/** @default "知道了" */
+	/** The only button's text. @default the locale's `acknowledge` word (知道了 / OK) */
 	confirmLabel?: string
 	tone?: "default" | "danger"
 }
@@ -357,7 +393,7 @@ export function createDialogManager(): DialogManager {
 			const [first] = store.getSnapshot()
 			if (first != null) close(first.id)
 		},
-		confirm({ title, description, confirmLabel, cancelLabel = "取消", tone = "default" }) {
+		confirm({ title, description, confirmLabel, cancelLabel, tone = "default" }) {
 			const handle = push<boolean>(
 				({ close: done }) => (
 					<ConfirmContent
@@ -375,7 +411,7 @@ export function createDialogManager(): DialogManager {
 			)
 			return handle.result.then((value) => value === true)
 		},
-		alert({ title, description, confirmLabel = "知道了", tone = "default" }) {
+		alert({ title, description, confirmLabel, tone = "default" }) {
 			const handle = push<void>(
 				({ close: done }) => (
 					<ConfirmContent
@@ -415,16 +451,23 @@ export type DialogsProps = {
 	manager?: DialogManager
 	/** 包在裡面的 `useDialog()` 拿到的是這個 host 的 manager。 */
 	children?: ReactNode
+	/** Override built-in words for the confirms and alerts this host renders; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DialogLabels>
 }
 
-export function Dialogs({ manager, children }: DialogsProps) {
+/** The host that renders `dialog.open` / `confirm` / `alert`. Mount one per manager, near the app root. */
+export function Dialogs({ manager, children, labels }: DialogsProps) {
 	const [own] = useState(() => manager ?? dialogManager)
 	const entries = useStore(own)
 	const first = entries[0]
 	return (
 		<DialogManagerContext value={own}>
 			{children}
-			{first != null && <StackedDialog key={first.id} entries={entries} index={0} manager={own} />}
+			{first != null && (
+				<DialogLabelsContext value={labels}>
+					<StackedDialog key={first.id} entries={entries} index={0} manager={own} />
+				</DialogLabelsContext>
+			)}
 		</DialogManagerContext>
 	)
 }
