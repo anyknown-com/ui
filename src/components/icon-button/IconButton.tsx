@@ -4,7 +4,7 @@ import { Tooltip } from "../tooltip/Tooltip"
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
 
 /**
- * `.ib`: a square that holds one glyph. Nothing at rest, an ink wash under the pointer, the
+ * `.ib`: a circle that holds one glyph. Nothing at rest, an ink wash under the pointer, the
  * name in a tooltip; a badge in the corner when it counts something.
  */
 
@@ -14,7 +14,7 @@ const styles = stylex.create({
 	root: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":hover": ink.n8 },
-		borderRadius: corner.ib,
+		borderRadius: corner.pill,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -27,14 +27,14 @@ const styles = stylex.create({
 		justifyItems: "center",
 		lineHeight: "inherit",
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.accent}` },
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 		padding: 0,
 		placeItems: "center",
 		position: "relative",
-		scale: { default: "1", ":active": "0.96" },
+		scale: { default: "1", ":active": { default: "0.98", [REDUCED]: "1" } },
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionProperty: "background-color, color",
+		transitionProperty: "background-color, color, scale",
 		transitionTimingFunction: motion.easeOut,
 		width: "2.25rem",
 	},
@@ -44,7 +44,7 @@ const styles = stylex.create({
 	xs: { height: "1.75rem", width: "1.75rem" },
 	badge: {
 		backgroundColor: color.accent,
-		borderRadius: 8,
+		borderRadius: corner.pill,
 		color: color.accentText,
 		fontFamily: font.mono,
 		fontSize: type.t1,
