@@ -8,22 +8,31 @@ import { breakpoint, color, corner, focusRing, font, space, type } from "../../t
 import { controlStyles } from "../input/Input"
 
 export type SelectItemProps = {
+	/** The value `onValueChange` reports and the form submits. */
 	value: string
+	/** A muted note after the label, e.g. 「最強」. */
 	hint?: string
+	/** Shown but cannot be picked. */
 	disabled?: boolean
+	/** The text search and typeahead match; needed when `children` is not a plain string. */
 	textValue?: string
+	/** The option's label. */
 	children: ReactNode
 }
 
+/** One option of a `Select`. It only describes the option; `Select` renders it. */
 export function SelectItem(_props: SelectItemProps): null {
 	return null
 }
 
 export type SelectGroupProps = {
+	/** The group heading. */
 	label: string
+	/** The group's `SelectItem`s. */
 	children: ReactNode
 }
 
+/** A labelled group of options in a `Select`. */
 export function SelectGroup(_props: SelectGroupProps): null {
 	return null
 }

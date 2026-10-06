@@ -101,15 +101,23 @@ const itemClassName = (variant?: "danger") => (state: { highlighted: boolean; di
 	).className ?? ""
 
 export type DropdownItemProps = {
+	/** A leading icon; decorative (hidden from assistive tech). */
 	icon?: ReactNode
+	/** A shortcut shown at the end and exposed as `aria-keyshortcuts`, e.g. "⌘N". It does not bind the key. */
 	shortcut?: string
+	/** `danger` paints the item red, for destructive actions. */
 	variant?: "danger"
+	/** Focusable but not selectable (APG: disabled menu items stay discoverable). */
 	disabled?: boolean
+	/** Close the menu after the item is chosen. @default true */
 	closeOnClick?: boolean
+	/** Runs when the item is chosen by click, Enter or Space. */
 	onSelect?: () => void
+	/** The item's label. */
 	children: ReactNode
 }
 
+/** One action in a `DropdownMenu` (`role="menuitem"`). */
 export function DropdownItem({ icon, shortcut, variant, onSelect, children, ...rest }: DropdownItemProps) {
 	return (
 		<Menu.Item {...rest} aria-keyshortcuts={shortcut} onClick={onSelect} className={itemClassName(variant)}>
@@ -129,14 +137,21 @@ export function DropdownItem({ icon, shortcut, variant, onSelect, children, ...r
 }
 
 export type DropdownCheckboxItemProps = {
+	/** Controlled checked state. */
 	checked?: boolean
+	/** Initial checked state when uncontrolled. */
 	defaultChecked?: boolean
+	/** Called with the new checked state. */
 	onCheckedChange?: (checked: boolean) => void
+	/** Focusable but not toggleable. */
 	disabled?: boolean
+	/** Close the menu after toggling. @default false */
 	closeOnClick?: boolean
+	/** The item's label. */
 	children: ReactNode
 }
 
+/** An on / off setting in a `DropdownMenu` (`role="menuitemcheckbox"`); the menu stays open. */
 export function DropdownCheckboxItem({ children, ...rest }: DropdownCheckboxItemProps) {
 	return (
 		<Menu.CheckboxItem {...rest} className={itemClassName()}>
@@ -150,8 +165,14 @@ export function DropdownCheckboxItem({ children, ...rest }: DropdownCheckboxItem
 	)
 }
 
-export type DropdownGroupProps = { label?: string; children: ReactNode }
+export type DropdownGroupProps = {
+	/** A small heading that names the group. */
+	label?: string
+	/** The group's items. */
+	children: ReactNode
+}
 
+/** A labelled group of items (`role="group"`). */
 export function DropdownGroup({ label, children }: DropdownGroupProps) {
 	return (
 		<Menu.Group>
@@ -161,17 +182,23 @@ export function DropdownGroup({ label, children }: DropdownGroupProps) {
 	)
 }
 
+/** A line between groups of items (`role="separator"`). */
 export function DropdownSeparator() {
 	return <Menu.Separator {...stylex.props(styles.separator)} />
 }
 
 export type DropdownSubProps = {
+	/** The submenu trigger's label. */
 	label: ReactNode
+	/** A leading icon on the trigger; decorative. */
 	icon?: ReactNode
+	/** The trigger is focusable but does not open the submenu. */
 	disabled?: boolean
+	/** The submenu's items. */
 	children: ReactNode
 }
 
+/** A nested menu: ArrowRight or hover opens it, ArrowLeft or Escape closes it. */
 export function DropdownSub({ label, icon, disabled, children }: DropdownSubProps) {
 	return (
 		<Menu.SubmenuRoot>
@@ -204,15 +231,26 @@ export function DropdownSub({ label, icon, disabled, children }: DropdownSubProp
 }
 
 export type DropdownMenuProps = {
+	/** The menu button, usually a `Button`; it gets `aria-haspopup="menu"` and `aria-expanded`. */
 	trigger: ReactNode
+	/** Controlled open state. */
 	open?: boolean
+	/** Initial open state when uncontrolled. */
 	defaultOpen?: boolean
+	/** Called when the menu opens or closes. */
 	onOpenChange?: (open: boolean) => void
+	/** The side of the trigger it opens on (flips when there is no room). @default "bottom" */
 	side?: "top" | "bottom" | "left" | "right"
+	/** Alignment along that side. @default "start" */
 	align?: "start" | "center" | "end"
+	/** Items, groups, separators and submenus. */
 	children: ReactNode
 }
 
+/**
+ * A menu button (WAI-ARIA APG): Enter, Space or ArrowDown opens it; arrows, Home / End and
+ * typeahead move; Escape or Tab closes it and focus returns to the trigger as the exit starts.
+ */
 export function DropdownMenu({
 	trigger,
 	open,

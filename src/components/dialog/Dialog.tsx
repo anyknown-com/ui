@@ -114,47 +114,69 @@ export type DialogLabels = StringsOf<typeof strings>
 const DialogLabelsContext = createContext<Partial<DialogLabels> | undefined>(undefined)
 
 export type DialogProps = {
+	/** Controlled open state. */
 	open?: boolean
+	/** Initial open state when uncontrolled. */
 	defaultOpen?: boolean
+	/** Called when the dialog opens or closes, from the trigger, a close button, Escape or the backdrop. */
 	onOpenChange?: (open: boolean) => void
+	/** `DialogTrigger` and `DialogContent`. */
 	children: ReactNode
 }
 
+/** A modal dialog: focus moves in and is trapped, the page behind is inert, Escape closes it. */
 export function Dialog({ children, ...props }: DialogProps) {
 	return <BaseDialog.Root {...props}>{children}</BaseDialog.Root>
 }
 
-export type DialogTriggerProps = { children: ReactElement }
+export type DialogTriggerProps = {
+	/** The element that opens the dialog, usually a `Button`. Focus returns to it on close. */
+	children: ReactElement
+}
 
+/** Makes its child open the surrounding `Dialog`. */
 export function DialogTrigger({ children }: DialogTriggerProps) {
 	return <BaseDialog.Trigger render={children} />
 }
 
-export type DialogCloseProps = { children: ReactElement }
+export type DialogCloseProps = {
+	/** The element that closes the dialog, usually a `Button`. */
+	children: ReactElement
+}
 
+/** Makes its child close the surrounding `Dialog`. */
 export function DialogClose({ children }: DialogCloseProps) {
 	return <BaseDialog.Close render={children} />
 }
 
-export type DialogActionsProps = { children: ReactNode }
+export type DialogActionsProps = {
+	/** The buttons, least important first; the primary action goes last. */
+	children: ReactNode
+}
 
+/** The button row at the bottom of a dialog, aligned to the end. */
 export function DialogActions({ children }: DialogActionsProps) {
 	return <div {...stylex.props(styles.actions)}>{children}</div>
 }
 
 export type DialogContentProps = {
+	/** The heading; it names the dialog. */
 	title: ReactNode
+	/** A muted line under the title; it describes the dialog. */
 	description?: ReactNode
+	/** Content under the description that does not scroll (forms, `DialogActions`). */
 	children?: ReactNode
-	/** 寬度階;`full` 是沉浸式(整個視窗那麼高)。 @default "sm" */
+	/** Width step; `full` is immersive (as tall as the window). @default "sm" */
 	size?: "sm" | "md" | "full"
-	/** 會捲的那一段 —— 標頭與 children 釘住,只有這裡捲。 */
+	/** The part that scrolls: the header and `children` stay pinned, only this scrolls. */
 	body?: ReactNode
+	/** Extra styles for the `body` wrapper. */
 	bodySx?: StyleArg
-	/** 寬高是 popup 自己的事,但要蓋得掉 —— 三欄選擇器那種得自己給 width / maxHeight */
+	/** Extra styles for the popup; they replace its own (e.g. a custom `width` / `maxHeight`). */
 	sx?: StyleArg
 }
 
+/** The dialog card, its backdrop and its portal. Put it inside `Dialog`, or return it from `dialog.open`. */
 export function DialogContent({
 	title,
 	description,
@@ -310,25 +332,43 @@ function ConfirmContent({
 // ---------------------------------------------------------------------------
 // 命令式:dialog.open / confirm / alert,狀態在 lib/store,畫面由 <Dialogs /> 掛
 
-export type DialogControls<T = unknown> = { close: (result?: T) => void }
+/** What a `dialog.open` render function receives. */
+export type DialogControls<T = unknown> = {
+	/** Closes this dialog (and any stacked on it) and settles `result` with the value. */
+	close: (result?: T) => void
+}
 
+/** The function `dialog.open` calls to draw the dialog; return a `DialogContent`. */
 export type DialogRender<T = unknown> = (controls: DialogControls<T>) => ReactNode
 
 export type DialogOptions = {
-	/** `alertdialog`:要使用者明確回答;點 backdrop 不會關,Esc 仍會。 @default "dialog" */
+	/**
+	 * `alertdialog` asks for an explicit answer: a backdrop click does not close it, Escape still
+	 * does. @default "dialog"
+	 */
 	role?: "dialog" | "alertdialog"
 }
 
+/** What `dialog.open` returns. */
 export type DialogHandle<T = unknown> = {
+	/** The entry's id in the manager. */
 	id: string
+	/** Closes this dialog (and any stacked on it) and settles `result` with the value. */
 	close: (result?: T) => void
-	/** 關掉時落定;Esc / backdrop / `closeAll` 關掉的是 `undefined`(confirm 是 `false`)。 */
+	/**
+	 * Settles when the dialog closes (as its exit starts). Escape, the backdrop and `closeAll`
+	 * settle it with `undefined` (`false` for a confirm).
+	 */
 	result: Promise<T | undefined>
 }
 
+/** One dialog in a manager's snapshot, bottom first. */
 export type DialogEntry = {
+	/** The dialog's id. */
 	id: string
+	/** Draws the dialog. */
 	render: DialogRender<never>
+	/** The dialog's role. */
 	role: "dialog" | "alertdialog"
 	/**
 	 * Closed and already settled, but still fading out. `<Dialogs>` drops the entry when the
@@ -338,33 +378,44 @@ export type DialogEntry = {
 }
 
 export type ConfirmOptions = {
+	/** The question; it names the dialog. */
 	title: ReactNode
+	/** What happens if the user confirms. */
 	description?: ReactNode
 	/** Verb first and names the consequence: 「封存 thread」, not 「確認」. No default. */
 	confirmLabel: string
 	/** The cancel button's text. @default the locale's `cancel` word (取消 / Cancel) */
 	cancelLabel?: string
-	/** `danger`:紅色確認鈕,焦點先落在取消。 @default "default" */
+	/** `danger`: a red confirm button, and focus starts on cancel. @default "default" */
 	tone?: "default" | "danger"
 }
 
 export type AlertOptions = {
+	/** The message; it names the dialog. */
 	title: ReactNode
+	/** More detail under the title. */
 	description?: ReactNode
 	/** The only button's text. @default the locale's `acknowledge` word (知道了 / OK) */
 	confirmLabel?: string
+	/** `danger` paints the button red. @default "default" */
 	tone?: "default" | "danger"
 }
 
+/** The imperative dialog store; `<Dialogs>` renders it. `dialog` is the default one. */
 export type DialogManager = {
+	/** Opens a dialog on top of any already open; `render` returns a `DialogContent`. */
 	open: <T = unknown>(render: DialogRender<T>, options?: DialogOptions) => DialogHandle<T>
-	/** 連同疊在它上面的 dialog 一起關。 */
+	/** Closes a dialog together with the ones stacked on it; `result` settles that one's promise. */
 	close: (id: string, result?: unknown) => void
+	/** Closes every open dialog; each settles with its dismiss value. */
 	closeAll: () => void
-	/** 確認 → true;取消、Esc → false。 */
+	/** Asks a yes / no question: resolves `true` from the confirm button, `false` from cancel or Escape. */
 	confirm: (options: ConfirmOptions) => Promise<boolean>
+	/** Shows a message with one button; resolves when it is dismissed. */
 	alert: (options: AlertOptions) => Promise<void>
+	/** For `useSyncExternalStore` / `useStore`. */
 	subscribe: (listener: () => void) => () => void
+	/** The open dialogs, bottom first, including ones still fading out. */
 	getSnapshot: () => readonly DialogEntry[]
 	/** @internal `<Dialogs>` calls it when a closed dialog has finished fading out. */
 	remove: (id: string) => void
@@ -372,6 +423,7 @@ export type DialogManager = {
 
 let dialogSeq = 0
 
+/** A separate dialog store, for a scoped `<Dialogs manager>` (tests, embedded apps). */
 export function createDialogManager(): DialogManager {
 	const store = createStore<readonly DialogEntry[]>([])
 	// 結果的出口不放進 snapshot:畫面用不到
@@ -471,23 +523,27 @@ export function createDialogManager(): DialogManager {
 	}
 }
 
-/** 只有一個 <Dialogs/> 的 app 用這個:直接 import `dialog` 就能用。 */
+/** The default manager, used by `dialog` and by a `<Dialogs>` without a `manager`. */
 export const dialogManager = createDialogManager()
 
+/**
+ * Opens dialogs from anywhere, no context needed (apps with one `<Dialogs>`):
+ * `dialog.open(render)`, `dialog.confirm(options)`, `dialog.alert(options)`, `dialog.closeAll()`.
+ */
 export const dialog: DialogManager = dialogManager
 
 const DialogManagerContext = createContext<DialogManager | null>(null)
 
-/** 在 `<Dialogs manager>` 底下拿到那個 manager,否則是預設的 `dialog`。 */
+/** `{ dialog }` for the nearest `<Dialogs manager>`, or the default `dialog` outside one. */
 export function useDialog() {
 	const scoped = useContext(DialogManagerContext)
 	return { dialog: scoped ?? dialog }
 }
 
 export type DialogsProps = {
-	/** Pass a manager from `createDialogManager()` to scope this host. 一個 manager 只掛一個 host。 */
+	/** Pass a manager from `createDialogManager()` to scope this host. Mount one host per manager. */
 	manager?: DialogManager
-	/** 包在裡面的 `useDialog()` 拿到的是這個 host 的 manager。 */
+	/** `useDialog()` inside reaches this host's manager. */
 	children?: ReactNode
 	/** Override built-in words for the confirms and alerts this host renders; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<DialogLabels>

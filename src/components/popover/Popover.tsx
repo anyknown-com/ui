@@ -28,51 +28,79 @@ const styles = stylex.create({
 })
 
 export type PopoverProps = {
+	/** Controlled open state. */
 	open?: boolean
+	/** Initial open state when uncontrolled. */
 	defaultOpen?: boolean
+	/** Called when the popover opens or closes (trigger, Escape, outside click, `PopoverClose`). */
 	onOpenChange?: (open: boolean) => void
+	/** Trap focus and make the page behind inert while open. @default false */
 	modal?: boolean
+	/** `PopoverTrigger` and `PopoverContent`. */
 	children: ReactNode
 }
 
+/** A non-modal panel anchored to its trigger. Escape or an outside click closes it; focus returns to the trigger. */
 export function Popover({ children, ...props }: PopoverProps) {
 	return <BasePopover.Root {...props}>{children}</BasePopover.Root>
 }
 
-export type PopoverTriggerProps = { children: ReactElement }
+export type PopoverTriggerProps = {
+	/** The element that toggles the popover, usually a `Button`. */
+	children: ReactElement
+}
 
+/** Makes its child toggle the surrounding `Popover`; it gets `aria-expanded`. */
 export function PopoverTrigger({ children }: PopoverTriggerProps) {
 	return <BasePopover.Trigger render={children} />
 }
 
-export type PopoverTitleProps = { children: ReactNode }
+export type PopoverTitleProps = {
+	/** The heading text. */
+	children: ReactNode
+}
 
+/** The popover's heading; it names the panel (pass `titled` to `PopoverContent`). */
 export const PopoverTitle = ({ children }: PopoverTitleProps) => (
 	<BasePopover.Title {...stylex.props(styles.title)}>{children}</BasePopover.Title>
 )
 
-export type PopoverDescriptionProps = { children: ReactNode }
+export type PopoverDescriptionProps = {
+	/** The description text. */
+	children: ReactNode
+}
 
+/** A muted paragraph that describes the panel. */
 export const PopoverDescription = ({ children }: PopoverDescriptionProps) => (
 	<BasePopover.Description {...stylex.props(styles.description)}>{children}</BasePopover.Description>
 )
 
-export type PopoverCloseProps = { children: ReactElement }
+export type PopoverCloseProps = {
+	/** The element that closes the popover, usually a `Button`. */
+	children: ReactElement
+}
 
+/** Makes its child close the surrounding `Popover`. */
 export const PopoverClose = ({ children }: PopoverCloseProps) => <BasePopover.Close render={children} />
 
 type PopoverContentBase = {
+	/** The side of the trigger it opens on (flips when there is no room). @default "bottom" */
 	side?: "top" | "bottom" | "left" | "right"
+	/** Alignment along that side. @default "center" */
 	align?: "start" | "center" | "end"
+	/** Gap to the trigger in px. @default 8 */
 	sideOffset?: number
+	/** Extra class names for the panel. */
 	className?: string
+	/** The panel's content. */
 	children: ReactNode
 }
 
-/** role="dialog" needs a name: pass `aria-label`, or render a `PopoverTitle` inside. */
+/** role="dialog" needs a name: pass `aria-label`, or render a `PopoverTitle` inside and pass `titled`. */
 export type PopoverContentProps = PopoverContentBase &
 	({ "aria-label": string; titled?: never } | { "aria-label"?: never; titled: true })
 
+/** The floating panel, portalled to `<body>` and positioned against the trigger. */
 export function PopoverContent({
 	side = "bottom",
 	align = "center",

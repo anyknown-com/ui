@@ -242,19 +242,35 @@ const strings = defineStrings({
 /** The Toaster's built-in words (follow `<LocaleProvider>`); override any with `<Toaster labels={…}>`. */
 export type ToastLabels = StringsOf<typeof strings>
 
+/**
+ * What a toast is about; it sets the dot colour, the spoken prefix and the role. `danger` is an
+ * `alert` and waits to be dismissed; the others are polite `status`es.
+ */
 export type ToastType = keyof typeof TONE
 
-export type ToastAction = { label: string; onClick: () => void }
+/** A button on the toast. Pressing it runs `onClick`, then closes the toast. */
+export type ToastAction = {
+	/** The button's text: a verb (「復原」), not 「確定」. */
+	label: string
+	/** Runs before the toast closes. */
+	onClick: () => void
+}
 
 export type ToastOptions = {
+	/** A second, muted line under the title. */
 	description?: string
+	/** One button on the toast; a toast with an action does not time out unless `timeout` is given. */
 	action?: ToastAction
 	/**
-	 * 毫秒;0 = 不自動消失。沒給就用 Toaster 的 `timeout` —— 但有 `action` 或 `danger` 的那則
-	 * 不自動消失(WCAG 2.2.1:鍵盤使用者要 Tab 很久才到得了),要倒數就明確給一個值。
+	 * Milliseconds before it closes on its own; 0 never. Defaults to the Toaster's `timeout`,
+	 * except that a toast with an `action` or of type `danger` waits to be dismissed (WCAG 2.2.1:
+	 * a keyboard user needs time to reach it); give a value to count those down anyway.
 	 */
 	timeout?: number
-	/** 同一個 key 正在顯示時,不疊新的一則:原地更新那則、重新倒數、計數 +1(顯示 ×N)。 */
+	/**
+	 * While a toast with this key is on screen, a new one with the same key updates it in place,
+	 * restarts its timeout and counts up (shown as ×N) instead of stacking.
+	 */
 	key?: string
 	/**
 	 * Called once when this toast closes, whatever closed it: its close or action button, its
@@ -265,13 +281,25 @@ export type ToastOptions = {
 	onAutoClose?: () => void
 }
 
-export type ToastInput = ToastOptions & { title: string; type?: ToastType }
-
-export type ToastUpdate = {
-	title?: string
-	description?: string
+/** Everything `manager.add` takes: the options plus a title and a type. */
+export type ToastInput = ToastOptions & {
+	/** The one line that says what happened. */
+	title: string
+	/** @default "default" */
 	type?: ToastType
+}
+
+/** Fields `toast.update` replaces on a toast on screen; its timeout restarts. */
+export type ToastUpdate = {
+	/** A new title. */
+	title?: string
+	/** A new description. */
+	description?: string
+	/** A new type. */
+	type?: ToastType
+	/** A new action button. */
 	action?: ToastAction
+	/** A new timeout in milliseconds; 0 never. */
 	timeout?: number
 }
 
@@ -288,41 +316,66 @@ export type ToastPromiseMessages<T> = {
 	error: ToastMessage | ((error: unknown) => ToastMessage)
 }
 
+/** One toast in a manager's snapshot. */
 export type ToastRecord = {
+	/** Pass it to `toast.update` / `toast.close`. */
 	id: string
+	/** See `ToastOptions.key`. */
 	key?: string
+	/** The one line that says what happened. */
 	title: string
+	/** The muted second line. */
 	description?: string
+	/** What the toast is about. */
 	type: ToastType
+	/** The toast's button. */
 	action?: ToastAction
+	/** The timeout the caller gave, if any. */
 	timeout?: number
+	/** See `ToastOptions.onClose`. */
 	onClose?: () => void
+	/** See `ToastOptions.onAutoClose`. */
 	onAutoClose?: () => void
-	/** promise 還沒落定;不倒數。 */
+	/** A `toast.promise` toast whose promise has not settled; it does not count down. */
 	loading: boolean
-	/** 同 key 被加了幾次。 */
+	/** How many times a toast with this key was added (shown as ×N above 1). */
 	count: number
-	/** 這一輪倒數的毫秒數,0 = 不倒數。 */
+	/** This round's countdown in milliseconds; 0 = no countdown. */
 	duration: number
-	/** 每重新倒數一次 +1,倒數線靠它重播。 */
+	/** Goes up by one each time the countdown restarts. */
 	epoch: number
-	/** 已經關了、正在淡出;不唸、不能按、不算進 limit,也不再被同 key 更新。 */
+	/** Closed and fading out: hidden from assistive tech, inert, and out of `limit`. */
 	leaving: boolean
 }
 
-export type ToastState = { toasts: readonly ToastRecord[]; paused: boolean }
+/** A toast manager's snapshot. */
+export type ToastState = {
+	/** Newest first, including the ones fading out. */
+	toasts: readonly ToastRecord[]
+	/** Every countdown is paused (hover, focus inside, or a hidden tab). */
+	paused: boolean
+}
 
 type PauseReason = "hover" | "focus" | "hidden"
 
+/** The store behind a `<Toaster>`; `createToastManager()` makes one, `toastManager` is the default. */
 export type ToastManager = {
+	/** Shows a toast and returns its id (the existing id when `key` matches one on screen). */
 	add: (input: ToastInput) => string
+	/** Changes a toast on screen and restarts its countdown. */
 	update: (id: string, patch: ToastUpdate) => void
+	/** Closes one toast; it fades out, and its `onClose` fires. */
 	close: (id: string) => void
 	/** Closes every toast on screen, like `dialog.closeAll()`; each one's `onClose` fires. */
 	closeAll: () => void
-	/** loading 那則不倒數;落定後換成 success / danger 並開始倒數。回傳原本的 promise。 */
+	/**
+	 * Shows `loading` without a countdown, then turns into a `success` or `danger` toast when the
+	 * promise settles and starts counting down. Returns the same promise.
+	 */
 	promise: <T>(promise: Promise<T>, messages: ToastPromiseMessages<T>) => Promise<T>
+	/** For `useSyncExternalStore` / `useStore`. */
 	subscribe: (listener: () => void) => () => void
+	/** The current toasts. */
 	getSnapshot: () => ToastState
 	/** @internal Toaster 用:預設 timeout、limit 與退場毫秒數(reduced motion 時 0)。 */
 	configure: (config: { timeout: number; limit: number; exit?: number }) => void
@@ -346,6 +399,7 @@ type Timer = { handle?: ReturnType<typeof setTimeout>; remaining: number; starte
 
 let seq = 0
 
+/** A separate toast store, for a scoped `<Toaster manager>` (tests, embedded apps). */
 export function createToastManager(): ToastManager {
 	const store = createStore<ToastState>({ toasts: [], paused: false })
 	const config = { timeout: DEFAULT_TIMEOUT, limit: DEFAULT_LIMIT, exit: EXIT_MS }
@@ -512,13 +566,19 @@ function makeApi(getManager: () => ToastManager) {
 	})
 }
 
-/** 只有一個 <Toaster/> 的 app 用這個:直接 import `toast` 就能用,不必穿 context。 */
+/** The default manager, used by `toast` and by a `<Toaster>` without a `manager`. */
 export const toastManager = createToastManager()
 
 const ToastApiContext = createContext<ReturnType<typeof makeApi> | null>(null)
 
+/**
+ * Shows a toast from anywhere, no context needed (apps with one `<Toaster>`):
+ * `toast(title, options)`, `toast.success` / `danger` / `warning` / `info`, `toast.update(id, patch)`,
+ * `toast.close(id)`, `toast.closeAll()` and `toast.promise(promise, messages)`.
+ */
 export const toast = makeApi(() => toastManager)
 
+/** `{ toast }` for the nearest `<Toaster manager>`, or the default `toast` outside one. */
 export function useToast() {
 	const scoped = useContext(ToastApiContext)
 	return { toast: scoped ?? toast }
@@ -532,8 +592,11 @@ const POSITIONS = {
 } as const
 
 export type ToasterProps = {
+	/** The corner the toasts stack in. @default "bottom-right" */
 	position?: keyof typeof POSITIONS
+	/** Default milliseconds before a toast closes on its own. @default 5000 */
 	timeout?: number
+	/** How many toasts show at once; a new one pushes the oldest out. @default 3 */
 	limit?: number
 	/** Pass a manager from `createToastManager()` to scope this viewport. */
 	manager?: ToastManager
@@ -543,6 +606,11 @@ export type ToasterProps = {
 
 const noSubscribe = () => () => {}
 
+/**
+ * The notification region: a polite live region in a corner, portalled to `<body>`. F8 moves
+ * focus into it and Escape hands it back; hover, focus inside or a hidden tab pause every
+ * countdown. Mount one per manager, near the app root.
+ */
 export function Toaster({
 	position = "bottom-right",
 	timeout = DEFAULT_TIMEOUT,

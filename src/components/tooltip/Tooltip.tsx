@@ -38,18 +38,30 @@ const styles = stylex.create({
 
 export type TooltipProviderProps = ComponentProps<typeof BaseTooltip.Provider>
 
+/** Shares the open delay across the tooltips below it, so moving between triggers opens the next at once. */
 export const TooltipProvider = BaseTooltip.Provider
 
 export type TooltipProps = {
+	/** The text; it becomes the trigger's accessible description while shown. Keep it short. */
 	content: ReactNode
+	/** A keyboard shortcut shown after the text, e.g. `<KbdGroup keys={["⌘", "K"]} />`. */
 	shortcut?: ReactNode
+	/** The side of the trigger it shows on (flips when there is no room). @default "top" */
 	side?: "top" | "bottom" | "left" | "right"
+	/** Alignment along that side. @default "center" */
 	align?: "start" | "center" | "end"
+	/** Milliseconds of hover before it shows; 0 under reduced motion. @default 400 */
 	delay?: number
+	/** Render the trigger alone, with no tooltip. @default false */
 	disabled?: boolean
+	/** The trigger: a focusable element, usually a `Button`. */
 	children: ReactElement
 }
 
+/**
+ * A short hint on hover or keyboard focus. Escape or moving away hides it. It describes the
+ * trigger (`aria-describedby`); never put the only name of an icon button here.
+ */
 export function Tooltip({
 	content,
 	shortcut,
