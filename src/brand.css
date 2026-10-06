@@ -133,9 +133,9 @@ body {
 	margin-bottom: 0.25rem;
 }
 .ak-prose a {
-	color: var(--ak-accent);
+	color: var(--ak-link);
 	text-decoration: underline;
-	text-decoration-color: var(--ak-border-strong);
+	text-decoration-color: var(--ak-text-faint);
 	text-underline-offset: 0.15em;
 }
 .ak-prose a:hover {

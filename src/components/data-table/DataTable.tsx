@@ -141,7 +141,7 @@ const styles = stylex.create({
 		color: color.textMuted,
 	},
 	clear: {
-		color: color.accent,
+		color: color.link,
 		cursor: "pointer",
 		textDecorationLine: "underline",
 		textUnderlineOffset: 2,

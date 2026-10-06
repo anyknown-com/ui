@@ -58,7 +58,7 @@ const styles = stylex.create({
 		borderBlockStartColor: color.border,
 		margin: 0,
 	},
-	link: { color: color.accent, textUnderlineOffset: "0.15em" },
+	link: { color: color.link, textDecorationLine: "underline", textUnderlineOffset: "0.15em" },
 	image: { maxWidth: "100%", height: "auto", borderRadius: corner.card },
 	// The table itself must not shrink to fit; the wrapper scrolls instead. A squashed table on a
 	// phone is unreadable, a scrolling one is merely narrow.
