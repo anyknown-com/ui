@@ -41,7 +41,12 @@ const styles = stylex.create({
 		transitionProperty: "background-color, color, box-shadow",
 		whiteSpace: "nowrap",
 	},
-	on: { backgroundColor: color.surfaceRaised, boxShadow: shadow.rest, color: color.text },
+	// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊
+	on: {
+		backgroundColor: color.surfaceRaised,
+		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
+		color: color.text,
+	},
 })
 
 export type SegmentedProps<T extends string> = {

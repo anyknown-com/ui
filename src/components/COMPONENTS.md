@@ -240,7 +240,8 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
   `state.disabled`,寫 `:disabled` 永遠不會命中
 - underline 240ms `cubic-bezier(.16,1,.3,1)`,兩邊各自單調往目標走,**無倒退無過衝**
 - pills:軌道是凹下去的 `surface`(`corner.control`,不加框),選中的那格是浮起來的一張紙
-  (`surfaceRaised` + `shadow.rest`)在 tab 底下滑。內層圓角 = 12 − 內距 4 = 8
+  (`surfaceRaised` + `shadow.rest`)在 tab 底下滑。內層圓角 = 12 − 內距 4 = 8。白紙對軌道
+  只有 1.09:1,所以那張紙外圈再一條 1px `borderControl` 環(3:1 以上),選中的是哪格才看得出來
 - indicator 位置不自己量:Base UI 的 `Tabs.Indicator` 本來就把 `--active-tab-*` 寫成
   inline style,藥丸的 `width` / `height` / `translate` 直接吃那些變數
 - 走過的彎路:底線的「鬆緊彈性」(雙彈簧 + 拉伸下垂)——「太誇張了」;
@@ -587,7 +588,8 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 
 - `IconButton` 是正圓(`corner.pill`),按下去 0.98,focus 環是 `focusRing`
 - `Segmented` 跟 pills tabs 同一個語言:凹下去的 `surface` 軌道(`corner.control`,不加框),
-  選中的那格是 `surfaceRaised` + `shadow.rest` 的一張紙。在 grid 裡也只包住自己的選項
+  選中的那格是 `surfaceRaised` + `shadow.rest` 的一張紙,外圈 1px `borderControl` 環(跟 pills
+  tabs 一樣,對軌道 3:1 以上)。在 grid 裡也只包住自己的選項
 - `StatusChip` 的 `a`(執行中)與 `Pill` 的 `live` 點用 `signal`:那是 agent 正在做事
 
 ### group / page / settings-rows / table

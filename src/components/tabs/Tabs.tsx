@@ -70,7 +70,8 @@ const styles = stylex.create({
 		// 內層圓角 = 軌道 12 − 內距 4
 		borderRadius: radius.md,
 		backgroundColor: color.surfaceRaised,
-		boxShadow: shadow.rest,
+		// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊
+		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
 		pointerEvents: "none",
 		transitionProperty: "translate, width",
 		transitionDuration: { default: "240ms", [REDUCED]: "0s" },

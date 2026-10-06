@@ -97,7 +97,7 @@ dialog 的 backdrop 用黑色 32% 不加 blur。`backdrop-filter` 是 DESIGN.md 
 - 按鈕：膠囊。高度 32 / 40 / 48,預設 40(觸控)。primary 墨色實心;secondary 是凹下去的 `accentSubtle` 底、無框;ghost 透明，hover 才有底;danger 是 `dangerSolid` 底配 `onDangerSolid` 字，只給不可復原的刪除。按下時 `scale: 0.98`,120ms ease-out,reduced-motion 時不縮。
 - 輸入框:`surface` 底 + 1px `borderControl` 框(邊界對底色要 3:1 才看得到;`border` 只有 1.2:1,只能當分隔線)。focus 時框換 `signal` 加 2px 環。
 - checkbox / radio / switch:未選是 `borderControl` 框,switch 關的軌道也是;選中是墨色實心。switch 是膠囊軌道 + 白色圓鈕，鈕有 rest 陰影。
-- tabs / segmented:選中的那格是浮起來的白紙(rest 陰影)放在凹下去的 `surface` 軌道上。
+- tabs / segmented:選中的那格是浮起來的白紙(rest 陰影)放在凹下去的 `surface` 軌道上,外圈一條 1px `borderControl` 環。白紙對軌道只有 1.09:1,選中與否要靠這條環的 3:1 才分得出來。
 
 ## 字
 
