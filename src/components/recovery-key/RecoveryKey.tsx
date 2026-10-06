@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { CheckGlyph, Glyph } from "../icon/glyphs"
 
@@ -27,7 +27,7 @@ const styles = stylex.create({
 		borderRadius: corner.small,
 		padding: space.md,
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 		"--ak-key-blur": { default: "blur(7px)", ":hover": "none", ":focus-visible": "none" },
 		"--ak-veil-opacity": { default: "1", ":hover": "0", ":focus-visible": "0" },
@@ -58,7 +58,7 @@ const styles = stylex.create({
 		color: color.text,
 		filter: "var(--ak-key-blur)",
 		transitionProperty: "filter",
-		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
 	},
 	veil: {
 		position: "absolute",
@@ -89,7 +89,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 	},
 	copied: { color: color.success },
