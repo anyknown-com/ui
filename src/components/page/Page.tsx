@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, corner, font, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 
 /**
  * The words around the rows: the page's one line (`.page-h`), the label a section wears
@@ -225,22 +226,36 @@ export function StatBar({ percent, label, text }: StatBarProps) {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": { range: (from: string, to: string) => `${from} 到 ${to}` },
+	en: { range: (from: string, to: string) => `${from} to ${to}` },
+})
+
+/** Bars' built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type PageLabels = StringsOf<typeof strings>
+
 export type BarsProps = {
+	/** One value a day, oldest first; bars are scaled to the largest. */
 	values: number[]
-	/** What a bar says when the pointer is on it. */
+	/** What a bar says when the pointer is on it (and to a screen reader). */
 	tip: (value: number, index: number) => string
+	/** The first day's name, under the first bar. */
 	from: string
+	/** The last day's name, under the last bar. */
 	to: string
+	/** Override built-in words for this chart; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<PageLabels>
 	sx?: stylex.StyleXStyles
 }
 
 /** `.bars` + `.bx`: one bar a day, the first and last day named under them. */
-export function Bars({ values, tip, from, to, sx }: BarsProps) {
+export function Bars({ values, tip, from, to, labels, sx }: BarsProps) {
+	const t = useStrings(strings, labels)
 	const max = Math.max(1, ...values)
 
 	return (
 		<div {...stylex.props(sx)}>
-			<div {...stylex.props(styles.bars)} aria-label={`${from} – ${to}`}>
+			<div role="group" aria-label={t.range(from, to)} {...stylex.props(styles.bars)}>
 				{values.map((value, index) => (
 					<i
 						// oxlint-disable-next-line react/no-array-index-key -- one bar a day, in order
