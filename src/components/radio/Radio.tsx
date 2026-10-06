@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
 import { styled } from "../../lib/styled"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 import { useRadioGroup } from "./RadioGroup"
 
@@ -20,7 +20,7 @@ const styles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: color.border,
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		paddingBlock: space.sm,
 		paddingInline: space.sm,
 		transitionProperty: "border-color, background-color",
@@ -39,19 +39,20 @@ const styles = stylex.create({
 		borderWidth: 1.5,
 		borderStyle: "solid",
 		borderColor: color.borderStrong,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.bg,
-		transitionProperty: "border-color",
+		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":has(:focus-visible)": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
-	dotOn: { borderColor: color.accent },
+	// 選中是墨色實心,中間一顆 accentText 的點(跟 checkbox 的勾同一個配色)
+	dotOn: { borderColor: color.accent, backgroundColor: color.accent },
 	fill: {
-		width: "0.55rem",
-		height: "0.55rem",
-		borderRadius: radius.full,
-		backgroundColor: color.accent,
+		width: "0.4rem",
+		height: "0.4rem",
+		borderRadius: corner.pill,
+		backgroundColor: color.accentText,
 		scale: "0",
 		transitionProperty: "scale",
 		transitionDuration: { default: "160ms", [REDUCED]: "0s" },

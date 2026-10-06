@@ -3,7 +3,7 @@ import { type ComponentProps, type ReactNode, useCallback, useId } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type StyleArg, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -30,7 +30,7 @@ const styles = stylex.create({
 		borderWidth: 1.5,
 		borderStyle: "solid",
 		borderColor: color.borderStrong,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		backgroundColor: color.bg,
 		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },

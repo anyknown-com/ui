@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useId, useRef, useState } from "react"
 import type { StyleArg } from "../../lib/styled"
-import { color, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const ARROW_FRACTION = 0.05
@@ -12,7 +12,7 @@ const styles = stylex.create({
 	control: {
 		position: "relative",
 		height: "1.5rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.layer4,
 		cursor: "pointer",
 		touchAction: "none",
@@ -24,16 +24,16 @@ const styles = stylex.create({
 		position: "absolute",
 		insetInlineStart: 0,
 		insetBlock: 0,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.borderStrong,
 	},
 	thumb: {
 		position: "absolute",
 		insetBlock: "0.2rem",
 		width: "1.6rem",
-		borderRadius: radius.md,
+		borderRadius: corner.pill,
 		backgroundColor: color.surfaceRaised,
-		boxShadow: shadow.raised,
+		boxShadow: shadow.rest,
 		transitionProperty: "inset-inline-start",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,

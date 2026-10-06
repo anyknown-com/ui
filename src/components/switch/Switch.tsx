@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -25,7 +25,7 @@ const styles = stylex.create({
 		width: "2.75rem",
 		height: "1.4rem",
 		marginTop: "0.1rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.borderStrong,
 		transitionProperty: "background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -39,8 +39,9 @@ const styles = stylex.create({
 		insetInlineStart: 2,
 		width: "calc(1.4rem - 4px)",
 		height: "calc(1.4rem - 4px)",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: "#FFFFFF",
+		boxShadow: shadow.rest,
 		translate: "0 0",
 		transitionProperty: "translate, background-color",
 		transitionDuration: { default: "180ms", [REDUCED]: "0s" },
