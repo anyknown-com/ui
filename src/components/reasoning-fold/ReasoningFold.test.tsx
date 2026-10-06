@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { ReasoningFold } from "./ReasoningFold"
 
 describe("ReasoningFold", () => {
@@ -135,6 +136,27 @@ describe("ReasoningFold open state", () => {
 		expect(row).toHaveAttribute("aria-expanded", "true")
 		await userEvent.keyboard(" ")
 		expect(row).toHaveAttribute("aria-expanded", "false")
+	})
+})
+
+describe("ReasoningFold axe", () => {
+	test("streaming (open)", async () => {
+		const { container } = render(<ReasoningFold streaming>推理內容</ReasoningFold>)
+		await expectNoAxeViolations(container)
+	})
+
+	test("done, collapsed", async () => {
+		const { container } = render(<ReasoningFold durationSec={12}>推理內容</ReasoningFold>)
+		await expectNoAxeViolations(container)
+	})
+
+	test("done, open", async () => {
+		const { container } = render(
+			<ReasoningFold durationSec={12} defaultOpen>
+				推理內容
+			</ReasoningFold>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
 
