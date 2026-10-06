@@ -37,11 +37,16 @@ const styles = stylex.create({
 })
 
 export type LiveDotProps = {
-	/** 有 label 就變成 `role="status"`,讀屏聽得到「還在跑」。沒有就只是一顆裝飾。 */
+	/**
+	 * With a label the dot becomes a `role="status"` region that reads the label ("still
+	 * running"); without one it is decoration, hidden from screen readers.
+	 */
 	label?: string
+	/** Extra StyleX styles for the outer element. */
 	sx?: StyleArg
 }
 
+/** A breathing signal-blue dot: the agent is working. */
 export function LiveDot({ label, sx }: LiveDotProps) {
 	if (label == null) return <span aria-hidden="true" {...stylex.props(styles.dot, sx)} />
 	return (
