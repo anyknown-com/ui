@@ -65,7 +65,7 @@ function fitHeight(area: HTMLTextAreaElement, sizing: Sizing, maxRows: number | 
  * Grows the textarea where `field-sizing: content` is missing. Returns the
  * cleanup, or nothing when CSS already does the job.
  */
-function autoGrow(area: HTMLTextAreaElement, maxRows: number | undefined) {
+export function autoGrow(area: HTMLTextAreaElement, maxRows: number | undefined) {
 	if (typeof CSS !== "undefined" && CSS.supports("field-sizing", "content")) return
 	const fonts = document.fonts as FontFaceSet | undefined
 	// 字型還在載入時量出來的寬是 fallback 字型的,Pretext 會把它快取住;先用

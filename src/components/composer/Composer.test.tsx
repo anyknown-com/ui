@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test, vi } from "vitest"
+import { afterEach, describe, expect, test, vi } from "vitest"
 import { Composer, type SourceRef } from "./Composer"
 
 const SOURCES: SourceRef[] = [
@@ -202,5 +202,24 @@ describe("Composer regressions", () => {
 		render(<Composer onSubmit={() => {}} sources={async () => Promise.reject(new Error("offline"))} />)
 		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "@x")
 		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+	})
+})
+
+describe("Composer autoGrow", () => {
+	afterEach(() => vi.restoreAllMocks())
+
+	test("without field-sizing it sizes like Textarea, and shrinks back after sending", async () => {
+		let scrollHeight = 24
+		vi.spyOn(CSS, "supports").mockReturnValue(false)
+		vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(() => scrollHeight)
+		render(<Composer onSubmit={() => {}} />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		expect(box.style.height).toBe("24px")
+		scrollHeight = 72
+		await userEvent.type(box, "一{Shift>}{Enter}{/Shift}二{Shift>}{Enter}{/Shift}三")
+		expect(box.style.height).toBe("72px")
+		scrollHeight = 24
+		await userEvent.type(box, "{Enter}")
+		expect(box.style.height).toBe("24px")
 	})
 })

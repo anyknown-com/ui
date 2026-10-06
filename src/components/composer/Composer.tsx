@@ -1,16 +1,10 @@
 import * as stylex from "@stylexjs/stylex"
-import {
-	type KeyboardEvent,
-	type ReactNode,
-	useEffect,
-	useId,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react"
+import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useState } from "react"
+import { flushSync } from "react-dom"
 import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
 import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { autoGrow } from "../textarea/Textarea"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -258,48 +252,49 @@ export function Composer({
 	const [rawActive, setActive] = useState(0)
 	const [picked, setPicked] = useState<SourceRef[]>([])
 	const [dismissed, setDismissed] = useState(false)
-	const pendingCaret = useRef<number | null>(null)
-	const latestSources = useRef(sources)
+	// The @ query the last source lookup was for, and a counter that retires stale answers.
+	const lookup = useRef<{ query: string | null; id: number }>({ query: null, id: 0 })
 
-	// Held in a ref so an inline `sources` prop doesn't refetch on every parent
-	// render; assigned in an effect that is declared before the fetch below, so
-	// it is already current when that one runs.
-	useEffect(() => {
-		latestSources.current = sources
-	})
+	// Same growth as Textarea autoGrow: field-sizing, else Pretext, else scrollHeight.
+	// Clearing the value on submit fires no input event, so a new value re-attaches.
+	const attach = useCallback(
+		(area: HTMLTextAreaElement | null) => {
+			textarea.current = area
+			const cleanup = area ? autoGrow(area, undefined) : undefined
+			return () => {
+				cleanup?.()
+				textarea.current = null
+			}
+		},
+		// oxlint-disable-next-line react-hooks/exhaustive-deps, react/memo-dependencies -- value / placeholder re-measure
+		[value, placeholder],
+	)
 
-	// The caret lives in state so the @/-slash mode can be derived from it, but
-	// the DOM caret has to be moved explicitly or the browser parks it at the end.
-	useLayoutEffect(() => {
-		if (pendingCaret.current == null) return
-		textarea.current?.setSelectionRange(pendingCaret.current, pendingCaret.current)
-		pendingCaret.current = null
-	})
+	/** Moves text and caret together, and asks `sources` when the @ query changed. */
+	function track(next: string, position: number) {
+		setValue(next)
+		setCaret(position)
+		const query = AT_PATTERN.exec(next.slice(0, position))?.[2] ?? null
+		if (query === lookup.current.query) return
+		lookup.current.query = query
+		const id = ++lookup.current.id
+		if (query == null || sources == null) return
+		sources(query)
+			.then((result) => {
+				if (lookup.current.id !== id) return
+				setItems(result)
+				setActive(0)
+			})
+			.catch(() => {
+				if (lookup.current.id === id) setItems([])
+			})
+	}
 
 	const before = value.slice(0, caret)
 	const atMatch = AT_PATTERN.exec(before)
 	const slashMatch = SLASH_PATTERN.exec(before)
 	const mode = atMatch ? "sources" : slashMatch ? "commands" : null
 	const query = atMatch?.[2] ?? slashMatch?.[1] ?? ""
-
-	useEffect(() => {
-		if (mode !== "sources" || latestSources.current == null) return
-		let cancelled = false
-		latestSources
-			.current(query)
-			.then((result) => {
-				if (!cancelled) {
-					setItems(result)
-					setActive(0)
-				}
-			})
-			.catch(() => {
-				if (!cancelled) setItems([])
-			})
-		return () => {
-			cancelled = true
-		}
-	}, [mode, query])
 
 	const options: SourceRef[] =
 		mode === "commands"
@@ -314,10 +309,11 @@ export function Composer({
 	const active = options.length === 0 ? 0 : Math.min(rawActive, options.length - 1)
 	const canSend = value.trim().length > 0
 
+	// The caret lives in state so the @/-slash mode can be derived from it, but the DOM
+	// caret has to be moved explicitly or the browser parks it at the end: commit first.
 	function moveCaret(next: string, position: number) {
-		setValue(next)
-		setCaret(position)
-		pendingCaret.current = position
+		flushSync(() => track(next, position))
+		textarea.current?.setSelectionRange(position, position)
 	}
 
 	function complete(option: SourceRef) {
@@ -339,9 +335,8 @@ export function Composer({
 			value,
 			picked.filter((ref) => value.includes(`@${ref.label}`)),
 		)
-		setValue("")
+		track("", 0)
 		setPicked([])
-		setCaret(0)
 		setDismissed(false)
 	}
 
@@ -409,7 +404,7 @@ export function Composer({
 				</div>
 			)}
 			<textarea
-				ref={textarea}
+				ref={attach}
 				rows={1}
 				aria-label={label}
 				role={suggestible ? "combobox" : undefined}
@@ -421,12 +416,12 @@ export function Composer({
 				placeholder={placeholder}
 				value={value}
 				onChange={(event) => {
-					setValue(event.currentTarget.value)
-					setCaret(event.currentTarget.selectionStart ?? event.currentTarget.value.length)
+					const area = event.currentTarget
+					track(area.value, area.selectionStart ?? area.value.length)
 					setDismissed(false)
 				}}
-				onKeyUp={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}
-				onClick={(event) => setCaret(event.currentTarget.selectionStart ?? 0)}
+				onKeyUp={(event) => track(event.currentTarget.value, event.currentTarget.selectionStart ?? 0)}
+				onClick={(event) => track(event.currentTarget.value, event.currentTarget.selectionStart ?? 0)}
 				onKeyDown={onKeyDown}
 				{...stylex.props(reset.control, styles.textarea)}
 			/>
