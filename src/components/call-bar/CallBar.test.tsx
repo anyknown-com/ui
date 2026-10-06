@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { CallBar } from "./CallBar"
 
 describe("CallBar", () => {
@@ -52,5 +53,23 @@ describe("CallBar", () => {
 		expect(screen.getByText("On a call")).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Hang up" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "靜音" })).toBeInTheDocument()
+	})
+
+	test("follow the LocaleProvider; labels still win", () => {
+		render(
+			<LocaleProvider locale="en">
+				<CallBar
+					status="thinking"
+					seconds={0}
+					muted
+					onMute={() => {}}
+					onHangUp={() => {}}
+					labels={{ hangUp: "End call" }}
+				/>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("group", { name: "Call" })).toHaveTextContent("Muted")
+		expect(screen.getByRole("button", { name: "Unmute" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "End call" })).toBeInTheDocument()
 	})
 })

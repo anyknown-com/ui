@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, corner, font, type } from "../../tokens.stylex"
 import { formatClock } from "../../lib/format"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { IconButton } from "../icon-button/IconButton"
 import { MicGlyph, MicOffGlyph, PhoneOffGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
@@ -21,22 +22,42 @@ export type CallStatus =
 	| "speaking"
 	| "interrupted"
 
-export type CallBarLabels = Record<CallStatus | "muted" | "call" | "mute" | "unmute" | "hangUp", string>
+const strings = defineStrings({
+	"zh-TW": {
+		listening: "通話中",
+		"user-speaking": "你在說話",
+		transcribing: "聽寫中",
+		holding: "等你說完",
+		thinking: "思考中",
+		speaking: "回話中",
+		interrupted: "先停一下",
+		muted: "已靜音",
+		call: "通話",
+		mute: "靜音",
+		unmute: "取消靜音",
+		hangUp: "掛斷",
+	},
+	en: {
+		listening: "On a call",
+		"user-speaking": "You're speaking",
+		transcribing: "Transcribing",
+		holding: "Waiting for you to finish",
+		thinking: "Thinking",
+		speaking: "Replying",
+		interrupted: "Paused",
+		muted: "Muted",
+		call: "Call",
+		mute: "Mute",
+		unmute: "Unmute",
+		hangUp: "Hang up",
+	},
+})
 
-const LABELS: CallBarLabels = {
-	listening: "通話中",
-	"user-speaking": "你在說話",
-	transcribing: "聽寫中",
-	holding: "等你說完",
-	thinking: "思考中",
-	speaking: "回話中",
-	interrupted: "先停一下",
-	muted: "已靜音",
-	call: "通話",
-	mute: "靜音",
-	unmute: "取消靜音",
-	hangUp: "掛斷",
-}
+/**
+ * The CallBar's built-in words (follow `<LocaleProvider>`): one per `CallStatus`, plus `muted`,
+ * the group name `call`, and the button names `mute`, `unmute` and `hangUp`.
+ */
+export type CallBarLabels = StringsOf<typeof strings>
 
 const styles = stylex.create({
 	// 取代 chatbox 的位置,所以跟 Composer 同一張凹下去的 surface 紙
@@ -66,20 +87,25 @@ const styles = stylex.create({
 })
 
 export type CallBarProps = {
+	/** What the call is doing now; shown as text next to the dot. */
 	status: CallStatus
 	/** How long the call has run. */
 	seconds: number
+	/** The mic is muted: the text reads `muted` and the mute button shows the crossed-out mic. */
 	muted: boolean
 	/** Asked to mute (`true`) or unmute (`false`). */
 	onMute: (muted: boolean) => void
+	/** Called when the hang-up button is pressed. */
 	onHangUp: () => void
-	/** The words, for another language. Muted wins over the status. */
+	/** Override built-in words for this bar; the rest follow `<LocaleProvider>`. Muted wins over the status. */
 	labels?: Partial<CallBarLabels>
+	/** Extra StyleX styles for the bar. */
 	sx?: stylex.StyleXStyles
 }
 
+/** The voice-call bar that stands in for the Composer while a call runs. */
 export function CallBar({ status, seconds, muted, onMute, onHangUp, labels, sx }: CallBarProps) {
-	const words = { ...LABELS, ...labels }
+	const words = useStrings(strings, labels)
 	const Glyph = muted ? MicOffGlyph : MicGlyph
 
 	return (
