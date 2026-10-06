@@ -11,6 +11,7 @@ import {
 	DialogActions,
 	DialogClose,
 	DialogContent,
+	type ConfirmOptions,
 	type DialogHandle,
 	dialogManager,
 	Dialogs,
@@ -271,8 +272,8 @@ describe("dialog store", () => {
 	test("confirm needs a confirmLabel; it labels the button", async () => {
 		render(<Dialogs />)
 		// @ts-expect-error confirmLabel has no default
-		const check = () => dialogManager.confirm({ title: "封存 thread?" })
-		expect(check).toBeTypeOf("function")
+		const missing: ConfirmOptions = { title: "封存 thread?" }
+		expect(missing).not.toHaveProperty("confirmLabel")
 		let answer: Promise<boolean> = Promise.resolve(false)
 		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?", confirmLabel: "封存 thread" })))
 		await userEvent.click(await screen.findByRole("button", { name: "封存 thread" }))
