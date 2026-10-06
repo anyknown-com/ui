@@ -2,7 +2,7 @@ import { Menu } from "@base-ui/react/menu"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 import { popupStyles } from "../../lib/popup"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -19,7 +19,7 @@ const styles = stylex.create({
 		paddingBlock: "0.42rem",
 		paddingInline: space.xs,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.text,
 		cursor: "pointer",
 		outline: "none",
@@ -44,9 +44,9 @@ const styles = stylex.create({
 	arrow: { marginInlineStart: "auto", color: color.textFaint, display: "flex" },
 	tick: { width: "0.9rem", flex: "none", color: color.accent, display: "flex", justifyContent: "center" },
 	groupLabel: {
-		fontSize: text.xs,
+		fontSize: type.t1,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.textMuted,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,

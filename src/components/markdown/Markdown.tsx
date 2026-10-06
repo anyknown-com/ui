@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Marked, type Token, type Tokens } from "marked"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, space, text, type } from "../../tokens.stylex"
+import { color, corner, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { CodeBlock, InlineCode } from "../code-block/CodeBlock"
 import { Formula } from "./Formula"
@@ -31,12 +31,12 @@ const styles = stylex.create({
 		minWidth: 0,
 	},
 	p: { margin: 0, lineHeight: type.body },
-	heading: { margin: 0, lineHeight: text.leadingSnug, fontWeight: 600 },
-	h1: { fontSize: text.lg },
+	heading: { margin: 0, lineHeight: type.snug, fontWeight: 600 },
+	h1: { fontSize: type.t4 },
 	// h2 and below are body-sized and carry their weight instead: these are headings inside one
 	// chat message, not a page outline, and a message that shouts three sizes at you reads worse.
-	h2: { fontSize: text.base },
-	h3: { fontSize: text.base },
+	h2: { fontSize: type.t3 },
+	h3: { fontSize: type.t3 },
 	list: { margin: 0, paddingInlineStart: "1.5em", display: "grid", gap: space.xxs },
 	item: { lineHeight: type.body },
 	// The item's own text follows it on the same line, so the box must not take the whole row.

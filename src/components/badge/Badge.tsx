@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
-import { color, corner, font, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 
 const styles = stylex.create({
@@ -10,7 +10,7 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xxs,
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		fontWeight: 500,
 		lineHeight: 1,
 		paddingBlock: space.xxs,

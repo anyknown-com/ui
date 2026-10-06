@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react"
-import { color, corner, font, motion, shadow, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 import { Checkbox } from "../checkbox/Checkbox"
 import { Radio } from "../radio/Radio"
@@ -29,7 +29,7 @@ const styles = stylex.create({
 	head: { display: "flex", alignItems: "center", gap: space.xs },
 	headIconWarning: { flex: "none", color: color.warning },
 	headIconAccent: { flex: "none", color: color.accent },
-	verb: { fontSize: text.sm, fontWeight: 500, lineHeight: text.leadingSnug, color: color.text },
+	verb: { fontSize: type.t2, fontWeight: 500, lineHeight: type.snug, color: color.text },
 	state: {
 		marginInlineStart: "auto",
 		fontFamily: font.mono,
@@ -47,7 +47,7 @@ const styles = stylex.create({
 	mono: {
 		fontFamily: font.mono,
 		fontSize: type.t2,
-		lineHeight: text.leadingNormal,
+		lineHeight: type.snug,
 		backgroundColor: color.surface,
 		borderRadius: corner.small,
 		paddingBlock: space.xs,
@@ -79,11 +79,11 @@ const styles = stylex.create({
 	question: {
 		fontSize: type.t3,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		margin: 0,
 		color: color.text,
 	},
-	markdown: { fontSize: text.sm, lineHeight: text.leadingRelaxed, margin: 0, color: color.textMuted },
+	markdown: { fontSize: type.t2, lineHeight: type.body, margin: 0, color: color.textMuted },
 	options: {
 		display: "grid",
 		gap: space.xxs,
@@ -128,7 +128,7 @@ const styles = stylex.create({
 		borderRadius: corner.control,
 		color: color.text,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
 		resize: "vertical",
@@ -143,7 +143,7 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.textMuted,
 		margin: 0,
 	},

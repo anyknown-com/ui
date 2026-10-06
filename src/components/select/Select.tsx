@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
-import { breakpoint, color, corner, font, space, text, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 
 export type SelectItemProps = {
@@ -81,7 +81,7 @@ const styles = stylex.create({
 		borderRadius: corner.small,
 		paddingBlock: "0.1rem",
 		paddingInline: space.xxs,
-		fontSize: text.xs,
+		fontSize: type.t1,
 	},
 	chipRemove: {
 		cursor: "pointer",
@@ -105,7 +105,7 @@ const styles = stylex.create({
 	searchInput: {
 		flex: 1,
 		fontFamily: font.body,
-		fontSize: { default: text.sm, [breakpoint.phone]: text.base },
+		fontSize: { default: type.t2, [breakpoint.phone]: type.phoneInput },
 		color: color.text,
 		// 打開就落在這裡,閃動的游標就是焦點;UA 的框會把搜尋列框成第二個輸入框
 		outline: "none",
@@ -123,9 +123,9 @@ const styles = stylex.create({
 	},
 	list: { maxHeight: "14rem", overflowY: "auto", padding: space.xxs, margin: 0 },
 	groupLabel: {
-		fontSize: text.xs,
+		fontSize: type.t1,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.textMuted,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
@@ -138,7 +138,7 @@ const styles = stylex.create({
 		borderRadius: corner.control,
 		paddingBlock: "0.42rem",
 		paddingInline: space.xs,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		cursor: "pointer",
 		outline: "none",
 		userSelect: "none",
@@ -156,7 +156,7 @@ const styles = stylex.create({
 		// Empty 一直都在 DOM 裡;有結果時它是空的,不能留一段 padding
 		paddingBlock: { default: space.md, ":empty": 0 },
 		paddingInline: space.sm,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		color: color.textMuted,
 		textAlign: "center",
 	},

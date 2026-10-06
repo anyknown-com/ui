@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
 import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -40,7 +40,7 @@ const styles = stylex.create({
 		borderBottomStyle: "solid",
 		borderBottomColor: color.border,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.text,
 		cursor: "default",
 		userSelect: "none",
@@ -72,7 +72,7 @@ const styles = stylex.create({
 	},
 	size: {
 		fontFamily: font.mono,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		lineHeight: 1,
 		fontVariantNumeric: "tabular-nums",
 		color: color.textMuted,
@@ -81,7 +81,7 @@ const styles = stylex.create({
 		gridRow: { default: "auto", [NARROW]: "2" },
 	},
 	mtime: {
-		fontSize: text.xs,
+		fontSize: type.t1,
 		color: color.textMuted,
 		gridColumn: { default: "auto", [NARROW]: "4" },
 		gridRow: { default: "auto", [NARROW]: "2" },
@@ -107,7 +107,7 @@ const styles = stylex.create({
 	},
 	count: {
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		color: color.textMuted,
 		margin: 0,
 		marginTop: space.xxs,
@@ -118,7 +118,7 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		fontSize: text.xs,
+		fontSize: type.t1,
 	},
 	track: {
 		flex: 1,

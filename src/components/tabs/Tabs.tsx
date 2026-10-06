@@ -2,7 +2,7 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, createContext, useContext } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, ink, motion, radius, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, ink, motion, radius, shadow, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -30,9 +30,9 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": ink.n6 },
 		borderWidth: 0,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
@@ -81,7 +81,7 @@ const styles = stylex.create({
 	},
 	panel: {
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.textMuted,
 		paddingBlock: space.xxs,
 		borderRadius: radius.sm,

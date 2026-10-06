@@ -3,7 +3,7 @@ import { type ReactNode, useId, useState } from "react"
 import { reset } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
-import { color, corner, font, ink, shadow, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, ink, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -39,8 +39,8 @@ const styles = stylex.create({
 		paddingBlock: space.sm,
 		paddingInline: space.md,
 		fontFamily: font.body,
-		fontSize: text.sm,
-		lineHeight: text.leadingSnug,
+		fontSize: type.t2,
+		lineHeight: type.snug,
 		color: color.text,
 		textAlign: "start",
 		cursor: "pointer",
@@ -143,8 +143,8 @@ const styles = stylex.create({
 	io: {
 		margin: 0,
 		fontFamily: font.mono,
-		fontSize: text.code,
-		lineHeight: text.leadingNormal,
+		fontSize: type.code,
+		lineHeight: type.snug,
 		backgroundColor: color.surface,
 		borderRadius: corner.small,
 		paddingBlock: space.xs,
@@ -203,7 +203,7 @@ const styles = stylex.create({
 	chip: {
 		fontFamily: font.mono,
 		fontSize: type.t1,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.textMuted,
 		backgroundColor: color.surface,
 		borderRadius: corner.pill,

@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { press, type StyleArg, styled } from "../../lib/styled"
-import { color, corner, font, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -12,9 +12,9 @@ const styles = stylex.create({
 		justifyContent: "center",
 		gap: space.xs,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		fontWeight: 500,
-		lineHeight: text.leadingTight,
+		lineHeight: type.dense,
 		borderRadius: corner.pill,
 		borderWidth: 0,
 		backgroundColor: "transparent",
@@ -29,7 +29,7 @@ const styles = stylex.create({
 		paddingBlock: space.xs,
 		paddingInline: space.lg,
 		minHeight: "3rem",
-		fontSize: text.base,
+		fontSize: type.t3,
 	},
 	md: {
 		paddingBlock: space.xs,
@@ -46,7 +46,7 @@ const styles = stylex.create({
 		paddingBlock: 0,
 		paddingInline: space.xs,
 		minHeight: "1.75rem",
-		fontSize: text.xs,
+		fontSize: type.t1,
 		gap: space.xxs,
 	},
 	// 圖示鈕:正圓,直徑跟著該階的高,沒有左右內距

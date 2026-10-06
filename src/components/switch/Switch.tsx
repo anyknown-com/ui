@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -49,8 +49,8 @@ const styles = stylex.create({
 	},
 	// 軌道 2.75rem − 鈕 (1.4rem − 4px) − 2px 的邊 = 1.35rem + 2px
 	thumbOn: { insetInlineStart: "calc(1.35rem + 2px)", backgroundColor: color.accentText },
-	labelText: { display: "block", fontWeight: 500, fontSize: text.sm, color: color.text },
-	description: { display: "block", fontSize: text.xs, color: color.textMuted },
+	labelText: { display: "block", fontWeight: 500, fontSize: type.t2, color: color.text },
+	description: { display: "block", fontSize: type.t1, color: color.textMuted },
 })
 
 export type SwitchProps = Omit<ComponentProps<"input">, "type" | "role" | "children"> & {

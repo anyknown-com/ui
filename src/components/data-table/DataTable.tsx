@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -29,7 +29,7 @@ const styles = stylex.create({
 		borderRadius: corner.control,
 		color: color.text,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		paddingBlock: space.xxs,
 		paddingInlineStart: space.xl,
 		paddingInlineEnd: space.xs,
@@ -62,7 +62,7 @@ const styles = stylex.create({
 		borderCollapse: "separate",
 		borderSpacing: 0,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 	},
 	th: {
 		position: "sticky",
@@ -121,13 +121,13 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	tdCheck: { width: "2rem" },
-	mono: { fontFamily: font.mono, fontSize: text.xs, color: color.textMuted, whiteSpace: "nowrap" },
+	mono: { fontFamily: font.mono, fontSize: type.t1, color: color.textMuted, whiteSpace: "nowrap" },
 	editable: { cursor: "text" },
 	empty: { color: color.textFaint },
 	cellInput: {
 		width: "100%",
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		boxShadow: `inset 0 0 0 2px ${color.focusRing}`,
 		borderRadius: corner.small,
 		paddingInline: "0.2rem",

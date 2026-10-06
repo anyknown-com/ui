@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useEffect, useId, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
-import { color, corner, motion, space, text, type } from "../../tokens.stylex"
+import { color, corner, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -20,7 +20,7 @@ const styles = stylex.create({
 		height: 32,
 		paddingInline: space.sm,
 		fontSize: type.t2,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: color.surface, ":hover": color.accentSubtle },
 		cursor: "pointer",
@@ -49,7 +49,7 @@ const styles = stylex.create({
 		borderInlineStartColor: color.border,
 		marginInlineStart: `calc(${space.sm} + 6px)`,
 		fontSize: type.t2,
-		lineHeight: text.leadingRelaxed,
+		lineHeight: type.body,
 		fontStyle: "italic",
 		color: color.textMuted,
 	},

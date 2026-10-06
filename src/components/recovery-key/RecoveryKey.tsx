@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, shadow, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { Glyph } from "../icon/glyphs"
 
@@ -18,7 +18,7 @@ const styles = stylex.create({
 		gap: space.sm,
 		fontFamily: font.body,
 	},
-	intro: { margin: 0, fontSize: text.xs, color: color.textMuted },
+	intro: { margin: 0, fontSize: type.t1, color: color.textMuted },
 	keyBox: {
 		position: "relative",
 		// 卡片裡凹下去的一塊,不加框
@@ -49,9 +49,9 @@ const styles = stylex.create({
 		gap: `${space.xxs} ${space.xs}`,
 		justifyContent: "center",
 		fontFamily: font.mono,
-		fontSize: text.base,
+		fontSize: type.t3,
 		fontWeight: 500,
-		lineHeight: text.leadingRelaxed,
+		lineHeight: type.body,
 		letterSpacing: "0.06em",
 		userSelect: "all",
 		color: color.text,
@@ -64,7 +64,7 @@ const styles = stylex.create({
 		inset: 0,
 		display: "grid",
 		placeItems: "center",
-		fontSize: text.xs,
+		fontSize: type.t1,
 		color: color.textMuted,
 		pointerEvents: "none",
 		opacity: "var(--ak-veil-opacity)",

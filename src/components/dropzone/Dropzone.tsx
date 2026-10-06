@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, motion, shadow, space, text, tone, type } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, tone, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -49,7 +49,7 @@ const styles = stylex.create({
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
 	iconOver: { color: color.text },
-	title: { margin: 0, fontSize: text.sm, color: color.text },
+	title: { margin: 0, fontSize: type.t2, color: color.text },
 	hint: { color: color.textMuted, fontSize: type.t2 },
 	pick: {
 		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
@@ -108,7 +108,7 @@ const styles = stylex.create({
 		borderBottomWidth: 1,
 		borderBottomStyle: "solid",
 		borderBottomColor: color.border,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.text,
 		":last-child": { borderBottomWidth: 0 },
 	},

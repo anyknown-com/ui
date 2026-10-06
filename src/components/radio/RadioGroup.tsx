@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, createContext, useContext, useId, useMemo } from "react"
 import { styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, font, space, text } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 
 type RadioGroupContextValue = {
 	name: string
@@ -28,9 +28,9 @@ const styles = stylex.create({
 		padding: 0,
 		marginBottom: space.xxs,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.text,
 	},
 })

@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { useEffect, useRef } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, space, text } from "../../tokens.stylex"
+import { color, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	// Display maths is the one block that routinely overflows a phone: a long equation cannot be
@@ -25,7 +25,7 @@ const styles = stylex.create({
 	// the reader can still read the formula, and it is obvious who to blame.
 	error: {
 		fontFamily: "ui-monospace, monospace",
-		fontSize: text.xs,
+		fontSize: type.t1,
 		color: color.danger,
 		overflowWrap: "anywhere",
 	},

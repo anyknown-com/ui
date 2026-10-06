@@ -1,14 +1,14 @@
 import * as stylex from "@stylexjs/stylex"
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useId, useRef, useState } from "react"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const ARROW_FRACTION = 0.05
 
 const styles = stylex.create({
 	root: { display: "flex", flexDirection: "column", gap: space.xs, fontFamily: font.body },
-	label: { fontSize: text.sm, fontWeight: 500, color: color.text },
+	label: { fontSize: type.t2, fontWeight: 500, color: color.text },
 	control: {
 		position: "relative",
 		height: "1.5rem",

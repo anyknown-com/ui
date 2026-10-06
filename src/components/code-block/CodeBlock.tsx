@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -28,7 +28,7 @@ const styles = stylex.create({
 	lang: {
 		fontFamily: font.mono,
 		fontSize: type.t1,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.textMuted,
 	},
 	copy: {
@@ -56,8 +56,8 @@ const styles = stylex.create({
 		paddingInline: space.md,
 		overflowX: "auto",
 		fontFamily: font.mono,
-		fontSize: text.code,
-		lineHeight: text.leadingNormal,
+		fontSize: type.code,
+		lineHeight: type.snug,
 		color: color.text,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
@@ -77,8 +77,8 @@ const styles = stylex.create({
 	},
 	inline: {
 		fontFamily: font.mono,
-		fontSize: text.code,
-		lineHeight: text.leadingNormal,
+		fontSize: type.code,
+		lineHeight: type.snug,
 		backgroundColor: color.surface,
 		borderRadius: corner.small,
 		paddingInline: "0.3em",

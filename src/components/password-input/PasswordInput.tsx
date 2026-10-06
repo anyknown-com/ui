@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, useId, useState } from "react"
 import { reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -39,7 +39,7 @@ const styles = stylex.create({
 	barWeak: { backgroundColor: color.danger },
 	barFair: { backgroundColor: color.warning },
 	barStrong: { backgroundColor: color.accent },
-	label: { fontFamily: font.body, fontSize: text.xs, color: color.textMuted, minHeight: "1.2em", margin: 0 },
+	label: { fontFamily: font.body, fontSize: type.t1, color: color.textMuted, minHeight: "1.2em", margin: 0 },
 	labelWeak: { color: color.danger },
 	warningIcon: { color: color.warning, flex: "none" },
 	caps: {
@@ -52,10 +52,10 @@ const styles = stylex.create({
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		marginTop: space.xxs,
 	},
-	error: { fontFamily: font.body, fontSize: text.xs, color: color.danger, margin: 0, marginTop: space.xxs },
+	error: { fontFamily: font.body, fontSize: type.t1, color: color.danger, margin: 0, marginTop: space.xxs },
 	srOnly: {
 		position: "absolute",
 		width: 1,

@@ -5,7 +5,7 @@ import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import { press, reset } from "../../lib/styled"
-import { color, corner, font, motion, shadow, space, text, type as scale } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type as scale } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
@@ -65,8 +65,8 @@ const styles = stylex.create({
 		paddingInlineStart: space.md,
 		paddingInlineEnd: space.sm,
 		fontFamily: font.body,
-		fontSize: text.sm,
-		lineHeight: text.leadingSnug,
+		fontSize: scale.t2,
+		lineHeight: scale.snug,
 		color: color.text,
 		animationName: { default: slideIn, [REDUCED]: "none" },
 		animationDuration: "180ms",
@@ -122,7 +122,7 @@ const styles = stylex.create({
 	dotDanger: { backgroundColor: color.danger },
 	spin: { color: color.signal, width: space.md, height: space.md },
 	content: { flex: 1, minWidth: 0, display: "grid", gap: "0.125rem" },
-	title: { margin: 0, fontSize: text.sm, color: color.text },
+	title: { margin: 0, fontSize: scale.t2, color: color.text },
 	titleStrong: { fontWeight: 500 },
 	count: {
 		flex: "none",
@@ -135,7 +135,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		backgroundColor: color.accentSubtle,
 		color: color.text,
-		fontSize: text.xs,
+		fontSize: scale.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		fontVariantNumeric: "tabular-nums",

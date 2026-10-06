@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ElementType, ReactNode } from "react"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	root: {
@@ -19,13 +19,13 @@ const styles = stylex.create({
 	icon: { display: "grid", placeItems: "center", color: color.textMuted },
 	title: {
 		fontFamily: font.display,
-		fontSize: text.base,
+		fontSize: type.t3,
 		fontWeight: 600,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		margin: 0,
 		color: color.text,
 	},
-	description: { margin: 0, fontSize: text.sm, color: color.textMuted, maxWidth: "18rem" },
+	description: { margin: 0, fontSize: type.t2, color: color.textMuted, maxWidth: "18rem" },
 	action: { marginTop: space.xxs },
 })
 

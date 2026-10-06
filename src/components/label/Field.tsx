@@ -1,15 +1,15 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId, useMemo } from "react"
 import { styled } from "../../lib/styled"
-import { color, font, space, text } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 import { FieldContext } from "./fieldContext"
 import { Label } from "./Label"
 
 const styles = stylex.create({
 	group: { display: "grid", gap: space.xxs },
 	dimmed: { opacity: { default: 1, ":has(:disabled)": 0.5 } },
-	help: { margin: 0, fontFamily: font.body, fontSize: text.xs, color: color.textMuted },
-	error: { margin: 0, fontFamily: font.body, fontSize: text.xs, color: color.danger },
+	help: { margin: 0, fontFamily: font.body, fontSize: type.t1, color: color.textMuted },
+	error: { margin: 0, fontFamily: font.body, fontSize: type.t1, color: color.danger },
 })
 
 export type FieldProps = Omit<ComponentProps<"div">, "children"> & {

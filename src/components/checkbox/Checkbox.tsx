@@ -3,7 +3,7 @@ import { type ComponentProps, type ReactNode, useCallback, useId } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type StyleArg, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -53,8 +53,8 @@ const styles = stylex.create({
 		transitionTimingFunction: "ease-out",
 	},
 	markOn: { strokeDashoffset: 0 },
-	labelText: { display: "block", fontWeight: 500, fontSize: text.sm, color: color.text },
-	description: { display: "block", fontSize: text.xs, color: color.textMuted },
+	labelText: { display: "block", fontWeight: 500, fontSize: type.t2, color: color.text },
+	description: { display: "block", fontSize: type.t1, color: color.textMuted },
 })
 
 export type CheckboxProps = Omit<ComponentProps<"input">, "type" | "children"> & {

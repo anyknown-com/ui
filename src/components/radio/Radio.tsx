@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 import { useRadioGroup } from "./RadioGroup"
 
@@ -59,8 +59,8 @@ const styles = stylex.create({
 		transitionTimingFunction: "ease-out",
 	},
 	fillOn: { scale: "1" },
-	labelText: { display: "block", fontWeight: 500, fontSize: text.sm, color: color.text },
-	description: { display: "block", fontSize: text.xs, color: color.textMuted },
+	labelText: { display: "block", fontWeight: 500, fontSize: type.t2, color: color.text },
+	description: { display: "block", fontSize: type.t1, color: color.textMuted },
 })
 
 export type RadioProps = Omit<ComponentProps<"input">, "type" | "value" | "children"> & {

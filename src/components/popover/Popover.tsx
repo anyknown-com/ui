@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ReactElement, ReactNode } from "react"
 import { popupStyles } from "../../lib/popup"
 import { styled } from "../../lib/styled"
-import { color, font, space, text } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	panel: {
@@ -13,14 +13,14 @@ const styles = stylex.create({
 		boxSizing: "border-box",
 		padding: space.md,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		color: color.text,
 	},
 	title: {
 		fontFamily: font.display,
-		fontSize: text.base,
+		fontSize: type.t3,
 		fontWeight: 600,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		margin: 0,
 		marginBottom: space.xxs,
 	},

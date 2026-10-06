@@ -3,7 +3,7 @@ import { type ComponentProps, useCallback } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type StyleArg, styled } from "../../lib/styled"
 import { clearTextLayoutCache, getTextLayoutEngine, measureTextHeight } from "../../lib/textLayout"
-import { space, text } from "../../tokens.stylex"
+import { space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -12,7 +12,7 @@ const styles = stylex.create({
 		minHeight: "4.5rem",
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
-		lineHeight: text.leadingRelaxed,
+		lineHeight: type.body,
 		resize: "vertical",
 	},
 	// field-sizing 不支援時由 JS 量高度(見 fitHeight),所以一律不給拉把

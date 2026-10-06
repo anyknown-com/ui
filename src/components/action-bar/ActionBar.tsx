@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
 import { press, reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, motion, space, text } from "../../tokens.stylex"
+import { color, corner, motion, space, type } from "../../tokens.stylex"
 import { useMessageBody } from "../message/Message"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -24,8 +24,8 @@ const styles = stylex.create({
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
-		fontSize: text.xs,
-		lineHeight: text.leadingSnug,
+		fontSize: type.t1,
+		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		paddingBlock: space.xxs,

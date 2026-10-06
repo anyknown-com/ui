@@ -3,7 +3,7 @@ import { useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { useAnimationFrame } from "../../lib/useAnimationFrame"
 import { type VoiceState, voicePath } from "../../lib/voice"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -23,7 +23,7 @@ const styles = stylex.create({
 	fibre: { fill: "none", stroke: color.textFaint, strokeWidth: 1.6, strokeLinecap: "round" },
 	// 聽、想、說都是 agent 正在做事:signal
 	fibreActive: { stroke: color.signal },
-	label: { fontSize: text.sm, color: color.textMuted },
+	label: { fontSize: type.t2, color: color.textMuted },
 	labelStrong: { fontWeight: 500, color: color.text },
 	motionLabel: {
 		display: { default: "none", [REDUCED]: "inline" },

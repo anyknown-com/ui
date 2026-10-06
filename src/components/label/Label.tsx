@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, font, text } from "../../tokens.stylex"
+import { color, font, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -9,13 +9,13 @@ const styles = stylex.create({
 		alignItems: "baseline",
 		gap: "0.35rem",
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: type.t2,
 		fontWeight: 500,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		color: color.text,
 	},
 	required: { color: color.danger },
-	optional: { fontWeight: 400, fontSize: text.xs, color: color.textMuted },
+	optional: { fontWeight: 400, fontSize: type.t1, color: color.textMuted },
 })
 
 export type LabelProps = ComponentProps<"label"> & {

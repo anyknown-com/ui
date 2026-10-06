@@ -5,7 +5,7 @@ import { createContext, type ReactElement, type ReactNode, useContext, useRef, u
 import { layerStyles, returnFocusOnExit } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -73,15 +73,15 @@ const styles = stylex.create({
 	body: { flexGrow: 1, minHeight: 0, overflowY: "auto" },
 	title: {
 		fontFamily: font.display,
-		fontSize: text.lg,
+		fontSize: type.t4,
 		fontWeight: 600,
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		margin: 0,
 		marginBottom: space.xs,
 	},
 	description: {
-		fontSize: text.sm,
-		lineHeight: text.leadingRelaxed,
+		fontSize: type.t2,
+		lineHeight: type.body,
 		color: color.textMuted,
 		margin: 0,
 		marginBottom: space.md,

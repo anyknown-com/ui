@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -26,7 +26,7 @@ const styles = stylex.create({
 		paddingBlock: space.sm,
 		paddingInline: space.md,
 		fontFamily: font.mono,
-		fontSize: text.code,
+		fontSize: type.code,
 		fontWeight: 500,
 		lineHeight: 1,
 		color: color.text,
@@ -42,7 +42,7 @@ const styles = stylex.create({
 	line: {
 		display: "flex",
 		fontFamily: font.mono,
-		fontSize: text.code,
+		fontSize: type.code,
 		lineHeight: 1.55,
 		whiteSpace: "pre",
 		minWidth: "max-content",
@@ -77,7 +77,7 @@ const styles = stylex.create({
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		fontFamily: font.mono,
-		fontSize: text.xs,
+		fontSize: type.t1,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },

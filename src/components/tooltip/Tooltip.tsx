@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactElement, type ReactNode, useId, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
-import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -27,7 +27,7 @@ const styles = stylex.create({
 		paddingInline: space.xs,
 		fontFamily: font.body,
 		fontSize: "0.75rem",
-		lineHeight: text.leadingSnug,
+		lineHeight: type.snug,
 		animationName: { default: fade, [REDUCED]: "none" },
 		animationDuration: motion.fast,
 		animationTimingFunction: motion.ease,
