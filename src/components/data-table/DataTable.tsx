@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { type ReactNode, useCallback, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
@@ -235,7 +235,7 @@ export function DataTable<Row>({
 	onSelectedChange,
 	emptyState,
 	onClearFilter,
-	countLabel = (shown, total) => `${shown} / ${total}`,
+	countLabel = (shown, all) => `${shown} / ${all}`,
 	selectLabel = (key) => `選取 ${key}`,
 	selectAllLabel = "全選",
 	editLabel = (column, key) => `編輯 ${key} 的 ${column}`,
@@ -247,16 +247,19 @@ export function DataTable<Row>({
 	const [editing, setEditing] = useState<{ key: string; col: string } | null>(null)
 	const cancelling = useRef(false)
 	const [draft, setDraft] = useState("")
-	const selectAll = useRef<HTMLInputElement>(null)
-
 	const visible = rows
 	const keys = visible.map(rowKey)
 	const selectedCount = selected ? keys.filter((key) => selected.has(key)).length : 0
 	const allSelected = keys.length > 0 && selectedCount === keys.length
+	const someSelected = selectedCount > 0 && !allSelected
 
-	useEffect(() => {
-		if (selectAll.current) selectAll.current.indeterminate = selectedCount > 0 && !allSelected
-	}, [selectedCount, allSelected])
+	// indeterminate 只能從 DOM 設:ref callback 跟著 someSelected 換 identity,React 重跑它就寫回去
+	const selectAll = useCallback(
+		(node: HTMLInputElement | null) => {
+			if (node) node.indeterminate = someSelected
+		},
+		[someSelected],
+	)
 
 	// A row that disappears while being edited would otherwise strand the draft
 	// and re-open with it when the row comes back. Adjusted during render rather
