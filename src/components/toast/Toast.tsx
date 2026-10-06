@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { createContext, useCallback, useContext, useRef, useState, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
@@ -186,10 +187,19 @@ const styles = stylex.create({
 })
 
 const TONE = {
-	success: { dot: styles.dotSuccess, line: styles.lineSuccess, word: "成功:" },
-	danger: { dot: styles.dotDanger, line: styles.lineDanger, word: "錯誤:" },
-	default: { dot: styles.dotDefault, line: styles.lineDefault, word: "" },
+	success: { dot: styles.dotSuccess, line: styles.lineSuccess },
+	danger: { dot: styles.dotDanger, line: styles.lineDanger },
+	default: { dot: styles.dotDefault, line: styles.lineDefault },
 } as const
+
+// success / danger 是唸給螢幕閱讀器的前綴:顏色看不到,類型要用說的
+const strings = defineStrings({
+	"zh-TW": { region: "通知", dismiss: "關閉通知", success: "成功:", danger: "錯誤:" },
+	en: { region: "Notifications", dismiss: "Dismiss notification", success: "Success:", danger: "Error:" },
+})
+
+/** The Toaster's built-in words (follow `<LocaleProvider>`); override any with `<Toaster labels={…}>`. */
+export type ToastLabels = StringsOf<typeof strings>
 
 export type ToastType = keyof typeof TONE
 
@@ -446,6 +456,8 @@ export type ToasterProps = {
 	limit?: number
 	/** Pass a manager from `createToastManager()` to scope this viewport. */
 	manager?: ToastManager
+	/** Override built-in words for this viewport; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ToastLabels>
 }
 
 const noSubscribe = () => () => {}
@@ -455,7 +467,9 @@ export function Toaster({
 	timeout = DEFAULT_TIMEOUT,
 	limit = DEFAULT_LIMIT,
 	manager,
+	labels,
 }: ToasterProps) {
+	const t = useStrings(strings, labels)
 	const [own] = useState(() => manager ?? toastManager)
 	const reduced = usePrefersReducedMotion()
 	const [api] = useState(() => makeApi(() => own))
@@ -542,7 +556,7 @@ export function Toaster({
 				<div
 					ref={connect}
 					role="region"
-					aria-label="通知"
+					aria-label={t.region}
 					aria-keyshortcuts={HOTKEY}
 					aria-live="polite"
 					tabIndex={-1}
@@ -554,7 +568,7 @@ export function Toaster({
 					)}
 				>
 					{toasts.map((record) => (
-						<ToastItem key={record.id} record={record} paused={paused} onClose={dismiss} />
+						<ToastItem key={record.id} record={record} paused={paused} onClose={dismiss} t={t} />
 					))}
 				</div>,
 				document.body,
@@ -563,11 +577,12 @@ export function Toaster({
 	)
 }
 
-type ToastItemProps = { record: ToastRecord; paused: boolean; onClose: (id: string) => void }
+type ToastItemProps = { record: ToastRecord; paused: boolean; onClose: (id: string) => void; t: ToastLabels }
 
-function ToastItem({ record, paused, onClose }: ToastItemProps) {
+function ToastItem({ record, paused, onClose, t }: ToastItemProps) {
 	const reduced = usePrefersReducedMotion()
 	const tone = TONE[record.type in TONE ? record.type : "default"]
+	const word = record.type === "success" || record.type === "danger" ? t[record.type] : ""
 	const action = record.action
 	const twoLine = record.description != null
 
@@ -592,7 +607,7 @@ function ToastItem({ record, paused, onClose }: ToastItemProps) {
 				{record.loading ? <Spin sx={styles.spin} /> : <span {...stylex.props(styles.dot, tone.dot)} />}
 			</span>
 			<div {...stylex.props(styles.content)}>
-				{tone.word !== "" && <span {...stylex.props(styles.srOnly)}>{tone.word}</span>}
+				{word !== "" && <span {...stylex.props(styles.srOnly)}>{word}</span>}
 				<p {...stylex.props(styles.title, twoLine && styles.titleStrong)}>{record.title}</p>
 				{twoLine && <p {...stylex.props(styles.description)}>{record.description}</p>}
 			</div>
@@ -616,7 +631,7 @@ function ToastItem({ record, paused, onClose }: ToastItemProps) {
 			)}
 			<button
 				type="button"
-				aria-label="關閉通知"
+				aria-label={t.dismiss}
 				onClick={() => onClose(record.id)}
 				{...stylex.props(reset.control, styles.close, twoLine && styles.closeTwoLine, press.button)}
 			>

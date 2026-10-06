@@ -63,6 +63,7 @@ export type {
 export { Toaster, toast, useToast, toastManager, createToastManager } from "./components/toast/Toast"
 export type {
 	ToasterProps,
+	ToastLabels,
 	ToastOptions,
 	ToastAction,
 	ToastInput,

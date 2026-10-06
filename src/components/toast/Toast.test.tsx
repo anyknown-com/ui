@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { Button } from "../button/Button"
 import { createToastManager, Toaster, toast as moduleToast, toastManager, useToast } from "./Toast"
 
@@ -370,5 +371,20 @@ describe("toast manager", () => {
 		act(() => void manager.add({ title: "只在這裡" }))
 		expect(toastManager.getSnapshot().toasts).toHaveLength(0)
 		expect(viewport()).toHaveTextContent("只在這裡")
+	})
+})
+
+describe("Toaster words", () => {
+	test("follow the LocaleProvider, and labels override one of them", () => {
+		const manager = createToastManager()
+		render(
+			<LocaleProvider locale="en">
+				<Toaster manager={manager} labels={{ dismiss: "Close" }} />
+			</LocaleProvider>,
+		)
+		act(() => void manager.add({ title: "Upload failed", type: "danger" }))
+		const region = screen.getByRole("region", { name: "Notifications" })
+		expect(region).toHaveTextContent("Error:")
+		expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument()
 	})
 })
