@@ -26,7 +26,7 @@ import { Radio, RadioGroup } from "@anyknown/ui"
 </RadioGroup>
 ```
 
-`RadioGroup` works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`). A `Radio` outside a `RadioGroup` throws.
+`RadioGroup` works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`, with `onValueChange` to listen). A `Radio` outside a `RadioGroup` throws.
 
 ## Accessibility
 
@@ -35,11 +35,12 @@ import { Radio, RadioGroup } from "@anyknown/ui"
 - All radios share one `name` (the `name` prop, or a generated id), so the browser treats them as one group.
 - Accessible name of each radio: `label`, through `aria-labelledby`; without `label`, pass `aria-label`. `description` goes into `aria-describedby`.
 - `disabled` on the group disables the `fieldset`, which disables every radio.
-- Inside a [Field](../label/README.md), a Radio takes the Field's `aria-describedby` and `disabled` but not its `id`, so a Field `label` does not name it. Use `legend` instead.
-- Focus ring: a 2px `focusRing` outline around the dot when the input has `:focus-visible`.
+- Inside a [Field](../label/README.md), a Radio takes the Field's `aria-describedby`, `required` and `disabled` but not its `id`, so a Field `label` does not name it. Use `legend` instead.
+- Focus ring: a 2px `focusRing` outline around the dot when the input has `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the dot is a `ButtonText` ring on `Canvas`; checked fills with `Highlight` and a `HighlightText` center; disabled draws in `GrayText`.
 - The dot scale (160ms) and color transitions are instant under `prefers-reduced-motion: reduce`.
 - `variant="card"` marks the selected card with an ink border and `accentSubtle` fill; the native checked state carries the meaning.
-- Known gap (A11Y-DEBT): without `label` the hit area is 16.8px, below 24px.
+- The dot is drawn at about 17px, but the transparent native input over it is at least 24×24px, so the target meets 24px even without `label`.
 
 ## Keyboard
 

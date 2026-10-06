@@ -5,7 +5,7 @@ Progress and loading indicators. A bar uses the blue `signal` fill because it me
 - `Progress` — a 6 px bar. With `value` it is determinate; without it, a segment sweeps the track and a mono line below names the current stage.
 - `ProgressRing` — a 60 px ring with the percentage written in its center, for an exact reading.
 - `ProgressBall` — the same arc without the center text, at any `size` (default 48).
-- `Spinner` — an arc that turns, at `sm` / `md` / `lg` = 18 / 28 / 40 px, announced as a status.
+- `Spinner` — an arc that turns, at `sm` / `md` / `lg` = 18 / 28 / 40 px (default `md`), announced as a status.
 
 ## When to use
 
@@ -37,6 +37,7 @@ Without `value` the bar is indeterminate. `stages` sets the lines that cycle und
   stages={["Scanning the conversation", "Picking what to keep", "Merging duplicates", "Saving"]}
 />
 <Spinner size="sm" label="Loading threads" />
+<Spinner labels={{ loading: "Fetching" }} />
 ```
 
 ## Accessibility
@@ -45,7 +46,8 @@ Without `value` the bar is indeterminate. `stages` sets the lines that cycle und
 - Determinate bars and rings set `aria-valuenow` to the rounded, clamped value (0–100). The indeterminate bar sets no `aria-valuenow` and shows no percentage, because there is no real progress to report.
 - The ring's visible percentage is `aria-hidden`; the reading comes from `valueText`. The indeterminate stage line is plain visible text, not a live region.
 - `Spinner` is `role="status"` with `aria-label` from `label` and the same text in a visually hidden span. The SVG is `aria-hidden`.
-- Built-in words are hard-coded Chinese and do not follow `<LocaleProvider>`: `Spinner`'s default `label` and `Progress`'s default `stages`. Pass `label` and `stages` in other locales.
+- Built-in words follow `<LocaleProvider>` (zh-TW, en): `Spinner`'s default label (`labels.loading`) and the indeterminate bar's four default stages (`labels.stageScan`, `stagePick`, `stageMerge`, `stageSave`). `label` wins over `labels.loading`; `stages` wins over the stage labels.
+- Under `forced-colors: active` the bar track keeps a `CanvasText` border, the fill and ring arcs paint in `Highlight`, and the ring track in `GrayText`. The spinner arc uses `currentColor`.
 - Under `prefers-reduced-motion: reduce` the determinate fill jumps without a transition, the indeterminate segment stops at the start of the track, and the spinner stops turning. The stage line still changes every 1.8 s.
 
 ## Keyboard

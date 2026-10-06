@@ -38,12 +38,13 @@ import { AssistantMessage, TextPart, Thread, UserMessage } from "@anyknown/ui"
 ## Accessibility
 
 - Plain `<div>` and `<p>` elements; no landmark or list role.
-- Each turn starts with a visually hidden author label so a linear read says who spoke: `authorLabel` on `UserMessage` (default "你說:") and `AssistantMessage` (default "助理說:").
-- `pending` renders a `role="status"` region with a hidden `pendingLabel` (default "回覆中"); the dot itself is `aria-hidden`.
+- Each turn starts with a visually hidden author label so a linear read says who spoke ("你說:" / "助理說:", "You said:" / "Assistant said:" in `en`).
+- `pending` renders a `role="status"` region with a hidden pending word ("回覆中", "Replying" in `en`); the dot itself is `aria-hidden`.
 - The streaming caret is `aria-hidden` and only on the last `TextPart`.
 - `prefers-reduced-motion: reduce` stops the caret blink and the pending pulse.
 - On devices without hover (`(hover: none)`), the action bar inside an assistant turn is always visible.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`; pass `authorLabel` and `pendingLabel` to change them.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `userAuthor`, `assistantAuthor`, `pending`. Override any with `labels` on `UserMessage` / `AssistantMessage`; `authorLabel` and `pendingLabel` win over `labels`.
+- In forced-colors mode the user bubble gets a 1px outline and the caret and pending dot paint in `CanvasText`.
 
 ## Keyboard
 

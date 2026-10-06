@@ -44,17 +44,16 @@ const MAX = 10 * 1024 * 1024
 <UploadList jobs={jobs} onCancel={cancelUpload} />
 ```
 
-A failed row says why. With `error` it uses your words. With `limit` it names the limit ("超過 10 MB 上限…"), not the file's size. Otherwise it uses a general "try again" sentence.
+A failed row says why. With `error` it uses your words. With `limit` it names the limit (`labels.tooBig`), not the file's size. Otherwise it uses `labels.failure`, a general "try again" sentence.
 
 ## Accessibility
 
-- The drop area is a plain `<div>` with no role and no focus. The way in for keyboard and screen-reader users is the native "Choose files" button (`pickLabel`). It opens a hidden file input that is `aria-hidden` and `tabIndex={-1}`.
+- The drop area is a plain `<div>` with no role and no focus. The way in for keyboard and screen-reader users is the native "Choose files" button. It opens a hidden file input that is `aria-hidden` and `tabIndex={-1}`.
 - The upload icon and the dashed outline are `aria-hidden`. `disabled` disables the button and ignores drops.
 - On drag-over, the dashed outline moves. Under `prefers-reduced-motion: reduce`, it is still and the color transitions are instant.
-- `UploadList` is a `<ul>` named by `label` (default "上傳中的檔案"). A separate, visually hidden `role="status"` paragraph announces "name: state" for each job. It holds no buttons, so cancel buttons do not leak out of an open modal.
-- Each cancel button is named "取消上傳 {name}". Progress is a `progressbar` with `aria-valuetext` "{name} {state} N%".
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. Use `title`, `hint`, `pickLabel` and `label` to change some, and `UploadJob.error` for a failure. The state words and the cancel label cannot be changed today.
-- Known gap (A11Y-DEBT): the cancel button hit area is 22.4px.
+- `UploadList` is a `<ul>` named by `label` (default `labels.uploads`). A separate, visually hidden `role="status"` paragraph announces "name: state" for each job. It holds no buttons, so cancel buttons do not leak out of an open modal.
+- Each cancel button is named by `labels.cancel(name)` and has a hit area of about 30px. Progress is a `progressbar` named by the file name, with `aria-valuetext` "{name} {state} N%".
+- The words (`title`, `hint`, `pick`, `uploads`, `cancel`, the five state words, `failure`, `tooBig`) follow `<LocaleProvider>` (zh-TW by default). `Dropzone` and `UploadList` both take `labels` (`Partial<DropzoneLabels>`). The `title`, `hint`, `pickLabel` and `label` props and `UploadJob.error` win over them.
 
 ## Keyboard
 

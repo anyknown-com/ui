@@ -22,7 +22,7 @@ import { Field, PasswordInput } from "@anyknown/ui"
   <PasswordInput meter value={passphrase} onValueChange={setPassphrase} />
 </Field>
 <Field label="Repeat the passphrase">
-  <PasswordInput confirmOf={passphrase} mismatchLabel="Type the same passphrase again." />
+  <PasswordInput confirmOf={passphrase} labels={{ mismatch: "Type the same passphrase again." }} />
 </Field>
 ```
 
@@ -32,13 +32,14 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`)
 
 - Renders a native `<input>` (`type="password"`, or `"text"` while revealed) with the Input styling, and a native toggle `<button>`.
 - The accessible name comes from the caller: a [Field](../label/README.md) `label` or `aria-label`. Inside a Field, the Field's id, help and error are wired in.
-- Toggle button: named by `showLabel` / `hideLabel`, with `aria-pressed`. After toggling, focus goes back to the field. A visually hidden `role="status"` says `shownStatus` when the text is revealed.
+- Toggle button: named by `labels.show` / `labels.hide`, with `aria-pressed` for the revealed state. It is 28px across, above the 24px minimum target. After toggling, focus goes back to the field. A visually hidden `role="status"` says `labels.shown` when the text is revealed.
 - Meter: the bars are `aria-hidden`; the level text is `aria-live="polite"` and is in the field's `aria-describedby`.
-- Caps Lock: a `role="status"` region, mounted from the start, shows `capsLockLabel` while Caps Lock is on; it clears on blur. Set `capsLockWarning={false}` to turn it off.
-- Confirm field: once something is typed and it differs from `confirmOf`, `aria-invalid="true"` is set and `mismatchLabel` is shown and added to `aria-describedby`.
+- Caps Lock: a `role="status"` region, mounted from the start, shows `labels.capsLock` while Caps Lock is on; it clears on blur. Set `capsLockWarning={false}` to turn it off.
+- Confirm field: once something is typed and it differs from `confirmOf`, `aria-invalid="true"` is set and `labels.mismatch` is shown and added to `aria-describedby`.
 - Paste is not blocked.
 - Put requirements in the Field `help`, not the placeholder.
-- Built-in words are Traditional Chinese defaults and do not follow `<LocaleProvider>`. Override them with `levelLabels`, `capsLockLabel`, `mismatchLabel`, `showLabel`, `hideLabel` and `shownStatus`.
+- Built-in words follow `<LocaleProvider>` (zh-TW, en): `show`, `hide`, `shown`, `capsLock`, `mismatch` and the five strength words `levelEmpty` … `levelVeryStrong`. Override any with `labels`. The single-word props `showLabel`, `hideLabel`, `shownStatus`, `capsLockLabel`, `mismatchLabel` and the array `levelLabels` still work and win over `labels`.
+- Under `forced-colors: active` each meter bar is a `GrayText` outline and filled bars paint `CanvasText`, so the level still shows.
 - The meter transition is off under `prefers-reduced-motion: reduce`.
 
 ## Keyboard

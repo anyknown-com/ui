@@ -28,11 +28,11 @@ Long lines scroll sideways inside the block; the page never scrolls horizontally
 
 ## Accessibility
 
-- The code is a `<pre>` with `role="region"`, `tabIndex={0}` and `aria-label` "`<lang>` 程式碼" (or "程式碼" without `lang`), so keyboard users can reach it and scroll it. It shows a 2px focus ring.
-- The copy button is a native `<button>` whose text is the label: `copyLabel` (default "複製"), then `copiedLabel` (default "已複製 ✓") for 2 seconds. The change is not announced through a live region.
+- The code is a `<pre>` with `role="region"`, `tabIndex={0}` and `aria-label` "`<lang>` 程式碼" (or "程式碼" without `lang`; "`<lang>` code" / "Code" in `en`), so keyboard users can reach it and scroll it. It shows a 2px focus ring.
+- The copy button is a native `<button>`, at least 24px tall, whose text is the label: "複製", then "已複製 ✓" for 2 seconds. The change is not announced through a live region.
 - The streaming caret is `aria-hidden`; `prefers-reduced-motion: reduce` stops its blink and the button's color transition.
 - `InlineCode` is a plain `<code>` and takes all `<code>` attributes.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`; pass `copyLabel` and `copiedLabel`. The region name cannot be changed.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `copy`, `copied`, `code`, `codeIn(lang)`. Override any with `labels`; `copyLabel` and `copiedLabel` win over `labels`.
 
 ## Keyboard
 

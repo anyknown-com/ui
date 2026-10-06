@@ -18,7 +18,7 @@ Renders one message's markdown — GFM tables, fenced code, task lists and TeX m
 
 The family:
 
-- `Markdown` — the renderer. `children` is the markdown string; `tables` is `"grid"` (default) or `"ruled"`; `renderBlock`, `copyLabel` and `copiedLabel` pass through to fenced blocks.
+- `Markdown` — the renderer. `children` is the markdown string; `tables` is `"grid"` (default) or `"ruled"`; `renderBlock`, `copyLabel` and `copiedLabel` pass through to fenced blocks; `labels` overrides the task-box names.
 - `Formula` — TeX to MathML. `display` makes it a block.
 
 ```tsx
@@ -40,11 +40,11 @@ A single newline is a line break (`breaks: true`): this is a message, not a docu
 - Real elements: `<p>`, `<h1>`–`<h3>` (deeper headings are capped at `<h3>`), `<ul>`/`<ol>`, `<blockquote>`, `<table>` with `<th>`, `<img alt>` from the markdown alt text.
 - Links open in a new tab with `rel="noopener noreferrer nofollow"`; they do not announce that they open a new tab.
 - Raw HTML is shown as source in a code block (block) or as text (inline), never parsed.
-- Task list boxes are the design system's `Checkbox`, disabled, with `aria-label` "已完成" or "未完成".
+- Task list boxes are the design system's `Checkbox`, disabled, with `aria-label` "已完成" or "未完成" ("Done" / "Not done" in `en`).
 - Fenced code blocks are [CodeBlock](../code-block/README.md): a focusable, named scroll region.
 - `Formula` outputs MathML, so screen readers get real maths; display maths has `role="math"`. Until the Temml chunk loads, or if it fails, the TeX source shows instead.
 - Wide tables and display maths scroll inside their own box. The table wrapper is not focusable.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`; `copyLabel` and `copiedLabel` change the code block button. The task-box labels cannot be changed.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the task-box names `taskDone` and `taskOpen`, and the code blocks' own words. Override the task-box names with `labels`; `copyLabel` and `copiedLabel` override the code block button.
 
 ## Keyboard
 

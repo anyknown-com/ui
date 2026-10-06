@@ -20,14 +20,14 @@ import { VoiceIndicator } from "@anyknown/ui"
 <VoiceIndicator state={voiceState} level={micLevel} />
 ```
 
-`state` is `"idle" | "listening" | "thinking" | "speaking"` (the exported `VoiceState`). `level` (0–1, default 0.4) sets how far the line swings while listening. `statusLabel` replaces the bold state word. The line has a fixed size, so changing state never shifts the layout.
+`state` is `"idle" | "listening" | "thinking" | "speaking"` (the exported `VoiceState`). `level` (0–1, default 0.4) sets how far the line swings while listening. `statusLabel` replaces the bold state word; `labels` overrides any built-in word. The line has a fixed size, so changing state never shifts the layout.
 
 ## Accessibility
 
 - The line is an `aria-hidden` SVG. The text is a `role="status"` span, so each state change is announced politely, for example "聆聽中…說完就送".
 - Idle draws a flat gray line; the other states draw it in `signal` and also change the words, so state is not color alone.
 - `prefers-reduced-motion: reduce` stops the animation frame loop and freezes the line, and shows a small uppercase mono label with the state word (`aria-hidden`, so it is not read twice).
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. `statusLabel` replaces the bold word only; "通話待命 · " and the trailing hints cannot be changed.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the state names `idle`, `listening`, `thinking`, `speaking`, the hints `listeningHint` and `speakingHint`, and the idle prefix `standby`. Override any with `labels`; `statusLabel` wins over the state name.
 
 ## Keyboard
 

@@ -1,6 +1,6 @@
 # Segmented
 
-A row of a few short words on a sunken track, where the chosen one is a raised sheet; each word is a pressed/unpressed button.
+A row of a few short words on a sunken track, where the chosen one is a raised sheet: a radio group drawn as a segmented control.
 
 ## When to use
 
@@ -24,33 +24,40 @@ const [view, setView] = useState<"list" | "grid">("list")
 <Segmented
   label="View"
   value={view}
-  onChange={setView}
+  onValueChange={setView}
   options={[
     { value: "list", label: "List" },
     { value: "grid", label: "Grid" },
+    { value: "board", label: "Board", disabled: true },
   ]}
 />
+
+<Segmented label="Theme" defaultValue="auto" options={themes} />
 ```
 
-Segmented is always controlled: `value`, `options`, `onChange` and `label` are required.
+It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`, which defaults to the first option). `onChange` is deprecated: use `onValueChange` (both are called with the same value). `options` and `label` are required. `disabled` turns off the whole group; `options[].disabled` turns off one option.
 
 ## Accessibility
 
-- Renders a `<div>` holding one native `<button type="button">` per option. Each button's name is its `label`; the chosen one has `aria-pressed="true"`, the rest `aria-pressed="false"`.
-- `label` (required) is set as `aria-label` on the wrapping `<div>`.
-- Known gap: the wrapper has no role, so many screen readers ignore its `aria-label`; the group name may not be announced.
+- Renders a `<div role="radiogroup">` named by `label` (`aria-label`). Each option is a native `<button type="button" role="radio">` with `aria-checked`; its name is its `label`.
+- Roving tabindex: only the checked option is a tab stop (or the first enabled option when none is checked or the checked one is disabled).
+- A disabled option is a native `disabled` button, so it takes no focus and the arrow keys skip it. With `disabled` on the group, every option is disabled, the group gets `aria-disabled="true"`, and Tab skips it.
 - Focus ring: a 2px `focusRing` outline inset 2px on `:focus-visible`.
-- Buttons shrink to 0.98 on press (shared `press.button`).
-- On phones each button is 40px tall and the track scrolls sideways when it does not fit.
+- Under `forced-colors: active` the checked option fills with `Highlight` and `HighlightText` words (its focus ring is `HighlightText`); disabled options draw in `GrayText`.
+- Each option is 28px tall (40px on phones), above the 24px minimum target. On phones the track scrolls sideways when it does not fit.
+- Options shrink to 0.98 on press (shared `press.button`); no scale and no transition under `prefers-reduced-motion: reduce`.
 
 ## Keyboard
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Moves between the buttons; each one is a tab stop. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Chooses the focused option (native `<button>`). |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Moves focus into the group (to the checked option) and out of it. |
+| <kbd>→</kbd> / <kbd>↓</kbd> | Moves focus to the next enabled option and checks it; wraps from last to first. |
+| <kbd>←</kbd> / <kbd>↑</kbd> | Moves focus to the previous enabled option and checks it; wraps from first to last. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Moves focus to the first / last enabled option and checks it. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Checks the focused option (native `<button>`). |
 
-There is no arrow-key navigation.
+In a right-to-left context (computed `direction: rtl`), <kbd>←</kbd> and <kbd>→</kbd> swap so they follow the visual order; <kbd>↑</kbd> and <kbd>↓</kbd> do not change.
 
 ## Related
 

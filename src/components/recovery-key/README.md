@@ -25,23 +25,26 @@ const [saved, setSaved] = useState(false)
 </Button>
 ```
 
-The key is split on `-` and shown in mono groups. Copy writes the full key with its dashes. Download saves `filename` (default `anyknown-storage-recovery-key.txt`). The card has no primary button of its own, so you must check `ack` before letting the person continue.
+The key is split on `-` and shown in mono groups; the dashes are visually hidden text, so selecting the key by hand also yields them. Copy writes the full key with its dashes. Download saves the key and a newline as `filename` (default `anyknown-storage-recovery-key.txt`). The card has no primary button of its own, so you must check `ack` before letting the person continue.
+
+`labels` (`RecoveryKeyLabels`: `intro`, `warning`, `ack`, `key`, `reveal`, `hide`, `veil`, `copy`, `copied`, `download`) overrides any built-in word. The older single-word props (`intro`, `warning`, `ackLabel`, `revealLabel`, `hideLabel`, `veilLabel`, `copyLabel`, `copiedLabel`, `downloadLabel`) still work and win over `labels`.
 
 ## Accessibility
 
+- The key box is `role="region"`, named by `labels.key` ("復原金鑰" / "Recovery key"), with `tabIndex={0}`. Focusing it unblurs the key (like hover) and selects the whole key, dashes included, ready for the system copy shortcut.
 - The key is plain text, so screen readers can read it even while it is blurred. The blur and the "hover to reveal" veil are only visual, and the veil is `aria-hidden`.
-- Reveal is a native button with `aria-pressed`. Its text switches between `revealLabel` and `hideLabel`. The key also shows on pointer hover.
-- Copy and download are native buttons, and their icons are `aria-hidden`. After a copy, the button text changes to `copiedLabel` for 2 seconds. This change is not announced in a live region.
+- Reveal is a native button with `aria-pressed`. Its text switches between `labels.reveal` and `labels.hide`.
+- Copy and download are native buttons, and their icons are `aria-hidden`. After a copy, the button text changes to `labels.copied` for 2 seconds, and a status region that is always mounted announces it once.
 - The warning is `role="note"`.
-- The acknowledgement is a [Checkbox](../checkbox/README.md) labeled by `ackLabel`.
+- The acknowledgement is a [Checkbox](../checkbox/README.md) labeled by `labels.ack`.
 - With `prefers-reduced-motion: reduce`, the blur and button transitions are instant.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. Change them with `intro`, `warning`, `ackLabel`, `revealLabel`, `hideLabel`, `veilLabel`, `copyLabel`, `copiedLabel` and `downloadLabel`.
+- All built-in words follow `<LocaleProvider>` (`zh-TW` without one, `en` for other locales).
 
 ## Keyboard
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Moves through reveal, copy, download and the checkbox. The key area itself is not focusable. |
+| <kbd>Tab</kbd> | Moves to the key box (shows and selects the key), then reveal, copy, download and the checkbox. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates reveal, copy or download (native `<button>`). |
 | <kbd>Space</kbd> | Toggles the acknowledgement checkbox. |
 

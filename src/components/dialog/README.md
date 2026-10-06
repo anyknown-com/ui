@@ -46,23 +46,34 @@ const ok = await dialog.confirm({
 })
 ```
 
-- Declarative: `Dialog` (root; `open` / `defaultOpen` / `onOpenChange`), `DialogTrigger`, `DialogContent` (`title`, `description`, `size` `"sm"` / `"md"` / `"full"`, `body` for the part that scrolls under a pinned header, `sx`, `bodySx`), `DialogActions`, `DialogClose`, and `ConfirmDialog` (`title`, `description`, `danger`, `confirmLabel` (required), `cancelLabel`, `onConfirm`, `trigger`).
+- Declarative: `Dialog` (root; controlled `open` / `onOpenChange` or uncontrolled `defaultOpen`), `DialogTrigger`, `DialogContent` (`title`, `description`, `size` `"sm"` / `"md"` / `"full"`, `body` for the part that scrolls under a pinned header, `sx`, `bodySx`), `DialogActions`, `DialogClose`, and `ConfirmDialog` (`title`, `description`, `danger`, `confirmLabel` (required), `cancelLabel`, `onConfirm`, `trigger`, `labels`, plus `open` / `defaultOpen` / `onOpenChange`).
 - `dialog.open(({ close }) => <DialogContent … />, { role? })` returns `{ id, close(result?), result }`; `result` is a Promise. `render` must return a `DialogContent`, or stacked dialogs above it never mount.
 - `dialog.confirm({ title, description?, confirmLabel, cancelLabel?, tone? })` resolves `true` or `false`; `dialog.alert({ title, description?, confirmLabel?, tone? })` resolves when its one button is pressed. Both render the ConfirmDialog card.
 - `dialog.close(id, result?)` also closes every dialog stacked above it; `dialog.closeAll()` closes all. Escape, backdrop and `closeAll` resolve `undefined` (`false` for confirm).
-- Scoping: `createDialogManager()` plus `<Dialogs manager={m}>…</Dialogs>`; `useDialog()` returns `{ dialog }` for the nearest host, or the default `dialog`.
+- A closed imperative dialog fades out: its promise settles when the exit starts, and its `DialogEntry` (from `getSnapshot()`) stays with `closing: true` until the exit ends.
+- Scoping: `createDialogManager()` plus `<Dialogs manager={m}>…</Dialogs>`; `useDialog()` returns `{ dialog }` for the nearest `<Dialogs>` that wraps the caller as `children`, or the default `dialog` outside one.
+
+```tsx
+const m = createDialogManager()
+<Dialogs manager={m} labels={{ cancel: "Keep it" }}><Panel /></Dialogs>
+
+function Panel() {
+  const { dialog } = useDialog() // reaches m
+  return <Button onClick={() => dialog.alert({ title: "Saved" })}>Save</Button>
+}
+```
 
 ## Accessibility
 
 - Base UI Dialog: `role="dialog"` named by the `title` and described by the `description`. Focus moves in and is trapped, the page behind is inert, and scroll is locked.
 - `ConfirmDialog`, `dialog.confirm` and `dialog.alert` use Base UI AlertDialog: `role="alertdialog"`. A backdrop click does not close it; Escape does. `dialog.open(…, { role: "alertdialog" })` gets the same behavior.
 - With `danger` (or `tone: "danger"`), focus starts on the cancel button.
-- `confirmLabel` is required: start with a verb that names the result ("Delete memory"), not "OK".
-- Focus returns to the element that opened the dialog as soon as the exit starts, not after the fade.
+- `confirmLabel` is required on a confirm: start with a verb that names the result ("Delete memory"), not "OK".
+- Focus returns to the element that opened the dialog as soon as the exit starts, not after the fade. In a stack, it goes to the opener inside the dialog below.
 - Stacked dialogs nest, so Escape closes only the top one and screen readers see the top one.
 - There is no built-in close (×) button; give every dialog a `DialogClose` or another way out besides Escape.
 - The grow-in and the exit fade/shrink are off under `prefers-reduced-motion: reduce`. A transparent border keeps an edge in forced-colors mode.
-- Built-in words are Traditional Chinese defaults and do not follow `<LocaleProvider>`: `cancelLabel` (`取消`) and the alert's `confirmLabel` (`知道了`). Pass them for other languages.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `cancel` (取消 / Cancel) on a confirm's cancel button and `acknowledge` (知道了 / OK) on an alert's only button. Override them with `labels` on `<Dialogs>` or `<ConfirmDialog>`; an explicit `cancelLabel` / `confirmLabel` wins over both.
 
 ## Keyboard
 
@@ -71,7 +82,7 @@ Base UI Dialog handles these keys.
 | Key | Action |
 | --- | --- |
 | <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Moves focus within the dialog; it does not leave. |
-| <kbd>Escape</kbd> | Closes the top dialog (confirm resolves `false`). |
+| <kbd>Escape</kbd> | Closes only the top dialog (confirm resolves `false`) and returns focus to its opener. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused button. |
 
 ## Related

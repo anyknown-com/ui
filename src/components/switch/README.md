@@ -25,7 +25,7 @@ import { Switch } from "@anyknown/ui"
 />
 ```
 
-It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChecked`). The native `onChange` is still called.
+It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChecked`, with `onCheckedChange` to listen). The native `onChange` is still called.
 
 ## Accessibility
 
@@ -34,11 +34,12 @@ It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChe
 - `description` is added to `aria-describedby`, before any Field help or error.
 - `aria-invalid="true"` comes from `aria-invalid` or a Field `error`.
 - Inside a [Field](../label/README.md), give only `help`, `error` or `disabled`.
-- Focus ring: a 2px `focusRing` outline 3px outside the track when the input has `:focus-visible`.
+- Focus ring: a 2px `focusRing` outline 3px outside the track when the input has `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the track gets a `ButtonText` frame; on is a `Highlight` track with a `HighlightText` thumb; disabled draws in `GrayText`.
 - The thumb moves with `inset-inline-start`, so it follows `dir="rtl"`.
 - The track and thumb transitions (180ms) are instant under `prefers-reduced-motion: reduce`.
 - Disabled: the whole row dims to 50% and shows `not-allowed`.
-- Known gap (A11Y-DEBT): without `label` the track is 22.4px tall, below the 24px hit area.
+- The track is drawn 22.4px tall, but the transparent native input over it is at least 24px tall, so the target meets 24px even without `label`. With a label the whole row is also clickable.
 
 ## Keyboard
 

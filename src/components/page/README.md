@@ -27,7 +27,7 @@ The family:
 - `PageSub`, `FootNote`, `Hint` — muted sentences (under a section, under a group, above a control).
 - `Snippet` — a muted mono `<pre>` that wraps.
 - `Panel` — a sunken `surface` region, with no border. `padded` is for prose.
-- `StatLine`, `StatBar` (`percent`, `label`, `text`), `Bars` (`values`, `tip`, `from`, `to`).
+- `StatLine`, `StatBar` (`percent`, `label`, `text`), `Bars` (`values`, `tip`, `from`, `to`, `labels`).
 - `Faint` — muted inline text.
 - `B` and `Sub` are deprecated aliases of `PageNumber` and `PageSub`.
 
@@ -53,9 +53,9 @@ import { PageHead, PageNumber, PageSub, SectionLabel, StatBar, StatLine } from "
 - `PageHead` renders the page's `<h1>`. Use one per page.
 - `SectionLabel` is a `<div>`, not a heading, so sections do not appear in a screen reader's heading list. Wrap it in your own `<h2>` if the page needs that structure.
 - `StatBar` is `role="progressbar"` with `aria-valuemin` 0, `aria-valuemax` 100 and a rounded `aria-valuenow`. `label` becomes its `aria-label`. It is optional in the type, but pass it. `text` becomes `aria-valuetext`.
-- `Bars` gives each bar only a `title` (from `tip`). Its `aria-label` is on a `<div>` with no role, so screen readers will likely ignore it, and the values are not exposed. Give the same numbers in text near the chart.
+- `Bars` is a `role="group"` named by `labels.range(from, to)` ("9/1 到 9/3" / "9/1 to 9/3"; follows `<LocaleProvider>`, and `labels` (`PageLabels`) overrides it). Each bar has only a `title` (from `tip`), so the values are not exposed to screen readers. Give the same numbers in text near the chart.
 - `Snippet` is a plain `<pre>` with no copy button.
-- No focus handling, motion or built-in words of their own.
+- No focus handling or motion of their own. `Bars`' range name is the only built-in word.
 
 ## Keyboard
 

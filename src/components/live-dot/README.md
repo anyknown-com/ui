@@ -32,8 +32,9 @@ Without `label` the dot is decorative; give it one when nothing else on screen s
 - Without `label`: a bare `<span aria-hidden="true">`, invisible to assistive technology.
 - With `label`: a `<span role="status">` that holds the decorative dot and the label in a visually hidden span. The region announces the label when it appears or changes.
 - `label` is plain text from the caller; the component has no built-in words.
-- The dot breathes from full opacity to 0.35 and back over 1.6 s, never fading out, so it does not read as a flashing alert.
+- The dot breathes from full opacity to 0.35 and back over `motion.loopSlow` (1.6 s), never fading out, so it does not read as a flashing alert.
 - Under `prefers-reduced-motion: reduce` the animation stops; the dot stays visible.
+- Under `forced-colors: active` the dot paints in `Highlight` so it does not vanish with the other backgrounds.
 
 ## Keyboard
 

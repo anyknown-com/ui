@@ -28,11 +28,11 @@ import { AttachButton, PendingFiles } from "@anyknown/ui"
 
 ## Accessibility
 
-- The control is an [IconButton](../icon-button/README.md): a native `<button>` whose `aria-label` and tooltip are `label` (default "附加檔案"). 2px focus ring.
+- The control is an [IconButton](../icon-button/README.md): a native `<button>` whose `aria-label` and tooltip are "附加檔案" ("Attach files" in `en`). 2px focus ring.
 - The real `<input type="file">` is `hidden` and `tabIndex={-1}`; keyboard and screen reader users only meet the button.
 - `disabled` disables both the button and the input.
 - No motion of its own.
-- The built-in word is a fixed Chinese default and does not follow `<LocaleProvider>`; pass `label`.
+- The built-in word follows `<LocaleProvider>` (`zh-TW` default, `en`): `attach`. Override it with `labels`; `label` wins over `labels`.
 
 ## Keyboard
 
@@ -40,7 +40,7 @@ import { AttachButton, PendingFiles } from "@anyknown/ui"
 | --- | --- |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Opens the file picker (native `<button>`). |
 
-The tooltip opens on keyboard focus (Base UI Tooltip).
+The tooltip opens on keyboard focus; <kbd>Esc</kbd> hides it.
 
 ## Related
 

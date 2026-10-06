@@ -2,7 +2,7 @@
 
 Not a component: a StyleX size helper and a stroke constant, so icons you draw or import line up with the ones in the library.
 
-- `icon` — StyleX styles `xs` / `sm` / `md` / `base` / `lg` = 12 / 14 / 16 / 18 / 20 px. Each sets width and height, `flex-shrink: 0` and `pointer-events: none`.
+- `icon` — StyleX styles `xs` / `sm` / `md` / `base` / `lg` = 12 / 14 / 16 / 18 / 20 px, read from the `iconSize` token (`@anyknown/ui/tokens.stylex`). Each sets width and height, `flex-shrink: 0` and `pointer-events: none`.
 - `ICON_STROKE` — `2`, the stroke width every library glyph uses (24-unit view box, round caps and joins, `currentColor`).
 
 ## When to use
@@ -41,7 +41,7 @@ The glyphs the library draws for itself (check, close, chevron and others) are i
 
 - The helper sets no role or aria attributes. Mark a decorative icon `aria-hidden="true"`, as the library's own glyphs are.
 - An icon that is the only content of a control gets its name from the control: `label` on [IconButton](../icon-button/README.md), `aria-label` on [Button](../button/README.md).
-- Use `stroke="currentColor"` so the icon follows the text color of its control.
+- Use `stroke="currentColor"` so the icon follows the text color of its control, including the system colors under `forced-colors: active`.
 
 ## Keyboard
 

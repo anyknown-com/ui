@@ -27,10 +27,10 @@ The package ships no highlighter and takes no HTML string. Without `highlight` t
 
 ## Accessibility
 
-- The copy button is an [IconButton](../icon-button/README.md) (native `<button>`, 32px): its `aria-label` and tooltip are `copyLabel` (default "複製"), then `copiedLabel` (default "已複製") for 1.5 seconds while the icon turns into a check. The change is not announced through a live region.
+- The copy button is an [IconButton](../icon-button/README.md) (native `<button>`, 32px): its `aria-label` and tooltip are "複製", then "已複製" for 1.5 seconds while the icon turns into a check. The change is not announced through a live region.
 - The code is a plain `<pre>` in a container that scrolls sideways. The scroll container is not focusable, so keyboard users cannot scroll a wide payload; the copy button still gives them the full text.
 - No motion of its own.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`; pass `copyLabel` and `copiedLabel`.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `copy`, `copied`. Override either with `labels`; `copyLabel` and `copiedLabel` win over `labels`.
 
 ## Keyboard
 
@@ -38,7 +38,7 @@ The package ships no highlighter and takes no HTML string. Without `highlight` t
 | --- | --- |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Copies `code` (native `<button>`). |
 
-The tooltip opens on keyboard focus (Base UI Tooltip).
+The tooltip opens on keyboard focus; <kbd>Esc</kbd> hides it.
 
 ## Related
 

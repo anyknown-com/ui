@@ -38,7 +38,7 @@ import {
 </DropdownMenu>
 ```
 
-The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`), `DropdownItem`, `DropdownCheckboxItem`, `DropdownGroup`, `DropdownSeparator` and `DropdownSub` (submenus nest to any depth).
+The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`), `DropdownItem` (`onSelect`, `icon`, `shortcut`, `variant`, `disabled`, `closeOnClick`), `DropdownCheckboxItem` (`checked` / `defaultChecked` / `onCheckedChange`, `disabled`, `closeOnClick`), `DropdownGroup`, `DropdownSeparator` and `DropdownSub` (`label`, `icon`, `disabled`; submenus nest to any depth).
 
 ## Accessibility
 
@@ -47,24 +47,27 @@ The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenC
 - `shortcut` is shown visually with `aria-hidden` and exposed as `aria-keyshortcuts`, so it is not part of the item's name. The menu does not bind the shortcut; the app must.
 - `icon` and the submenu chevron are `aria-hidden`.
 - `variant="danger"` is color only; the item text must say what happens.
+- `disabled` items (and a disabled `DropdownSub`) stay focusable with `aria-disabled`, so they can be found, but do nothing.
 - Highlighted item: `accentSubtle` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
 - The popup grow-in, the fade-out and the submenu animation are off under `prefers-reduced-motion: reduce`.
-- Escape closes the menu and returns focus to the trigger.
+- When the menu closes (Escape, Tab, or choosing an item, also from a submenu), focus returns to the trigger as soon as the exit starts, not after the fade.
+- The menu has no built-in words, so nothing here follows `<LocaleProvider>`; all text comes from you.
 
 ## Keyboard
 
-Base UI Menu handles these keys.
+Base UI Menu handles these keys (APG menu button).
 
 | Key | Action |
 | --- | --- |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>↓</kbd> on the trigger | Opens the menu. |
-| <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the highlight. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>↓</kbd> on the trigger | Opens the menu with the first item highlighted. |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the highlight through every item, disabled ones included; wraps at the ends. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Moves to the first or last item. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the item. A `DropdownItem` closes the menu; a checkbox item toggles and stays open. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the item. A `DropdownItem` closes the menu (unless `closeOnClick={false}`); a checkbox item toggles and stays open (unless `closeOnClick`). |
 | <kbd>→</kbd> | Opens the highlighted submenu. |
 | <kbd>←</kbd> | Closes the current submenu. |
 | <kbd>Escape</kbd> | Closes the menu and returns focus to the trigger. |
-| Typing a letter | Moves to the next item starting with it. |
+| <kbd>Tab</kbd> | Closes the menu. |
+| Typing | Moves to the next item starting with that letter; quick typing matches a prefix. |
 
 ## Related
 

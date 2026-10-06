@@ -30,7 +30,10 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@anyknown/ui"
 </Tabs>
 ```
 
-The family is `Tabs` (root; `value` / `defaultValue` / `onValueChange`, `variant` `"underline"` or `"pills"`), `TabsList`, `TabsTab` and `TabsPanel`.
+The family is `Tabs` (root; `variant` `"underline"` or `"pills"`), `TabsList` (`aria-label`), `TabsTab` (`value`, `disabled`) and `TabsPanel` (`value`).
+
+- Uncontrolled: `defaultValue` picks the first open tab; `onValueChange` still reports switches.
+- Controlled: pass `value` with `onValueChange`; the selected tab follows `value` only.
 
 ## Accessibility
 
@@ -40,7 +43,8 @@ The family is `Tabs` (root; `value` / `defaultValue` / `onValueChange`, `variant
 - Activation is manual: arrow keys move focus, and Enter or Space selects.
 - A disabled tab has `aria-disabled="true"`, stays focusable, never activates, and looks different.
 - Both variants keep tab semantics. In `pills`, the selected tab has a 1px `borderControl` ring so it stands out from the track.
-- The underline and pill indicators move without overshoot (240ms); the movement is off under `prefers-reduced-motion: reduce`.
+- The underline and pill indicators move without overshoot (`motion.slide`, 240ms); the movement is off under `prefers-reduced-motion: reduce`.
+- In forced-colors mode the underline and the selected pill are `Highlight` (pill text `HighlightText`), and a disabled tab is `GrayText`.
 
 ## Keyboard
 

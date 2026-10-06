@@ -23,10 +23,12 @@ import { HandoffReceipt } from "@anyknown/ui"
   memory={{ count: 3, items: ["Prefers pnpm", "Deploys on Cloudflare"] }}
   ledgerCount={42}
   handoffSummary="Pricing table done; FAQ is next."
+  open={open}
+  onOpenChange={setOpen}
 />
 ```
 
-`reason` is `"soft-threshold"` (default), `"hard-limit"` or `"state-transition"`; the last two add "(硬上限)" or "(狀態切換)" to the row text. It is a receipt, not a control: there are no action buttons, only the toggle.
+`reason` is `"soft-threshold"` (default), `"hard-limit"` or `"state-transition"`; the last two add "(硬上限)" or "(狀態切換)" to the row text. It starts collapsed; `defaultOpen` starts it open, or control it with `open` and `onOpenChange`. It is a receipt, not a control: there are no action buttons, only the toggle.
 
 ## Accessibility
 
@@ -34,7 +36,7 @@ import { HandoffReceipt } from "@anyknown/ui"
 - The collapsed body uses `inert`, not `hidden`: it is out of the accessibility tree and tab order but stays in layout so the open and close animation can run.
 - The reason is written into the row text, not shown by color alone.
 - `prefers-reduced-motion: reduce` removes the height, opacity, color and chevron transitions.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. The three checks take `memoryTitle` / `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel` and `ledgerTitle` / `ledgerLabel(count)`; the row sentence and reason words cannot be changed.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the row words `rotated`, `newSession`, `hardLimit`, `stateTransition`, and the checks' `memoryTitle` / `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel`, `ledgerTitle` / `ledgerLabel(count)`. Override any with `labels`; the same-named props win over `labels`.
 
 ## Keyboard
 

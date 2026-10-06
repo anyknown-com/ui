@@ -27,20 +27,22 @@ import { Field, Input } from "@anyknown/ui"
 ```tsx
 import { Input, Label } from "@anyknown/ui"
 
-<Label htmlFor="display-name" optional optionalLabel="optional">Display name</Label>
+<Label htmlFor="display-name" optional labels={{ optional: "if you like" }}>Display name</Label>
 <Input id="display-name" />
 ```
+
+`optionalLabel` is deprecated: use `labels={{ optional }}`.
 
 ## Accessibility
 
 - `Label` renders a native `<label>`. The required `*` is `aria-hidden="true"`; the requirement is announced by the control's native `required`, which `Field` sets.
-- The optional marker is visible text. Its word comes from `optionalLabel` (default `選填`); it does not follow `<LocaleProvider>`.
+- The optional marker is visible text. Its word (`labels.optional`) follows `<LocaleProvider>`: `選填` in zh-TW (the default), `optional` in en. A Field's `optional` uses the same word.
 - `Field` renders a `<div>` with the `Label` (`htmlFor` = the control id), the child, the error and the help.
 - `Field` owns the control `id`: a caller `id` on the child is ignored, so put exactly one control in a Field.
 - The control gets `aria-describedby` pointing at the error then the help, `aria-invalid="true"` when `error` is set, and `required` / `disabled` from the Field (a prop on the control wins).
 - The error is a `<p role="alert">`, so it is announced when it appears.
 - The whole Field dims to 50% when its control is disabled.
-- Controls that read the Field: Input, Textarea, Checkbox, Switch, PasswordInput. Radio reads `aria-describedby` and `disabled` but not the `id`. Select and Slider do not read the Field; give them their own `aria-label` or `label`.
+- Controls that read the Field: Input, Textarea, Checkbox, Switch, PasswordInput and Select (its trigger takes the id, so the label names it). Radio reads `aria-describedby`, `required` and `disabled` but not the `id`. Slider and Segmented do not read the Field; give them their own `aria-label` or `label`.
 
 ## Keyboard
 

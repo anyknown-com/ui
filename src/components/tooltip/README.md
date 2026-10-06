@@ -1,6 +1,6 @@
 # Tooltip
 
-A small floating hint that appears on hover or keyboard focus after 400ms, with one line of text and an optional shortcut, built on Base UI Tooltip.
+A small floating hint that appears after 400ms of hover or at once on keyboard focus, with one line of text and an optional shortcut, built on Base UI Tooltip.
 
 ## When to use
 
@@ -23,14 +23,16 @@ import { Button, KbdGroup, Tooltip } from "@anyknown/ui"
 </Tooltip>
 ```
 
-Props: `content`, `shortcut`, `side` (`"top"` default), `align` (`"center"` default), `delay` (400ms default), `disabled` (renders the child untouched). `TooltipProvider` (Base UI Tooltip.Provider) can wrap a region so neighboring tooltips share their delay.
+Props: `content`, `shortcut`, `side` (`"top"` default), `align` (`"center"` default), `delay` (hover delay, 400ms default), `disabled` (renders the child untouched). `TooltipProvider` (Base UI Tooltip.Provider) can wrap a region so that, after one tooltip opens, moving to a neighboring trigger opens the next at once.
 
 ## Accessibility
 
-- Base UI Tooltip: the child element becomes the trigger. The popup has `role="tooltip"`, and the trigger gets `aria-describedby` pointing at it only while it is open.
+- Base UI Tooltip: the child element becomes the trigger. The popup has `role="tooltip"`, and the trigger gets `aria-describedby` pointing at it only while it is open, so the reference never points at a missing element.
 - The tooltip describes; it does not name. An icon-only trigger still needs its own accessible name (`aria-label`, or IconButton's `label`).
 - The child must be one focusable element, so keyboard users can open the tooltip by focusing it.
-- Under `prefers-reduced-motion: reduce` the delay is 0 and the fade-in is off.
+- The tooltip has no built-in words; `content` is yours, so nothing here follows `<LocaleProvider>`.
+- It sits above dialogs and popovers.
+- Under `prefers-reduced-motion: reduce` the hover delay is 0 and the fade-in is off.
 - A transparent border keeps an edge in forced-colors mode.
 
 ## Keyboard
@@ -39,7 +41,8 @@ Base UI Tooltip handles these keys.
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Focusing the trigger opens the tooltip after the delay. |
+| <kbd>Tab</kbd> to the trigger | Focusing the trigger shows the tooltip at once (no delay). |
+| <kbd>Tab</kbd> away | Hides the tooltip. |
 | <kbd>Escape</kbd> | Hides the tooltip; focus stays on the trigger. |
 
 ## Related

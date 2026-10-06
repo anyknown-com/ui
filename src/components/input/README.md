@@ -20,11 +20,13 @@ A single-line text field drawn as a sunken cell on the page, with the same borde
 import { Field, Input } from "@anyknown/ui"
 
 <Field label="Workspace name" help="You can change this later in settings.">
-  <Input placeholder="e.g. anyknown" />
+  <Input value={name} onValueChange={setName} placeholder="e.g. anyknown" />
 </Field>
+
+<Input defaultValue="anyknown" onValueChange={save} aria-label="Workspace" />
 ```
 
-`size` is `"md"` (40px, default) or `"sm"` (32px), matching the Button heights.
+`value` / `defaultValue` work as on a native input. `onValueChange` gets the new string on every edit and runs after the native `onChange`, which still fires. `size` is `"md"` (40px, default) or `"sm"` (32px), matching the Button heights.
 
 ## Accessibility
 
@@ -36,7 +38,7 @@ import { Field, Input } from "@anyknown/ui"
 - Focus ring: on `:focus-visible` the border turns `focusRing` and a 2px solid `focusRing` outline sits 1px outside.
 - The border-color transition is turned off under `prefers-reduced-motion: reduce`.
 - On phones the font is 16px so iOS Safari does not zoom the page on focus.
-- Known gap (A11Y-DEBT): the placeholder uses `textFaint`, which is below 4.5:1 on `surface`. Do not put requirements in the placeholder; put them in the Field `help`.
+- The placeholder uses `textMuted` (at least 4.5:1). It is still not a label: put requirements in the Field `help`.
 
 ## Keyboard
 

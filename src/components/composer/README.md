@@ -18,7 +18,8 @@ The prompt bar pinned to the bottom of a conversation: a growing textarea with `
 import { Composer } from "@anyknown/ui"
 
 <Composer
-  placeholder="Talk to the agent"
+  value={draft}
+  onValueChange={setDraft}
   models={["Fable 5", "Opus 5"]}
   model={model}
   onModelChange={setModel}
@@ -29,28 +30,28 @@ import { Composer } from "@anyknown/ui"
 />
 ```
 
-The text is held inside the component and cleared after each send. `onSubmit` gets the text and the `@` sources still present in it. `sources` is async; stale answers are dropped. `/` commands only open when `/` is the first character. The mic button appears only when `onMicToggle` is given; `micActive` shows it pressed.
+`value` / `onValueChange` control the text; leave `value` out (optionally with `defaultValue`, e.g. a restored draft) and the component holds it. After each send it calls `onValueChange("")`, so a controlled composer clears when its owner applies that value. `onSubmit` gets the text and the `@` sources still present in it. `sources` is async; stale answers are dropped. `/` commands only open when `/` is the first character. The mic button appears only when `onMicToggle` is given; `micActive` shows it pressed.
 
 ## Accessibility
 
-- The textarea is named by `label` (default "訊息"). With `sources` or `commands` it becomes a `role="combobox"` with `aria-autocomplete="list"`, `aria-expanded`, `aria-controls` and `aria-activedescendant` pointing into a `role="listbox"` of `role="option"`s (named by `sourcesLabel` / `commandsLabel`). Focus stays in the textarea; the active option has a focus ring, and `Highlight` in forced colors.
+- The textarea is named "訊息" ("Message" in `en`). With `sources` or `commands` it becomes a `role="combobox"` with `aria-autocomplete="list"`, `aria-expanded`, `aria-controls` and `aria-activedescendant` pointing into a `role="listbox"` of `role="option"`s (named by the visible heading, "@ 來源" or "/ 指令"). Focus stays in the textarea; the active option has a focus ring, and `Highlight` in forced colors.
 - Bar buttons are native `<button>`s: "加入來源(@)" and "指令(/)" with `aria-expanded`, the mic with `aria-pressed`, and "送出", disabled while the text is empty. The model picker is a native `<select>` named "模型".
 - The whole sheet shows a 2px focus ring while anything inside has focus.
 - Font size is at least 16px on phones, so iOS does not zoom on focus.
 - Enter during IME composition commits the candidate, not the message.
 - `hint` is a plain paragraph; it is not linked to the textarea with `aria-describedby`.
 - `prefers-reduced-motion: reduce` removes the hover transitions.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. `placeholder`, `label`, `sourcesLabel` and `commandsLabel` are props; the bar button names, "模型" and the default command kind "指令" cannot be changed.
-- Known gap: the placeholder uses `textFaint` (3.75:1 in light), below 4.5:1 (see `A11Y-DEBT.md`).
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `placeholder`, `label`, `sources`, `commands`, `addSource`, `addCommand`, `model`, `voiceInput`, `send`, and `commandKind` (the tag on a command without `kind`). Override any with `labels`; `placeholder`, `label`, `sourcesLabel` and `commandsLabel` win over `labels`.
+- The placeholder uses `textMuted`, which meets 4.5:1.
 
 ## Keyboard
 
 | Key | Action |
 | --- | --- |
-| <kbd>Enter</kbd> | Sends the message; with the suggestion list open, inserts the active option. |
+| <kbd>Enter</kbd> | Sends the message (nothing happens while the text is blank); with the suggestion list open, inserts the active option. During IME composition it commits the candidate instead. |
 | <kbd>Shift</kbd> + <kbd>Enter</kbd> | Inserts a new line. |
 | <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the active option when the suggestion list is open (wraps around). |
-| <kbd>Esc</kbd> | Closes the suggestion list; typing reopens it. |
+| <kbd>Esc</kbd> | Closes the suggestion list when it is open; typing reopens it. |
 | <kbd>Tab</kbd> | Moves to the `@`, `/`, model, mic and send controls. |
 
 ## Related

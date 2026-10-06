@@ -29,10 +29,10 @@ The component keeps no state: `files` is what it shows and `onRemove(id)` asks t
 ## Accessibility
 
 - A plain `<div>` of [Chip](../badge/README.md)s; there is no list role or count.
-- Each chip's `×` is a native `<button>` with `aria-label` from `removeLabel(name)` (default "移除 `name`"). Its hit area is enlarged to 24px.
+- Each chip's `×` is a native `<button>` named "移除 `name`" ("Remove `name`" in `en`). Its hit area is enlarged to 24px.
 - Focus does not move after a chip is removed; the caller decides where it goes.
 - No motion of its own.
-- The built-in word is a fixed Chinese default and does not follow `<LocaleProvider>`; pass `removeLabel`.
+- The built-in word follows `<LocaleProvider>` (`zh-TW` default, `en`): `remove(name)`. Override it with `labels`; `removeLabel(name)` wins over `labels`.
 
 ## Keyboard
 

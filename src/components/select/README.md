@@ -16,37 +16,48 @@ A trigger styled like an input that opens a floating list with a search box, opt
 ## Usage
 
 ```tsx
-import { Select, SelectGroup, SelectItem } from "@anyknown/ui"
+import { Field, Select, SelectGroup, SelectItem } from "@anyknown/ui"
 
-<Select
-  aria-label="Model"
-  placeholder="Choose a model…"
-  searchPlaceholder="Search models…"
-  searchLabel="Search models"
-  emptyLabel={(query) => `No model matches “${query}”.`}
-  value={model}
-  onValueChange={(next: string) => setModel(next)}
->
-  <SelectGroup label="Anthropic">
-    <SelectItem value="fable-5" hint="Strongest">Fable 5</SelectItem>
-    <SelectItem value="sonnet-5" hint="Fast">Sonnet 5</SelectItem>
-  </SelectGroup>
+<Field label="Model" help="Used for new chats." error={error} required>
+  <Select
+    value={model}
+    onValueChange={(next: string) => setModel(next)}
+    labels={{ searchPlaceholder: "Search models…", empty: (q) => `No model matches “${q}”.` }}
+  >
+    <SelectGroup label="Anthropic">
+      <SelectItem value="fable-5" hint="Strongest">Fable 5</SelectItem>
+      <SelectItem value="sonnet-5" hint="Fast">Sonnet 5</SelectItem>
+    </SelectGroup>
+  </Select>
+</Field>
+
+// Outside a Field, name it yourself. Uncontrolled, several values:
+<Select aria-label="Memories" multiple defaultValue={["pnpm"]} name="memories">
+  <SelectItem value="pnpm">Prefer pnpm</SelectItem>
 </Select>
 ```
 
-The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`value`, `hint`, `disabled`, and `textValue` when the children are not plain text). With `multiple`, `value` is a `string[]` and `onValueChange` receives a `string[]`. `searchable={false}` hides the search box. Empty groups are hidden while filtering.
+The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`value`, `hint`, `disabled`, and `textValue` when the children are not plain text).
+
+- Value: `value` (controlled) or `defaultValue` (uncontrolled), and `onValueChange`. With `multiple`, the value is a `string[]`.
+- State: `disabled`, `required`, `invalid` (danger border and `aria-invalid`), and `name` to submit with a form. Inside a `Field`, `disabled`, `required`, `invalid` and `aria-describedby` come from the Field; props you pass win.
+- `searchable={false}` hides the search box. Empty groups are hidden while filtering.
+- Words: `labels` (`placeholder`, `searchPlaceholder`, `searchLabel`, `remove(item)`, `empty(query)`). The single props `placeholder`, `searchPlaceholder`, `searchLabel` and `emptyLabel(query)` still work and win over `labels`.
 
 ## Accessibility
 
-- Base UI Combobox: the trigger has `role="combobox"` with `aria-expanded`; the list is a `listbox` of `option`s; group labels name their groups.
-- Accessible name: pass `aria-label` or `aria-labelledby`. The trigger is labelled by that name and by its own text, so the current value is read too. Select does not read [Field](../label/README.md) context, so a Field `label` does not name it.
-- The search box is named by `searchLabel`. Without the search box, a visually hidden input carries the name.
-- The empty state shows the query (`emptyLabel(query)`).
+- APG select-only combobox on Base UI Combobox: the trigger has `role="combobox"` with `aria-expanded`; the list is a `listbox` of `option`s; group labels name their groups.
+- Name: inside a `Field`, the trigger takes the Field's control id, so the Field `label` names it and the Field's error and help describe it. Outside a Field, pass `aria-label` or `aria-labelledby`; the trigger's `aria-labelledby` then lists that name and the trigger itself, so the current value is read too. For `multiple` inside a Field, also pass `aria-label`.
+- `required` sets `aria-required`; `invalid` (or a Field `error`) sets `aria-invalid`.
+- The search box is named by `searchLabel`. Without the search box, a visually hidden input carries the Select's name.
+- Each chip's remove button is named by `remove(item)`. Clicking it does not open the list.
+- The empty state shows the query (`empty(query)`).
 - Highlighted option: `accentSubtle` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
 - Focus returns to the trigger as soon as the popup starts to close, not after the fade.
+- The popup sits above dialogs, so a Select inside a Dialog opens on top.
 - The popup grow-in and fade-out are off under `prefers-reduced-motion: reduce`.
-- Built-in words are Traditional Chinese defaults and do not follow `<LocaleProvider>`: `placeholder` (`選擇…`), `searchPlaceholder` (`搜尋…`), `searchLabel` (`搜尋選項`), `emptyLabel` (`找不到「…」。`). The chip remove button's name (`移除 <option>`) has no prop.
-- Known gap (A11Y-DEBT): the search placeholder uses `textFaint`, below 4.5:1.
+- Built-in words follow `<LocaleProvider>` (zh-TW by default, or en): `placeholder`, `searchPlaceholder`, `searchLabel`, `remove(item)`, `empty(query)`. Override them per instance with `labels`.
+- Known gap (A11Y-DEBT): the trigger placeholder and the search placeholder use `textFaint`, below 4.5:1.
 
 ## Keyboard
 
@@ -54,14 +65,15 @@ Base UI Combobox handles these keys.
 
 | Key | Action |
 | --- | --- |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>↓</kbd> on the trigger | Opens the list. |
+| <kbd>↓</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> on the trigger | Opens the list. |
 | Typing | Filters the options (when `searchable`). |
 | <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the highlight. |
-| <kbd>Enter</kbd> | Selects the highlighted option. Single select closes; `multiple` stays open. |
-| <kbd>Escape</kbd> | Closes the list. |
+| <kbd>Enter</kbd> | Picks the highlighted option. Single select closes and focus returns to the trigger; `multiple` stays open. |
+| <kbd>Escape</kbd> | Closes the list without picking; focus returns to the trigger. |
 
 ## Related
 
+- [Field](../label/README.md) — label, help and error for the trigger.
 - [DropdownMenu](../dropdown/README.md) — for actions instead of values.
 - [RadioGroup](../radio/README.md) — for short lists that stay visible.
 - [Popover](../popover/README.md) — the floating layer Select shares its look with.

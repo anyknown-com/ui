@@ -23,13 +23,15 @@ const effortLabel = (v: number) => (v < 0.3 ? "Low" : v < 0.6 ? "Medium" : "High
 <Slider
   label={`Thinking · ${effortLabel(effort)}`}
   value={effort}
-  onChange={setEffort}
+  onValueChange={setEffort}
   onValueCommit={saveEffort}
   valueText={effortLabel}
 />
+
+<Slider aria-label="Volume" defaultValue={0.5} onValueCommit={saveVolume} />
 ```
 
-The Slider is always controlled: `value` and `onChange` are required. `min` / `max` / `step` default to 0 / 1 / 0.01; every value is clamped and snapped to `step`. `onChange` fires while the value moves. `onValueCommit` fires once when a drag ends (including `pointercancel`) and once per key press that moved the value, and never when the value did not change. Save in `onValueCommit`.
+It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`, which defaults to `min`). `onChange` is deprecated: use `onValueChange` (both are called with the same value). `min` / `max` / `step` default to 0 / 1 / 0.01; every value is clamped and snapped to `step`. `largeStep` sets the PageUp / PageDown jump (default 10% of the range). `onValueChange` fires while the value moves. `onValueCommit` fires once when a drag ends (including `pointercancel`) and once per key press that moved the value, and never when the value did not change. Save in `onValueCommit`.
 
 ## Accessibility
 
@@ -37,7 +39,9 @@ The Slider is always controlled: `value` and `onChange` are required. `min` / `m
 - Accessible name: `label` (rendered as text and linked with `aria-labelledby`) or `aria-label`. One of them is needed.
 - Use `valueText` so the value is read as a word ("High"), not "0.62".
 - Disabled: `aria-disabled="true"`, `tabIndex={-1}` (out of the tab order), keys and pointer ignored, 50% opacity.
-- Focus ring: a 2px `focusRing` outline on `:focus-visible`.
+- The track and thumb are 24px tall, which meets the 24px minimum target.
+- Focus ring: a 2px `focusRing` outline on `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the track gets a `ButtonText` frame and the fill and thumb ring paint in `Highlight`; disabled draws in `GrayText`.
 - The fill and thumb move together (200ms ease-out); the transition is off while dragging and under `prefers-reduced-motion: reduce`.
 - Pointer: pressing the track focuses the slider and captures the pointer until release.
 - The Slider does not read [Field](../label/README.md) context; use its own `label`.
@@ -48,10 +52,11 @@ The Slider is always controlled: `value` and `onChange` are required. `min` / `m
 | --- | --- |
 | <kbd>→</kbd> / <kbd>↑</kbd> | Increases by 5% of the range (not by `step`), then snaps. |
 | <kbd>←</kbd> / <kbd>↓</kbd> | Decreases by 5% of the range, then snaps. |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Increases / decreases by `largeStep` (default 10% of the range), then snaps. |
 | <kbd>Home</kbd> | Moves to `min`. |
 | <kbd>End</kbd> | Moves to `max`. |
 
-The value stops at the ends; it does not wrap.
+The value stops at the ends; it does not wrap. Each key press that moves the value calls `onValueCommit` once. Keys do nothing while `disabled`.
 
 ## Related
 

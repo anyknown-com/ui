@@ -37,7 +37,9 @@ The family is `Popover` (root; `open` / `defaultOpen` / `onOpenChange`, `modal`)
 - Base UI Popover: the trigger gets `aria-expanded`; the popup is `role="dialog"`, labelled by `PopoverTitle` and described by `PopoverDescription`.
 - The popup needs a name, and the types enforce it: pass `aria-label="…"` to `PopoverContent`, or pass `titled` and render a `PopoverTitle` inside.
 - `PopoverTrigger` and `PopoverClose` render their single child element; it must be focusable and have its own name.
-- Focus moves into the popup when it opens. Escape and a click outside close it, and focus returns to the trigger.
+- Focus moves into the popup when it opens. Escape and a click outside close it, and focus returns to the trigger as soon as the exit starts, not after the fade.
+- By default the popover is non-modal. `modal` traps focus inside it and makes the page behind inert while it is open.
+- The popover has no built-in words, so nothing here follows `<LocaleProvider>`.
 - The popup is portalled to `document.body` and sits above dialogs, so a Popover inside a Dialog is not hidden.
 - The grow-in and fade-out are off under `prefers-reduced-motion: reduce`. A transparent border keeps an edge in forced-colors mode.
 - Width is capped at `min(22rem, 100vw − 2rem)`, so long text wraps on narrow screens.
@@ -51,6 +53,7 @@ Base UI Popover handles these keys.
 | <kbd>Enter</kbd> / <kbd>Space</kbd> on the trigger | Opens the popover (native `<button>`) and moves focus into it. |
 | <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Moves through the content. |
 | <kbd>Escape</kbd> | Closes the popover and returns focus to the trigger. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> on a `PopoverClose` child | Closes the popover and returns focus to the trigger. |
 
 ## Related
 

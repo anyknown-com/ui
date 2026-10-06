@@ -31,7 +31,7 @@ import { StatusBadge } from "@anyknown/ui"
 - A `<span>` with no role for `warn` and `plain`; the text is read in place and is not a live region.
 - With `tone="live"` the badge contains a `LiveDot` with `role="status"` that carries the text in a visually hidden span, and the visible text is `aria-hidden`. A screen reader hears the state once, and again when the text changes.
 - Color is never the only signal: each tone shows its state in words.
-- Under `prefers-reduced-motion: reduce` the live dot stops breathing but stays visible.
+- Under `prefers-reduced-motion: reduce` the live dot stops breathing but stays visible. Under `forced-colors: active` it paints in `Highlight`.
 
 ## Keyboard
 

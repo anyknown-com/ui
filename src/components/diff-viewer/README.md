@@ -21,22 +21,21 @@ import { DiffViewer } from "@anyknown/ui"
 <DiffViewer
   file={{ path: "apps/desktop/src/memory/memory-panel.tsx", before: previousSource, after: nextSource }}
   collapseContext={3}
-  foldLabel={(count) => `⋯ ${count} unchanged lines`}
+  labels={{ fold: (count) => `⋯ ${count} unchanged lines` }}
 />
 ```
 
-`collapseContext` is the number of unchanged lines kept around each change (3 by default, and `Infinity` never folds). `wordDiff={false}` turns off the word marks. The header shows a kind dot (modified, added or deleted), the path, and `+N −N`.
+`collapseContext` is the number of unchanged lines kept around each change (3 by default, and `Infinity` never folds). `wordDiff={false}` turns off the word marks. The header shows a kind dot (modified, added or deleted), the path, and `+N −N`. `labels` (`DiffViewerLabels`: `modified`, `added`, `deleted`, `addedLine`, `removedLine`, `region(path)`, `fold(count)`) overrides any built-in word; `foldLabel(count)` still works and wins over `labels.fold`.
 
 ## Accessibility
 
-- The header states the kind in visually hidden text ("已修改", "新增檔案", "已刪除") next to the `aria-hidden` color dot. The `+N −N` counts are visible text.
-- The lines sit in a scroll container with `role="region"`, `aria-label` "{path} 的變更", and `tabIndex={0}`, so keyboard users can scroll it.
-- Line numbers and the `+` / `−` signs are `aria-hidden`. Added and removed lines start with visually hidden "新增行" / "刪除行", so the change is not shown by color alone.
-- Changed words are `<mark>` elements.
+- The header states the kind in visually hidden text ("已修改" / "Modified", "新增檔案" / "Added file", "已刪除" / "Deleted") next to the `aria-hidden` color dot. The `+N −N` counts are visible text.
+- The lines sit in a scroll container with `role="region"`, named "{path} 的變更" / "Changes to {path}", and `tabIndex={0}`, so keyboard users can scroll it.
+- Every added or removed line keeps a visible `+` / `−` sign, and starts with visually hidden "新增行" / "Added line" or "刪除行" / "Removed line", so the change is not shown by color alone. Line numbers and signs are `aria-hidden`.
+- Changed words are `<ins>` (underlined) and `<del>` (struck through) on top of the tint; in forced-colors mode they use `Mark` / `MarkText`.
 - Each fold is a native button with `aria-expanded` and `aria-controls`. The folded lines are `hidden` until it opens.
-- Focus rings are 2px `focusRing` outlines. With `prefers-reduced-motion: reduce`, the fold opens without its unfold animation and transitions are instant.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. Only the fold text can change, with `foldLabel`. The kind words, line prefixes and region name cannot.
-- Known gap (A11Y-DEBT): the word highlight is only a fill, at 1.15–1.23:1 against the line background.
+- Focus rings are `focusRing` outlines. With `prefers-reduced-motion: reduce`, the fold opens without its unfold animation and the chevron turns instantly.
+- All built-in words follow `<LocaleProvider>` (`zh-TW` without one, `en` for other locales); `labels` overrides single words.
 
 ## Keyboard
 

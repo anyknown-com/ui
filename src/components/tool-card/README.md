@@ -18,7 +18,7 @@ The receipt for one tool call: a single row with the tool's icon, a verb, its ma
 
 The family:
 
-- `ToolCard` — the card. `tool` picks the icon and default verb (`read`, `edit`, `write`, `shell`, `search`, `fetch`, `subagent`; anything else gets a wrench). `shell`, `edit`, `write` and any `error` start expanded.
+- `ToolCard` — the card. `tool` picks the icon and default verb (`read`, `edit`, `write`, `shell`, `search`, `fetch`, `subagent`; anything else gets a wrench). `shell`, `edit`, `write` and any `error` start expanded unless you pass `defaultOpen` or control `open` / `onOpenChange` (a controlled card does not open itself on error). `progress` (0–1) fills the bar of a running call; without it the bar sweeps.
 - `ToolInput`, `ToolOutput`, `ToolError` — the panes inside the expanded area. `ToolError` adds a copy button.
 - `SubagentLine` — the second row of a subagent card: model chip, then `now` or `toolCount`.
 - `SubagentSummary` — a three-line summary shown while collapsed (pass as `footer`).
@@ -35,17 +35,22 @@ import { ToolCard, ToolError, ToolInput, ToolOutput } from "@anyknown/ui"
 <ToolCard tool="shell" state="error" subtitle="pnpm build" retry={{ attempt: 2, max: 3, delayMs: 3000 }}>
   <ToolError text={stderr} />
 </ToolCard>
+
+<ToolCard tool="fetch" state="running" subtitle={url} progress={0.4} open={open} onOpenChange={setOpen}>
+  <ToolOutput text={partial} />
+</ToolCard>
 ```
 
 ## Accessibility
 
 - The whole row is one native `<button>` with `aria-expanded` and `aria-controls`; the detail area uses `hidden` when collapsed. 2px focus ring inside the row.
-- Completed and failed states change the icon shape (check, cross) and add hidden text from `completedLabel` / `errorLabel`, so state is not color alone.
-- A persistent visually hidden `role="status"` region announces the state and the retry sentence (`runningLabel`, `completedLabel`, `errorLabel`, `retryLabel(attempt, max, seconds)`). The visible retry line is `aria-hidden` so it is not read twice.
+- Completed and failed states change the icon shape (check, cross) and add hidden state text, so state is not color alone. In forced-colors mode the tile and card get frames.
+- A persistent visually hidden `role="status"` region announces the state and the retry sentence. The visible retry line is `aria-hidden` so it is not read twice.
+- With `progress` on a running card, a visually hidden `role="progressbar"` (0–100) sits beside the row, named by the title and subtitle.
 - A clipped `subtitle` keeps its full text in `title`; expanded, it wraps instead.
 - Input, output and error panes are `<pre role="group" tabIndex={0}>` named by their `label` (defaults "輸入", "輸出", "錯誤"), so wide output can be scrolled from the keyboard.
 - `prefers-reduced-motion: reduce` stops the progress sweep and the subagent shimmer and removes the chevron transition; the retry spinner keeps turning at half speed.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. The default verbs and `SubagentLine`'s "N 工具" cannot be changed; use `title` for the verb.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the verbs, `running`, `completed`, `failed`, `retry(attempt, max, seconds)`, the pane names, `copyError`, `copied` and `toolCount(n)`. Override any with `labels` on `ToolCard`; the panes and `SubagentLine` inside read the same overrides. Per-prop words (`runningLabel`, `completedLabel`, `errorLabel`, `retryLabel`, a pane's `label`, `copyLabel`, `copiedLabel`) win over `labels`.
 
 ## Keyboard
 

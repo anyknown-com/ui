@@ -39,18 +39,18 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 />
 ```
 
-`onReply` receives `"once"`, `{ always: scope }` or `{ reject: true }`. `onAnswer` receives `{ [blockId]: string | string[] }`.
+`onReply` receives `"once"`, `{ always: scope }` or `{ reject: true }`; `scope` defaults to the locale's word ("這個指令", "this command" in `en`). `onAnswer` receives `{ [blockId]: string | string[] }`. Both cards take `labels`.
 
 ## Accessibility
 
-- `PermissionCard` is a `role="group"` named "`verb`:`subject`". The subject is a `<pre role="region" tabIndex={0}>` named by `verb`, so a long command can be scrolled from the keyboard. `DecisionCard` has no group role or name of its own.
+- `PermissionCard` is a `role="group"` named "`verb`:`subject`" (`labels.cardName`). The subject is a `<pre role="region" tabIndex={0}>` named by `verb`, so a long command can be scrolled from the keyboard. `DecisionCard` has no group role or name of its own.
 - Reply buttons are [Button](../button/README.md)s. The shortcut glyphs (⏎, ⌘⏎, Esc) are `aria-hidden`; "總是允許" and "拒絕" carry `aria-keyshortcuts`.
-- Options are native radios (inside a `RadioGroup` `<fieldset>`) or native checkboxes (inside a `<fieldset>`). With no block `label`, the group takes `aria-label` from `title`. Required groups set `aria-required`.
+- Single-choice options are native radios in a `RadioGroup` with `role="radiogroup"`; a required one sets `aria-required`. Multiple-choice options are native checkboxes in a `<fieldset>` (group semantics), which has no `aria-required`: a required checkbox group is shown only by the disabled submit button. With no block `label`, the group takes `aria-label` from `title`.
 - A free-text block is a `<textarea>` named by its `label`, or by `title`.
 - Each card has an `aria-live="polite"` paragraph that exists while pending (visually hidden, empty) and fills with the receipt when `resolved` arrives, so the answer is announced.
-- Rejected receipts are marked by color only (a red check); the receipt text should say "rejected".
+- A rejected receipt swaps the check for a cross as well as turning red, so it is not color alone.
 - `prefers-reduced-motion: reduce` removes the ring and border transitions.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. Props cover `scope`, `blockingLabel`, `submitLabel`, `recommendedLabel` and `deadlineLabel`; the reply button names, "已回覆", "決定", "已決定" and "建議" cannot be changed.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `cardName`, the badges (`blocking`, `waiting`, `replied`, `decided`), the reply buttons (`allowOnce`, `allowAlways`, `reject`), `scope`, `decide`, `submit`, `acceptRecommended`, `recommended`. Override any with `labels`; `scope`, `blockingLabel`, `deadlineLabel`, `submitLabel` and `recommendedLabel` win over `labels`.
 - Known gap: free-text placeholders use `textFaint` (3.75:1 in light), below 4.5:1 (see `A11Y-DEBT.md`).
 
 ## Keyboard
@@ -58,7 +58,7 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 | Key | Action |
 | --- | --- |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused button (native `<button>`); plain Enter is never intercepted. |
-| <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd> | `PermissionCard`: always allow, while focus is on one of its three buttons. |
+| <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd> | `PermissionCard`: always allow (`{ always: scope }`), while focus is on one of its three buttons. |
 | <kbd>Esc</kbd> | `PermissionCard`: reject, while focus is on one of its three buttons. |
 | Arrow keys | Move the choice within a radio group (native radios). |
 | <kbd>Space</kbd> | Toggles a checkbox option (native checkbox). |

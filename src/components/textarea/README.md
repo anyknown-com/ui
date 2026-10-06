@@ -18,9 +18,17 @@ A multi-line text field with the same styling as Input, which can grow with its 
 import { Field, Textarea } from "@anyknown/ui"
 
 <Field label="Handoff note">
-  <Textarea autoGrow maxRows={8} placeholder="What should the next session know?" />
+  <Textarea
+    autoGrow
+    maxRows={8}
+    value={note}
+    onValueChange={setNote}
+    placeholder="What should the next session know?"
+  />
 </Field>
 ```
+
+`value` / `defaultValue` work as on a native textarea. `onValueChange` gets the new string on every edit and runs after the native `onChange`, which still fires.
 
 `autoGrow` sizes the field in this order:
 
@@ -48,7 +56,7 @@ setTextLayoutEngine(pretext)
 - Inside a Field, the Field owns the `id` and supplies `aria-describedby`, `required` and `disabled`.
 - `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`.
 - Focus ring, reduced-motion handling and the 16px phone font are the same as [Input](../input/README.md).
-- Known gap (A11Y-DEBT): the placeholder uses `textFaint`, which is below 4.5:1 on `surface`.
+- The placeholder uses `textMuted` (at least 4.5:1). It is still not a label: put requirements in the Field `help`.
 
 ## Keyboard
 

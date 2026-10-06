@@ -24,7 +24,7 @@ The family:
 - `TableCell` — a cell: `mono`, `num` (right-aligned), `faint`. For the phone layout: `order`, `prefixed` (`· ` before it), `pushed` (to the line end), `grow` and `hidden`.
 - `StatusCell` — the state column: nothing when fine, a warning dot and a code when `warn`.
 - `Subject` — a mono identifier that is also a button (for example, filter by it).
-- `Toggle` — the chevron button at a row's end that opens a `Detail`.
+- `Toggle` — the chevron button at a row's end that opens a `Detail`. `open` is required; `onOpenChange(!open)` and `onPress` are both called on press.
 - `Detail` — the content under a row.
 - `Break` — the line break where a phone row wraps.
 - `MoreRow` — a 40px "show more" button at the end.
@@ -52,7 +52,7 @@ const COLS = "minmax(0, 1fr) 6rem 5rem 24px"
         <TableCell num>{key.uses}</TableCell>
         <Toggle
           open={openId === key.id}
-          onPress={() => setOpenId(openId === key.id ? null : key.id)}
+          onOpenChange={(open) => setOpenId(open ? key.id : null)}
           label={`Details for ${key.name}`}
           controls={`key-${key.id}`}
         />

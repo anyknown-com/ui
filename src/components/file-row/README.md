@@ -17,21 +17,20 @@ One row of a file browser (type icon, name, mono size, modified time, and a chec
 
 The family:
 
-- `FileList` — the rest card (`surfaceRaised`, `shadow.rest`) with hairlines between rows. It shows an optional selection count under it.
-- `FileRow` — one row for a `FileItem` (`kind`, `name`, `size`, `mtime`). Click toggles the selection and double-click calls `onOpen`. `actions` are icon buttons.
+- `FileList` — the rest card (`surfaceRaised`, `shadow.rest`) with hairlines between rows. Given `selectedCount`, it shows a live selection count under it.
+- `FileRow` — one row for a `FileItem` (`kind`, `name`, `size`, `mtime`). A click toggles the selection and a double-click calls `onOpen`. `actions` are icon buttons; pressing one does not change the selection.
 
 ```tsx
 import { FileList, FileRow } from "@anyknown/ui"
 
-<FileList label="Files" selectedCount={selected.size} selectedLabel={(n) => `${n} selected`}>
+<FileList label="Files in Taxes" selectedCount={selected.size}>
   {items.map((item) => (
     <FileRow
       key={item.name}
       item={item}
       selected={selected.has(item.name)}
-      onSelectChange={(on) => toggle(item.name, on)}
+      onSelectedChange={(on) => toggle(item.name, on)}
       onOpen={() => openItem(item)}
-      selectLabel={(name) => `Select ${name}`}
       actions={[
         { icon: <DownloadIcon />, label: `Download ${item.name}`, onAction: () => download(item) },
       ]}
@@ -41,20 +40,22 @@ import { FileList, FileRow } from "@anyknown/ui"
 </FileList>
 ```
 
-A folder, or a file with no `size`, shows `—` in the size column. A busy row (`encrypting`, `uploading`) has no checkbox and no actions.
+Selection is controlled (`selected` + `onSelectedChange`) or uncontrolled (`defaultSelected`). A folder, or a file with no `size`, shows `—` in the size column. A busy row (`encrypting`, `uploading`) has no checkbox and no actions. `icon` replaces the file or folder glyph.
+
+Deprecated: `onSelectChange` (use `onSelectedChange`), `selectLabel` (use `labels={{ select }}`) and FileList's `selectedLabel` (use `labels={{ selected }}`). While passed, they win over `labels`.
 
 ## Accessibility
 
 - `FileList` is `role="grid"` with `aria-multiselectable="true"`. `label` (required) is its `aria-label`.
 - Each `FileRow` is `role="row"` with `role="gridcell"` children. It is focusable (`tabIndex={0}`) and has `aria-selected`. The icon cell is `aria-hidden`. The name has a `title` with the full name.
-- The checkbox is native and named by `selectLabel(name)` (default "選取 {name}").
+- The checkbox is native, named by `labels.select(name)`, and sits in a 24px label; clicking the label toggles the row once.
 - Each action is a native button named by its `label`. Include the file name in it.
 - The checkbox and actions appear on hover, on focus within the row, when the row is selected, and always on devices without hover (`(hover: none)`).
-- A busy row has `aria-busy="true"`. An uploading row has a `progressbar` with `aria-valuetext` "{name} 上傳中 N%".
-- `selectedCount` renders an `aria-live="polite"` line with `selectedLabel(count)`.
+- A busy row has `aria-busy="true"`. An encrypting row says `labels.encrypting`. An uploading row has a `progressbar` named by the file name, with `aria-valuetext` from `labels.uploading(name, percent)`.
+- `selectedCount` renders an `aria-live="polite"` line with `labels.selected(count)`, empty at 0.
+- The words (`select`, `encrypting`, `uploading`, `selected`) follow `<LocaleProvider>` (zh-TW by default). `FileRow` and `FileList` both take `labels` (`Partial<FileRowLabels>`).
 - Focus rings are 2px `focusRing` outlines. With `prefers-reduced-motion: reduce`, the encrypting spinner stops.
-- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. `selectLabel` and `selectedLabel` change two of them. "加密中" and "上傳中" cannot be changed today.
-- Known gaps: the grid has no arrow-key navigation, and every row is its own Tab stop. The row checkbox hit area is 16px (A11Y-DEBT).
+- Known gap: the grid has no arrow-key navigation, and every row is its own Tab stop.
 
 ## Keyboard
 

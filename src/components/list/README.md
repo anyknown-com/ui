@@ -20,7 +20,7 @@ A list of things you open, such as memories or questions: a muted head over the 
 The family:
 
 - `ListHead` — the column names, `t1` and muted, with a hairline under them. It accepts any `<div>` attribute, such as `aria-hidden`.
-- `ListSort` — a column name that orders the list. When `active`, it goes dark and ` ↓` follows it.
+- `ListSort` — a column name (a plain string) that orders the list. When `active`, it goes dark, ` ↓` follows it, and its name gains "sorted". `labels.sorted(column)` changes that word.
 - `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 40` and grows when it wraps.
 - `WeightDot` — the 8px mark in front of a question. `weight="light"` is a grey dot (it goes ahead if nobody answers), `soon` turns it red (about to go ahead), and `weight="heavy"` is an orange ring (it waits for you).
 
@@ -61,11 +61,11 @@ Give the middle column `minmax(0, 1fr)`. Cell text wraps inside its column (`ove
 
 - `ListHead` is a plain `<div>`, not a set of column headers. If no column in it can sort, pass `aria-hidden="true"` to hide it from screen readers.
 - `ListRow` is a native `<button>`. Its accessible name is the text of all its cells joined together, so keep the cells short.
-- `ListSort` is a native `<button>`. The active state is the darker color and a ` ↓` that is read as text. It does not set `aria-sort` or `aria-pressed`.
+- `ListSort` is a native `<button>` named by its text. When `active`, its accessible name becomes "Created, sorted" (zh-TW "建立，排序中") and the ` ↓` is `aria-hidden`. It does not set `aria-sort` or `aria-pressed`. An `aria-label` you pass wins.
 - `WeightDot` is a `<span>` with only an optional `title`. It has no role and no text, so the weight is invisible to screen readers. Say it in words in the row as well.
 - The rows are not a `<ul>`, so there is no list count.
 - Focus rings, press scale and reduced motion come from Ghost (a 2px `focusRing` outline, a 0.98 press that is off under `prefers-reduced-motion: reduce`).
-- No built-in words.
+- The only built-in word is ListSort's `sorted`; it follows `<LocaleProvider>` and `labels` overrides it.
 
 ## Keyboard
 

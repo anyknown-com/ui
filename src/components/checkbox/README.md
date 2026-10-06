@@ -27,7 +27,7 @@ import { Checkbox } from "@anyknown/ui"
 />
 ```
 
-It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChecked`). The native `onChange` is still called.
+It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChecked`, with `onCheckedChange` to listen). The native `onChange` is still called.
 
 ## Accessibility
 
@@ -37,10 +37,11 @@ It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChe
 - `indeterminate` is written to the native element's `indeterminate` property, so assistive technology reports "mixed".
 - `aria-invalid="true"` comes from `aria-invalid` or a Field `error`; the box border turns `danger`.
 - Inside a [Field](../label/README.md), give only `help`, `error` or `disabled`; the Checkbox already has its own label.
-- Focus ring: a 2px `focusRing` outline around the box when the input has `:focus-visible`.
+- Focus ring: a 2px `focusRing` outline around the box when the input has `:focus-visible` (`Highlight` under forced colors).
+- Under `forced-colors: active` the box is a `ButtonText` frame on `Canvas`; checked fills with `Highlight` and a `HighlightText` tick; disabled draws in `GrayText`.
 - The tick draw (160ms) and color transitions are instant under `prefers-reduced-motion: reduce`.
 - Disabled: the whole row dims to 50% and shows `not-allowed`.
-- Known gap (A11Y-DEBT): without `label` the hit area is 16.8px, below 24px. With a label the whole label row is the hit area.
+- The box is drawn at about 17px, but the transparent native input over it is at least 24×24px, so the target meets 24px even without `label`. With a label the whole label row is also clickable.
 
 ## Keyboard
 

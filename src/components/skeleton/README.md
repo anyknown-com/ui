@@ -39,8 +39,9 @@ A `line` is 0.8rem tall and full width unless you set `width` / `height`. A `cir
 - Each `Skeleton` is a `<div aria-hidden="true">`; bones are never read.
 - `SkeletonGroup` is `role="status"` with `aria-label` from the required `label`, plus the same text in a visually hidden span, so the region is announced once as loading.
 - Always wrap bones in a `SkeletonGroup` (or use `ThreadSkeleton`); bare bones give assistive technology no sign that anything is loading.
-- `ThreadSkeleton`'s default `label` is hard-coded ("thread 載入中") and does not follow `<LocaleProvider>`; pass `label` in other locales.
+- `ThreadSkeleton`'s default label (`labels.loading`) follows `<LocaleProvider>` (zh-TW, en). `label` wins over `labels.loading`.
 - Under `prefers-reduced-motion: reduce` the shimmer gradient and animation are removed; the bones stay as flat shapes.
+- Under `forced-colors: active` each bone drops its fill and sheen and keeps a 1 px `GrayText` border.
 
 ## Keyboard
 
