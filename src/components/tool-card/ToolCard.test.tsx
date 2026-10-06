@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { SubagentLine, SubagentSummary, ToolCard, ToolError, ToolInput, ToolOutput } from "./ToolCard"
 
 describe("ToolCard", () => {
@@ -173,6 +174,52 @@ describe("ToolCard open state", () => {
 		expect(row).toHaveAttribute("aria-expanded", "true")
 		await userEvent.keyboard(" ")
 		expect(row).toHaveAttribute("aria-expanded", "false")
+	})
+})
+
+describe("ToolCard axe", () => {
+	test("running, indeterminate, closed", async () => {
+		const { container } = render(<ToolCard tool="read" state="running" subtitle="a.ts" />)
+		await expectNoAxeViolations(container)
+	})
+
+	test("running with progress", async () => {
+		const { container } = render(
+			<ToolCard tool="fetch" state="running" subtitle="example.com" progress={0.4} />,
+		)
+		await expectNoAxeViolations(container)
+	})
+
+	test("done, open", async () => {
+		const { container } = render(
+			<ToolCard tool="shell" state="completed" subtitle="pnpm test" durationMs={1200}>
+				<ToolInput json={{ cmd: "pnpm test" }} />
+				<ToolOutput text="Tests 84 passed" />
+			</ToolCard>,
+		)
+		await expectNoAxeViolations(container)
+	})
+
+	test("failed with retry, open", async () => {
+		const { container } = render(
+			<ToolCard tool="shell" state="error" retry={{ attempt: 2, max: 3, delayMs: 3000 }}>
+				<ToolError text="Error: ENOMEM" />
+			</ToolCard>,
+		)
+		await expectNoAxeViolations(container)
+	})
+
+	test("subagent, closed", async () => {
+		const { container } = render(
+			<ToolCard
+				tool="subagent"
+				subtitle="調查 retry 事件缺漏"
+				state="completed"
+				secondLine={<SubagentLine model="sonnet-5" toolCount={7} />}
+				footer={<SubagentSummary>缺口在 turn.ts</SubagentSummary>}
+			/>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
 
