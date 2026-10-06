@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"paths": {
+			"@anyknown/ui": ["../src/index.ts"],
+			"@anyknown/ui/tokens.stylex": ["../src/tokens.stylex.ts"],
+			"@anyknown/ui/themes.stylex": ["../src/themes.stylex.ts"]
+		}
+	},
+	"include": ["."],
+	"exclude": ["dist"]
+}

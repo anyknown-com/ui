@@ -39,7 +39,8 @@
 	},
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/esm-extensions.mjs && cp src/tokens.css src/scrollbar.css dist/ && node scripts/brand-css.mjs",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc -p playground/tsconfig.json",
+		"typecheck:playground": "tsc -p playground/tsconfig.json",
 		"lint": "oxlint src",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",

@@ -25,7 +25,10 @@
 				"!src/**/*.html",
 				"tsconfig.json",
 				"stylex.vite.ts",
-				"vitest.config.ts"
+				"vitest.config.ts",
+				"playground/**",
+				"!playground/**/*.html",
+				"!playground/dist/**"
 			]
 		},
 		"lint": {
