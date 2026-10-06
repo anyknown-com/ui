@@ -116,10 +116,10 @@ describe("Select", () => {
 	})
 })
 
-describe("Select keyboard and axe", () => {
-	const highlighted = () =>
-		screen.getAllByRole("option").find((option) => option.hasAttribute("data-highlighted"))
+const highlighted = () =>
+	screen.getAllByRole("option").find((option) => option.hasAttribute("data-highlighted"))
 
+describe("Select keyboard and axe", () => {
 	test("ArrowDown opens; arrows move; Enter picks; focus returns to the trigger", async () => {
 		const onValueChange = vi.fn()
 		render(<Models onValueChange={onValueChange} />)

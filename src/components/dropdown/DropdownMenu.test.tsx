@@ -161,21 +161,21 @@ describe("DropdownMenu focus return", () => {
 	})
 })
 
+function Plain() {
+	return (
+		<DropdownMenu trigger={<Button>動作</Button>}>
+			<DropdownItem>複製</DropdownItem>
+			<DropdownItem>封存</DropdownItem>
+			<DropdownItem disabled>移動</DropdownItem>
+			<DropdownItem>刪除</DropdownItem>
+		</DropdownMenu>
+	)
+}
+
+const highlighted = () =>
+	screen.getAllByRole("menuitem").find((item) => item.hasAttribute("data-highlighted"))
+
 describe("DropdownMenu keyboard (APG menu button)", () => {
-	function Plain() {
-		return (
-			<DropdownMenu trigger={<Button>動作</Button>}>
-				<DropdownItem>複製</DropdownItem>
-				<DropdownItem>封存</DropdownItem>
-				<DropdownItem disabled>移動</DropdownItem>
-				<DropdownItem>刪除</DropdownItem>
-			</DropdownMenu>
-		)
-	}
-
-	const highlighted = () =>
-		screen.getAllByRole("menuitem").find((item) => item.hasAttribute("data-highlighted"))
-
 	test("ArrowDown on the trigger opens the menu on the first item", async () => {
 		render(<Plain />)
 		screen.getByRole("button", { name: "動作" }).focus()
