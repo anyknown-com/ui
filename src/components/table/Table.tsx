@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, motion, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
@@ -10,7 +10,6 @@ import type { ReactNode } from "react"
  */
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
-const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	table: {
@@ -25,7 +24,7 @@ const styles = stylex.create({
 		backgroundColor: color.surface,
 		borderRadius: corner.small,
 		color: color.textMuted,
-		display: { default: "grid", [PHONE]: "none" },
+		display: { default: "grid", [breakpoint.phone]: "none" },
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		gap: space.sm,
@@ -36,14 +35,14 @@ const styles = stylex.create({
 	row: {
 		alignItems: "center",
 		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
-		columnGap: { default: space.sm, [PHONE]: space.xs },
-		display: { default: "grid", [PHONE]: "flex" },
+		columnGap: { default: space.sm, [breakpoint.phone]: space.xs },
+		display: { default: "grid", [breakpoint.phone]: "flex" },
 		flexWrap: "wrap",
 		fontSize: type.t2,
-		height: { default: 34, [PHONE]: "auto" },
-		lineHeight: { default: type.body, [PHONE]: "1.4" },
-		minHeight: { default: 34, [PHONE]: 52 },
-		paddingBlock: { default: 0, [PHONE]: space.xs },
+		height: { default: 34, [breakpoint.phone]: "auto" },
+		lineHeight: { default: type.body, [breakpoint.phone]: "1.4" },
+		minHeight: { default: 34, [breakpoint.phone]: 52 },
+		paddingBlock: { default: 0, [breakpoint.phone]: space.xs },
 		paddingInline: space.sm,
 		rowGap: 0,
 	},

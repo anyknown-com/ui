@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, font, text as textSize, type } from "../../tokens.stylex"
+import { breakpoint, color, font, text as textSize, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
@@ -14,7 +14,6 @@ import { Textarea, type TextareaProps } from "../textarea/Textarea"
  */
 
 // iOS Safari 在 16px 以下的欄位 focus 時會放大整頁;手機上欄位一律 16px
-const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	hairline: {
@@ -82,7 +81,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: { default: type.t3, [PHONE]: textSize.base },
+		fontSize: { default: type.t3, [breakpoint.phone]: textSize.base },
 		height: 44,
 		minHeight: 0,
 		outline: "none",
@@ -105,7 +104,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: { default: type.t3, [PHONE]: textSize.base },
+		fontSize: { default: type.t3, [breakpoint.phone]: textSize.base },
 		lineHeight: type.body,
 		minHeight: 0,
 		outline: "none",

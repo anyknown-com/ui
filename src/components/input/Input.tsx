@@ -1,10 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
-
-const PHONE = "@media (max-width: 45rem)"
 
 // 輸入框是紙上凹下去的一格:surface 底 + 1px border(邊界要 3:1 才看得到,只靠底色不夠)。
 // focus 時框換 focusRing(= signal),外面再貼一圈 2px 實心的 focusRing:淡環對底色不到 3:1,
@@ -26,7 +24,7 @@ export const controlStyles = stylex.create({
 		color: color.text,
 		fontFamily: font.body,
 		// iOS Safari 在 16px 以下的欄位 focus 時會放大整頁;手機上一律 16px,不靠 maximum-scale
-		fontSize: { default: text.sm, [PHONE]: text.base },
+		fontSize: { default: text.sm, [breakpoint.phone]: text.base },
 		// 單行控件的行高只要裝得下字:行高一大,md 會被撐得比 button 的 2.5rem 高
 		// (Textarea 自己蓋回 leadingRelaxed,多行照樣好讀)
 		lineHeight: text.leadingTight,
@@ -48,7 +46,7 @@ export const controlStyles = stylex.create({
 		minHeight: "2rem",
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
-		fontSize: { default: type.t2, [PHONE]: text.base },
+		fontSize: { default: type.t2, [breakpoint.phone]: text.base },
 	},
 })
 

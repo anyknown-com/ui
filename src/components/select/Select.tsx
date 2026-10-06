@@ -3,10 +3,8 @@ import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
-import { color, corner, font, space, text, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, space, text, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
-
-const PHONE = "@media (max-width: 45rem)"
 
 export type SelectItemProps = {
 	value: string
@@ -107,7 +105,7 @@ const styles = stylex.create({
 	searchInput: {
 		flex: 1,
 		fontFamily: font.body,
-		fontSize: { default: text.sm, [PHONE]: text.base },
+		fontSize: { default: text.sm, [breakpoint.phone]: text.base },
 		color: color.text,
 		// 打開就落在這裡,閃動的游標就是焦點;UA 的框會把搜尋列框成第二個輸入框
 		outline: "none",

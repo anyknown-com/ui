@@ -3,11 +3,10 @@ import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useStat
 import { flushSync } from "react-dom"
 import { press, reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
-const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	// 凹下去的 surface 紙,無框;打字時外圈一條 signal 焦點環
@@ -29,7 +28,7 @@ const styles = stylex.create({
 		boxSizing: "border-box",
 		fontFamily: font.body,
 		// iOS Safari 在 16px 以下的欄位 focus 時會放大整頁
-		fontSize: { default: type.t3, [PHONE]: text.base },
+		fontSize: { default: type.t3, [breakpoint.phone]: text.base },
 		lineHeight: type.body,
 		color: color.text,
 		backgroundColor: "transparent",

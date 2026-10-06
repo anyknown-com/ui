@@ -1,10 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
 import { press } from "../../lib/styled"
-import { color, corner, font, radius, shadow, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, radius, shadow, space, type } from "../../tokens.stylex"
 
 /** `.seg`: a few words on a sunken track; the chosen one is a sheet of paper raised on it. */
-
-const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	root: {
@@ -16,7 +14,7 @@ const styles = stylex.create({
 		display: "inline-flex",
 		gap: 2,
 		maxWidth: "100%",
-		overflowX: { default: "visible", [PHONE]: "auto" },
+		overflowX: { default: "visible", [breakpoint.phone]: "auto" },
 		padding: space.xxs,
 		scrollbarWidth: "none",
 	},
@@ -30,7 +28,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		fontFamily: font.body,
 		fontSize: type.t2,
-		height: { default: 28, [PHONE]: 40 },
+		height: { default: 28, [breakpoint.phone]: 40 },
 		lineHeight: type.body,
 		margin: 0,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },

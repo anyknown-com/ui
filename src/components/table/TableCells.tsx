@@ -1,12 +1,11 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, ink, motion, space, tone, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, font, ink, motion, space, tone, type } from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
 import type { ReactNode } from "react"
 import { icon } from "../icon/icon"
 
 /** The cells a `Tr` is made of; each says where it lands once the row wraps on a phone. */
 
-const PHONE = "@media (max-width: 45rem)"
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
@@ -20,7 +19,7 @@ const styles = stylex.create({
 	},
 	num: {
 		fontFamily: font.mono,
-		textAlign: { default: "end", [PHONE]: "start" },
+		textAlign: { default: "end", [breakpoint.phone]: "start" },
 		whiteSpace: "nowrap",
 	},
 	faint: { color: color.textMuted, fontFamily: font.mono, fontSize: type.t1, whiteSpace: "nowrap" },
@@ -33,12 +32,12 @@ const styles = stylex.create({
 	},
 	warn: { color: color.warning },
 	dot: { backgroundColor: color.warning, borderRadius: "50%", flex: "none", height: 6, width: 6 },
-	order: (order: number) => ({ order: { default: 0, [PHONE]: order } }),
-	prefixed: { "::before": { content: { default: "none", [PHONE]: '"· "' } } },
-	pushed: { marginInlineStart: { default: 0, [PHONE]: "auto" } },
-	grow: { flex: { default: "none", [PHONE]: "1 1 auto" } },
-	brk: { display: { default: "none", [PHONE]: "block" }, flex: "0 0 100%", height: 0 },
-	hidden: { display: { default: "block", [PHONE]: "none" } },
+	order: (order: number) => ({ order: { default: 0, [breakpoint.phone]: order } }),
+	prefixed: { "::before": { content: { default: "none", [breakpoint.phone]: '"· "' } } },
+	pushed: { marginInlineStart: { default: 0, [breakpoint.phone]: "auto" } },
+	grow: { flex: { default: "none", [breakpoint.phone]: "1 1 auto" } },
+	brk: { display: { default: "none", [breakpoint.phone]: "block" }, flex: "0 0 100%", height: 0 },
+	hidden: { display: { default: "block", [breakpoint.phone]: "none" } },
 	toggle: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":hover": ink.n8 },
