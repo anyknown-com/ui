@@ -105,18 +105,34 @@ export const font = stylex.defineVars({
 	mono: "'Geist Mono Variable', 'Geist Mono', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
+/**
+ * @deprecated The old type scale. Use `type`; each key names its replacement. Values are left
+ * as they were, so code still on `text` renders exactly as before.
+ */
 export const text = stylex.defineVars({
+	/** @deprecated Use `type.t1` (11px; this is 12px). */
 	xs: "0.75rem",
+	/** @deprecated Use `type.t2` (13px; this is 14px). */
 	sm: "0.875rem",
+	/** @deprecated Use `type.t3` (15px; this is 16px), or `type.phoneInput` for a phone-size input. */
 	base: "1rem",
+	/** @deprecated Use `type.t4` (17px; this is 18px). */
 	lg: "1.125rem",
+	/** @deprecated Use `type.t5` (same 22px). */
 	xl: "1.375rem",
+	/** @deprecated Use `type.t6` (same 28px). */
 	xxl: "1.75rem",
+	/** @deprecated Use `type.t7` (same 36px). */
 	display: "2.25rem",
+	/** @deprecated Use `type.code` (same 13px). */
 	code: "0.8125rem",
+	/** @deprecated Use `type.dense` (same 1.2). */
 	leadingTight: "1.2",
+	/** @deprecated Use `type.snug` (1.45). */
 	leadingSnug: "1.4",
+	/** @deprecated Use `type.snug` (1.45). */
 	leadingNormal: "1.5",
+	/** @deprecated Use `type.body` (same 1.6). */
 	leadingRelaxed: "1.6",
 })
 
@@ -217,16 +233,45 @@ export const focusRing = stylex.defineVars({
 	width: "2px",
 })
 
-// Product-level scales: four text sizes, the corner each kind of control wears,
+// Product-level scales: the type scale, the corner each kind of control wears,
 // the ink washes hover paints with, and the four surfaces `color` has no name for.
+
+/**
+ * The one type scale. Sizes are rem so they follow the reader's font-size setting; the px in
+ * each note is at the default 16px root. Steps t1–t4 are the UI, t5–t7 are headings.
+ * Line heights sit in the same group: `body` for running text, `snug` / `tight` for UI rows,
+ * `dense` for headings and single-line controls.
+ */
 export const type = stylex.defineVars({
-	t1: "11px",
-	t2: "13px",
-	t3: "15px",
-	t4: "17px",
+	/** 11px: chips, counters, timestamps, help and error lines. */
+	t1: "0.6875rem",
+	/** 13px: controls, labels, table cells, secondary text. */
+	t2: "0.8125rem",
+	/** 15px: body text and conversation. */
+	t3: "0.9375rem",
+	/** 17px: small headings (dialog title, markdown h1). */
+	t4: "1.0625rem",
+	/** 22px: section title (`<Text variant="title">`). */
+	t5: "1.375rem",
+	/** 28px: page title. */
+	t6: "1.75rem",
+	/** 36px: display (`<Text variant="display">`). */
+	t7: "2.25rem",
+	/** 13px: monospace code blocks and diffs (Geist Mono reads larger than Figtree). */
+	code: "0.8125rem",
+	/**
+	 * 16px: text inputs at `breakpoint.phone` only. iOS Safari zooms the page when a focused
+	 * field is under 16px, so this is the floor there; it is not a step of the scale.
+	 */
+	phoneInput: "1rem",
+	/** Line height for running text (15px body). */
 	body: "1.6",
+	/** Line height for compact UI rows (chips, list rows, table cells). */
 	tight: "1.35",
+	/** Line height for UI text that may wrap. */
 	snug: "1.45",
+	/** Line height for t5–t7 headings and single-line controls (button labels). */
+	dense: "1.2",
 })
 
 export const tone = stylex.defineVars({
