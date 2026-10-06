@@ -8,6 +8,9 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const spin = stylex.keyframes({ to: { rotate: "360deg" } })
 
+// 清單比這窄時,大小與時間排到檔名下面第二行,動作鈕跨兩行靠右,檔名才有位置
+const NARROW = "@container (max-width: 30rem)"
+
 const styles = stylex.create({
 	// A rest card on the sheet: white in light, `surface` in dark (`tone.railLayer2`), the ring is
 	// its only edge.
@@ -16,13 +19,19 @@ const styles = stylex.create({
 		backgroundColor: tone.railLayer2,
 		boxShadow: shadow.rest,
 		overflow: "hidden",
+		containerType: "inline-size",
 	},
 	row: {
 		display: "grid",
-		gridTemplateColumns: "2rem 1.5rem minmax(0, 1fr) 5.5rem 6.5rem 4.6rem",
+		gridTemplateColumns: {
+			default: "2rem 1.5rem minmax(0, 1fr) 5.5rem 6.5rem 4.6rem",
+			[NARROW]: "2rem 1.5rem auto minmax(0, 1fr) auto",
+		},
 		alignItems: "center",
-		gap: space.xxs,
-		height: "2.6rem",
+		columnGap: space.xxs,
+		rowGap: { default: space.xxs, [NARROW]: 0 },
+		height: { default: "2.6rem", [NARROW]: "auto" },
+		paddingBlock: { default: 0, [NARROW]: space.xs },
 		paddingInline: space.xxs,
 		borderBottomWidth: 1,
 		borderBottomStyle: "solid",
@@ -40,7 +49,8 @@ const styles = stylex.create({
 	},
 	selected: { backgroundColor: color.accentSubtle, "--ak-row-affordance": "1" },
 	busy: { color: color.textMuted, cursor: "progress" },
-	checkCell: { display: "grid", placeItems: "center" },
+	checkCell: { display: "grid", placeItems: "center", gridRow: { default: "auto", [NARROW]: "1 / 3" } },
+	iconCell: { gridRow: { default: "auto", [NARROW]: "1 / 3" } },
 	check: {
 		justifySelf: "center",
 		width: "1rem",
@@ -51,17 +61,31 @@ const styles = stylex.create({
 	},
 	icon: { color: color.textMuted },
 	folderIcon: { color: color.accent },
-	name: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+	name: {
+		overflow: "hidden",
+		textOverflow: "ellipsis",
+		whiteSpace: "nowrap",
+		gridColumn: { default: "auto", [NARROW]: "3 / 5" },
+	},
 	size: {
 		fontFamily: font.mono,
 		fontSize: "0.78rem",
 		lineHeight: 1,
 		fontVariantNumeric: "tabular-nums",
 		color: color.textMuted,
-		textAlign: "end",
+		textAlign: { default: "end", [NARROW]: "start" },
+		gridColumn: { default: "auto", [NARROW]: "3" },
+		gridRow: { default: "auto", [NARROW]: "2" },
 	},
-	mtime: { fontSize: "0.78rem", color: color.textMuted },
+	mtime: {
+		fontSize: "0.78rem",
+		color: color.textMuted,
+		gridColumn: { default: "auto", [NARROW]: "4" },
+		gridRow: { default: "auto", [NARROW]: "2" },
+	},
 	actions: {
+		gridColumn: { default: "auto", [NARROW]: "5" },
+		gridRow: { default: "auto", [NARROW]: "1 / 3" },
 		display: "flex",
 		justifyContent: "end",
 		gap: "0.15rem",
@@ -86,7 +110,8 @@ const styles = stylex.create({
 		marginTop: space.xxs,
 	},
 	busyCell: {
-		gridColumn: "4 / 7",
+		gridColumn: { default: "4 / 7", [NARROW]: "3 / 6" },
+		gridRow: { default: "auto", [NARROW]: "2" },
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
@@ -213,8 +238,8 @@ export function FileRow({
 				aria-selected={selected}
 				{...stylex.props(styles.row, styles.busy)}
 			>
-				<span role="gridcell" aria-label={selectLabel(item.name)} />
-				<span role="gridcell" aria-hidden="true">
+				<span role="gridcell" aria-label={selectLabel(item.name)} {...stylex.props(styles.checkCell)} />
+				<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 					{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
 				</span>
 				<span role="gridcell" {...stylex.props(styles.name)}>
@@ -270,7 +295,7 @@ export function FileRow({
 					{...stylex.props(styles.check)}
 				/>
 			</span>
-			<span role="gridcell" aria-hidden="true">
+			<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 				{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
 			</span>
 			<span role="gridcell" {...stylex.props(styles.name)}>
