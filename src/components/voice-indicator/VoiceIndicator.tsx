@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { useAnimationFrame } from "../../lib/useAnimationFrame"
 import { type VoiceState, voicePath } from "../../lib/voice"
@@ -37,25 +38,60 @@ const styles = stylex.create({
 	},
 })
 
-const STATE_TEXT: Record<VoiceState, { strong: string; rest: string }> = {
-	idle: { strong: "閒置", rest: "" },
-	listening: { strong: "聆聽中", rest: "…說完就送" },
-	thinking: { strong: "思考中", rest: "" },
-	speaking: { strong: "說話中", rest: "…插話會打斷" },
+const strings = defineStrings({
+	"zh-TW": {
+		idle: "閒置",
+		listening: "聆聽中",
+		thinking: "思考中",
+		speaking: "說話中",
+		listeningHint: "…說完就送",
+		speakingHint: "…插話會打斷",
+		standby: "通話待命 · ",
+	},
+	en: {
+		idle: "Idle",
+		listening: "Listening",
+		thinking: "Thinking",
+		speaking: "Speaking",
+		listeningHint: "… sends when you stop",
+		speakingHint: "… talk to interrupt",
+		standby: "Call on standby · ",
+	},
+})
+
+/**
+ * The VoiceIndicator's built-in words (follow `<LocaleProvider>`): one name per state, the
+ * hints after listening and speaking, and the `standby` prefix shown before idle.
+ */
+export type VoiceIndicatorLabels = StringsOf<typeof strings>
+
+const HINT: Record<VoiceState, "listeningHint" | "speakingHint" | null> = {
+	idle: null,
+	listening: "listeningHint",
+	thinking: null,
+	speaking: "speakingHint",
 }
 
 export type VoiceIndicatorProps = {
+	/** What the voice session is doing; the status text is announced when it changes. */
 	state: VoiceState
+	/** Input loudness from 0 to 1; only moves the drawing, never the announced text. */
 	level?: number
+	/** Shorthand that replaces the state's name (`labels[state]`); wins over it. */
 	statusLabel?: string
+	/** Override built-in words for this indicator; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<VoiceIndicatorLabels>
 }
 
-export function VoiceIndicator({ state, level = 0.4, statusLabel }: VoiceIndicatorProps) {
+/** A voice session's state: a decorative waveform plus a polite status line. */
+export function VoiceIndicator({ state, level = 0.4, statusLabel, labels }: VoiceIndicatorProps) {
+	const words = useStrings(strings, labels)
 	const reduced = usePrefersReducedMotion()
 	const [t, setT] = useState(1.2)
 	useAnimationFrame(!reduced && state !== "idle", (elapsed) => setT(elapsed / 1000))
 
-	const copy = STATE_TEXT[state]
+	const name = statusLabel ?? words[state]
+	const hint = HINT[state]
 
 	return (
 		<div {...stylex.props(styles.voice)}>
@@ -66,13 +102,13 @@ export function VoiceIndicator({ state, level = 0.4, statusLabel }: VoiceIndicat
 				/>
 			</svg>
 			<span role="status" {...stylex.props(styles.label)}>
-				{state === "idle" && "通話待命 · "}
-				<b {...stylex.props(styles.labelStrong)}>{statusLabel ?? copy.strong}</b>
-				{copy.rest}
+				{state === "idle" && words.standby}
+				<b {...stylex.props(styles.labelStrong)}>{name}</b>
+				{hint != null && words[hint]}
 			</span>
 			{state !== "idle" && (
 				<span aria-hidden="true" {...stylex.props(styles.motionLabel)}>
-					{statusLabel ?? copy.strong}
+					{name}
 				</span>
 			)}
 		</div>

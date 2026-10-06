@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { voicePath } from "../../lib/voice"
 import { VoiceIndicator } from "./VoiceIndicator"
 
@@ -44,6 +45,22 @@ describe("VoiceIndicator", () => {
 		unmount()
 		render(<VoiceIndicator state="idle" />)
 		expect(screen.queryAllByText("閒置")).toHaveLength(1)
+	})
+
+	test("follows the LocaleProvider; labels and statusLabel override words", () => {
+		const { unmount } = render(
+			<LocaleProvider locale="en">
+				<VoiceIndicator state="speaking" labels={{ speakingHint: " (interrupt any time)" }} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("status")).toHaveTextContent("Speaking (interrupt any time)")
+		unmount()
+		render(
+			<LocaleProvider locale="en">
+				<VoiceIndicator state="idle" statusLabel="Ready" />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("status")).toHaveTextContent("Call on standby · Ready")
 	})
 
 	test("is not interactive", () => {
