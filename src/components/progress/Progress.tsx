@@ -215,6 +215,7 @@ export type ProgressProps = {
 	stages?: string[]
 	/** Override the built-in stage names; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<ProgressLabels>
+	/** Extra class names for the progress bar element. */
 	className?: string
 	/** The progress bar's accessible name. */
 	"aria-label": string
@@ -270,13 +271,19 @@ function ProgressTidy({ stages, valueText, ...rest }: ProgressTidyProps) {
 }
 
 export type ProgressBallProps = {
+	/** 0–100; out-of-range values are clamped. */
 	value: number
+	/** Diameter in px. Defaults to 48. */
 	size?: number
+	/** Human-readable reading for screen readers, e.g. "下載模型 64%". */
 	valueText: string
+	/** Extra class names for the svg. */
 	className?: string
+	/** The progress bar's accessible name. */
 	"aria-label": string
 }
 
+/** A filled ring for a reading such as a download, with no number inside. */
 export function ProgressBall({ value, size = 48, valueText, ...rest }: ProgressBallProps) {
 	const percent = clampPercent(value)
 	const band = size * 0.12
@@ -309,13 +316,19 @@ export function ProgressBall({ value, size = 48, valueText, ...rest }: ProgressB
 }
 
 export type ProgressRingProps = {
+	/** 0–100; out-of-range values are clamped. */
 	value: number
+	/** Diameter in px. Defaults to 60. */
 	size?: number
+	/** Human-readable reading for screen readers, e.g. "128k context 已用 42%". */
 	valueText: string
+	/** Extra class names for the outer element. */
 	className?: string
+	/** The progress bar's accessible name. */
 	"aria-label": string
 }
 
+/** A ring with the percentage in the middle, for readings such as context use. */
 export function ProgressRing({ value, size = RING, valueText, ...rest }: ProgressRingProps) {
 	const percent = clampPercent(value)
 	return (
