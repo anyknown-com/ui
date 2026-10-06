@@ -398,6 +398,66 @@ describe("toast manager", () => {
 		}
 	})
 
+	test("onAutoClose then onClose fire when the timeout runs out", () => {
+		const manager = setup({ timeout: 3000 })
+		const calls: string[] = []
+		act(
+			() =>
+				void manager.add({
+					title: "已複製",
+					onAutoClose: () => calls.push("auto"),
+					onClose: () => calls.push("close"),
+				}),
+		)
+		act(() => vi.advanceTimersByTime(3000))
+		expect(calls).toEqual(["auto", "close"])
+		act(() => vi.advanceTimersByTime(EXIT_MS))
+		expect(calls).toEqual(["auto", "close"])
+	})
+
+	test("onClose fires once for the close button, close(), closeAll() and limit; onAutoClose does not", async () => {
+		const manager = setup({ timeout: 3000, limit: 3 })
+		const onClose = vi.fn()
+		const onAutoClose = vi.fn()
+		const add = (title: string) => manager.add({ title, onClose: () => onClose(title), onAutoClose })
+		let id = ""
+		act(() => {
+			add("按鈕")
+			id = add("程式")
+		})
+		act(() => screen.getAllByRole("button", { name: "關閉通知" })[1].click())
+		expect(onClose).toHaveBeenLastCalledWith("按鈕")
+		act(() => manager.close(id))
+		act(() => manager.close(id))
+		expect(onClose).toHaveBeenLastCalledWith("程式")
+		act(() => {
+			add("一")
+			add("二")
+			add("三")
+			add("四")
+		})
+		expect(onClose).toHaveBeenLastCalledWith("一")
+		act(() => manager.closeAll())
+		expect(onClose.mock.calls.map(([title]) => title)).toEqual(["按鈕", "程式", "一", "四", "三", "二"])
+		expect(onAutoClose).not.toHaveBeenCalled()
+		act(() => vi.advanceTimersByTime(EXIT_MS))
+		expect(screen.queryAllByRole("status")).toHaveLength(0)
+		expect(manager.getSnapshot().toasts).toHaveLength(0)
+	})
+
+	test("toast.closeAll closes every toast in the default viewport", () => {
+		render(<Toaster />)
+		act(() => {
+			moduleToast("一")
+			moduleToast.danger("二")
+		})
+		act(() => moduleToast.closeAll())
+		expect(screen.queryByRole("status")).not.toBeInTheDocument()
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+		act(() => vi.advanceTimersByTime(EXIT_MS))
+		expect(toastManager.getSnapshot().toasts).toHaveLength(0)
+	})
+
 	test("a scoped manager only reaches its own viewport", () => {
 		const manager = setup()
 		act(() => void manager.add({ title: "只在這裡" }))

@@ -236,6 +236,13 @@ export type ToastOptions = {
 	timeout?: number
 	/** 同一個 key 正在顯示時,不疊新的一則:原地更新那則、重新倒數、計數 +1(顯示 ×N)。 */
 	key?: string
+	/**
+	 * Called once when this toast closes, whatever closed it: its close or action button, its
+	 * timeout, `toast.close` / `toast.closeAll`, or a newer toast pushing it past `limit`.
+	 */
+	onClose?: () => void
+	/** Called when this toast closes because its timeout ran out, just before `onClose`. */
+	onAutoClose?: () => void
 }
 
 export type ToastInput = ToastOptions & { title: string; type?: ToastType }
@@ -262,6 +269,8 @@ export type ToastRecord = {
 	type: ToastType
 	action?: ToastAction
 	timeout?: number
+	onClose?: () => void
+	onAutoClose?: () => void
 	/** promise 還沒落定;不倒數。 */
 	loading: boolean
 	/** 同 key 被加了幾次。 */
@@ -282,6 +291,8 @@ export type ToastManager = {
 	add: (input: ToastInput) => string
 	update: (id: string, patch: ToastUpdate) => void
 	close: (id: string) => void
+	/** Closes every toast on screen, like `dialog.closeAll()`; each one's `onClose` fires. */
+	closeAll: () => void
 	/** loading 那則不倒數;落定後換成 success / danger 並開始倒數。回傳原本的 promise。 */
 	promise: <T>(promise: Promise<T>, messages: ToastPromiseMessages<T>) => Promise<T>
 	subscribe: (listener: () => void) => () => void
@@ -311,7 +322,7 @@ export function createToastManager(): ToastManager {
 
 	function run(id: string, timer: Timer) {
 		timer.startedAt = Date.now()
-		timer.handle = setTimeout(() => close(id), timer.remaining)
+		timer.handle = setTimeout(() => close(id, true), timer.remaining)
 	}
 
 	function stop(id: string) {
@@ -337,6 +348,8 @@ export function createToastManager(): ToastManager {
 		const dropped = new Set(toasts.filter((t) => !t.leaving).slice(config.limit))
 		for (const record of dropped) stop(record.id)
 		commit(toasts.filter((t) => !dropped.has(t)))
+		// 被擠掉也是關掉了
+		for (const record of dropped) record.onClose?.()
 	}
 
 	function insert(input: ToastInput, loading: boolean): string {
@@ -347,6 +360,8 @@ export function createToastManager(): ToastManager {
 			type: input.type ?? "default",
 			action: input.action,
 			timeout: input.timeout,
+			onClose: input.onClose,
+			onAutoClose: input.onAutoClose,
 			loading,
 		}
 		const same = input.key == null ? undefined : toasts.find((t) => t.key === input.key && !t.leaving)
@@ -380,7 +395,8 @@ export function createToastManager(): ToastManager {
 
 	const remove = (id: string) => commit(store.getSnapshot().toasts.filter((t) => t.id !== id))
 
-	function close(id: string) {
+	/** `auto`:倒數跑完關的(先叫 onAutoClose 再叫 onClose)。 */
+	function close(id: string, auto = false) {
 		const { toasts } = store.getSnapshot()
 		const current = toasts.find((t) => t.id === id)
 		if (current == null || current.leaving) return
@@ -390,16 +406,23 @@ export function createToastManager(): ToastManager {
 			reasons.delete("hover")
 			reasons.delete("focus")
 		}
-		if (config.exit <= 0) return remove(id)
-		// 先標成 leaving 讓它淡出,時間到才真的拿掉
-		commit(toasts.map((t) => (t === current ? { ...t, leaving: true } : t)))
-		setTimeout(() => remove(id), config.exit)
+		if (config.exit <= 0) remove(id)
+		else {
+			// 先標成 leaving 讓它淡出,時間到才真的拿掉
+			commit(toasts.map((t) => (t === current ? { ...t, leaving: true } : t)))
+			setTimeout(() => remove(id), config.exit)
+		}
+		if (auto) current.onAutoClose?.()
+		current.onClose?.()
 	}
 
 	return {
 		add: (input) => insert(input, false),
 		update: (id, changes) => patch(id, changes),
-		close,
+		close: (id) => close(id),
+		closeAll() {
+			for (const record of store.getSnapshot().toasts) close(record.id)
+		},
 		promise(promise, messages) {
 			const id = insert({ title: messages.loading }, true)
 			promise.then(
@@ -449,6 +472,7 @@ function makeApi(getManager: () => ToastManager) {
 		info: add("info"),
 		update: (id: string, patch: ToastUpdate) => getManager().update(id, patch),
 		close: (id: string) => getManager().close(id),
+		closeAll: () => getManager().closeAll(),
 		promise: <T,>(promise: Promise<T>, messages: ToastPromiseMessages<T>) =>
 			getManager().promise(promise, messages),
 	})
