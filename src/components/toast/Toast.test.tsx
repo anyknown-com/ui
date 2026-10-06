@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Button } from "../button/Button"
 import { createToastManager, Toaster, toast as moduleToast, toastManager, useToast } from "./Toast"
 
@@ -542,6 +543,24 @@ describe("toast manager", () => {
 		act(() => void manager.add({ title: "只在這裡" }))
 		expect(toastManager.getSnapshot().toasts).toHaveLength(0)
 		expect(viewport()).toHaveTextContent("只在這裡")
+	})
+})
+
+describe("Toast accessibility", () => {
+	test("a toaster with one toast of each type, a description, an action and a count has no axe violations", async () => {
+		const manager = createToastManager()
+		render(<Toaster manager={manager} limit={10} />)
+		act(() => {
+			manager.add({ title: "已複製", key: "copy" })
+			manager.add({ title: "已複製", key: "copy" })
+			manager.add({ title: "換班完成", type: "success", description: "3 則記憶" })
+			manager.add({ title: "無法連到 vault", type: "danger" })
+			manager.add({ title: "額度快用完了", type: "warning" })
+			manager.add({ title: "新版本可用", type: "info", action: { label: "重新整理", onClick: () => {} } })
+			void manager.promise(new Promise(() => {}), { loading: "儲存中", success: "已儲存", error: "失敗" })
+		})
+		expect(screen.getAllByRole("status")).toHaveLength(5)
+		await expectNoAxeViolations()
 	})
 })
 

@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { type StyleArg } from "../../lib/styled"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Button } from "../button/Button"
 import {
 	ConfirmDialog,
@@ -540,6 +541,61 @@ async function openStack() {
 	await waitFor(() => expect(top.contains(document.activeElement)).toBe(true))
 	return { page, inner }
 }
+
+describe("dialog accessibility", () => {
+	afterEach(() => act(() => dialogManager.closeAll()))
+
+	test("an open Dialog has no axe violations", async () => {
+		render(<Rename />)
+		await userEvent.click(screen.getByRole("button", { name: "重新命名工作區" }))
+		await screen.findByRole("dialog")
+		await expectNoAxeViolations()
+	})
+
+	test("an open ConfirmDialog has no axe violations", async () => {
+		render(
+			<ConfirmDialog
+				defaultOpen
+				title="刪除這則記憶?"
+				description="此動作無法復原。"
+				danger
+				confirmLabel="刪除"
+				onConfirm={() => {}}
+			/>,
+		)
+		await screen.findByRole("alertdialog")
+		await expectNoAxeViolations()
+	})
+
+	test("an open dialog.alert and a stacked dialog.confirm have no axe violations", async () => {
+		render(<Stack />)
+		await openStack()
+		await expectNoAxeViolations()
+		act(() => dialogManager.closeAll())
+		act(() => void dialogManager.alert({ title: "已達上限", description: "先封存幾個 thread。" }))
+		await screen.findByRole("alertdialog")
+		await expectNoAxeViolations()
+	})
+
+	test("Tab and Shift+Tab stay inside the dialog", async () => {
+		render(<ConfirmDialog defaultOpen title="封存?" confirmLabel="封存" onConfirm={() => {}} />)
+		const dialog = await screen.findByRole("alertdialog")
+		await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true))
+		const cancel = screen.getByRole("button", { name: "取消" })
+		const confirm = screen.getByRole("button", { name: "封存" })
+		const seen: (Element | null)[] = []
+		for (let i = 0; i < 4; i += 1) {
+			await userEvent.tab()
+			// Base UI's focus guards hand focus back in on the next tick
+			await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true))
+			seen.push(document.activeElement)
+		}
+		expect(seen).toContain(cancel)
+		expect(seen).toContain(confirm)
+		await userEvent.tab({ shift: true })
+		await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true))
+	})
+})
 
 describe("stacked dialogs and focus", () => {
 	afterEach(() => act(() => dialogManager.closeAll()))

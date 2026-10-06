@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Button } from "../button/Button"
 import {
 	DropdownCheckboxItem,
@@ -157,6 +158,103 @@ describe("DropdownMenu focus return", () => {
 		} finally {
 			exits.restore()
 		}
+	})
+})
+
+describe("DropdownMenu keyboard (APG menu button)", () => {
+	function Plain() {
+		return (
+			<DropdownMenu trigger={<Button>動作</Button>}>
+				<DropdownItem>複製</DropdownItem>
+				<DropdownItem>封存</DropdownItem>
+				<DropdownItem disabled>移動</DropdownItem>
+				<DropdownItem>刪除</DropdownItem>
+			</DropdownMenu>
+		)
+	}
+
+	const highlighted = () =>
+		screen.getAllByRole("menuitem").find((item) => item.hasAttribute("data-highlighted"))
+
+	test("ArrowDown on the trigger opens the menu on the first item", async () => {
+		render(<Plain />)
+		screen.getByRole("button", { name: "動作" }).focus()
+		await userEvent.keyboard("{ArrowDown}")
+		await screen.findByRole("menu")
+		await waitFor(() => expect(highlighted()).toHaveTextContent("複製"))
+	})
+
+	// APG: disabled items stay focusable (so they are discoverable) but do nothing
+	test("arrows move through every item, disabled ones included, and wrap; Home and End jump", async () => {
+		const onSelect = vi.fn()
+		render(
+			<DropdownMenu trigger={<Button>動作</Button>}>
+				<DropdownItem>複製</DropdownItem>
+				<DropdownItem>封存</DropdownItem>
+				<DropdownItem disabled onSelect={onSelect}>
+					移動
+				</DropdownItem>
+				<DropdownItem>刪除</DropdownItem>
+			</DropdownMenu>,
+		)
+		screen.getByRole("button", { name: "動作" }).focus()
+		await userEvent.keyboard("{Enter}")
+		await screen.findByRole("menu")
+		await waitFor(() => expect(highlighted()).toHaveTextContent("複製"))
+		await userEvent.keyboard("{ArrowDown}{ArrowDown}")
+		expect(highlighted()).toHaveTextContent("移動")
+		expect(highlighted()).toHaveAttribute("aria-disabled", "true")
+		await userEvent.keyboard("{Enter}")
+		expect(onSelect).not.toHaveBeenCalled()
+		expect(screen.getByRole("menu")).toBeInTheDocument()
+		await userEvent.keyboard("{ArrowDown}")
+		expect(highlighted()).toHaveTextContent("刪除")
+		await userEvent.keyboard("{ArrowUp}{ArrowUp}")
+		expect(highlighted()).toHaveTextContent("封存")
+		await userEvent.keyboard("{End}")
+		expect(highlighted()).toHaveTextContent("刪除")
+		await userEvent.keyboard("{Home}")
+		expect(highlighted()).toHaveTextContent("複製")
+		await userEvent.keyboard("{ArrowUp}")
+		expect(highlighted()).toHaveTextContent("刪除")
+	})
+
+	test("typeahead: a letter jumps to the item that starts with it; quick typing matches a prefix", async () => {
+		render(
+			<DropdownMenu trigger={<Button>Actions</Button>}>
+				<DropdownItem>Copy</DropdownItem>
+				<DropdownItem>Archive</DropdownItem>
+				<DropdownItem>Delete</DropdownItem>
+				<DropdownItem>Duplicate</DropdownItem>
+			</DropdownMenu>,
+		)
+		const trigger = screen.getByRole("button", { name: "Actions" })
+		trigger.focus()
+		await userEvent.keyboard("{Enter}")
+		await screen.findByRole("menu")
+		await userEvent.keyboard("d")
+		await waitFor(() => expect(highlighted()).toHaveTextContent("Delete"))
+		await userEvent.keyboard("{Escape}")
+		await waitFor(() => expect(trigger).toHaveFocus())
+		await userEvent.keyboard("{Enter}")
+		await screen.findByRole("menu")
+		await userEvent.keyboard("du")
+		await waitFor(() => expect(highlighted()).toHaveTextContent("Duplicate"))
+	})
+
+	test("Tab closes the menu", async () => {
+		render(<Plain />)
+		await userEvent.click(screen.getByRole("button", { name: "動作" }))
+		await screen.findByRole("menu")
+		await userEvent.tab()
+		await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
+	})
+
+	test("an open menu has no axe violations", async () => {
+		render(<ThreadMenu />)
+		await userEvent.click(screen.getByRole("button", { name: "Thread 動作" }))
+		await screen.findByRole("menu")
+		await expectNoAxeViolations()
 	})
 })
 

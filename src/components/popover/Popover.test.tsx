@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Button } from "../button/Button"
 import { Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger } from "./Popover"
 
@@ -79,6 +80,23 @@ describe("Popover", () => {
 		} finally {
 			exits.restore()
 		}
+	})
+
+	test("an open popover has no axe violations", async () => {
+		render(<MemoryPopover />)
+		await userEvent.click(screen.getByRole("button", { name: "部署走 Cloudflare" }))
+		await screen.findByRole("dialog")
+		await expectNoAxeViolations()
+	})
+
+	test("Tab moves through the content and focus stays reachable", async () => {
+		render(<MemoryPopover />)
+		await userEvent.click(screen.getByRole("button", { name: "部署走 Cloudflare" }))
+		const panel = await screen.findByRole("dialog")
+		await waitFor(() => expect(panel.contains(document.activeElement)).toBe(true))
+		const edit = screen.getByRole("button", { name: "編輯" })
+		if (document.activeElement !== edit) await userEvent.tab()
+		expect(edit).toHaveFocus()
 	})
 
 	test("clicking outside closes it", async () => {

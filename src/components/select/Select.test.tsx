@@ -4,6 +4,7 @@ import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { layer } from "../../lib/popup"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Dialog, DialogContent } from "../dialog/Dialog"
 import { Select, SelectGroup, SelectItem } from "./Select"
 
@@ -112,6 +113,56 @@ describe("Select", () => {
 		expect(screen.getByRole("listbox")).toBeInTheDocument()
 		await userEvent.click(screen.getByRole("button", { name: "移除 偏好 pnpm" }))
 		await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith([]))
+	})
+})
+
+describe("Select keyboard and axe", () => {
+	const highlighted = () =>
+		screen.getAllByRole("option").find((option) => option.hasAttribute("data-highlighted"))
+
+	test("ArrowDown opens; arrows move; Enter picks; focus returns to the trigger", async () => {
+		const onValueChange = vi.fn()
+		render(<Models onValueChange={onValueChange} />)
+		const trigger = screen.getByRole("combobox", { name: "選擇模型" })
+		trigger.focus()
+		await userEvent.keyboard("{ArrowDown}")
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{ArrowDown}")
+		await waitFor(() => expect(highlighted()).toHaveTextContent("Fable 5"))
+		await userEvent.keyboard("{ArrowDown}{ArrowDown}")
+		expect(highlighted()).toHaveTextContent("GPT-5.4")
+		await userEvent.keyboard("{ArrowUp}")
+		expect(highlighted()).toHaveTextContent("Opus 5")
+		await userEvent.keyboard("{Enter}")
+		await waitFor(() => expect(onValueChange).toHaveBeenCalledWith("opus-5"))
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+		expect(trigger).toHaveFocus()
+	})
+
+	test("Escape closes without picking and focus returns to the trigger", async () => {
+		const onValueChange = vi.fn()
+		render(<Models onValueChange={onValueChange} />)
+		const trigger = screen.getByRole("combobox", { name: "選擇模型" })
+		await userEvent.click(trigger)
+		await screen.findByRole("listbox")
+		await userEvent.keyboard("{ArrowDown}{Escape}")
+		await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument())
+		expect(trigger).toHaveFocus()
+		expect(onValueChange).not.toHaveBeenCalled()
+	})
+
+	test("an open select has no axe violations", async () => {
+		render(<Models />)
+		await userEvent.click(screen.getByRole("combobox", { name: "選擇模型" }))
+		await screen.findByRole("listbox")
+		await expectNoAxeViolations()
+	})
+
+	test("an open multiple select with chips has no axe violations", async () => {
+		render(<Memories />)
+		await userEvent.click(screen.getByRole("combobox", { name: "選擇記憶" }))
+		await userEvent.click(await screen.findByRole("option", { name: /偏好 pnpm/ }))
+		await expectNoAxeViolations()
 	})
 })
 

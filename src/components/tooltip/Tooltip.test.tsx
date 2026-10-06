@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Button } from "../button/Button"
 import { KbdGroup } from "../kbd/Kbd"
 import { Tooltip } from "./Tooltip"
@@ -61,6 +62,34 @@ describe("Tooltip", () => {
 			</Tooltip>,
 		)
 		expect(screen.getByRole("button", { name: "單獨按鈕" })).toBeInTheDocument()
+	})
+})
+
+describe("Tooltip accessibility", () => {
+	test("a visible tooltip has no axe violations", async () => {
+		render(
+			<Tooltip content="產生交接摘要" delay={0} shortcut={<KbdGroup keys={["⌘", "H"]} />}>
+				<Button>開始換班</Button>
+			</Tooltip>,
+		)
+		await userEvent.hover(screen.getByRole("button", { name: "開始換班" }))
+		await screen.findByRole("tooltip")
+		await expectNoAxeViolations()
+	})
+
+	test("Tab away hides it", async () => {
+		render(
+			<>
+				<Tooltip content="封存 thread" delay={0}>
+					<Button>封存</Button>
+				</Tooltip>
+				<Button>下一個</Button>
+			</>,
+		)
+		await userEvent.tab()
+		expect(await screen.findByRole("tooltip")).toBeInTheDocument()
+		await userEvent.tab()
+		await waitFor(() => expect(screen.queryByRole("tooltip")).not.toBeInTheDocument())
 	})
 })
 
