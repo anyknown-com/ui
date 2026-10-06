@@ -42,7 +42,7 @@ const styles = stylex.create({
 		overflowY: "auto",
 		whiteSpace: "pre-wrap",
 		overflowWrap: "anywhere",
-		"::placeholder": { color: color.textFaint },
+		"::placeholder": { color: color.textMuted },
 	},
 	// 左邊的圖示鈕往外推半顆,圖示跟上面的字對齊
 	bar: {
