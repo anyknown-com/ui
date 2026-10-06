@@ -185,7 +185,6 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		color: color.warning,
 	},
-	retryCount: { marginInlineStart: "auto", fontVariantNumeric: "tabular-nums" },
 	subLine: {
 		display: "flex",
 		alignItems: "center",
@@ -347,6 +346,8 @@ export type ToolCardProps = {
 	durationLabel?: string
 	defaultOpen?: boolean
 	retry?: ToolRetry
+	/** The retry line, shown and announced: when the next try starts and which try of how many it is. */
+	retryLabel?: (attempt: number, max: number, seconds: number) => string
 	runningLabel?: string
 	completedLabel?: string
 	errorLabel?: string
@@ -364,6 +365,7 @@ export function ToolCard({
 	durationLabel,
 	defaultOpen,
 	retry,
+	retryLabel = (attempt, max, seconds) => `${seconds} 秒後重試(第 ${attempt} / ${max} 次)`,
 	runningLabel = "執行中",
 	completedLabel = "完成",
 	errorLabel = "失敗",
@@ -383,7 +385,7 @@ export function ToolCard({
 	}
 	const STATE_LABELS = { running: runningLabel, completed: completedLabel, error: errorLabel }
 	const retryText =
-		retry != null ? `重試中(第 ${retry.attempt} 次,${Math.round(retry.delayMs / 1000)} 秒後)…` : ""
+		retry != null ? retryLabel(retry.attempt, retry.max, Math.round(retry.delayMs / 1000)) : ""
 	const time = durationLabel ?? (durationMs != null ? formatDuration(durationMs) : "")
 
 	return (
@@ -435,7 +437,6 @@ export function ToolCard({
 				<div aria-hidden="true" {...stylex.props(styles.retryLine)}>
 					<span {...stylex.props(styles.spinner)} />
 					{retryText}
-					<span {...stylex.props(styles.retryCount)}>{`重試 ${retry.attempt}/${retry.max}`}</span>
 				</div>
 			)}
 			<span role="status" {...stylex.props(styles.srOnly)}>

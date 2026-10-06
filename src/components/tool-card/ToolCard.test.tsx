@@ -47,10 +47,22 @@ describe("ToolCard", () => {
 		expect(screen.getByRole("button")).toHaveTextContent("失敗")
 	})
 
-	test("retry is announced with its attempt count", () => {
+	test("retry shows and announces the wait, the attempt and the max in one line", () => {
 		render(<ToolCard tool="shell" state="error" retry={{ attempt: 2, max: 3, delayMs: 3000 }} />)
-		expect(screen.getByRole("status")).toHaveTextContent("重試中(第 2 次,3 秒後)")
-		expect(screen.getByText("重試 2/3")).toBeInTheDocument()
+		expect(screen.getByRole("status")).toHaveTextContent("3 秒後重試(第 2 / 3 次)")
+		expect(screen.getByText("3 秒後重試(第 2 / 3 次)")).toBeInTheDocument()
+	})
+
+	test("retryLabel replaces the retry line's words", () => {
+		render(
+			<ToolCard
+				tool="shell"
+				state="error"
+				retry={{ attempt: 1, max: 5, delayMs: 2400 }}
+				retryLabel={(attempt, max, seconds) => `Retrying in ${seconds}s (${attempt} of ${max})`}
+			/>,
+		)
+		expect(screen.getByRole("status")).toHaveTextContent("Retrying in 2s (1 of 5)")
 	})
 
 	test("the error block copies its text", async () => {
