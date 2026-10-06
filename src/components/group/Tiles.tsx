@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, type } from "../../tokens.stylex"
+import { color, corner, type } from "../../tokens.stylex"
 import type { ComponentType, SVGProps } from "react"
 import { ICON_STROKE } from "../icon/icon"
 
@@ -12,7 +12,7 @@ const styles = stylex.create({
 	tile: {
 		alignItems: "center",
 		backgroundColor: color.layer4,
-		borderRadius: 7,
+		borderRadius: corner.small,
 		color: color.text,
 		display: "flex",
 		flexShrink: 0,

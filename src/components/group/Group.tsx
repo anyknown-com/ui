@@ -6,7 +6,7 @@ import { icon } from "../icon/icon"
 
 /**
  * `.group` / `.item` / `.row`: a grouped list. An optional muted header above, the lines on one
- * `layer3` card with hairlines between them, an optional muted footer below. The lines are cells
+ * sunken `surface` region of the sheet with hairlines between them, an optional muted footer below. The lines are cells
  * (`GroupCell`, `InputCell`, `TextCell`, `SliderCell`) or, for a thing with its name, its state
  * and its one action on the right, an `Item` holding a `Row`, whose detail unfolds under it in an
  * `Expand`, never over the screen.
@@ -24,7 +24,7 @@ const styles = stylex.create({
 		lineHeight: type.body,
 	},
 	header: { color: color.textMuted, fontSize: type.t2, paddingInline: 16 },
-	cells: { backgroundColor: color.layer3, borderRadius: 10, overflow: "hidden" },
+	cells: { backgroundColor: color.surface, borderRadius: corner.card, overflow: "hidden" },
 	footer: { color: color.textMuted, fontSize: type.t2, lineHeight: type.snug, paddingInline: 16 },
 	item: {
 		boxShadow: { default: "none", ":not(:first-child)": `inset 0 1px 0 ${color.border}` },
@@ -44,7 +44,7 @@ const styles = stylex.create({
 	rowgo: {
 		alignItems: "center",
 		backgroundColor: "transparent",
-		borderRadius: corner.sm,
+		borderRadius: corner.small,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: "inherit",
@@ -57,7 +57,7 @@ const styles = stylex.create({
 		lineHeight: "inherit",
 		margin: 0,
 		minWidth: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.accent}` },
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 		padding: 0,
 		textAlign: "start",
@@ -65,7 +65,7 @@ const styles = stylex.create({
 	still: { cursor: "default" },
 	mark: {
 		alignItems: "center",
-		borderRadius: corner.sm,
+		borderRadius: corner.small,
 		color: color.text,
 		display: "grid",
 		flex: "none",
@@ -76,7 +76,7 @@ const styles = stylex.create({
 		placeItems: "center",
 		width: 22,
 	},
-	markTint: (tint: string) => ({ backgroundColor: `color-mix(in srgb, ${tint}, ${color.layer3})` }),
+	markTint: (tint: string) => ({ backgroundColor: `color-mix(in srgb, ${tint}, ${color.surface})` }),
 	name: {
 		flex: "none",
 		fontSize: type.t2,
