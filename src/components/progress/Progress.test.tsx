@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { Progress, ProgressBall, ProgressRing, Spinner } from "./Progress"
 
 describe("Progress", () => {
@@ -68,6 +69,23 @@ describe("ProgressRing", () => {
 		expect(arc(20)).not.toBe(arc(80))
 		expect(arc(0)).not.toBe(arc(100))
 		expect(arc(50)).toBe("50 50")
+	})
+})
+
+describe("Progress words", () => {
+	test("follow the LocaleProvider; labels, label and stages override them", () => {
+		render(
+			<LocaleProvider locale="en">
+				<Spinner />
+				<Spinner label="Fetching" />
+				<Progress valueText="Tidying memory" aria-label="Tidy" labels={{ stageScan: "Reading" }} />
+				<Progress valueText="Syncing" aria-label="Sync" stages={["Pulling"]} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument()
+		expect(screen.getByRole("status", { name: "Fetching" })).toBeInTheDocument()
+		expect(screen.getByRole("progressbar", { name: "Tidy" })).toHaveTextContent("Reading")
+		expect(screen.getByRole("progressbar", { name: "Sync" })).toHaveTextContent("Pulling")
 	})
 })
 

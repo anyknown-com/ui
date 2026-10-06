@@ -1,10 +1,40 @@
 import * as stylex from "@stylexjs/stylex"
 import { useCallback, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { styled } from "../../lib/styled"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
-const STAGES = ["掃描對話", "挑出要記的事", "合併重複", "存成記憶"]
+
+const spinnerStrings = defineStrings({
+	"zh-TW": { loading: "載入中" },
+	en: { loading: "Loading" },
+})
+
+/** The Spinner's built-in words (follow `<LocaleProvider>`): `loading` is its default label. */
+export type SpinnerLabels = StringsOf<typeof spinnerStrings>
+
+// 不定量進度預設的四個階段:整理記憶的流程
+const progressStrings = defineStrings({
+	"zh-TW": {
+		stageScan: "掃描對話",
+		stagePick: "挑出要記的事",
+		stageMerge: "合併重複",
+		stageSave: "存成記憶",
+	},
+	en: {
+		stageScan: "Scanning the conversation",
+		stagePick: "Picking what to remember",
+		stageMerge: "Merging duplicates",
+		stageSave: "Saving to memory",
+	},
+})
+
+/**
+ * The indeterminate Progress's built-in words (follow `<LocaleProvider>`): the four default
+ * stages it cycles through when no `stages` are given.
+ */
+export type ProgressLabels = StringsOf<typeof progressStrings>
 
 // 進度 = 一條膠囊軌加一段填充:軌是凹下去的 accentSubtle 6px 帶,填充是實心 signal
 // (進度條說的是 agent 正在做事),寬度就是讀數。不定量時同一段填充在軌上等速滑過。
@@ -123,12 +153,19 @@ const SPINNER_SIZES = { sm: 18, md: 28, lg: 40 } as const
 const clampPercent = (value: number) => Math.max(0, Math.min(100, value))
 
 export type SpinnerProps = {
+	/** 18, 28 or 40 px. Defaults to `"md"` (28). */
 	size?: keyof typeof SPINNER_SIZES
+	/** Shorthand for `labels.loading`, the status text; wins over it. */
 	label?: string
+	/** Override built-in words for this spinner; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<SpinnerLabels>
 }
 
 // spinner = 一段圓弧在轉:pathLength 100,72 長的弧留 28 的缺口。
-export function Spinner({ size = "md", label = "載入中" }: SpinnerProps) {
+/** A turning arc in a polite `role="status"` region that reads its label once. */
+export function Spinner({ size = "md", label: labelProp, labels }: SpinnerProps) {
+	const t = useStrings(spinnerStrings, labels)
+	const label = labelProp ?? t.loading
 	const px = SPINNER_SIZES[size]
 	const band = px * 0.135
 	const r = (px - band) / 2 - 0.5
@@ -158,15 +195,23 @@ export function Spinner({ size = "md", label = "載入中" }: SpinnerProps) {
 }
 
 export type ProgressProps = {
+	/** 0–100. Leave it out for indeterminate progress: a sweeping fill and cycling stage names. */
 	value?: number
 	/** Human-readable reading, e.g. "3 則訊息交接中 · 64%". Required by NOTES for determinate progress. */
 	valueText: string
+	/** Stage names the indeterminate bar cycles through; wins over the built-in four. */
 	stages?: string[]
+	/** Override the built-in stage names; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ProgressLabels>
 	className?: string
+	/** The progress bar's accessible name. */
 	"aria-label": string
 }
 
-export function Progress({ value, valueText, stages = STAGES, ...rest }: ProgressProps) {
+/** A capsule progress bar; determinate with `value`, indeterminate without. */
+export function Progress({ value, valueText, stages: stagesProp, labels, ...rest }: ProgressProps) {
+	const t = useStrings(progressStrings, labels)
+	const stages = stagesProp ?? [t.stageScan, t.stagePick, t.stageMerge, t.stageSave]
 	if (value == null) return <ProgressTidy stages={stages} valueText={valueText} {...rest} />
 	const percent = clampPercent(value)
 	return (
