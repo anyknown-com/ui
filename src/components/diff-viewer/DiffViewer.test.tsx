@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
 import { buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
+import { expectNoAxeViolations } from "../../test/axe"
 import { DiffViewer } from "./DiffViewer"
 
 const BEFORE = ["const a = 1", "const b = 2", "const c = 3"].join("\n")
@@ -86,6 +87,50 @@ describe("DiffViewer", () => {
 		render(<DiffViewer file={{ path: "a.ts", before: BEFORE, after: AFTER }} />)
 		expect(screen.getByText("新增行")).toBeInTheDocument()
 		expect(screen.getByText("刪除行")).toBeInTheDocument()
+	})
+
+	test("changed words are <ins> / <del>, underlined or struck through, not only tinted", () => {
+		const { container } = render(<DiffViewer file={{ path: "a.ts", before: BEFORE, after: AFTER }} />)
+		const ins = container.querySelector("ins")
+		const del = container.querySelector("del")
+		expect(ins).toHaveTextContent("22")
+		expect(del).toHaveTextContent("2")
+		expect(ins).toHaveStyle({ textDecorationLine: "underline" })
+		expect(del).toHaveStyle({ textDecorationLine: "line-through" })
+		expect(container.querySelector("mark")).toBeNull()
+	})
+
+	test("every added or removed line keeps a +/− sign and a spoken prefix", () => {
+		const { container } = render(<DiffViewer file={{ path: "new.ts", after: AFTER }} />)
+		expect(screen.getAllByText("新增行")).toHaveLength(3)
+		const signs = Array.from(container.querySelectorAll("[aria-hidden='true']"), (node) => node.textContent)
+		expect(signs.filter((sign) => sign === "+")).toHaveLength(3)
+	})
+
+	test("without wordDiff there are no word-level marks", () => {
+		const { container } = render(
+			<DiffViewer file={{ path: "a.ts", before: BEFORE, after: AFTER }} wordDiff={false} />,
+		)
+		expect(container.querySelector("ins, del")).toBeNull()
+	})
+
+	test("has no axe violations, folded and unfolded", async () => {
+		const { container } = render(
+			<DiffViewer file={{ path: "a.ts", before: LONG_BEFORE, after: LONG_AFTER }} />,
+		)
+		await expectNoAxeViolations(container)
+		for (const fold of screen.getAllByRole("button")) await userEvent.click(fold)
+		await expectNoAxeViolations(container)
+	})
+
+	test("has no axe violations for an added and a deleted file", async () => {
+		const { container } = render(
+			<>
+				<DiffViewer file={{ path: "new.ts", after: AFTER }} />
+				<DiffViewer file={{ path: "gone.ts", before: BEFORE }} />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("fold rows are real buttons that expand and collapse", async () => {

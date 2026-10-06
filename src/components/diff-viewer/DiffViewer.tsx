@@ -6,6 +6,7 @@ import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 const unfold = stylex.keyframes({
 	from: { opacity: 0, translate: "0 -3px" },
@@ -46,6 +47,8 @@ const styles = stylex.create({
 		lineHeight: 1.55,
 		whiteSpace: "pre",
 		minWidth: "max-content",
+		// 明寫:加/刪行的底上 text 都 ≥ 11.7:1,繼承到 host 的色就不保證
+		color: color.text,
 	},
 	lineAdd: { backgroundColor: color.successSubtle },
 	lineDel: { backgroundColor: color.dangerSubtle },
@@ -60,12 +63,23 @@ const styles = stylex.create({
 		lineHeight: 1.85,
 	},
 	sign: { flex: "none", width: "1.1rem", textAlign: "center", userSelect: "none", color: color.textFaint },
-	signAdd: { color: color.success },
-	signDel: { color: color.danger },
+	// + / − 是不靠顏色的那個記號;用 text 色,success/danger 在淺色的加刪底上只有 4.6–5.6:1
+	signAdd: { color: color.text },
+	signDel: { color: color.text },
 	code: { paddingInlineEnd: space.md },
-	mark: { backgroundColor: "transparent", color: "inherit", borderRadius: 2 },
-	markAdd: { backgroundColor: color.successHl },
-	markDel: { backgroundColor: color.dangerHl },
+	// 字級的變更:底色跟行底只差 1.15:1,所以另外畫底線 / 刪除線,forced-colors 換成 Mark
+	change: { borderRadius: 2, textDecorationThickness: "1px" },
+	changeAdd: {
+		backgroundColor: { default: color.successHl, [FORCED]: "Mark" },
+		color: { default: "inherit", [FORCED]: "MarkText" },
+		textDecorationLine: "underline",
+		textUnderlineOffset: "0.2em",
+	},
+	changeDel: {
+		backgroundColor: { default: color.dangerHl, [FORCED]: "Mark" },
+		color: { default: "inherit", [FORCED]: "MarkText" },
+		textDecorationLine: "line-through",
+	},
 	fold: {
 		display: "flex",
 		alignItems: "center",
@@ -141,13 +155,14 @@ function Line({ row }: { row: DiffRow }) {
 			<span {...stylex.props(styles.code)}>
 				{PREFIX[row.type] !== "" && <span {...stylex.props(styles.srOnly)}>{PREFIX[row.type]}</span>}
 				{row.segments.map((segment, index) =>
-					segment.marked ? (
-						<mark
-							key={index}
-							{...stylex.props(styles.mark, row.type === "add" ? styles.markAdd : styles.markDel)}
-						>
+					segment.marked && row.type === "add" ? (
+						<ins key={index} {...stylex.props(styles.change, styles.changeAdd)}>
 							{segment.text}
-						</mark>
+						</ins>
+					) : segment.marked && row.type === "del" ? (
+						<del key={index} {...stylex.props(styles.change, styles.changeDel)}>
+							{segment.text}
+						</del>
 					) : (
 						<Fragment key={index}>{segment.text}</Fragment>
 					),
