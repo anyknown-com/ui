@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { AttachButton } from "./AttachButton"
 
 function picker(container: HTMLElement) {
@@ -56,5 +57,15 @@ describe("AttachButton", () => {
 		)
 		expect(screen.getByRole("button", { name: "Attach files" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Prop" })).toBeInTheDocument()
+	})
+
+	test("has no axe violations, enabled and disabled", async () => {
+		const { container } = render(
+			<>
+				<AttachButton onFiles={() => {}} />
+				<AttachButton onFiles={() => {}} disabled />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
