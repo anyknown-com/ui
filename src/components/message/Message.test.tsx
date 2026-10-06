@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { InlineCode } from "../code-block/CodeBlock"
 import { AssistantMessage, TextPart, Thread, UserMessage } from "./Message"
 
@@ -39,6 +40,22 @@ describe("Message", () => {
 		)
 		expect(screen.getByText("你說:")).toBeInTheDocument()
 		expect(screen.getByText("助理說:")).toBeInTheDocument()
+	})
+
+	test("built-in words follow the locale; labels and single-word props win", () => {
+		render(
+			<LocaleProvider locale="en">
+				<Thread>
+					<UserMessage>Question</UserMessage>
+					<UserMessage authorLabel="Ann said:">Again</UserMessage>
+					<AssistantMessage pending labels={{ assistantAuthor: "Agent said:" }} />
+				</Thread>
+			</LocaleProvider>,
+		)
+		expect(screen.getByText("You said:")).toBeInTheDocument()
+		expect(screen.getByText("Ann said:")).toBeInTheDocument()
+		expect(screen.getByText("Agent said:")).toBeInTheDocument()
+		expect(screen.getByRole("status")).toHaveTextContent("Replying")
 	})
 
 	test("the streaming cursor is decorative and only on the last part", () => {

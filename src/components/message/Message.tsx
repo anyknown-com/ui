@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { CSSProperties } from "react"
 import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
 import { color, corner, space, type } from "../../tokens.stylex"
 
@@ -103,34 +104,65 @@ export function Thread({ children, ...rest }: ThreadProps) {
 	)
 }
 
-export type UserMessageProps = { children: ReactNode; authorLabel?: string }
+const strings = defineStrings({
+	"zh-TW": { userAuthor: "你說:", assistantAuthor: "助理說:", pending: "回覆中" },
+	en: { userAuthor: "You said:", assistantAuthor: "Assistant said:", pending: "Replying" },
+})
 
-export function UserMessage({ children, authorLabel = "你說:" }: UserMessageProps) {
+/**
+ * The message turns' built-in words (follow `<LocaleProvider>`): the screen-reader author
+ * prefix of each turn and the pending announcement. Override any with `labels`.
+ */
+export type MessageLabels = StringsOf<typeof strings>
+
+export type UserMessageProps = {
+	/** What the person said. */
+	children: ReactNode
+	/** The screen-reader prefix that names the author. Wins over `labels.userAuthor`. */
+	authorLabel?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<MessageLabels>
+}
+
+/** The person's turn: a sunken bubble at the end of the line, named for screen readers. */
+export function UserMessage({ children, authorLabel, labels }: UserMessageProps) {
+	const t = useStrings(strings, labels)
 	return (
 		<div {...stylex.props(styles.turn, styles.userTurn)}>
-			<span {...stylex.props(styles.srOnly)}>{authorLabel}</span>
+			<span {...stylex.props(styles.srOnly)}>{authorLabel ?? t.userAuthor}</span>
 			<div {...stylex.props(styles.bubble)}>{children}</div>
 		</div>
 	)
 }
 
 export type AssistantMessageProps = {
+	/** Shows a blinking cursor after the last text part while the reply is still arriving. */
 	streaming?: boolean
+	/** Before the first token: shows a pulsing dot and announces `pendingLabel` instead of the parts. */
 	pending?: boolean
+	/** Announced while pending. Wins over `labels.pending`. */
 	pendingLabel?: string
+	/** The screen-reader prefix that names the author. Wins over `labels.assistantAuthor`. */
 	authorLabel?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<MessageLabels>
+	/** The reply's parts: `TextPart`s, tool cards, an action bar. */
 	children?: ReactNode
+	/** StyleX overrides for the turn. */
 	sx?: StyleArg
 }
 
+/** The assistant's turn: no bubble, its parts on the paper, named for screen readers. */
 export function AssistantMessage({
 	streaming = false,
 	pending = false,
-	pendingLabel = "回覆中",
-	authorLabel = "助理說:",
+	pendingLabel,
+	authorLabel,
+	labels,
 	children,
 	sx,
 }: AssistantMessageProps) {
+	const t = useStrings(strings, labels)
 	const body = useRef<HTMLDivElement>(null)
 	const parts = Children.toArray(children)
 	const lastText = parts.reduce(
@@ -141,11 +173,11 @@ export function AssistantMessage({
 	return (
 		<MessageBodyContext value={body}>
 			<div ref={body} {...stylex.props(styles.turn, styles.assistant, sx)}>
-				<span {...stylex.props(styles.srOnly)}>{authorLabel}</span>
+				<span {...stylex.props(styles.srOnly)}>{authorLabel ?? t.assistantAuthor}</span>
 				{pending ? (
 					<span role="status">
 						<span aria-hidden="true" {...stylex.props(styles.pending)} />
-						<span {...stylex.props(styles.srOnly)}>{pendingLabel}</span>
+						<span {...stylex.props(styles.srOnly)}>{pendingLabel ?? t.pending}</span>
 					</span>
 				) : (
 					parts.map((part, index) => (
