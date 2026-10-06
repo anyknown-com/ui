@@ -26,6 +26,9 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 - **單行控件行高用 `leadingTight`**。行高一大就會把 md 撐得比 button 高,並排時對不齊。
   Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
 - 尺寸:md / sm = 40 / 32px,跟 button 的預設與小顆對齊;textarea 72px
+- **手機上(`max-width: 45rem`)欄位字一律 `text.base`(16px)**。iOS Safari 在 16px 以下的
+  欄位 focus 時會把整頁放大;不用 `maximum-scale` 擋,那會連使用者自己的縮放一起擋掉。
+  Select 的搜尋列、InputCell / TextCell、Composer 也照這條
 - **`autoGrow` 依序走三條路**:
   1. 支援 `field-sizing: content`(Chrome / Edge 123、Safari 26.2、Firefox 152 起)→ 純 CSS,
      不寫 inline height

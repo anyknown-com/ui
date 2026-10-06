@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, font, type } from "../../tokens.stylex"
+import { color, font, text, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
@@ -12,6 +12,9 @@ import { Textarea, type TextareaProps } from "../textarea/Textarea"
  * The lines of a `Group`: 44px, 16px in, a hairline between them that stops 16px short of the
  * left edge. A cell is a setting to read, a way into a page, one choice of several, or a field.
  */
+
+// iOS Safari 在 16px 以下的欄位 focus 時會放大整頁;手機上欄位一律 16px
+const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	hairline: {
@@ -77,7 +80,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: type.t3,
+		fontSize: { default: type.t3, [PHONE]: text.base },
 		height: 44,
 		minHeight: 0,
 		outline: "none",
@@ -100,7 +103,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: type.t3,
+		fontSize: { default: type.t3, [PHONE]: text.base },
 		lineHeight: type.body,
 		minHeight: 0,
 		outline: "none",

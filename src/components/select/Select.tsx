@@ -6,6 +6,8 @@ import { popupStyles } from "../../lib/popup"
 import { color, corner, font, space, text } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 
+const PHONE = "@media (max-width: 45rem)"
+
 export type SelectItemProps = {
 	value: string
 	hint?: string
@@ -105,7 +107,7 @@ const styles = stylex.create({
 	searchInput: {
 		flex: 1,
 		fontFamily: font.body,
-		fontSize: text.sm,
+		fontSize: { default: text.sm, [PHONE]: text.base },
 		color: color.text,
 		// 打開就落在這裡,閃動的游標就是焦點;UA 的框會把搜尋列框成第二個輸入框
 		outline: "none",

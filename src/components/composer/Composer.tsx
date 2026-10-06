@@ -7,6 +7,7 @@ import { color, corner, font, motion, space, text, type } from "../../tokens.sty
 import { autoGrow } from "../textarea/Textarea"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	// 凹下去的 surface 紙,無框;打字時外圈一條 signal 焦點環
@@ -27,7 +28,8 @@ const styles = stylex.create({
 		width: "100%",
 		boxSizing: "border-box",
 		fontFamily: font.body,
-		fontSize: type.t3,
+		// iOS Safari 在 16px 以下的欄位 focus 時會放大整頁
+		fontSize: { default: type.t3, [PHONE]: text.base },
 		lineHeight: type.body,
 		color: color.text,
 		backgroundColor: "transparent",
