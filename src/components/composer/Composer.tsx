@@ -108,7 +108,7 @@ const styles = stylex.create({
 	},
 	groupLabel: {
 		fontFamily: font.mono,
-		fontSize: "0.65rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		letterSpacing: "0.08em",
@@ -136,7 +136,7 @@ const styles = stylex.create({
 		outlineOffset: -2,
 		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
 	},
-	kind: { color: color.textMuted, fontSize: "0.72rem", marginInlineStart: "auto" },
+	kind: { color: color.textMuted, fontSize: type.t1, marginInlineStart: "auto" },
 	hint: {
 		fontFamily: font.body,
 		fontSize: type.t1,

@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 
 const PHONE = "@media (max-width: 45rem)"
@@ -152,7 +152,7 @@ const styles = stylex.create({
 		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
 	},
 	optionDisabled: { opacity: 0.5, cursor: "not-allowed" },
-	hint: { color: color.textMuted, fontSize: "0.72rem" },
+	hint: { color: color.textMuted, fontSize: type.t1 },
 	tick: { marginInlineStart: "auto", color: color.accent, display: "flex" },
 	empty: {
 		// Empty 一直都在 DOM 裡;有結果時它是空的,不能留一段 padding

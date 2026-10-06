@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, motion, shadow, space, text, tone } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, tone, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -50,14 +50,14 @@ const styles = stylex.create({
 	},
 	iconOver: { color: color.text },
 	title: { margin: 0, fontSize: text.sm, color: color.text },
-	hint: { color: color.textMuted, fontSize: "0.78rem" },
+	hint: { color: color.textMuted, fontSize: type.t2 },
 	pick: {
 		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
 		borderWidth: 0,
 		borderRadius: corner.pill,
 		color: color.text,
 		fontFamily: font.body,
-		fontSize: "0.82rem",
+		fontSize: type.t2,
 		fontWeight: 500,
 		lineHeight: 1,
 		paddingBlock: space.xs,
@@ -143,7 +143,7 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: "linear",
 	},
-	status: { gridColumn: "1 / -1", fontSize: "0.75rem", color: color.textMuted },
+	status: { gridColumn: "1 / -1", fontSize: type.t2, color: color.textMuted },
 	statusError: { color: color.danger },
 })
 
