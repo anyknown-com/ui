@@ -1,44 +1,49 @@
 import * as stylex from "@stylexjs/stylex"
 
-// Semantic tokens for all AnyKnown products. The default palette is neutral:
-// white paper, ink text, ink accent. Ledger (warm paper, viridian accent) is the
-// opt-in palette in scripts/ledger.mjs. Light is the primary mode;
-// dark follows the OS unless a theme from themes.stylex.ts is applied.
+// Semantic tokens for all AnyKnown products, in the 軟材 (tactile) language:
+// white paper on a cool grey desk, ink text, ink accent, iris `signal` for agent activity
+// and focus. Spec: docs/plans/02-tactile.md. Colour values come from scripts/palette.mjs
+// (OKLCH → hex); change them there and paste the output back here.
+// Light is the primary mode; dark follows the OS unless a theme from themes.stylex.ts is applied.
 
 const DARK = "@media (prefers-color-scheme: dark)"
 
 export const color = stylex.defineVars({
-	bg: { default: "#FFFFFF", [DARK]: "#000000" },
-	surface: { default: "#F5F5F7", [DARK]: "#1C1C1E" },
-	surfaceRaised: { default: "#FFFFFF", [DARK]: "#2C2C2E" },
-	border: { default: "#E5E5EA", [DARK]: "#38383A" },
-	borderStrong: { default: "#C7C7CC", [DARK]: "#48484A" },
-	text: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
-	textMuted: { default: "#6E6E73", [DARK]: "#98989D" },
-	textFaint: { default: "#86868B", [DARK]: "#8E8E93" },
-	accent: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
-	accentText: { default: "#FFFFFF", [DARK]: "#000000" },
-	accentSubtle: { default: "#E8E8ED", [DARK]: "#2C2C2E" },
-	danger: { default: "#B3402E", [DARK]: "#DD7059" },
-	dangerSubtle: { default: "#F7E7E3", [DARK]: "#3D231E" },
-	success: { default: "#23705A", [DARK]: "#4FA184" },
-	successSubtle: { default: "#E7F0EB", [DARK]: "#22352E" },
-	warning: { default: "#B25000", [DARK]: "#FFB340" },
-	warningSubtle: { default: "#F5EBD9", [DARK]: "#3A2F1D" },
-	info: { default: "#2C5C86", [DARK]: "#6FA3CE" },
-	infoSubtle: { default: "#E4EDF5", [DARK]: "#1E2C38" },
-	focusRing: { default: "#1D1D1F", [DARK]: "#F5F5F7" },
-	bone: { default: "#E6E6EA", [DARK]: "#2C2C2E" },
-	sheen: { default: "#F2F2F5", [DARK]: "#3F3F42" },
-	successHl: { default: "#C6E0C6", [DARK]: "#2F4A2E" },
-	dangerHl: { default: "#EFCEC3", [DARK]: "#573328" },
+	bg: { default: "#FFFFFF", [DARK]: "#15171B" },
+	surface: { default: "#F4F5F8", [DARK]: "#1D1F24" },
+	surfaceRaised: { default: "#FFFFFF", [DARK]: "#24272B" },
+	border: { default: "#E0E2E6", [DARK]: "#303338" },
+	borderStrong: { default: "#C6C9CE", [DARK]: "#454950" },
+	text: { default: "#161A1F", [DARK]: "#EFF0F3" },
+	textMuted: { default: "#5B5F67", [DARK]: "#B7BBC1" },
+	textFaint: { default: "#7C8088", [DARK]: "#83868C" },
+	accent: { default: "#1B1E24", [DARK]: "#EFF0F3" },
+	accentText: { default: "#FFFFFF", [DARK]: "#15171B" },
+	accentSubtle: { default: "#E9EBEF", [DARK]: "#2B2E33" },
+	// 鳶尾紫:只給 agent 正在做事、焦點環、目前選中的導覽項。不當按鈕底色,不拿來裝飾。
+	signal: { default: "#5D55C6", [DARK]: "#A8ABFC" },
+	signalSubtle: { default: "#EDEFFE", [DARK]: "#2C2C4E" },
+	danger: { default: "#C72E2B", [DARK]: "#FA887D" },
+	dangerSubtle: { default: "#FFEEEC", [DARK]: "#46221E" },
+	success: { default: "#227849", [DARK]: "#66C189" },
+	successSubtle: { default: "#E7F8EC", [DARK]: "#193323" },
+	warning: { default: "#A85B05", [DARK]: "#F2B458" },
+	warningSubtle: { default: "#FFF2DE", [DARK]: "#402C12" },
+	// info 併進 signal:資訊提示跟「agent 在跟你說話」是同一件事。focusRing 也是 signal。
+	info: { default: "#5D55C6", [DARK]: "#A8ABFC" },
+	infoSubtle: { default: "#EDEFFE", [DARK]: "#2C2C4E" },
+	focusRing: { default: "#5D55C6", [DARK]: "#A8ABFC" },
+	bone: { default: "#E8E9ED", [DARK]: "#292B30" },
+	sheen: { default: "#F2F3F6", [DARK]: "#34373C" },
+	successHl: { default: "#C0EACD", [DARK]: "#19482C" },
+	dangerHl: { default: "#FFD4CE", [DARK]: "#632D28" },
 	// 分層底色:rail → main → 訊息 → fold → 列,越深的一階數字越大。
 	// 面與面靠深淺分,不靠邊框;hover 升一階,對應表在 lib/layers.ts。
-	layer1: { default: "#EFEFF2", [DARK]: "#000000" },
-	layer2: { default: "#FFFFFF", [DARK]: "#161618" },
-	layer3: { default: "#F2F2F5", [DARK]: "#242426" },
-	layer4: { default: "#E6E6EA", [DARK]: "#323234" },
-	layer5: { default: "#D9D9DE", [DARK]: "#3F3F42" },
+	layer1: { default: "#EDEFF3", [DARK]: "#0D0E11" },
+	layer2: { default: "#FFFFFF", [DARK]: "#15171B" },
+	layer3: { default: "#F4F5F8", [DARK]: "#1D1F24" },
+	layer4: { default: "#E9EBEF", [DARK]: "#24272B" },
+	layer5: { default: "#DDE0E4", [DARK]: "#2D3036" },
 })
 
 export const shadow = stylex.defineVars({
@@ -119,10 +124,10 @@ export const type = stylex.defineVars({
 })
 
 export const tone = stylex.defineVars({
-	layer6: { default: "#CDCDD3", [DARK]: "#4C4C50" },
-	faint: { default: "#86868B", [DARK]: "#8E8E93" },
-	railLayer2: { default: "#FFFFFF", [DARK]: "#242426" },
-	railLayer3: { default: "#E6E6EA", [DARK]: "#323234" },
+	layer6: { default: "#D1D4DA", [DARK]: "#373B41" },
+	faint: { default: "#7C8088", [DARK]: "#83868C" },
+	railLayer2: { default: "#FFFFFF", [DARK]: "#1D1F24" },
+	railLayer3: { default: "#E9EBEF", [DARK]: "#24272B" },
 })
 
 export const corner = stylex.defineVars({
