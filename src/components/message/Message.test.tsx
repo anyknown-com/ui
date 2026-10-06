@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { InlineCode } from "../code-block/CodeBlock"
 import { AssistantMessage, TextPart, Thread, UserMessage } from "./Message"
 
@@ -56,6 +57,22 @@ describe("Message", () => {
 		expect(screen.getByText("Ann said:")).toBeInTheDocument()
 		expect(screen.getByText("Agent said:")).toBeInTheDocument()
 		expect(screen.getByRole("status")).toHaveTextContent("Replying")
+	})
+
+	test("has no axe violations for user, assistant, streaming and pending turns", async () => {
+		const { container } = render(
+			<Thread>
+				<UserMessage>問題</UserMessage>
+				<AssistantMessage>
+					<TextPart>完成的回覆</TextPart>
+				</AssistantMessage>
+				<AssistantMessage streaming>
+					<TextPart>寫到一半</TextPart>
+				</AssistantMessage>
+				<AssistantMessage pending />
+			</Thread>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("the streaming cursor is decorative and only on the last part", () => {
