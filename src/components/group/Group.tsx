@@ -216,7 +216,10 @@ export function Status(props: StatusProps) {
 			{shape !== undefined && (
 				<span {...stylex.props(styles.dot, DOT_TONE[hue], styles[shape])} aria-hidden="true" />
 			)}
-			<span {...(typeof children === "string" ? { title: children } : {})} {...stylex.props(styles.statusText)}>
+			<span
+				{...(typeof children === "string" ? { title: children } : {})}
+				{...stylex.props(styles.statusText)}
+			>
 				{children}
 			</span>
 		</span>

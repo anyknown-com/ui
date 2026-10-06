@@ -34,10 +34,16 @@ const styles = stylex.create({
 	column: { display: "grid", gap: 16, maxWidth: 560 },
 	// 窄的時候旁邊幾欄縮到剛好放得下,寬度讓給中間那欄
 	memoryGrid: {
-		gridTemplateColumns: { default: "72px minmax(0, 1fr) 96px 56px", [PHONE]: "56px minmax(0, 1fr) 32px 40px" },
+		gridTemplateColumns: {
+			default: "72px minmax(0, 1fr) 96px 56px",
+			[PHONE]: "56px minmax(0, 1fr) 32px 40px",
+		},
 	},
 	questionGrid: {
-		gridTemplateColumns: { default: "16px minmax(0, 1fr) 128px 88px", [PHONE]: "16px minmax(0, 1fr) 72px 56px" },
+		gridTemplateColumns: {
+			default: "16px minmax(0, 1fr) 128px 88px",
+			[PHONE]: "16px minmax(0, 1fr) 72px 56px",
+		},
 	},
 	muted: { color: "inherit", opacity: 0.7 },
 })
