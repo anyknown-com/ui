@@ -76,22 +76,27 @@ export const shadow = stylex.defineVars({
 		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
 	},
 	// 舊名,值跟著最接近的新階走,元件改完前不會跟新階打架。新程式碼用上面三個。
+	/** @deprecated Use `shadow.rest` (same value). */
 	raised: {
 		default: "0 0 0 1px #DFDFDF, 0 2px 6px rgba(0, 0, 0, 0.05)",
 		[DARK]: "0 0 0 1px #2B2B2B",
 	},
+	/** @deprecated Use `shadow.float` (same value). */
 	popover: {
 		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
+	/** @deprecated Use `shadow.float` (same value). */
 	pop: {
 		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
+	/** @deprecated Use `shadow.float` (same value). */
 	dock: {
 		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
+	/** @deprecated Use `shadow.modal` (same value). */
 	sheet: {
 		default: "0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16)",
 		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
@@ -298,10 +303,15 @@ export const corner = stylex.defineVars({
 	modal: "24px",
 	// 按鈕、badge、tag、switch、進度條、LiveDot 外框
 	pill: "9999px",
+	/** @deprecated Pre-tactile name; nothing uses it. Use a role name (`corner.control`). */
 	ib: "0.6rem",
+	/** @deprecated Pre-tactile name; nothing uses it. Use a role name (`corner.small`). */
 	md: "0.5rem",
+	/** @deprecated Pre-tactile name; nothing uses it. Buttons are `corner.pill`. */
 	btn: "0.55rem",
+	/** @deprecated Pre-tactile name; nothing uses it. Use `corner.small`. */
 	sm: "0.4rem",
+	/** @deprecated Pre-tactile name; nothing uses it. Use `corner.small`. */
 	xs: "0.3rem",
 })
 
