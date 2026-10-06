@@ -190,6 +190,40 @@ describe("Toast regressions", () => {
 		}
 	})
 
+	test("the countdown line pauses while focus is inside the viewport", async () => {
+		render(<Harness />)
+		await userEvent.click(screen.getByRole("button", { name: "default" }))
+		await screen.findByText("交接摘要已複製")
+		const line = document.querySelector("[data-countdown]") as HTMLElement
+		act(() => screen.getByRole("button", { name: "關閉通知" }).focus())
+		await waitFor(() => expect(line.getAttribute("style")).toContain("paused"))
+		act(() => screen.getByRole("button", { name: "關閉通知" }).blur())
+		await waitFor(() => expect(line.getAttribute("style")).toContain("running"))
+	})
+
+	test("under reduced motion there is no countdown line, but the toast still times out", () => {
+		const original = window.matchMedia
+		window.matchMedia = (query: string) =>
+			({
+				matches: query.includes("reduce"),
+				media: query,
+				addEventListener: () => {},
+				removeEventListener: () => {},
+			}) as unknown as MediaQueryList
+		vi.useFakeTimers()
+		try {
+			const manager = setup({ timeout: 3000 })
+			act(() => void manager.add({ title: "已複製" }))
+			expect(screen.getByRole("status")).toHaveTextContent("已複製")
+			expect(document.querySelector("[data-countdown]")).toBeNull()
+			act(() => vi.advanceTimersByTime(3000))
+			expect(screen.queryByText("已複製")).not.toBeInTheDocument()
+		} finally {
+			vi.useRealTimers()
+			window.matchMedia = original
+		}
+	})
+
 	test("a success toast says so in words, not only in colour", async () => {
 		render(<Harness />)
 		await userEvent.click(screen.getByRole("button", { name: "success" }))
