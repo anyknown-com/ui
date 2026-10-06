@@ -75,6 +75,25 @@ describe("ActionBar", () => {
 	})
 })
 
+describe("ActionBar targets", () => {
+	test("every button, icon-only included, is at least 24×24", () => {
+		render(
+			<Thread>
+				<AssistantMessage>
+					<TextPart>內容</TextPart>
+					<ActionBar>
+						<ActionBar.Copy />
+						<ActionBar.Regenerate onRegenerate={() => {}} />
+						<ActionBar.Button aria-label="讚" icon={<svg aria-hidden="true" />} />
+					</ActionBar>
+				</AssistantMessage>
+			</Thread>,
+		)
+		for (const button of screen.getAllByRole("button"))
+			expect(button).toHaveStyle({ minHeight: "24px", minWidth: "24px" })
+	})
+})
+
 describe("ActionBar words", () => {
 	test("reads English under an en LocaleProvider", async () => {
 		writeText(vi.fn().mockResolvedValue(undefined))

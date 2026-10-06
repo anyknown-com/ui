@@ -31,6 +31,10 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
+		// 24px both ways, also for an icon-only ActionBar.Button: the WCAG 2.5.8 minimum
+		minHeight: "1.5rem",
+		minWidth: "1.5rem",
+		justifyContent: "center",
 		borderRadius: corner.pill,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
