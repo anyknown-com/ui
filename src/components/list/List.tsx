@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, radius, type } from "../../tokens.stylex"
+import { color, corner, type } from "../../tokens.stylex"
 import type { HTMLAttributes, ReactNode } from "react"
 import { Ghost, type GhostProps } from "../ghost/Ghost"
 
@@ -36,7 +36,7 @@ const styles = stylex.create({
 	row: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		color: color.text,
 		columnGap: 12,
 		display: "grid",
