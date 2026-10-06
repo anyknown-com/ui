@@ -9,6 +9,7 @@ import { color, corner, font, ink, motion, shadow, space, type } from "../../tok
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 // 左邊的圖示底 36px;第二行以後的內容跟標題對齊 = 卡片左 padding + 圖示底 + 間距
 const TILE = 36
@@ -28,9 +29,12 @@ const styles = stylex.create({
 		boxShadow: shadow.rest,
 		borderRadius: corner.card,
 		overflow: "hidden",
+		// forced colors 下陰影消失,卡片要靠外框才看得出邊界;錯誤卡框加粗
+		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	cardError: {
 		boxShadow: `0 0 0 1px color-mix(in srgb, ${color.danger} 45%, ${color.border}), ${shadow.rest}`,
+		outline: { default: null, [FORCED]: "2px solid CanvasText" },
 	},
 	row: {
 		display: "flex",
@@ -60,9 +64,18 @@ const styles = stylex.create({
 		backgroundColor: color.surface,
 		color: color.textMuted,
 	},
-	tileRunning: { backgroundColor: color.signalSubtle, color: color.signal },
+	// 狀態本來就有三種不同的圖形(工具圖示 / 勾 / 叉)與文字;forced colors 再用框區分
+	tileRunning: {
+		backgroundColor: color.signalSubtle,
+		color: color.signal,
+		outline: { default: null, [FORCED]: "1px solid Highlight" },
+	},
 	tileOk: { color: color.success },
-	tileBad: { backgroundColor: color.dangerSubtle, color: color.danger },
+	tileBad: {
+		backgroundColor: color.dangerSubtle,
+		color: color.danger,
+		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+	},
 	glyph: { width: 18, height: 18, pointerEvents: "none" },
 	main: { flex: 1, minWidth: 0, display: "grid", gap: 6 },
 	line: { display: "flex", alignItems: "baseline", gap: space.xs, minWidth: 0 },
@@ -84,14 +97,17 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		backgroundColor: color.accentSubtle,
 		overflow: "hidden",
+		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
+	// forced colors 會把背景色清掉:進度條自己保留顏色,用 Highlight
 	bar: {
 		position: "absolute",
 		insetBlock: 0,
 		insetInlineStart: 0,
 		width: `${SWEEP}%`,
 		borderRadius: corner.pill,
-		backgroundColor: color.signal,
+		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
+		forcedColorAdjust: "none",
 		animationName: { default: sweep, [REDUCED]: "none" },
 		animationDuration: "1.6s",
 		animationTimingFunction: "linear",
@@ -103,7 +119,8 @@ const styles = stylex.create({
 		insetBlock: 0,
 		insetInlineStart: 0,
 		borderRadius: corner.pill,
-		backgroundColor: color.signal,
+		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
+		forcedColorAdjust: "none",
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
@@ -130,8 +147,9 @@ const styles = stylex.create({
 		flex: "none",
 		borderWidth: 1.5,
 		borderStyle: "solid",
-		borderColor: color.borderStrong,
-		borderTopColor: color.warning,
+		borderColor: { default: color.borderStrong, [FORCED]: "GrayText" },
+		borderTopColor: { default: color.warning, [FORCED]: "Highlight" },
+		forcedColorAdjust: "none",
 		borderRadius: corner.pill,
 		animationName: spin,
 		animationDuration: { default: "0.8s", [REDUCED]: "1.6s" },
