@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { HandoffReceipt } from "./HandoffReceipt"
 
 const props = {
@@ -98,5 +98,30 @@ describe("HandoffReceipt regressions", () => {
 		expect(body).toHaveAttribute("inert")
 		await userEvent.click(row)
 		expect(document.getElementById(row.getAttribute("aria-controls") as string)).not.toHaveAttribute("inert")
+	})
+})
+
+describe("HandoffReceipt open state", () => {
+	test("uncontrolled: defaultOpen sets the start and onOpenChange reports each toggle", async () => {
+		const onOpenChange = vi.fn()
+		render(<HandoffReceipt {...props} defaultOpen onOpenChange={onOpenChange} />)
+		const row = screen.getByRole("button")
+		expect(row).toHaveAttribute("aria-expanded", "true")
+		await userEvent.click(row)
+		expect(row).toHaveAttribute("aria-expanded", "false")
+		expect(onOpenChange).toHaveBeenLastCalledWith(false)
+		await userEvent.click(row)
+		expect(onOpenChange).toHaveBeenLastCalledWith(true)
+	})
+
+	test("controlled: open wins and a click only asks", async () => {
+		const onOpenChange = vi.fn()
+		const { rerender } = render(<HandoffReceipt {...props} open={false} onOpenChange={onOpenChange} />)
+		const row = screen.getByRole("button")
+		await userEvent.click(row)
+		expect(onOpenChange).toHaveBeenCalledWith(true)
+		expect(row).toHaveAttribute("aria-expanded", "false")
+		rerender(<HandoffReceipt {...props} open onOpenChange={onOpenChange} />)
+		expect(row).toHaveAttribute("aria-expanded", "true")
 	})
 })

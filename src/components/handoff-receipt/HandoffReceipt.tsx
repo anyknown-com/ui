@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useId, useState } from "react"
+import { type ReactNode, useId } from "react"
+import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
@@ -136,7 +137,12 @@ export type HandoffReceiptProps = {
 	memory: { count: number; items?: string[] }
 	ledgerCount: number
 	handoffSummary?: ReactNode
+	/** Whether the checks are shown. Pass it to control the fold; pair it with `onOpenChange`. */
+	open?: boolean
+	/** Whether the checks start shown when `open` is not passed. Collapsed by default. */
 	defaultOpen?: boolean
+	/** Called with the new state when the user opens or closes the fold. */
+	onOpenChange?: (open: boolean) => void
 	/** The three checks' names. */
 	memoryTitle?: string
 	summaryTitle?: string
@@ -155,7 +161,9 @@ export function HandoffReceipt({
 	memory,
 	ledgerCount,
 	handoffSummary,
+	open: openProp,
 	defaultOpen = false,
+	onOpenChange,
 	memoryTitle = "記憶",
 	summaryTitle = "摘要",
 	ledgerTitle = "紀錄",
@@ -164,7 +172,7 @@ export function HandoffReceipt({
 	ledgerLabel = (count) => `這一輪的 ${count} 筆紀錄還查得到,不會帶進新 session。`,
 }: HandoffReceiptProps) {
 	const bodyId = useId()
-	const [open, setOpen] = useState(defaultOpen)
+	const [open, setOpen] = useControllableState(openProp, defaultOpen, onOpenChange)
 
 	return (
 		<div {...stylex.props(styles.receipt)}>
@@ -172,7 +180,7 @@ export function HandoffReceipt({
 				type="button"
 				aria-expanded={open}
 				aria-controls={bodyId}
-				onClick={() => setOpen((value) => !value)}
+				onClick={() => setOpen(!open)}
 				{...stylex.props(styles.row)}
 			>
 				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
