@@ -138,15 +138,83 @@ export const radius = stylex.defineVars({
 	full: "9999px",
 })
 
+/**
+ * Durations and curves. Five durations, shortest first: pick by how far the thing travels,
+ * not by taste. Nothing bounces.
+ *
+ * Old literals map as: 120ms, 140ms → `fast`; 160ms, 180ms → `quick`; 200ms → `normal`;
+ * 240ms, 300ms → `slide`. Keyword `ease-out` → `easeOut`, `ease-in-out` → `easeInOut`,
+ * `linear` → `linear`. Reduced motion still uses `"0s"`, which is not a token.
+ */
 export const motion = stylex.defineVars({
+	/** 120ms: press feedback, hover washes, popup exit. */
 	fast: "120ms",
+	/** 160ms: small enters (popup, dialog, check marks), colour and border changes. */
+	quick: "160ms",
+	/** 200ms: panels and folds opening. */
 	normal: "200ms",
+	/** 240ms: things that slide (tab indicator, switch thumb, sheet). Pair with `easeOut`. */
+	slide: "240ms",
+	/** 400ms: large surfaces and deliberate reveals. */
 	slow: "400ms",
 	ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+	/** The default curve for enters and for anything that moves. */
 	easeOut: "cubic-bezier(0.16, 1, 0.3, 1)",
-	// 過衝曲線。全站規則是「動畫不回彈」,所以這條目前沒有任何元件在用 ——
-	// 新元件不要挑它,滑動類一律 240ms easeOut。保留只是因為它已經在發佈的 API 裡。
+	/** Looping pulses (live dot, typing dots). */
+	easeInOut: "cubic-bezier(0.42, 0, 0.58, 1)",
+	/** Spinners and indeterminate progress, which must keep a constant speed. */
+	linear: "linear",
+	/**
+	 * @deprecated Overshoots, and the house rule is "motion never bounces"; nothing uses it.
+	 * Use `easeOut`. Kept only because it is in the published API.
+	 */
 	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+})
+
+/**
+ * Stacking order for everything that portals to `<body>`. Base UI popups, dialogs and toasts
+ * share one stacking context, so the numbers live in one table: popup above dialog (what you
+ * are using is on top), tooltip above popup (a popup's contents can have tooltips), toast
+ * above everything (a non-blocking notice is never covered).
+ *
+ * Constants, inlined at build time: `zIndex: zIndex.popup` works in any `stylex.create`, and
+ * `zIndex.popup` is a plain number in JS. Stacking inside one component (`zIndex: 1`) does
+ * not belong here.
+ */
+export const zIndex = stylex.defineConsts({
+	dialogBackdrop: 70,
+	dialog: 71,
+	popup: 75,
+	tooltip: 78,
+	toast: 80,
+})
+
+/**
+ * Media queries, as constants so they can be StyleX condition keys:
+ * `fontSize: { default: type.t2, [breakpoint.phone]: type.phoneInput }`.
+ * `phone` (≤ 45rem / 720px): controls go full width and inputs grow to 16px.
+ * `tablet` (≤ 55rem / 880px): the docs site drops its sidebar.
+ */
+export const breakpoint = stylex.defineConsts({
+	phone: "@media (max-width: 45rem)",
+	tablet: "@media (max-width: 55rem)",
+})
+
+/** Icon boxes. An icon draws at the size it is given; stroke 2, currentColor. See `icon/icon.ts`. */
+export const iconSize = stylex.defineVars({
+	xs: "12px",
+	sm: "14px",
+	md: "16px",
+	base: "18px",
+	lg: "20px",
+})
+
+/**
+ * Keyboard focus ring geometry. The colour is `color.focusRing`:
+ * `outline: { default: "none", ":focus-visible": \`${focusRing.width} solid ${color.focusRing}\` }`.
+ */
+export const focusRing = stylex.defineVars({
+	width: "2px",
 })
 
 // Product-level scales: four text sizes, the corner each kind of control wears,
