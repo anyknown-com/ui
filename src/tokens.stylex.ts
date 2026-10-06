@@ -139,7 +139,7 @@ export const motion = stylex.defineVars({
 	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
 })
 
-// The flat language's own scales: four text sizes, the corner each kind of control wears,
+// Product-level scales: four text sizes, the corner each kind of control wears,
 // the ink washes hover paints with, and the four surfaces `color` has no name for.
 export const type = stylex.defineVars({
 	t1: "11px",
@@ -158,8 +158,23 @@ export const tone = stylex.defineVars({
 	railLayer3: { default: "#E9EBEF", [DARK]: "#24272B" },
 })
 
+// 圓角跟尺寸走:越靠近使用者越圓。巢狀時內層圓角 = 外層 − padding。
+// 前七個是軟材的角色名;ib / md / btn / sm / xs 是舊名,元件改完前保留。
 export const corner = stylex.defineVars({
-	card: "12px",
+	// checkbox、kbd、小 chip 的內角
+	small: "6px",
+	// input、select、textarea、segmented 外框
+	control: "12px",
+	// 紙上的卡片(rest)
+	card: "14px",
+	// toast、popover、dropdown
+	float: "16px",
+	// composer、主紙
+	sheet: "20px",
+	// dialog
+	modal: "24px",
+	// 按鈕、badge、tag、switch、進度條、LiveDot 外框
+	pill: "9999px",
 	ib: "0.6rem",
 	md: "0.5rem",
 	btn: "0.55rem",

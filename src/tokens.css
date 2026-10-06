@@ -60,6 +60,14 @@ html {
 	--ak-radius-lg: 0.75rem;
 	--ak-radius-xl: 1rem;
 
+	--ak-corner-small: 6px;
+	--ak-corner-control: 12px;
+	--ak-corner-card: 14px;
+	--ak-corner-float: 16px;
+	--ak-corner-sheet: 20px;
+	--ak-corner-modal: 24px;
+	--ak-corner-pill: 9999px;
+
 	--ak-motion-fast: 120ms;
 	--ak-motion-normal: 200ms;
 	--ak-motion-slow: 400ms;
