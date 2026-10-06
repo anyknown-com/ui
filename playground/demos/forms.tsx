@@ -6,6 +6,7 @@ import {
 	DropdownItem,
 	DropdownMenu,
 	DropdownSeparator,
+	DirectionProvider,
 	DropdownSub,
 	Field,
 	Input,
@@ -258,7 +259,7 @@ function SliderDemo() {
 		<Demo
 			id="slider"
 			title="slider"
-			note="Continuous, with no stops. Arrow keys move 5% of the range, PageUp and PageDown move largeStep (10% unless set; 25% on the second slider), Home and End jump to either end."
+			note={`Continuous, with no stops. Arrow keys move 5% of the range, PageUp and PageDown move largeStep (10% unless set; 25% on the second slider), Home and End jump to either end. The last slider sits under dir="rtl" and a DirectionProvider set to "rtl": it fills from the right and ← raises it.`}
 		>
 			<Slider
 				value={effort}
@@ -273,6 +274,11 @@ function SliderDemo() {
 				valueText={(value) => `${Math.round(value * 100)}% of context`}
 			/>
 			<Slider defaultValue={0.4} disabled aria-label="Thinking effort (disabled)" />
+			<div dir="rtl">
+				<DirectionProvider direction="rtl">
+					<Slider defaultValue={0.3} label="Right to left" />
+				</DirectionProvider>
+			</div>
 		</Demo>
 	)
 }
