@@ -1,12 +1,21 @@
 import { Combobox } from "@base-ui/react/combobox"
 import * as stylex from "@stylexjs/stylex"
-import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
+import {
+	Children,
+	type ReactElement,
+	type ReactNode,
+	isValidElement,
+	useContext,
+	useId,
+	useMemo,
+	useState,
+} from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
-import { useFieldControl } from "../label/fieldContext"
+import { FieldContext, useFieldControl } from "../label/fieldContext"
 
 export type SelectItemProps = {
 	/** The value `onValueChange` reports and the form submits. */
@@ -341,6 +350,7 @@ export function Select({
 	"aria-describedby": ariaDescribedBy,
 }: SelectProps) {
 	const field = useFieldControl({ "aria-describedby": ariaDescribedBy, required, disabled })
+	const fieldLabelId = useContext(FieldContext)?.labelId
 	const isInvalid = invalid ?? field.invalid
 	const t = useStrings(strings, labels)
 	const placeholder = placeholderProp ?? t.placeholder
@@ -349,7 +359,9 @@ export function Select({
 	const labelId = `${base}label`
 	// Inside a Field the trigger takes the Field's control id, so its `<label for>` names it.
 	const triggerId = field.id ?? `${base}trigger`
-	const nameId = ariaLabelledBy ?? (ariaLabel != null ? labelId : undefined)
+	// A multiple trigger is a div, which `<label for>` cannot name: it points at the Field's label.
+	const nameId =
+		ariaLabelledBy ?? (ariaLabel != null ? labelId : undefined) ?? (multiple ? fieldLabelId : undefined)
 	const triggerLabelledBy = nameId ? `${nameId} ${triggerId}` : undefined
 	const { options, groups } = useMemo(() => collect(children), [children])
 	const byValue = useMemo(() => new Map(options.map((o) => [o.value, o])), [options])

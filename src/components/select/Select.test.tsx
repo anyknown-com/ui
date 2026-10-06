@@ -286,6 +286,23 @@ describe("Select inside a Field", () => {
 		await expectNoAxeViolations(container)
 	})
 
+	test("a multiple trigger is a div, so it is named by aria-labelledby to the Field's label", async () => {
+		const { container } = render(
+			<Field label="Tools" help="Pick any." error="Pick at least one.">
+				<Select multiple defaultValue={["pnpm"]}>
+					<SelectItem value="pnpm">pnpm</SelectItem>
+					<SelectItem value="bun">bun</SelectItem>
+				</Select>
+			</Field>,
+		)
+		const trigger = screen.getByRole("combobox", { name: "Tools" })
+		expect(trigger.tagName).toBe("DIV")
+		const label = screen.getByText("Tools").closest("label")
+		expect(trigger.getAttribute("aria-labelledby")?.split(" ")).toContain(label?.id)
+		expect(trigger).toHaveAccessibleDescription("Pick at least one. Pick any.")
+		await expectNoAxeViolations(container)
+	})
+
 	test("takes disabled from the Field; own props win", () => {
 		render(
 			<>

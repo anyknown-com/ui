@@ -42,6 +42,7 @@ export function Field({
 }: FieldProps) {
 	const base = useId()
 	const controlId = `${base}control`
+	const labelId = label != null ? `${base}label` : undefined
 	const helpId = `${base}help`
 	const errorId = `${base}error`
 	const describedBy = [error ? errorId : null, help ? helpId : null].filter(Boolean).join(" ")
@@ -49,19 +50,20 @@ export function Field({
 	const value = useMemo(
 		() => ({
 			controlId,
+			labelId,
 			describedBy: describedBy || undefined,
 			invalid: Boolean(error),
 			required,
 			disabled,
 		}),
-		[controlId, describedBy, error, required, disabled],
+		[controlId, labelId, describedBy, error, required, disabled],
 	)
 
 	return (
 		<div {...props} {...styled(props, styles.group, styles.dimmed)}>
 			<FieldContext value={value}>
 				{label != null && (
-					<Label htmlFor={controlId} required={required} optional={optional}>
+					<Label id={labelId} htmlFor={controlId} required={required} optional={optional}>
 						{label}
 					</Label>
 				)}

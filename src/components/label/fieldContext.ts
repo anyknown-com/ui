@@ -4,6 +4,11 @@ import { type AriaAttributes, createContext, useContext } from "react"
 export type FieldContextValue = {
 	/** The id the control must use, so the label points at it. */
 	controlId: string
+	/**
+	 * The visible label's id, when the field has one. A control that is not labelable (a `div`
+	 * with a role) names itself with `aria-labelledby` pointing here; `<label for>` cannot.
+	 */
+	labelId?: string
 	/** Ids of the error and help text, for the control's `aria-describedby`. */
 	describedBy?: string
 	/** True when the field shows an error. */
