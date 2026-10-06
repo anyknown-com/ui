@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Progress, ProgressBall, ProgressRing, Spinner } from "./Progress"
 
 describe("Progress", () => {
@@ -69,6 +70,37 @@ describe("ProgressRing", () => {
 		expect(arc(20)).not.toBe(arc(80))
 		expect(arc(0)).not.toBe(arc(100))
 		expect(arc(50)).toBe("50 50")
+	})
+})
+
+describe("Progress a11y", () => {
+	test("determinate, indeterminate, ball, ring and spinner have no axe violations", async () => {
+		const { container } = render(
+			<>
+				<Progress value={64} valueText="3 則訊息交接中 · 64%" aria-label="同步 thread" />
+				<Progress valueText="整理記憶中" aria-label="整理記憶" />
+				<ProgressBall value={30} valueText="下載模型 30%" aria-label="下載模型" />
+				<ProgressRing value={42} valueText="128k context 已用 42%" aria-label="context 用量" />
+				<Spinner />
+			</>,
+		)
+		await expectNoAxeViolations(container)
+	})
+
+	// The value changes every tick; role=progressbar carries it. A live region here would read
+	// every step, and the indeterminate bar's cycling stage name would read every 1.8 s.
+	test("no bar is a live region, so ticks and stage names are not announced", () => {
+		const { container } = render(
+			<>
+				<Progress value={10} valueText="10%" aria-label="a" />
+				<Progress valueText="整理記憶中" aria-label="b" />
+				<ProgressBall value={10} valueText="10%" aria-label="c" />
+				<ProgressRing value={10} valueText="10%" aria-label="d" />
+			</>,
+		)
+		expect(
+			container.querySelectorAll("[aria-live], [role='status'], [role='alert'], [role='log']"),
+		).toHaveLength(0)
 	})
 })
 
