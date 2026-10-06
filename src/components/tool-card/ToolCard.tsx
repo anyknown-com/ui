@@ -425,16 +425,27 @@ function Chevron({ open }: { open: boolean }) {
 	)
 }
 
+/** Where a tool call is: still running, finished, or failed. */
 export type ToolState = "running" | "completed" | "error"
 
+/** A pending retry: which try comes next, of how many, and how long until it starts. */
 export type ToolRetry = { attempt: number; max: number; delayMs: number }
 
 export type ToolCardProps = {
+	/**
+	 * The tool's name. `read`, `edit`, `write`, `shell`, `search`, `fetch` and `subagent` get
+	 * their own icon and verb; any other name shows a wrench and itself.
+	 */
 	tool: string
+	/** The row's title. Defaults to the tool's verb (from the locale), or the tool name. */
 	title?: string
+	/** What it acted on (a path, a command, a URL), in mono; clipped with the full text on hover. */
 	subtitle?: string
+	/** Running, completed (the default) or error. Announced politely when it changes. */
 	state?: ToolState
+	/** How long the call took, formatted for the row (e.g. `300ms`, `1.2s`). */
 	durationMs?: number
+	/** The row's time text as-is, e.g. a running clock. Wins over `durationMs`. */
 	durationLabel?: string
 	/**
 	 * Whether the detail panel is shown. Pass it to control the card; it then no longer opens
@@ -455,6 +466,7 @@ export type ToolCardProps = {
 	 * Leave it undefined for the indeterminate sweep, the default.
 	 */
 	progress?: number
+	/** A pending retry: shows a spinner line with the countdown words and announces them. */
 	retry?: ToolRetry
 	/** Override built-in words for this card and the family parts inside it; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<ToolCardLabels>
@@ -469,11 +481,19 @@ export type ToolCardProps = {
 	completedLabel?: string
 	/** The error state's word. Wins over `labels.failed`. */
 	errorLabel?: string
+	/** A line under the row that stays visible when collapsed, e.g. `<SubagentLine>`. */
 	secondLine?: ReactNode
+	/** Content after `secondLine` that stays visible when collapsed, e.g. `<SubagentSummary>`. */
 	footer?: ReactNode
+	/** The detail panel the row folds: `<ToolInput>`, `<ToolOutput>`, `<ToolError>`, `<SubagentThread>`. */
 	children?: ReactNode
 }
 
+/**
+ * One tool call in the thread: a row (icon, verb, target, time) that folds open to the call's
+ * input and output. The row is a real button with `aria-expanded` and `aria-controls`: Enter
+ * and Space toggle it. The state is announced politely, once per change.
+ */
 export function ToolCard({
 	tool,
 	title,
@@ -683,11 +703,15 @@ export function ToolError({ text: value, label: labelProp, copyLabel, copiedLabe
 }
 
 export type SubagentLineProps = {
+	/** The subagent's model, shown as a chip. */
 	model?: string
+	/** What it is doing right now, shimmering. Wins over `toolCount`. */
 	now?: string
+	/** How many tools it used, once it is done. */
 	toolCount?: number
 }
 
+/** A subagent card's second line: its model and what it is doing, or how many tools it used. */
 export function SubagentLine({ model, now, toolCount }: SubagentLineProps) {
 	const t = useInheritedStrings()
 	return (
@@ -702,14 +726,24 @@ export function SubagentLine({ model, now, toolCount }: SubagentLineProps) {
 	)
 }
 
-export type SubagentSummaryProps = { children: ReactNode }
+export type SubagentSummaryProps = {
+	/** The subagent's result, clamped to three lines. */
+	children: ReactNode
+}
 
+/** A finished subagent's summary, for a ToolCard's `footer`, so it shows while collapsed. */
 export function SubagentSummary({ children }: SubagentSummaryProps) {
 	return <div {...stylex.props(styles.summary)}>{children}</div>
 }
 
-export type SubagentThreadProps = { task?: ReactNode; children?: ReactNode }
+export type SubagentThreadProps = {
+	/** The task the subagent was given, quoted at the top. */
+	task?: ReactNode
+	/** The subagent's own steps: nested ToolCards and SubagentText. */
+	children?: ReactNode
+}
 
+/** A subagent's nested thread, indented under a rule, for inside a ToolCard. */
 export function SubagentThread({ task, children }: SubagentThreadProps) {
 	return (
 		<div {...stylex.props(styles.nested)}>
@@ -719,8 +753,12 @@ export function SubagentThread({ task, children }: SubagentThreadProps) {
 	)
 }
 
-export type SubagentTextProps = { children: ReactNode }
+export type SubagentTextProps = {
+	/** A paragraph the subagent wrote. */
+	children: ReactNode
+}
 
+/** A paragraph of subagent text inside a SubagentThread. */
 export function SubagentText({ children }: SubagentTextProps) {
 	return <p {...stylex.props(styles.nestedText)}>{children}</p>
 }
