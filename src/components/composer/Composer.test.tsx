@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { Composer, type ComposerProps, type SourceRef } from "./Composer"
 
 const SOURCES: SourceRef[] = [
@@ -304,5 +305,32 @@ describe("Composer autoGrow", () => {
 		scrollHeight = 24
 		rerender(<Composer value="" onSubmit={() => {}} />)
 		expect(box.style.height).toBe("24px")
+	})
+})
+
+describe("Composer words", () => {
+	test("follow the LocaleProvider; labels and the shorthand props override them", async () => {
+		render(
+			<LocaleProvider locale="en">
+				<Composer
+					onSubmit={() => {}}
+					commands={[{ id: "c1", label: "handoff" }]}
+					onMicToggle={() => {}}
+					models={["Fable 5"]}
+					labels={{ send: "Go", label: "Ignored" }}
+					label="Chat"
+				/>
+			</LocaleProvider>,
+		)
+		const box = screen.getByRole("combobox", { name: "Chat" })
+		expect(box).toHaveAttribute("placeholder", "Talk to the agent")
+		expect(screen.getByRole("button", { name: "Go" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Add a source (@)" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Command (/)" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Voice input" })).toBeInTheDocument()
+		expect(screen.getByRole("combobox", { name: "Model" })).toBeInTheDocument()
+		await userEvent.type(box, "/")
+		const list = await screen.findByRole("listbox", { name: "/ Commands" })
+		expect(list).toHaveTextContent("handoffCommand")
 	})
 })

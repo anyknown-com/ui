@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { flushSync } from "react-dom"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { popupStyles } from "../../lib/popup"
@@ -145,6 +146,39 @@ const styles = stylex.create({
 	},
 })
 
+const strings = defineStrings({
+	"zh-TW": {
+		placeholder: "跟 agent 說話",
+		label: "訊息",
+		sources: "@ 來源",
+		commands: "/ 指令",
+		addSource: "加入來源(@)",
+		addCommand: "指令(/)",
+		model: "模型",
+		voiceInput: "語音輸入",
+		send: "送出",
+		commandKind: "指令",
+	},
+	en: {
+		placeholder: "Talk to the agent",
+		label: "Message",
+		sources: "@ Sources",
+		commands: "/ Commands",
+		addSource: "Add a source (@)",
+		addCommand: "Command (/)",
+		model: "Model",
+		voiceInput: "Voice input",
+		send: "Send",
+		commandKind: "Command",
+	},
+})
+
+/**
+ * The Composer's built-in words (follow `<LocaleProvider>`); override any with
+ * `<Composer labels={…}>`. `commandKind` is the tag on a command that has no `kind`.
+ */
+export type ComposerLabels = StringsOf<typeof strings>
+
 export type SourceRef = { id: string; label: string; kind: string }
 export type SlashCommand = { id: string; label: string; kind?: string }
 
@@ -229,26 +263,41 @@ export type ComposerProps = {
 	 * composer clears when its owner applies the value.
 	 */
 	onValueChange?: (value: string) => void
+	/** Shorthand for `labels.placeholder`; wins over it. */
 	placeholder?: string
+	/** A line under the bar, e.g. which keys send. */
 	hint?: ReactNode
+	/** Model names for the picker; the picker shows only when there is at least one. */
 	models?: string[]
+	/** The picked model (controlled). */
 	model?: string
+	/** Called with the model the user picked. */
 	onModelChange?: (model: string) => void
+	/** Looks up sources for an `@` query; the answers fill the `@` listbox. */
 	sources?: (query: string) => Promise<SourceRef[]>
+	/** Commands the `/` listbox offers, filtered by what follows the slash. */
 	commands?: SlashCommand[]
+	/** The mic button shows as pressed. */
 	micActive?: boolean
+	/** Called when the mic button is pressed; the button shows only when this is set. */
 	onMicToggle?: () => void
+	/** Called on send with the text and the `@` sources still in it. */
 	onSubmit: (text: string, refs: SourceRef[]) => void
+	/** Shorthand for `labels.label`, the text box's accessible name; wins over it. */
 	label?: string
+	/** Shorthand for `labels.sources`, the `@` listbox heading; wins over it. */
 	sourcesLabel?: string
+	/** Shorthand for `labels.commands`, the `/` listbox heading; wins over it. */
 	commandsLabel?: string
+	/** Override built-in words for this composer; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ComposerLabels>
 }
 
 export function Composer({
 	value: valueProp,
 	defaultValue = "",
 	onValueChange,
-	placeholder = "跟 agent 說話",
+	placeholder: placeholderProp,
 	hint,
 	models,
 	model,
@@ -258,10 +307,16 @@ export function Composer({
 	micActive = false,
 	onMicToggle,
 	onSubmit,
-	label = "訊息",
-	sourcesLabel = "@ 來源",
-	commandsLabel = "/ 指令",
+	label: labelProp,
+	sourcesLabel: sourcesLabelProp,
+	commandsLabel: commandsLabelProp,
+	labels,
 }: ComposerProps) {
+	const t = useStrings(strings, labels)
+	const placeholder = placeholderProp ?? t.placeholder
+	const label = labelProp ?? t.label
+	const sourcesLabel = sourcesLabelProp ?? t.sources
+	const commandsLabel = commandsLabelProp ?? t.commands
 	const listId = useId()
 	const suggestible = sources != null || commands != null
 	const textarea = useRef<HTMLTextAreaElement>(null)
@@ -329,7 +384,7 @@ export function Composer({
 		mode === "commands"
 			? (commands ?? [])
 					.filter((command) => command.label.toLowerCase().includes(query.toLowerCase()))
-					.map((command) => ({ id: command.id, label: command.label, kind: command.kind ?? "指令" }))
+					.map((command) => ({ id: command.id, label: command.label, kind: command.kind ?? t.commandKind }))
 			: mode === "sources"
 				? items
 				: []
@@ -457,7 +512,7 @@ export function Composer({
 			<div {...stylex.props(styles.bar)}>
 				<button
 					type="button"
-					aria-label={`加入來源(@)`}
+					aria-label={t.addSource}
 					aria-expanded={mode === "sources" && open}
 					onClick={() => insertMarker("@")}
 					{...stylex.props(reset.control, styles.iconButton)}
@@ -466,7 +521,7 @@ export function Composer({
 				</button>
 				<button
 					type="button"
-					aria-label="指令(/)"
+					aria-label={t.addCommand}
 					aria-expanded={mode === "commands" && open}
 					onClick={() => insertMarker("/")}
 					{...stylex.props(reset.control, styles.iconButton)}
@@ -476,7 +531,7 @@ export function Composer({
 				<span {...stylex.props(styles.spacer)} />
 				{models != null && models.length > 0 && (
 					<select
-						aria-label="模型"
+						aria-label={t.model}
 						value={model}
 						onChange={(event) => onModelChange?.(event.currentTarget.value)}
 						{...stylex.props(styles.model)}
@@ -491,7 +546,7 @@ export function Composer({
 				{onMicToggle != null && (
 					<button
 						type="button"
-						aria-label="語音輸入"
+						aria-label={t.voiceInput}
 						aria-pressed={micActive}
 						onClick={onMicToggle}
 						{...stylex.props(reset.control, styles.iconButton, micActive && styles.iconButtonOn)}
@@ -501,7 +556,7 @@ export function Composer({
 				)}
 				<button
 					type="button"
-					aria-label="送出"
+					aria-label={t.send}
 					disabled={!canSend}
 					onClick={submit}
 					{...stylex.props(reset.control, styles.send, press.button)}
