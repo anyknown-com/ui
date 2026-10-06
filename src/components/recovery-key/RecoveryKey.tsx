@@ -262,12 +262,7 @@ export function RecoveryKey({
 				</span>
 			</div>
 			<div {...stylex.props(styles.actions)}>
-				<button
-					type="button"
-					aria-pressed={revealed}
-					onClick={() => setRevealed((shown) => !shown)}
-					{...stylex.props(styles.button)}
-				>
+				<button type="button" onClick={() => setRevealed((shown) => !shown)} {...stylex.props(styles.button)}>
 					{revealed ? (hideLabel ?? t.hide) : (revealLabel ?? t.reveal)}
 				</button>
 				<button

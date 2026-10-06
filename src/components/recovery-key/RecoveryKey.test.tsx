@@ -17,14 +17,15 @@ describe("RecoveryKey", () => {
 	test("the reveal is a real button and the key stays readable to AT", async () => {
 		render(<RecoveryKey value={KEY} />)
 		const reveal = screen.getByRole("button", { name: "顯示復原金鑰" })
-		expect(reveal).toHaveAttribute("aria-pressed", "false")
+		// the label names the next action, so the button carries no aria-pressed
+		expect(reveal).not.toHaveAttribute("aria-pressed")
 		// the key characters are plain text, not swallowed by a role="button" wrapper
 		expect(screen.getByText("K7PQ")).toBeInTheDocument()
 		reveal.focus()
 		await userEvent.keyboard("{Enter}")
-		expect(screen.getByRole("button", { name: "隱藏復原金鑰" })).toHaveAttribute("aria-pressed", "true")
+		expect(screen.getByRole("button", { name: "隱藏復原金鑰" })).toBeInTheDocument()
 		await userEvent.keyboard(" ")
-		expect(screen.getByRole("button", { name: "顯示復原金鑰" })).toHaveAttribute("aria-pressed", "false")
+		expect(screen.getByRole("button", { name: "顯示復原金鑰" })).toBeInTheDocument()
 	})
 
 	test("the key box is a named tab stop; focusing it selects the whole key", async () => {
