@@ -1,8 +1,8 @@
-# call 的定價比較
+# Pricing comparison for call
 
-讀者:CEO。打開這頁要決定:Anyknown Call 第一個 SKU 每分鐘賣多少。
+Reader: the CEO. What they need to decide when they open the page: the per-minute price of Anyknown Call's first SKU.
 
-做一頁定價提案,資料如下。
+Build a one-page pricing proposal, written in Traditional Chinese, from the data below.
 
 - 我方成本:每分鐘 USD 0.067(v2)、0.037(Flash);TTS 佔 85–90%
 - 競品(每分鐘 USD,含 STT + LLM + TTS,不含電話線路):Retell 0.29、Vapi 0.18、Bland 0.09(月費 299 起)、Synthflow 0.13(月費 29 起)

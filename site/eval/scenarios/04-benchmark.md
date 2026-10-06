@@ -1,8 +1,8 @@
-# 記憶檢索的 benchmark
+# Memory retrieval benchmark
 
-讀者:CTO。打開這頁要決定:記憶系統用 hybrid + rerank 還是只用 embedding。
+Reader: the CTO. What they need to decide when they open the page: whether the memory system uses hybrid + rerank or embeddings only.
 
-做一頁 benchmark 報告,資料如下。
+Build a one-page benchmark report, written in Traditional Chinese, from the data below.
 
 - 資料集:1,200 條 query,人工標注的相關記憶
 - 三個方案的 recall@10 / MRR / p95 延遲:

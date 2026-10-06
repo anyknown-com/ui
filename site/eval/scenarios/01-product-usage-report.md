@@ -1,8 +1,8 @@
-# product 的 usage 月報
+# Usage report for product
 
-讀者:CEO。打開這頁要決定:下個月要不要把 gateway 的 Queue runs 配額調高。
+Reader: the CEO. What they need to decide when they open the page: whether to raise the gateway's Queue runs quota next month.
 
-做一頁 2026 年 8 月的 usage 月報,資料如下。
+Build a one-page usage report for August 2026, written in Traditional Chinese, from the data below.
 
 - 總呼叫數 1,204,311(7 月 1,020,880)
 - 成本 USD 412.50(7 月 398.20)
@@ -13,4 +13,4 @@
 - 最貴的 10 個 run 合計 USD 38.10,全部來自 desktop 的 goal loop
 - p95 延遲 2.8 s(7 月 3.1 s)
 
-結論要寫清楚:退回數成長五倍,配額該調。
+State the conclusion plainly: 「退回數成長五倍,配額該調。」 (Rejections grew fivefold; the quota should go up.)

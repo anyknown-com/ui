@@ -1,8 +1,8 @@
-# 一頁活動報名
+# Event sign-up page
 
-讀者:對 AI agent 有興趣的開發者。打開這頁要決定:要不要報名。
+Reader: developers interested in AI agents. What they need to decide when they open the page: whether to sign up.
 
-做一頁活動報名頁,資料如下。
+Build a one-page event sign-up page, written in Traditional Chinese, from the data below.
 
 - 活動:Anyknown Desktop 內測見面會
 - 時間:2026 年 9 月 20 日(六)14:00–17:00

@@ -1,8 +1,8 @@
-# storage 的功能提案
+# Feature proposal for storage
 
-讀者:CEO 與 storage 的工程師。打開這頁要決定:下一個 sprint 做「分享連結」還是「版本歷史」。
+Readers: the CEO and the storage engineers. What they need to decide when they open the page: whether the next sprint builds share links or version history.
 
-做一頁提案,資料如下。
+Build a one-page proposal, written in Traditional Chinese, from the data below.
 
 - 兩個候選:分享連結(E2EE 下要做 key wrapping,預估工作量 M)、版本歷史(每次上傳留 blob,預估工作量 S,但 R2 成本每月 +USD 12 起)
 - 用戶回饋:最近 30 天 41 則,提到分享 23 則、版本 9 則、其他 9 則
