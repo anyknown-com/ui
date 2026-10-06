@@ -1,18 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId, useState } from "react"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
+	// 直接畫在紙上:一條分隔線中間一顆膠囊,展開的摘要是凹下去的 surface
 	receipt: {
 		position: "relative",
-		overflow: "hidden",
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: corner.md,
-		backgroundColor: color.surfaceRaised,
 	},
 	row: {
 		// 注意:StyleX 0.19 會靜默丟掉 `all: unset`(編不出任何規則),原生按鈕的
@@ -26,15 +21,15 @@ const styles = stylex.create({
 		gap: space.xs,
 		width: "100%",
 		boxSizing: "border-box",
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		paddingBlock: space.xxs,
+		paddingInline: 0,
 		cursor: "pointer",
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t2,
 		color: { default: color.textMuted, ":hover": color.text },
-		borderRadius: corner.md,
+		borderRadius: corner.pill,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: -2,
+		outlineOffset: 2,
 	},
 	rule: {
 		flex: 1,
@@ -46,8 +41,20 @@ const styles = stylex.create({
 		transitionDuration: { default: "300ms", [REDUCED]: "0s" },
 	},
 	ruleOpen: { borderTopStyle: "solid", borderTopColor: color.accent },
-	label: { whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: space.xxs },
-	mono: { fontFamily: font.mono, fontSize: "0.76rem", lineHeight: 1 },
+	label: {
+		display: "flex",
+		alignItems: "center",
+		gap: 6,
+		minWidth: 0,
+		boxSizing: "border-box",
+		minHeight: 32,
+		paddingBlock: space.xxs,
+		paddingInline: space.sm,
+		borderRadius: corner.pill,
+		backgroundColor: color.surface,
+		textAlign: "start",
+	},
+	mono: { fontFamily: font.mono, fontSize: type.t1, lineHeight: 1, whiteSpace: "nowrap" },
 	link: {
 		flex: "none",
 		color: color.textFaint,
@@ -75,13 +82,14 @@ const styles = stylex.create({
 	bodyWrapOpen: { gridTemplateRows: "1fr" },
 	bodyClip: { overflow: "hidden", minHeight: 0 },
 	body: {
-		borderTopWidth: 1,
-		borderTopStyle: "solid",
-		borderTopColor: color.border,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		marginBlockStart: space.xs,
+		backgroundColor: color.surface,
+		borderRadius: corner.card,
+		paddingBlock: space.sm,
+		paddingInline: space.md,
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t2,
+		lineHeight: type.snug,
 		display: "grid",
 		gap: space.xxs,
 		opacity: 0,

@@ -2,9 +2,11 @@ import * as stylex from "@stylexjs/stylex"
 import type { CSSProperties } from "react"
 import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, radius, space, text } from "../../tokens.stylex"
+import { color, corner, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// 使用者泡泡的大角。軟材規格是 18 18 6 18,圓角 token 沒有 18 這一階
+const BUBBLE_CORNER = 18
 
 const blink = stylex.keyframes({ "50%": { opacity: 0 } })
 const pulse = stylex.keyframes({ "50%": { opacity: 0.3, scale: 0.8 } })
@@ -21,14 +23,16 @@ const styles = stylex.create({
 	userTurn: { alignItems: "flex-end" },
 	bubble: {
 		maxWidth: "85%",
-		backgroundColor: `color-mix(in srgb, ${color.border} 45%, ${color.surface})`,
-		borderRadius: radius.xl,
-		borderEndEndRadius: radius.sm,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
-		fontSize: text.sm,
-		lineHeight: text.leadingRelaxed,
+		boxSizing: "border-box",
+		backgroundColor: color.surface,
+		borderRadius: BUBBLE_CORNER,
+		borderEndEndRadius: corner.small,
+		paddingBlock: space.sm,
+		paddingInline: space.md,
+		fontSize: type.t3,
+		lineHeight: type.body,
 		color: color.text,
+		overflowWrap: "anywhere",
 	},
 	assistant: {
 		position: "relative",
@@ -38,7 +42,7 @@ const styles = stylex.create({
 		containIntrinsicSize: "auto 200px",
 		"--ak-action-bar-opacity": { default: "0", ":hover": "1" },
 	},
-	part: { margin: 0, fontSize: text.sm, lineHeight: text.leadingRelaxed, color: color.text },
+	part: { margin: 0, fontSize: type.t3, lineHeight: type.body, color: color.text },
 	cursor: {
 		display: "inline-block",
 		width: 1,
@@ -66,8 +70,8 @@ const styles = stylex.create({
 		display: "inline-block",
 		width: "0.5rem",
 		height: "0.5rem",
-		borderRadius: radius.full,
-		backgroundColor: color.textMuted,
+		borderRadius: corner.pill,
+		backgroundColor: color.signal,
 		animationName: { default: pulse, [REDUCED]: "none" },
 		animationDuration: "1.2s",
 		animationTimingFunction: "ease-in-out",

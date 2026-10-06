@@ -3,7 +3,7 @@ import { useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { useAnimationFrame } from "../../lib/useAnimationFrame"
 import { type VoiceState, voicePath } from "../../lib/voice"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -13,17 +13,16 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xs,
 		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		borderRadius: corner.pill,
 		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		paddingInlineStart: space.sm,
+		paddingInlineEnd: space.md,
 		fontFamily: font.body,
 	},
 	viz: { width: "3rem", height: "1.5rem", flex: "none", overflow: "visible" },
 	fibre: { fill: "none", stroke: color.textFaint, strokeWidth: 1.6, strokeLinecap: "round" },
-	fibreActive: { stroke: color.accent },
+	// 聽、想、說都是 agent 正在做事:signal
+	fibreActive: { stroke: color.signal },
 	label: { fontSize: text.sm, color: color.textMuted },
 	labelStrong: { fontWeight: 500, color: color.text },
 	motionLabel: {
@@ -34,7 +33,7 @@ const styles = stylex.create({
 		lineHeight: 1,
 		letterSpacing: "0.06em",
 		textTransform: "uppercase",
-		color: color.accent,
+		color: color.signal,
 	},
 })
 

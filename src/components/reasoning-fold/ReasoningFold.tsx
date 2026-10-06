@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useEffect, useId, useRef, useState } from "react"
 import { reset } from "../../lib/styled"
-import { color, radius, space, text } from "../../tokens.stylex"
+import { color, corner, motion, space, text, type } from "../../tokens.stylex"
+import { ICON_STROKE } from "../icon/icon"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const AUTO_COLLAPSE_MS = 1000
@@ -10,35 +11,44 @@ const shimmer = stylex.keyframes({ to: { backgroundPosition: "-200% 0" } })
 
 const styles = stylex.create({
 	fold: { display: "grid" },
+	// 膠囊:凹下去的 surface 底、無框,hover 深一階
 	row: {
 		display: "inline-flex",
 		alignItems: "center",
-		gap: space.xxs,
-		fontSize: text.xs,
+		gap: 6,
+		boxSizing: "border-box",
+		height: 32,
+		paddingInline: space.sm,
+		fontSize: type.t2,
 		lineHeight: text.leadingSnug,
 		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: { default: color.surface, ":hover": color.accentSubtle },
 		cursor: "pointer",
-		paddingBlock: "0.2rem",
 		justifySelf: "start",
-		borderRadius: radius.sm,
+		borderRadius: corner.pill,
+		transitionProperty: "background-color, color",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	chevron: {
-		color: color.textFaint,
+		width: 14,
+		height: 14,
 		flex: "none",
 		transitionProperty: "rotate",
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
 	chevronOpen: { rotate: "90deg" },
+	// 左線對齊膠囊裡 chevron 的中線
 	body: {
 		marginBlockStart: space.xs,
-		paddingInlineStart: `calc(12px + ${space.xxs})`,
+		paddingInlineStart: space.sm,
 		borderInlineStartWidth: 2,
 		borderInlineStartStyle: "solid",
 		borderInlineStartColor: color.border,
-		marginInlineStart: 5,
-		fontSize: text.xs,
+		marginInlineStart: `calc(${space.sm} + 6px)`,
+		fontSize: type.t2,
 		lineHeight: text.leadingRelaxed,
 		fontStyle: "italic",
 		color: color.textMuted,
@@ -61,12 +71,12 @@ const styles = stylex.create({
 function Chevron({ open }: { open: boolean }) {
 	return (
 		<svg
-			width="11"
-			height="11"
 			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"
-			strokeWidth="2"
+			strokeWidth={ICON_STROKE}
+			strokeLinecap="round"
+			strokeLinejoin="round"
 			aria-hidden="true"
 			{...stylex.props(styles.chevron, open && styles.chevronOpen)}
 		>

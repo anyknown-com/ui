@@ -3,37 +3,37 @@ import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useStat
 import { flushSync } from "react-dom"
 import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
+	// 凹下去的 surface 紙,無框;打字時外圈一條 signal 焦點環
 	composer: {
 		position: "relative",
 		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":focus-within": color.accent },
-		borderRadius: radius.lg,
-		paddingBlock: space.xs,
-		paddingInline: space.xs,
+		borderRadius: corner.sheet,
+		paddingBlockStart: space.sm,
+		paddingBlockEnd: space.xs,
+		paddingInlineStart: space.md,
+		paddingInlineEnd: space.xs,
 		display: "grid",
-		gap: space.xxs,
-		transitionProperty: "border-color",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-within": `1px solid ${color.accent}` },
-		outlineOffset: -1,
+		gap: space.xs,
+		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outlineOffset: 0,
 	},
 	textarea: {
 		width: "100%",
 		boxSizing: "border-box",
 		fontFamily: font.body,
-		fontSize: text.sm,
-		lineHeight: text.leadingNormal,
+		fontSize: type.t3,
+		lineHeight: type.body,
 		color: color.text,
-		paddingBlock: space.xxs,
-		paddingInline: space.xxs,
+		backgroundColor: "transparent",
+		paddingBlock: 0,
+		paddingInlineStart: 0,
+		paddingInlineEnd: space.xs,
 		resize: "none",
 		fieldSizing: "content",
 		maxHeight: "11rem",
@@ -42,13 +42,19 @@ const styles = stylex.create({
 		overflowWrap: "anywhere",
 		"::placeholder": { color: color.textFaint },
 	},
-	bar: { display: "flex", alignItems: "center", gap: space.xxs },
+	// 左邊的圖示鈕往外推半顆,圖示跟上面的字對齊
+	bar: {
+		display: "flex",
+		alignItems: "center",
+		gap: space.xxs,
+		marginInlineStart: `calc(${space.xs} * -1)`,
+	},
 	iconButton: {
 		display: "grid",
 		placeItems: "center",
-		width: "1.9rem",
-		height: "1.9rem",
-		borderRadius: radius.sm,
+		width: 32,
+		height: 32,
+		borderRadius: corner.pill,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
@@ -60,35 +66,39 @@ const styles = stylex.create({
 	iconButtonOn: { backgroundColor: color.accentSubtle, color: color.accent },
 	spacer: { flex: 1 },
 	model: {
+		height: 32,
 		fontFamily: font.body,
-		fontSize: "0.78rem",
+		fontSize: type.t2,
 		fontWeight: 500,
 		lineHeight: 1,
-		color: color.textMuted,
-		backgroundColor: "transparent",
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: "transparent", ":hover": color.border },
-		borderRadius: radius.sm,
-		paddingBlock: space.xxs,
-		paddingInline: space.xxs,
+		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		borderWidth: 0,
+		borderRadius: corner.pill,
+		paddingInline: space.sm,
 		cursor: "pointer",
-		transitionProperty: "border-color",
+		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
+	// 圓的墨色送出鈕;空值時退成凹下的灰
 	send: {
 		display: "grid",
 		placeItems: "center",
-		width: "1.9rem",
-		height: "1.9rem",
-		borderRadius: radius.sm,
-		backgroundColor: { default: color.accent, ":disabled": color.border },
+		width: 40,
+		height: 40,
+		flex: "none",
+		borderRadius: corner.pill,
+		backgroundColor: { default: color.accent, ":disabled": color.accentSubtle },
 		color: { default: color.accentText, ":disabled": color.textFaint },
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
+		scale: { default: null, ":active:not(:disabled)": { default: "0.98", [REDUCED]: null } },
+		transitionProperty: "scale, background-color",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: 1,
+		outlineOffset: 2,
 	},
 	popup: {
 		position: "absolute",
@@ -114,7 +124,7 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		borderRadius: radius.sm,
+		borderRadius: corner.control,
 		paddingBlock: "0.42rem",
 		paddingInline: space.xs,
 		fontFamily: font.body,
@@ -131,10 +141,9 @@ const styles = stylex.create({
 	kind: { color: color.textFaint, fontSize: "0.72rem", marginInlineStart: "auto" },
 	hint: {
 		fontFamily: font.body,
-		fontSize: "0.72rem",
-		color: color.textFaint,
+		fontSize: type.t1,
+		color: color.textMuted,
 		margin: 0,
-		marginInline: space.xxs,
 	},
 })
 
@@ -198,8 +207,8 @@ function MicIcon() {
 function SendIcon() {
 	return (
 		<svg
-			width="14"
-			height="14"
+			width="18"
+			height="18"
 			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"

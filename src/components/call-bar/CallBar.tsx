@@ -39,10 +39,11 @@ const LABELS: CallBarLabels = {
 }
 
 const styles = stylex.create({
+	// 取代 chatbox 的位置,所以跟 Composer 同一張凹下去的 surface 紙
 	box: {
 		alignItems: "center",
-		backgroundColor: color.layer4,
-		borderRadius: corner.card,
+		backgroundColor: color.surface,
+		borderRadius: corner.sheet,
 		boxSizing: "border-box",
 		color: color.text,
 		display: "flex",
