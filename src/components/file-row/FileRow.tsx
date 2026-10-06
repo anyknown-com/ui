@@ -127,6 +127,8 @@ const styles = stylex.create({
 		backgroundColor: color.border,
 		overflow: "hidden",
 	},
+	// 數字變動時寬度不跳:等寬數字,留得下「100%」
+	percent: { flex: "none", fontVariantNumeric: "tabular-nums", minWidth: "4ch", textAlign: "end" },
 	fill: (percent: number) => ({ width: `${percent}%` }),
 	bar: { display: "block", height: "100%", backgroundColor: color.accent },
 	spinner: {
@@ -248,7 +250,7 @@ export function FileRow({
 							>
 								<b {...stylex.props(styles.bar, styles.fill(progress))} />
 							</span>
-							{`${Math.round(progress)}%`}
+							<span {...stylex.props(styles.percent)}>{`${Math.round(progress)}%`}</span>
 						</>
 					)}
 				</span>
