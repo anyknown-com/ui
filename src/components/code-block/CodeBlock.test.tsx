@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { CodeBlock, InlineCode } from "./CodeBlock"
 
 const CODE = `export function useChildSession(callID: string) {\n  return null\n}`
@@ -31,6 +32,23 @@ describe("CodeBlock", () => {
 	test("the copy button is at least a 24px target", () => {
 		render(<CodeBlock code="x" />)
 		expect(screen.getByRole("button", { name: "複製" })).toHaveStyle({ minHeight: "24px" })
+	})
+
+	test("has no axe violations before and after a copy, and while streaming", async () => {
+		Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+		const { container } = render(
+			<>
+				<CodeBlock lang="ts" code={CODE} />
+				<CodeBlock code="bus.emit(" streaming />
+				<p>
+					<InlineCode>turn.ts</InlineCode>
+				</p>
+			</>,
+		)
+		await expectNoAxeViolations(container)
+		await userEvent.click(screen.getAllByRole("button", { name: "複製" })[0] as HTMLElement)
+		await screen.findByRole("button", { name: "已複製 ✓" })
+		await expectNoAxeViolations(container)
 	})
 
 	test("the streaming cursor is decorative", () => {
