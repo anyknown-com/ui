@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { Marked, type Token, type Tokens } from "marked"
 import type { ComponentProps, ReactNode } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
 import { color, corner, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
@@ -95,6 +96,14 @@ const styles = stylex.create({
 
 const ALIGN = { left: "start", center: "center", right: "end" } as const
 
+const strings = defineStrings({
+	"zh-TW": { taskDone: "已完成", taskOpen: "未完成" },
+	en: { taskDone: "Done", taskOpen: "Not done" },
+})
+
+/** Markdown's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type MarkdownLabels = StringsOf<typeof strings>
+
 /** A fenced block a shell wants to draw itself — mermaid, a chart spec, anything. */
 export type MarkdownBlock = { lang: string; code: string }
 
@@ -118,10 +127,14 @@ export type MarkdownProps = Omit<ComponentProps<"div">, "children"> & {
 	 * @default "grid"
 	 */
 	tables?: "grid" | "ruled"
+	/** Overrides for the built-in words (task-list checkbox names); the rest follow `<LocaleProvider>`. */
+	labels?: Partial<MarkdownLabels>
 	sx?: StyleArg
 }
 
-type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel" | "tables">
+type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel" | "tables"> & {
+	t: MarkdownLabels
+}
 
 function inlineTokens(token: Token): Token[] | undefined {
 	return (token as { tokens?: Token[] }).tokens
@@ -232,7 +245,7 @@ function renderList(token: Tokens.List, context: Context, key: string): ReactNod
 							checked={item.checked ?? false}
 							disabled
 							readOnly
-							aria-label={item.checked ? "已完成" : "未完成"}
+							aria-label={item.checked ? context.t.taskDone : context.t.taskOpen}
 							sx={styles.task}
 						/>
 					)}
@@ -404,13 +417,15 @@ export function Markdown({
 	copyLabel,
 	copiedLabel,
 	tables = "grid",
+	labels,
 	sx,
 	...rest
 }: MarkdownProps) {
+	const t = useStrings(strings, labels)
 	const tokens = parser.lexer(children)
 	return (
 		<div {...rest} {...styled(rest, styles.root, sx)}>
-			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel, tables })}
+			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel, tables, t })}
 		</div>
 	)
 }

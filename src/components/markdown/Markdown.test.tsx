@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { Markdown } from "./Markdown"
 
 // jsdom builds MathML elements without a `style` object, so Temml's own `node.style[x] = …` throws
@@ -68,6 +69,22 @@ describe("Markdown", () => {
 		expect(boxes).toHaveLength(2)
 		expect(boxes[0]).toBeChecked()
 		expect(boxes[1]).not.toBeChecked()
+	})
+
+	test("task checkboxes are named from the locale, and labels override them", () => {
+		const { unmount } = render(
+			<LocaleProvider locale="en">
+				<Markdown>{"- [x] shipped\n- [ ] later\n\n```ts\nx\n```"}</Markdown>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("checkbox", { name: "Done" })).toBeChecked()
+		expect(screen.getByRole("checkbox", { name: "Not done" })).not.toBeChecked()
+		// the code block inside follows the same locale
+		expect(screen.getByRole("button", { name: "Copy" })).toBeInTheDocument()
+		unmount()
+		render(<Markdown labels={{ taskDone: "好了" }}>{"- [x] 做完了\n- [ ] 還沒"}</Markdown>)
+		expect(screen.getByRole("checkbox", { name: "好了" })).toBeChecked()
+		expect(screen.getByRole("checkbox", { name: "未完成" })).not.toBeChecked()
 	})
 
 	test("links open in a new tab without handing it window.opener", () => {
