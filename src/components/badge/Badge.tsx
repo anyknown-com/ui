@@ -22,7 +22,7 @@ const styles = stylex.create({
 	// 凹下去的一塊,不加框;框只留給 outline 這一種。accentSubtle 在白紙與 surface 上都看得到
 	neutral: { backgroundColor: color.accentSubtle, color: color.textMuted },
 	accent: { backgroundColor: color.accentSubtle, color: color.accent },
-	success: { backgroundColor: color.success, color: color.bg },
+	success: { backgroundColor: color.successSubtle, color: color.success },
 	danger: { backgroundColor: color.dangerSubtle, color: color.danger },
 	outline: { borderColor: color.borderStrong, color: color.text },
 	mono: {

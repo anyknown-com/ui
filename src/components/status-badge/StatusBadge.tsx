@@ -22,10 +22,7 @@ const styles = stylex.create({
 	},
 	// 正在跑 = agent 在做事:signal 的字與點放在 signalSubtle 上
 	live: { backgroundColor: color.signalSubtle, color: color.signal },
-	warn: {
-		backgroundColor: `color-mix(in oklab, ${color.warning} 22%, transparent)`,
-		color: color.warning,
-	},
+	warn: { backgroundColor: color.warningSubtle, color: color.warning },
 	plain: { backgroundColor: color.accentSubtle, color: color.textMuted },
 })
 
