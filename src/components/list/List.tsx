@@ -44,10 +44,14 @@ const styles = stylex.create({
 		height: "auto",
 		lineHeight: type.tight,
 		minHeight: 40,
-		paddingBlock: 0,
+		overflowWrap: "anywhere",
+		paddingBlock: 4,
 		paddingInline: 8,
 		rowGap: 4,
 		textAlign: "start",
+		// Ghost keeps a word on one line; a row's cells wrap inside their columns instead of
+		// spilling into the next one when the list is narrow.
+		whiteSpace: "normal",
 		width: "100%",
 	},
 	dot: { borderRadius: 999, boxSizing: "border-box", flexShrink: 0, height: 8, width: 8 },

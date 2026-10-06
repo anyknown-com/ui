@@ -28,10 +28,17 @@ import * as stylex from "@stylexjs/stylex"
 import { type SVGProps, useState } from "react"
 import { Demo, Label, Row } from "../shell"
 
+const PHONE = "@media (max-width: 45rem)"
+
 const styles = stylex.create({
 	column: { display: "grid", gap: 16, maxWidth: 560 },
-	memoryGrid: { gridTemplateColumns: "72px minmax(0, 1fr) 96px 56px" },
-	questionGrid: { gridTemplateColumns: "16px minmax(0, 1fr) 128px 88px" },
+	// 窄的時候旁邊幾欄縮到剛好放得下,寬度讓給中間那欄
+	memoryGrid: {
+		gridTemplateColumns: { default: "72px minmax(0, 1fr) 96px 56px", [PHONE]: "56px minmax(0, 1fr) 32px 40px" },
+	},
+	questionGrid: {
+		gridTemplateColumns: { default: "16px minmax(0, 1fr) 128px 88px", [PHONE]: "16px minmax(0, 1fr) 72px 56px" },
+	},
 	muted: { color: "inherit", opacity: 0.7 },
 })
 

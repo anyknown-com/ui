@@ -619,6 +619,8 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
   (藏表頭、一列折兩行、列上下各 10px)也寫在同一個 `sx` 裡 —— 元件不帶 breakpoint,
   殼的 640px 與這個套件的 45rem 才不會打架
 - 列是 `minHeight: 40` 不是 `height: 40`:折兩行時自己長高
+- 列不繼承 `Ghost` 的 `nowrap`:格子裡的字在自己那欄折行(`overflow-wrap: anywhere`),
+  窄的時候不會蓋到隔壁欄。中間那欄給 `minmax(0, 1fr)`,手機上把旁邊幾欄縮窄讓它拿到寬度
 - 能排序的欄名用 `ListSort`(`t1` 的 `Ghost`),`active` 變深色、後面跟一個 ` ↓`
 - `WeightDot`:問題前面 8px 的點。`light` 灰色實心(沒人回答就照建議做)、`soon` 紅色實心
   (快到期了)、`heavy` 1.5px 橘色空心環(一定要人決定)。不是 `Dot`(設定列 6px accent)
