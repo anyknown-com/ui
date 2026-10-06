@@ -68,11 +68,13 @@
 
 | 階 | 用在 | 淺色 | 暗色 |
 | --- | --- | --- | --- |
-| rest | 紙上的卡片:tool card、檔案列、附件 | 1px `border` 環 + `0 2px 6px` 5% | 底色升一階(`surface`),環用 `border` |
+| rest | 紙上的卡片:tool card、檔案列、附件 | `surfaceRaised` 底 + 1px `border` 環 + `0 2px 6px` 5% | `surfaceRaised` 底(升一階),環用 `border` |
 | float | popover、dropdown、select、tooltip、toast | `0 1px 2px` 6% + `0 10px 24px` 10% | `surfaceRaised` 底 + 黑色 40% |
 | modal | dialog、sheet | `0 2px 4px` 6% + `0 24px 56px` 16% | `surfaceRaised` 底 + 黑色 60% |
 
 桌面是 `layer1`,主紙是 `layer2`(白)。紙裡面要分區就用凹下去的 `surface`(輸入區、使用者訊息泡泡、次要按鈕),不加邊框。
+
+所有 rest 卡片(`Card`、tool card、檔案列、附件、互動卡、復原金鑰)都是 `surfaceRaised` 底,不要另挑一個值;卡片裡凹下去的區塊仍然是 `surface`。
 
 dialog 的 backdrop 用黑色 32% 不加 blur。`backdrop-filter` 是 DESIGN.md 的反模式，現在的 Dialog 違規，一併拿掉。
 

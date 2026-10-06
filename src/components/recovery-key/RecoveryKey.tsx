@@ -1,15 +1,15 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, shadow, space, text, tone } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
-	// rest 階的卡片:淺色是白紙,暗色底色升一階(railLayer2 剛好是 bg / surface 這一對)
+	// rest 階的卡片:surfaceRaised,淺色是白紙,暗色底色升一階
 	card: {
-		backgroundColor: tone.railLayer2,
+		backgroundColor: color.surfaceRaised,
 		borderRadius: corner.card,
 		boxShadow: shadow.rest,
 		padding: space.md,

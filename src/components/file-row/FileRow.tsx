@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
 import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, font, shadow, space, text, tone } from "../../tokens.stylex"
+import { color, corner, font, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -12,11 +12,11 @@ const spin = stylex.keyframes({ to: { rotate: "360deg" } })
 const NARROW = "@container (max-width: 30rem)"
 
 const styles = stylex.create({
-	// A rest card on the sheet: white in light, `surface` in dark (`tone.railLayer2`), the ring is
+	// A rest card on the sheet: `surfaceRaised` (white in light, one step up in dark), the ring is
 	// its only edge.
 	list: {
 		borderRadius: corner.card,
-		backgroundColor: tone.railLayer2,
+		backgroundColor: color.surfaceRaised,
 		boxShadow: shadow.rest,
 		overflow: "hidden",
 		containerType: "inline-size",

@@ -507,7 +507,7 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 
 - 分段 mono(4 字一組)、預設模糊遮罩(hover / focus / 點擊才顯示)、一鍵複製(變 ✓)、
   下載 .txt、警告卡、「我已抄下」checkbox **gate 住主要按鈕**
-- 長相是 rest 卡片(`shadow.rest`、`corner.card`;暗色底升一階);金鑰區與警告是卡片裡凹下去
+- 長相是 rest 卡片(`surfaceRaised` 底、`shadow.rest`、`corner.card`);金鑰區與警告是卡片裡凹下去
   的塊,不畫框;動作鈕是 secondary 膠囊
 
 ### dropzone
@@ -525,8 +525,8 @@ dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放
 
 - 檔名放不下時切成 `…`,`title` 帶全名(附件方塊的名字、`Group` 的列名與狀態、`Pill`、
   `Cell mono`、`Subject` 也一樣:切掉的字一律 hover 看得到全文)
-- `FileList` 是紙上的 rest 卡片:`shadow.rest` 的環就是唯一的邊、`corner.card`,列與列之間
-  髮線。底色淺色是白、暗色升一階到 `surface`(`tone.railLayer2` 剛好是這一對)
+- `FileList` 是紙上的 rest 卡片:`surfaceRaised` 底、`shadow.rest` 的環就是唯一的邊、`corner.card`,
+  列與列之間髮線
 
 ### diff-viewer
 行級 unified diff + 行內字級 highlight。給 plan 審查 takeover 與 i18n 譯文對照用。
@@ -580,7 +580,7 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
   列與列之間一條髮線
 - `Table` 滿版、不進卡片:沒有底、沒有框。`Head` 是凹下去的 `surface` 條(`corner.small`),
   每一列底下一條髮線(最後一列沒有),`Detail` 同樣畫在底下
-- `Card` 是紙上的 rest 卡片:`shadow.rest` 的環 + `corner.card`,沒有另外的邊框。卡片裡要分區
+- `Card` 是紙上的 rest 卡片:`surfaceRaised` 底、`shadow.rest` 的環 + `corner.card`,沒有另外的邊框。卡片裡要分區
   用凹下去的 `surface`,不要卡片裡再放卡片
 
 ### group(分組清單)
