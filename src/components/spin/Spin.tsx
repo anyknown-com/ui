@@ -7,7 +7,7 @@ const turn = stylex.keyframes({ to: { transform: "rotate(360deg)" } })
 
 const styles = stylex.create({
 	root: {
-		animationDuration: "0.7s",
+		animationDuration: motion.loopFast,
 		animationIterationCount: "infinite",
 		animationName: { default: turn, "@media (prefers-reduced-motion: reduce)": "none" },
 		animationTimingFunction: motion.linear,

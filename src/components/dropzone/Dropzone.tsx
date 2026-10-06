@@ -40,7 +40,7 @@ const styles = stylex.create({
 	seamOver: {
 		stroke: color.accent,
 		animationName: { default: sew, [REDUCED]: "none" },
-		animationDuration: "0.5s",
+		animationDuration: motion.loopFast,
 		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},

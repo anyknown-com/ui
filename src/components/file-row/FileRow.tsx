@@ -151,7 +151,7 @@ const styles = stylex.create({
 		borderTopColor: color.accent,
 		borderRadius: corner.pill,
 		animationName: { default: spin, [REDUCED]: "none" },
-		animationDuration: "1.2s",
+		animationDuration: motion.loop,
 		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
