@@ -6,6 +6,7 @@ import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
+import { useFieldControl } from "../label/fieldContext"
 
 export type SelectItemProps = {
 	/** The value `onValueChange` reports and the form submits. */
@@ -295,21 +296,30 @@ export type SelectProps = {
 	multiple?: boolean
 	/** Show a search box at the top of the list. @default true */
 	searchable?: boolean
-	/** Disables the trigger. */
+	/** Disables the trigger. Inside a `Field`, defaults to the Field's `disabled`. */
 	disabled?: boolean
+	/** A value must be chosen before the form submits. Inside a `Field`, defaults to the Field's `required`. */
+	required?: boolean
+	/** Marks the trigger invalid (danger border, `aria-invalid`). Inside a `Field`, defaults to whether it has an `error`. */
+	invalid?: boolean
 	/** The form field name; the value is submitted with the form. */
 	name?: string
 	/** The trigger's name when there is no visible label. */
 	"aria-label"?: string
 	/** The id of a visible label that names the trigger. */
 	"aria-labelledby"?: string
+	/** Ids of elements that describe the trigger. Inside a `Field`, defaults to its help and error. */
+	"aria-describedby"?: string
 	/** Override built-in words for this instance; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<SelectLabels>
 	/** `SelectItem` and `SelectGroup` elements. */
 	children: ReactNode
 }
 
-/** A single or multiple choice from a searchable list, with the APG select-only combobox semantics. */
+/**
+ * A single or multiple choice from a searchable list, with the APG select-only combobox semantics.
+ * Inside a `Field`, the Field's label names the trigger and its help and error describe it.
+ */
 export function Select({
 	value,
 	defaultValue,
@@ -321,18 +331,24 @@ export function Select({
 	multiple = false,
 	searchable = true,
 	disabled,
+	required,
+	invalid,
 	name,
 	labels,
 	children,
 	"aria-label": ariaLabel,
 	"aria-labelledby": ariaLabelledBy,
+	"aria-describedby": ariaDescribedBy,
 }: SelectProps) {
+	const field = useFieldControl({ "aria-describedby": ariaDescribedBy, required, disabled })
+	const isInvalid = invalid ?? field.invalid
 	const t = useStrings(strings, labels)
 	const placeholder = placeholderProp ?? t.placeholder
 	const searchLabel = searchLabelProp ?? t.searchLabel
 	const base = useId()
 	const labelId = `${base}label`
-	const triggerId = `${base}trigger`
+	// Inside a Field the trigger takes the Field's control id, so its `<label for>` names it.
+	const triggerId = field.id ?? `${base}trigger`
 	const nameId = ariaLabelledBy ?? (ariaLabel != null ? labelId : undefined)
 	const triggerLabelledBy = nameId ? `${nameId} ${triggerId}` : undefined
 	const { options, groups } = useMemo(() => collect(children), [children])
@@ -365,7 +381,8 @@ export function Select({
 			items={items}
 			multiple={multiple as never}
 			value={selected as never}
-			disabled={disabled}
+			disabled={field.disabled}
+			required={field.required}
 			name={name}
 			filter={searchable ? undefined : null}
 			itemToStringLabel={(item: Option) => item.text}
@@ -384,9 +401,17 @@ export function Select({
 			<Combobox.Trigger
 				id={triggerId}
 				aria-labelledby={triggerLabelledBy}
+				aria-describedby={field["aria-describedby"]}
+				aria-invalid={isInvalid || undefined}
+				aria-required={field.required || undefined}
 				nativeButton={!multiple}
 				render={multiple ? <div /> : undefined}
-				{...stylex.props(controlStyles.base, controlStyles.md, styles.trigger)}
+				{...stylex.props(
+					controlStyles.base,
+					controlStyles.md,
+					styles.trigger,
+					isInvalid && controlStyles.invalid,
+				)}
 			>
 				{multiple ? (
 					selectedList.length === 0 ? (

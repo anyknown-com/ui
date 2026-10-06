@@ -6,6 +6,7 @@ import { LocaleProvider } from "../../lib/i18n"
 import { layer } from "../../lib/popup"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Dialog, DialogContent } from "../dialog/Dialog"
+import { Field } from "../label/Field"
 import { Select, SelectGroup, SelectItem } from "./Select"
 
 function Models({ onValueChange }: { onValueChange?: (v: string) => void }) {
@@ -265,5 +266,45 @@ describe("Select 在 Dialog 內", () => {
 		expect(dialogLayer).toBe(layer.dialog)
 		expect(popupLayer).toBe(layer.popup)
 		expect(popupLayer).toBeGreaterThan(dialogLayer)
+	})
+})
+
+describe("Select inside a Field", () => {
+	test("the Field's label names the trigger; help and error describe it", async () => {
+		const { container } = render(
+			<Field label="Model" help="Used for new chats." error="Pick a model." required>
+				<Select>
+					<SelectItem value="opus-5">Opus 5</SelectItem>
+				</Select>
+			</Field>,
+		)
+		const trigger = screen.getByLabelText(/Model/)
+		expect(trigger).toBe(screen.getByRole("combobox", { name: "Model" }))
+		expect(trigger).toHaveAccessibleDescription("Pick a model. Used for new chats.")
+		expect(trigger).toHaveAttribute("aria-invalid", "true")
+		expect(trigger).toHaveAttribute("aria-required", "true")
+		await expectNoAxeViolations(container)
+	})
+
+	test("takes disabled from the Field; own props win", () => {
+		render(
+			<>
+				<Field label="Region" disabled>
+					<Select>
+						<SelectItem value="tw">Taiwan</SelectItem>
+					</Select>
+				</Field>
+				<Field label="Plan" error="Required">
+					<Select invalid={false} aria-describedby="own">
+						<SelectItem value="pro">Pro</SelectItem>
+					</Select>
+				</Field>
+				<p id="own">Billed monthly.</p>
+			</>,
+		)
+		expect(screen.getByRole("combobox", { name: "Region" })).toBeDisabled()
+		const plan = screen.getByRole("combobox", { name: "Plan" })
+		expect(plan).not.toHaveAttribute("aria-invalid")
+		expect(plan).toHaveAccessibleDescription("Billed monthly.")
 	})
 })
