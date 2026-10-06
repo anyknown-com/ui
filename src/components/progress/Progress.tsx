@@ -22,6 +22,8 @@ const sweep = stylex.keyframes({
 const styles = stylex.create({
 	svg: { display: "block" },
 	track: {
+		// 軌是 span:不給 block,determinate 的 div 裡它是 inline,寬高都不生效、整條看不見
+		display: "block",
 		position: "relative",
 		width: "100%",
 		height: TRACK_H,
