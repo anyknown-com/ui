@@ -5,7 +5,7 @@ import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
-import { color, corner, font, ink, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, ink, motion, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -51,7 +51,7 @@ const styles = stylex.create({
 		textAlign: "start",
 		cursor: "pointer",
 		backgroundColor: { default: "transparent", ":hover": ink.n4 },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	tile: {
@@ -110,7 +110,7 @@ const styles = stylex.create({
 		forcedColorAdjust: "none",
 		animationName: { default: sweep, [REDUCED]: "none" },
 		animationDuration: "1.6s",
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 	// 定量:寬度跟著 progress 走,不掃
@@ -138,7 +138,7 @@ const styles = stylex.create({
 		color: color.textFaint,
 		flex: "none",
 		transitionProperty: "rotate",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	chevronOpen: { rotate: "180deg" },
 	spinner: {
@@ -153,7 +153,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		animationName: spin,
 		animationDuration: { default: "0.8s", [REDUCED]: "1.6s" },
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 	// 展開內容、io 標籤與重試列都從標題那條邊開始(INDENT),跟 subagent 的第二行同一條線
@@ -184,7 +184,7 @@ const styles = stylex.create({
 		overflowX: "auto",
 		whiteSpace: "pre",
 		color: color.text,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	ioError: {
@@ -206,7 +206,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	retryLine: {
@@ -253,7 +253,7 @@ const styles = stylex.create({
 		color: { default: "transparent", [REDUCED]: color.textMuted },
 		animationName: { default: shimmer, [REDUCED]: "none" },
 		animationDuration: "1.6s",
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 	summary: {
