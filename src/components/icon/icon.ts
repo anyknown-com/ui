@@ -1,12 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
+import { iconSize } from "../../tokens.stylex"
 
-/** An icon draws at the size it is given; these are the five in use. Stroke 2, currentColor. */
+/** An icon draws at the size it is given; these are the five in use (`iconSize`). Stroke 2, currentColor. */
 export const icon = stylex.create({
-	xs: { flexShrink: 0, height: 12, pointerEvents: "none", width: 12 },
-	sm: { flexShrink: 0, height: 14, pointerEvents: "none", width: 14 },
-	md: { flexShrink: 0, height: 16, pointerEvents: "none", width: 16 },
-	base: { flexShrink: 0, height: 18, pointerEvents: "none", width: 18 },
-	lg: { flexShrink: 0, height: 20, pointerEvents: "none", width: 20 },
+	xs: { flexShrink: 0, height: iconSize.xs, pointerEvents: "none", width: iconSize.xs },
+	sm: { flexShrink: 0, height: iconSize.sm, pointerEvents: "none", width: iconSize.sm },
+	md: { flexShrink: 0, height: iconSize.md, pointerEvents: "none", width: iconSize.md },
+	base: { flexShrink: 0, height: iconSize.base, pointerEvents: "none", width: iconSize.base },
+	lg: { flexShrink: 0, height: iconSize.lg, pointerEvents: "none", width: iconSize.lg },
 })
 
 export const ICON_STROKE = 2
