@@ -5,6 +5,8 @@ import { type StyleArg, styled } from "../../lib/styled"
 import { color, corner, radius, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Forced colors drop the bone colour and the sheen: each bone keeps a GrayText border instead.
+const FORCED = "@media (forced-colors: active)"
 
 const shimmer = stylex.keyframes({
 	from: { backgroundPosition: "180% 0" },
@@ -15,9 +17,14 @@ const styles = stylex.create({
 	bone: {
 		backgroundColor: color.bone,
 		borderRadius: corner.small,
+		borderStyle: { default: null, [FORCED]: "solid" },
+		borderWidth: { default: null, [FORCED]: 1 },
+		borderColor: { default: null, [FORCED]: "GrayText" },
+		boxSizing: "border-box",
 		backgroundImage: {
 			default: `linear-gradient(100deg, transparent 30%, ${color.sheen} 50%, transparent 70%)`,
 			[REDUCED]: "none",
+			[FORCED]: "none",
 		},
 		backgroundSize: "220% 100%",
 		animationName: { default: shimmer, [REDUCED]: "none" },
