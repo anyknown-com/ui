@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { PasswordInput, defaultScorer } from "./PasswordInput"
 
 function Pair() {
@@ -132,6 +133,19 @@ describe("PasswordInput", () => {
 		expect(screen.getByText("At least 12 characters.")).toBeInTheDocument()
 		await userEvent.type(screen.getByLabelText("Vault passphrase"), "Abcdefghijkl1!")
 		expect(screen.getByText("Solid")).toBeInTheDocument()
+	})
+
+	test("has no axe violations hidden, shown, with strength and mismatched", async () => {
+		const { container } = render(
+			<>
+				<PasswordInput aria-label="passphrase" meter defaultValue="Abcdefghijkl1!" />
+				<PasswordInput aria-label="confirm" confirmOf="something-else" defaultValue="wrong" />
+			</>,
+		)
+		await expectNoAxeViolations(container)
+		await userEvent.click(screen.getAllByRole("button", { name: "顯示 passphrase" })[0])
+		expect(screen.getByLabelText("passphrase")).toHaveAttribute("type", "text")
+		await expectNoAxeViolations(container)
 	})
 
 	test("levelLabels still wins over the table", () => {
