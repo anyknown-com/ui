@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useId, useRef, useState } from "react"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const ARROW_FRACTION = 0.05
@@ -20,27 +20,32 @@ const styles = stylex.create({
 		outlineOffset: 2,
 	},
 	disabled: { cursor: "not-allowed", opacity: 0.5 },
+	// 值 = 墨色實心,跟 switch 開的軌道同一個配色;鈕永遠包在填充的末端裡
 	fill: {
 		position: "absolute",
 		insetInlineStart: 0,
 		insetBlock: 0,
 		borderRadius: corner.pill,
-		backgroundColor: color.borderStrong,
+		backgroundColor: color.accent,
 	},
+	// 鈕是 accentText 的圓,外圈一環墨色把它跟軌道隔開(跟 switch 開的鈕同色)
 	thumb: {
 		position: "absolute",
-		insetBlock: "0.2rem",
-		width: "1.6rem",
+		insetBlock: 0,
+		boxSizing: "border-box",
+		width: "1.5rem",
+		borderWidth: "0.2rem",
+		borderStyle: "solid",
+		borderColor: color.accent,
 		borderRadius: corner.pill,
-		backgroundColor: color.surfaceRaised,
-		boxShadow: shadow.rest,
+		backgroundColor: color.accentText,
 		transitionProperty: "inset-inline-start",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
 	},
 	still: { transitionDuration: { default: "0s", [REDUCED]: "0s" } },
-	grown: (ratio: number) => ({ width: `calc(1.6rem + (100% - 1.6rem) * ${ratio})` }),
-	slid: (ratio: number) => ({ insetInlineStart: `calc((100% - 1.6rem) * ${ratio})` }),
+	grown: (ratio: number) => ({ width: `calc(1.5rem + (100% - 1.5rem) * ${ratio})` }),
+	slid: (ratio: number) => ({ insetInlineStart: `calc((100% - 1.5rem) * ${ratio})` }),
 })
 
 function snap(raw: number, min: number, max: number, step: number): number {
