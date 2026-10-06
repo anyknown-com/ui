@@ -42,6 +42,8 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
+		// 24px: the smallest pointer target WCAG 2.5.8 allows
+		minHeight: "1.5rem",
 		borderRadius: corner.pill,
 		cursor: "pointer",
 		transitionProperty: "background-color, color",

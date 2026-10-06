@@ -28,6 +28,11 @@ describe("CodeBlock", () => {
 		expect(await screen.findByRole("button", { name: "已複製 ✓" })).toBeInTheDocument()
 	})
 
+	test("the copy button is at least a 24px target", () => {
+		render(<CodeBlock code="x" />)
+		expect(screen.getByRole("button", { name: "複製" })).toHaveStyle({ minHeight: "24px" })
+	})
+
 	test("the streaming cursor is decorative", () => {
 		const { container } = render(<CodeBlock lang="ts" code="bus.emit(" streaming />)
 		expect(container.querySelectorAll("[aria-hidden='true']").length).toBeGreaterThan(0)
