@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ComponentProps, type ReactNode, createContext, use } from "react"
+import { type ComponentProps, type KeyboardEvent, type ReactNode, createContext, use } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
@@ -98,19 +98,74 @@ const LabelsContext = createContext<Partial<ActionBarLabels> | undefined>(undefi
 export type ActionBarProps = {
 	/** The toolbar's accessible name. Wins over `labels.toolbar`. */
 	label?: string
+	/** Show the bar at rest; otherwise it shows on hover of the message and on focus inside it. */
 	visible?: boolean
+	/** The actions: `ActionBar.Copy`, `ActionBar.Regenerate`, `ActionBar.Button`. */
 	children: ReactNode
 	/** Overrides for the built-in words of the bar and of `ActionBar.Copy` / `ActionBar.Regenerate` inside it. */
 	labels?: Partial<ActionBarLabels>
 }
 
+// WAI-ARIA APG toolbar: the bar is one tab stop and the arrow keys move between its buttons, so
+// a long thread costs one Tab per message instead of one per action.
+const ITEMS = "button:not(:disabled)"
+
+function items(bar: HTMLElement) {
+	return Array.from(bar.querySelectorAll<HTMLElement>(ITEMS))
+}
+
+// Roving tabindex: `current` (or the item that already holds the stop, or the first) gets 0.
+function rove(bar: HTMLElement, current?: HTMLElement) {
+	const list = items(bar)
+	const keep =
+		(current && list.includes(current) ? current : undefined) ??
+		list.find((item) => item.getAttribute("tabindex") === "0") ??
+		list[0]
+	for (const item of list) item.tabIndex = item === keep ? 0 : -1
+}
+
+// Ref callback: set the stop on mount and again when buttons come, go or turn disabled.
+function roveOnChange(bar: HTMLDivElement | null) {
+	if (bar == null) return
+	rove(bar)
+	const observer = new MutationObserver(() => rove(bar))
+	observer.observe(bar, { childList: true, subtree: true, attributes: true, attributeFilter: ["disabled"] })
+	return () => observer.disconnect()
+}
+
+function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+	const bar = event.currentTarget
+	const list = items(bar)
+	const at = list.indexOf(event.target as HTMLElement)
+	if (at < 0) return
+	// Left and right follow the reading direction: in RTL, ArrowLeft is "next".
+	const step = bar.closest("[dir]")?.getAttribute("dir")?.toLowerCase() === "rtl" ? -1 : 1
+	let next: number
+	if (event.key === "ArrowRight") next = at + step
+	else if (event.key === "ArrowLeft") next = at - step
+	else if (event.key === "Home") next = 0
+	else if (event.key === "End") next = list.length - 1
+	else return
+	event.preventDefault()
+	list[(next + list.length) % list.length]?.focus()
+}
+
+/**
+ * The row of actions under a message. A `role="toolbar"` with one tab stop: Tab lands on the
+ * last-used button, ←/→ move between buttons (mirrored under `dir="rtl"`, wrapping at the ends),
+ * Home/End jump to the first/last.
+ */
 export function ActionBar({ label, visible = false, children, labels }: ActionBarProps) {
 	const t = useStrings(strings, labels)
 	return (
 		<LabelsContext value={labels}>
+			{/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- focus goes to the buttons (roving tabindex), not the bar */}
 			<div
+				ref={roveOnChange}
 				role="toolbar"
 				aria-label={label ?? t.toolbar}
+				onKeyDown={onKeyDown}
+				onFocus={(event) => rove(event.currentTarget, event.target)}
 				{...stylex.props(styles.bar, visible && hoverStyles.reveal)}
 			>
 				{children}

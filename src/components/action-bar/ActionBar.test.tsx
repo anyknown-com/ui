@@ -76,6 +76,86 @@ describe("ActionBar", () => {
 	})
 })
 
+function Row({ dir }: { dir?: "rtl" }) {
+	return (
+		<div dir={dir}>
+			<button type="button">before</button>
+			<Bar visible />
+			<button type="button">after</button>
+		</div>
+	)
+}
+
+describe("ActionBar keyboard (APG toolbar)", () => {
+	test("the bar is one tab stop; arrows, Home and End move inside it and wrap", async () => {
+		render(<Row />)
+		const [copy, regenerate, like] = [
+			screen.getByRole("button", { name: "複製" }),
+			screen.getByRole("button", { name: "重新生成" }),
+			screen.getByRole("button", { name: "讚" }),
+		]
+		await userEvent.tab()
+		await userEvent.tab()
+		expect(copy).toHaveFocus()
+		await userEvent.tab()
+		expect(screen.getByRole("button", { name: "after" })).toHaveFocus()
+
+		await userEvent.tab({ shift: true })
+		expect(copy).toHaveFocus()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(regenerate).toHaveFocus()
+		await userEvent.keyboard("{End}")
+		expect(like).toHaveFocus()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(copy).toHaveFocus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(like).toHaveFocus()
+		await userEvent.keyboard("{Home}")
+		expect(copy).toHaveFocus()
+	})
+
+	test("Tab comes back to the button used last", async () => {
+		render(<Row />)
+		await userEvent.tab()
+		await userEvent.tab()
+		await userEvent.keyboard("{ArrowRight}")
+		await userEvent.tab()
+		await userEvent.tab({ shift: true })
+		expect(screen.getByRole("button", { name: "重新生成" })).toHaveFocus()
+		expect(screen.getByRole("button", { name: "複製" })).toHaveAttribute("tabindex", "-1")
+	})
+
+	test("under dir=rtl, ArrowLeft goes to the next button", async () => {
+		render(<Row dir="rtl" />)
+		await userEvent.tab()
+		await userEvent.tab()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(screen.getByRole("button", { name: "重新生成" })).toHaveFocus()
+		await userEvent.keyboard("{ArrowRight}{ArrowRight}")
+		expect(screen.getByRole("button", { name: "讚" })).toHaveFocus()
+	})
+
+	test("a button that turns disabled leaves the arrow order", async () => {
+		const { rerender } = render(
+			<ActionBar visible>
+				<ActionBar.Button>a</ActionBar.Button>
+				<ActionBar.Button>b</ActionBar.Button>
+				<ActionBar.Button>c</ActionBar.Button>
+			</ActionBar>,
+		)
+		rerender(
+			<ActionBar visible>
+				<ActionBar.Button>a</ActionBar.Button>
+				<ActionBar.Button disabled>b</ActionBar.Button>
+				<ActionBar.Button>c</ActionBar.Button>
+			</ActionBar>,
+		)
+		await userEvent.tab()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(screen.getByRole("button", { name: "c" })).toHaveFocus()
+	})
+})
+
 describe("ActionBar axe", () => {
 	test("has no axe violations, hidden and shown, before and after a copy", async () => {
 		writeText(vi.fn().mockResolvedValue(undefined))
