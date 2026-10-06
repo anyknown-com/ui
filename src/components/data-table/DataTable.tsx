@@ -38,7 +38,7 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -1,
-		"::placeholder": { color: color.textFaint },
+		"::placeholder": { color: color.textMuted },
 	},
 	count: {
 		color: color.textMuted,

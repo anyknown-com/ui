@@ -35,7 +35,8 @@ export const controlStyles = stylex.create({
 		outlineOffset: 1,
 		cursor: { default: "auto", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
-		"::placeholder": { color: color.textFaint },
+		// textFaint 只有 3.75:1,提示字要讀得到:textMuted(4.5:1 以上)
+		"::placeholder": { color: color.textMuted },
 	},
 	invalid: {
 		borderColor: { default: color.danger, ":hover:not(:disabled)": color.danger },
