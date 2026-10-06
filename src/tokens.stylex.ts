@@ -96,7 +96,7 @@ export const font = stylex.defineVars({
 	display:
 		"'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
 	body: "'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
-	mono: "'Geist Mono Variable', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
+	mono: "'Geist Mono Variable', 'Geist Mono', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
 export const text = stylex.defineVars({
