@@ -5,7 +5,7 @@ import { createContext, type ReactElement, type ReactNode, useContext, useRef, u
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
-import { color, font, radius, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, shadow, space, text } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -16,11 +16,11 @@ const grow = stylex.keyframes({
 })
 
 const styles = stylex.create({
+	// 中性墨 32%,不加 blur:backdrop-filter 是 DESIGN.md 的反模式
 	backdrop: {
 		position: "fixed",
 		inset: 0,
-		backgroundColor: "rgba(24, 22, 19, 0.35)",
-		backdropFilter: "blur(2px)",
+		backgroundColor: color.scrim,
 	},
 	viewport: {
 		position: "fixed",
@@ -29,15 +29,18 @@ const styles = stylex.create({
 		placeItems: "center",
 		padding: space.md,
 	},
+	// modal 階:浮得最高、最圓。透明的框只為了 forced-colors(那裡陰影會消失)
 	popup: {
-		backgroundColor: color.surface,
+		backgroundColor: color.surfaceRaised,
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		boxShadow: shadow.popover,
-		padding: space.lg,
+		borderColor: "transparent",
+		borderRadius: corner.modal,
+		boxShadow: shadow.modal,
+		// 28px
+		padding: `calc(${space.lg} + ${space.xxs})`,
+		boxSizing: "border-box",
 		width: "min(24rem, calc(100vw - 2rem))",
 		maxHeight: "calc(100vh - 2rem)",
 		overflowY: "auto",
@@ -62,10 +65,16 @@ const styles = stylex.create({
 		fontWeight: 600,
 		lineHeight: text.leadingSnug,
 		margin: 0,
-		marginBottom: space.xxs,
+		marginBottom: space.xs,
 	},
-	description: { fontSize: text.sm, color: color.textMuted, margin: 0, marginBottom: space.md },
-	actions: { display: "flex", justifyContent: "flex-end", gap: space.xs, marginTop: space.md },
+	description: {
+		fontSize: text.sm,
+		lineHeight: text.leadingRelaxed,
+		color: color.textMuted,
+		margin: 0,
+		marginBottom: space.md,
+	},
+	actions: { display: "flex", justifyContent: "flex-end", gap: space.xs, marginTop: space.lg },
 })
 
 export type DialogProps = {
@@ -216,7 +225,7 @@ function ConfirmContent({
 					)}
 					<div {...stylex.props(styles.actions)}>
 						{cancelLabel != null && (
-							<AlertDialog.Close render={<Button ref={cancelRef} variant="ghost" />} onClick={onCancel}>
+							<AlertDialog.Close render={<Button ref={cancelRef} variant="secondary" />} onClick={onCancel}>
 								{cancelLabel}
 							</AlertDialog.Close>
 						)}
