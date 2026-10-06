@@ -1,10 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useId, useRef, useState } from "react"
 import type { StyleArg } from "../../lib/styled"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { useControllableState } from "../../lib/useControllableState"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 const ARROW_FRACTION = 0.05
+const PAGE_FRACTION = 0.1
 
 const styles = stylex.create({
 	root: { display: "flex", flexDirection: "column", gap: space.xs, fontFamily: font.body },
@@ -13,20 +16,31 @@ const styles = stylex.create({
 		position: "relative",
 		height: "1.5rem",
 		borderRadius: corner.pill,
-		backgroundColor: color.layer4,
+		backgroundColor: { default: color.layer4, [FORCED]: "Canvas" },
 		cursor: "pointer",
 		touchAction: "none",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
+		// forced-colors 會把底色洗成 Canvas、拿掉填充:這裡自己給系統色,軌道多一圈 ButtonText 的框
+		forcedColorAdjust: "none",
+		borderStyle: "solid",
+		borderWidth: { default: 0, [FORCED]: 1 },
+		borderColor: "ButtonText",
 	},
-	disabled: { cursor: "not-allowed", opacity: 0.5 },
+	disabled: { cursor: "not-allowed", opacity: 0.5, borderColor: "GrayText" },
 	// 值 = 墨色實心,跟 switch 開的軌道同一個配色;鈕永遠包在填充的末端裡
 	fill: {
 		position: "absolute",
 		insetInlineStart: 0,
 		insetBlock: 0,
 		borderRadius: corner.pill,
-		backgroundColor: color.accent,
+		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
 		// 跟鈕同一個時長與曲線:只有鈕在動的話,點一下軌道時填充先跳到位、鈕才慢慢跟上
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
@@ -40,13 +54,15 @@ const styles = stylex.create({
 		width: "1.5rem",
 		borderWidth: "0.2rem",
 		borderStyle: "solid",
-		borderColor: color.accent,
+		borderColor: { default: color.accent, [FORCED]: "Highlight" },
 		borderRadius: corner.pill,
-		backgroundColor: color.accentText,
+		backgroundColor: { default: color.accentText, [FORCED]: "Canvas" },
 		transitionProperty: "inset-inline-start",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
 	},
+	fillDisabled: { backgroundColor: { default: color.accent, [FORCED]: "GrayText" } },
+	thumbDisabled: { borderColor: { default: color.accent, [FORCED]: "GrayText" } },
 	still: { transitionDuration: { default: "0s", [REDUCED]: "0s" } },
 	grown: (ratio: number) => ({ width: `calc(1.5rem + (100% - 1.5rem) * ${ratio})` }),
 	slid: (ratio: number) => ({ insetInlineStart: `calc((100% - 1.5rem) * ${ratio})` }),
@@ -61,34 +77,52 @@ function snap(raw: number, min: number, max: number, step: number): number {
 }
 
 export type SliderProps = {
-	value: number
-	onChange: (value: number) => void
+	/** The current value, for a controlled slider. Pair it with `onValueChange`. */
+	value?: number
+	/** The starting value of an uncontrolled slider. @default min */
+	defaultValue?: number
+	/** Every value the slider moves to, as it moves: each pointer move, each key. */
+	onValueChange?: (value: number) => void
+	/** @deprecated Use `onValueChange`; it is called with the same value. */
+	onChange?: (value: number) => void
 	/**
 	 * The value a gesture ended on: once when a drag lets go, once per key that moved it. Nothing
-	 * when the gesture left the value where it started. Save here, not in `onChange`.
+	 * when the gesture left the value where it started. Save here, not in `onValueChange`.
 	 */
 	onValueCommit?: (value: number) => void
-	/** @default 0 */
+	/** The lowest value. @default 0 */
 	min?: number
-	/** @default 1 */
+	/** The highest value. @default 1 */
 	max?: number
-	/** @default 0.01 */
+	/** Values snap to multiples of this, counted from `min`; 0 does not snap. @default 0.01 */
 	step?: number
+	/** How far PageUp and PageDown move the value. @default 10% of the range */
+	largeStep?: number
+	/** A visible name above the track; it also names the slider. */
 	label?: ReactNode
+	/** The slider's name when there is no visible `label`. */
 	"aria-label"?: string
-	/** 唸出來的值 —— 0.62 要唸成「多」不是「零點六二」。 */
+	/** What a screen reader says for a value: 0.62 should read "more", not "zero point six two". */
 	valueText?: (value: number) => string
+	/** Out of the tab order, deaf to pointer and keys, drawn faded. */
 	disabled?: boolean
 	sx?: StyleArg
 }
 
+/**
+ * A value on a range, dragged along a track or moved with the keys: arrows move 5% of the
+ * range, PageUp / PageDown `largeStep`, Home / End to either end.
+ */
 export function Slider({
 	value,
+	defaultValue,
+	onValueChange,
 	onChange,
 	onValueCommit,
 	min = 0,
 	max = 1,
 	step = 0.01,
+	largeStep,
 	label,
 	valueText,
 	disabled = false,
@@ -100,14 +134,18 @@ export function Slider({
 	const thumb = useRef<HTMLSpanElement>(null)
 	const [dragging, setDragging] = useState(false)
 	const gesture = useRef({ from: 0, to: 0 })
+	const [raw, setValue] = useControllableState(value, defaultValue ?? min, (next: number) => {
+		onValueChange?.(next)
+		onChange?.(next)
+	})
 
-	const current = snap(value, min, max, step)
+	const current = snap(raw, min, max, step)
 	const ratio = max === min ? 0 : (current - min) / (max - min)
 
-	function emit(raw: number) {
-		const next = snap(raw, min, max, step)
-		gesture.current.to = next
-		if (next !== current) onChange(next)
+	function emit(next: number) {
+		const snapped = snap(next, min, max, step)
+		gesture.current.to = snapped
+		if (snapped !== current) setValue(snapped)
 	}
 
 	function begin() {
@@ -174,9 +212,12 @@ export function Slider({
 				onKeyDown={(event) => {
 					if (disabled) return
 					const nudge = (max - min) * ARROW_FRACTION
+					const page = largeStep ?? (max - min) * PAGE_FRACTION
 					begin()
 					if (event.key === "ArrowRight" || event.key === "ArrowUp") emit(current + nudge)
 					else if (event.key === "ArrowLeft" || event.key === "ArrowDown") emit(current - nudge)
+					else if (event.key === "PageUp") emit(current + page)
+					else if (event.key === "PageDown") emit(current - page)
 					else if (event.key === "Home") emit(min)
 					else if (event.key === "End") emit(max)
 					else return
@@ -187,12 +228,22 @@ export function Slider({
 			>
 				<span
 					aria-hidden="true"
-					{...stylex.props(styles.fill, dragging && styles.still, styles.grown(ratio))}
+					{...stylex.props(
+						styles.fill,
+						disabled && styles.fillDisabled,
+						dragging && styles.still,
+						styles.grown(ratio),
+					)}
 				/>
 				<span
 					ref={thumb}
 					aria-hidden="true"
-					{...stylex.props(styles.thumb, dragging && styles.still, styles.slid(ratio))}
+					{...stylex.props(
+						styles.thumb,
+						disabled && styles.thumbDisabled,
+						dragging && styles.still,
+						styles.slid(ratio),
+					)}
 				/>
 			</div>
 		</div>

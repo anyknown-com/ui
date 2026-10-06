@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Slider } from "./Slider"
 
 function Effort({ start = 0, onCommit }: { start?: number; onCommit?: (value: number) => void }) {
@@ -113,6 +114,91 @@ describe("Slider", () => {
 		fireEvent.pointerDown(slider, { pointerId: 2, clientX: 80 })
 		fireEvent.pointerCancel(slider, { pointerId: 2 })
 		expect(onCommit).toHaveBeenCalledExactlyOnceWith(0.8)
+	})
+
+	test("PageUp / PageDown move 10% of the range by default", async () => {
+		const user = userEvent.setup()
+		render(<Effort start={0.5} />)
+		const slider = screen.getByRole("slider", { name: "思考多少" })
+		await user.tab()
+		await user.keyboard("{PageUp}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.6")
+		await user.keyboard("{PageDown}{PageDown}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.4")
+	})
+
+	test("largeStep sets how far PageUp / PageDown go, clamped at the ends", async () => {
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(
+			<Slider
+				defaultValue={90}
+				onValueChange={onValueChange}
+				min={0}
+				max={100}
+				step={1}
+				largeStep={25}
+				aria-label="音量"
+			/>,
+		)
+		const slider = screen.getByRole("slider")
+		await user.tab()
+		await user.keyboard("{PageDown}")
+		expect(onValueChange).toHaveBeenLastCalledWith(65)
+		await user.keyboard("{PageUp}{PageUp}")
+		expect(slider).toHaveAttribute("aria-valuenow", "100")
+		await user.keyboard("{Home}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0")
+		await user.keyboard("{End}")
+		expect(slider).toHaveAttribute("aria-valuenow", "100")
+	})
+
+	test("uncontrolled: defaultValue starts it, onValueChange reports each move", async () => {
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(<Slider defaultValue={0.2} onValueChange={onValueChange} aria-label="思考多少" />)
+		const slider = screen.getByRole("slider")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.2")
+		await user.tab()
+		await user.keyboard("{ArrowRight}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.25")
+		expect(onValueChange).toHaveBeenCalledExactlyOnceWith(0.25)
+	})
+
+	test("uncontrolled without defaultValue starts at min", () => {
+		render(<Slider min={10} max={20} step={1} aria-label="寬度" />)
+		expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "10")
+	})
+
+	test("controlled: the value only moves when the parent says so", async () => {
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(<Slider value={0.5} onValueChange={onValueChange} aria-label="思考多少" />)
+		await user.tab()
+		await user.keyboard("{ArrowRight}")
+		expect(onValueChange).toHaveBeenCalledWith(0.55)
+		expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0.5")
+	})
+
+	test("the deprecated onChange still hears every move, next to onValueChange", async () => {
+		const onChange = vi.fn()
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(<Slider defaultValue={0} onChange={onChange} onValueChange={onValueChange} aria-label="x" />)
+		await user.tab()
+		await user.keyboard("{ArrowRight}")
+		expect(onChange).toHaveBeenCalledWith(0.05)
+		expect(onValueChange).toHaveBeenCalledWith(0.05)
+	})
+
+	test("axe: labelled, valued, and disabled", async () => {
+		const { container } = render(
+			<>
+				<Slider defaultValue={0.3} label="思考多少" valueText={() => "少"} />
+				<Slider defaultValue={0.7} aria-label="音量" disabled />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("鍵盤每動一次值就 commit 一次,到底再按不 commit", async () => {
