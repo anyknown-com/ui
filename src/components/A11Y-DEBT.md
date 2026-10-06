@@ -7,39 +7,30 @@ a11y review 量測兩個主題的 token 組合後,列出低於門檻的項目。
 
 ## palette 層(改一次影響全站)
 
+數字對 `scripts/palette.mjs` 目前的輸出量(12 階中性 palette,light / dark)。
+
 | Token 組合 | 實測 | 門檻 | 出現處 |
 | --- | --- | --- | --- |
-| `textFaint` on `surface` | 2.97:1(light)/ 3.16:1(dark) | 4.5:1 | input placeholder、select 群組標題與 hint、dropdown 快捷鍵、label 的「選填」 |
-| `borderStrong` on `surface` | 1.76:1(light) | 3:1 | checkbox / radio 未勾邊框、switch 關閉時的軌道 |
-| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.21–1.32:1 | 3:1 | diff-viewer 行內字級 highlight ——「哪幾個字變了」目前只靠這層底色 |
-| `accent` on `accentSubtle`(dark) | 4.18:1 | 4.5:1 | Badge `variant="accent"`、tabs pills 的選取態 |
-| `danger` on `dangerSubtle`(dark) | 4.48:1 | 4.5:1 | Badge `variant="danger"` |
-| `textFaint` on `successSubtle` / `dangerSubtle` | 2.44–2.71:1 | — | diff-viewer 的行號(`aria-hidden`,只影響低視力的視覺使用者) |
+| `textFaint` on `surface` | 3.75:1(light)/ 4.88:1(dark) | 4.5:1 | input、select 搜尋、composer、interaction-card、data-table 篩選的 placeholder |
+| `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` | 1.15–1.23:1 | 3:1 | diff-viewer 行內字級 highlight ——「哪幾個字變了」目前只靠這層底色 |
 
-建議修法(擇一):把帶語意的 faint 文字改用 `textMuted`(已達 4.5:1),或把 `textFaint`
-/ `borderStrong` 各壓深一階。要動的話一次調 `tokens.stylex.ts` 與 `tokens.css` 兩邊。
+`textFaint` 只有 3:1,規則是不放要讀的字:icon、chevron、placeholder、分隔符、空格的 `—`
+與 disabled 態可以用它,其他文字一律 `textMuted`(在所有底色上 ≥ 5.36:1)。placeholder
+是唯一還算「字」的例外;要過 4.5:1 就把 placeholder 改成 `textMuted`,不是調 `textFaint`。
 
-## 已修:textMuted 調深一階(2026-08-29)
+diff 的字級 highlight 是填色階(5 階)疊在 subtle 底(3 階)上,兩階的明度差本來就小;
+要過 3:1 就另外加非顏色的記號(底線或粗體),不手調 `*Hl` 的值。
 
-`textMuted` 從 light `#777165` / dark `#A59B8C` 改成 **light `#635D52` / dark `#B0A697`**。
+## 已修:換成 12 階中性 palette
 
-起因是織體讓文字落在布上(底色從單一 `surface` 變成一段紗線階,要對**最不利的那一階**
-算),但查下去發現 muted 本來就貼著門檻 —— 它只在 `bg` 與 `surface` 上及格,落在
-`bone` / `sheen` / `accentSubtle` / `dangerSubtle` / `warningSubtle` 上全都是 3.99–4.40:1。
+舊表上的這幾列在新 palette 下都過門檻,已經拿掉:
 
-| 底色 | 舊 | 新 |
-| --- | --- | --- |
-| `bg` / `surface` | 4.63 / 4.85 | 6.24 / 6.53 |
-| `bone` / `sheen` | 3.99 / 4.40 | 5.37 / 5.93 |
-| `accentSubtle` / `dangerSubtle` / `warningSubtle` | 4.17 / 4.04 / 4.10 | 5.61 / 5.44 / 5.52 |
-| `yarnSecondary` 最深的一階(receipt 收合列) | 3.67 | 4.94 |
-| `yarnGhost` 最深的一階(ghost Button) | 3.40 | 4.57 |
-
-順帶把三階的間距拉勻:text → muted → faint 的 L\* 間距原本是 35.0 / 14.2(muted 離
-faint 遠比離 text 近,兩階分不太開),現在是 26.9 / 22.3;dark 從 26.9 / 19.2 變成
-22.8 / 23.3。
-
-`dangerGhost` 另外處理掉 interaction-card 的拒絕鈕(標籤改用 `color.danger`)。
+| Token 組合 | 舊 | 新(light / dark) | 怎麼修的 |
+| --- | --- | --- | --- |
+| `textFaint` 當文字(select 群組標題與 hint、dropdown 快捷鍵、label「選填」、list 欄名、diff 行號) | 2.44–3.16 | 改用 `textMuted`:≥ 5.36 / ≥ 7.30 | 讀得到的字全部移到 `textMuted` |
+| checkbox / radio 未勾邊框、switch 關的軌道 | 1.76(`borderStrong`) | 3.75 / 3.80(`borderControl` on `surface`) | 控制項邊界改用 `borderControl` |
+| `accent` on `accentSubtle`(Badge accent、pills tabs 選取態) | 4.18(dark) | 15.31 / 13.62 | 墨色 accent 在中性灰上 |
+| `danger` on `dangerSubtle`(Badge danger) | 4.48(dark) | 4.59 / 7.47 | red 9 階(light)/ 11 階(dark)on red 3 階 |
 
 ## 命中區
 
