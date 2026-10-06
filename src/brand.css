@@ -36,9 +36,9 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-/* ---- 骨架 ---- */
+/* ---- Structure ---- */
 
-/* 主紙:冷灰桌面上的一張白紙,最大寬、sheet 圓角、四周露出桌面。一頁一個。 */
+/* Main paper: a white sheet on a cool-gray desk, max width, sheet corners, desk showing all around. One per page. */
 .ak-page {
 	box-sizing: border-box;
 	width: min(67rem, 100% - 2rem);
@@ -48,19 +48,19 @@ body {
 	border-radius: var(--ak-corner-sheet);
 }
 
-/* 分段:上方留白,不畫線。結論在前的頁面用它切證據段。 */
+/* Section: space above, no rule. Conclusion-first pages use it to split the evidence sections. */
 .ak-section {
 	margin-top: 3rem;
 }
 
-/* 兩欄網格,375 寬以下折成單欄。 */
+/* Two-column grid; folds to one column at 375 wide and below. */
 .ak-grid-2 {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 1.5rem;
 }
 
-/* 三欄網格,375 寬以下折成單欄。stat 一排最多放這麼多再加一。 */
+/* Three-column grid; folds to one column at 375 wide and below. A row of stats holds at most this many plus one. */
 .ak-grid-3 {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -79,9 +79,9 @@ body {
 	}
 }
 
-/* ---- 文字 ---- */
+/* ---- Text ---- */
 
-/* display 級標題。一頁一個。 */
+/* Display-level title. One per page. */
 .ak-display {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -93,7 +93,7 @@ body {
 	text-wrap: balance;
 }
 
-/* section 標題。 */
+/* Section title. */
 .ak-h1 {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -104,7 +104,7 @@ body {
 	text-wrap: balance;
 }
 
-/* section 內的分節標題。 */
+/* Subsection title inside a section. */
 .ak-h2 {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -115,7 +115,7 @@ body {
 	text-wrap: balance;
 }
 
-/* 正文區:p / ul / ol / a / code / pre / blockquote / h3 的階層與行長。 */
+/* Body text: hierarchy and line length for p / ul / ol / a / code / pre / blockquote / h3. */
 .ak-prose {
 	max-width: 68ch;
 	font-size: 0.9375rem;
@@ -183,21 +183,21 @@ body {
 	margin: 2rem 0;
 }
 
-/* 次要說明:顏色降一階,字級不變。 */
+/* Secondary note: color one step down, same size. */
 .ak-muted {
 	color: var(--ak-text-muted);
 }
 
-/* 等寬:數據、代碼、識別碼。不當裝飾。 */
+/* Monospace: data, code, identifiers. Not for decoration. */
 .ak-mono {
 	font-family: var(--ak-font-mono);
 	font-size: 0.875em;
 	font-variant-numeric: tabular-nums;
 }
 
-/* ---- 證據 ---- */
+/* ---- Evidence ---- */
 
-/* 證據表:滿版、不進卡片、tabular-nums;表頭是凹下去的 surface 條,列之間一條髮線。數字欄加 data-num 靠右。 */
+/* Evidence table: full width, not in a card, tabular-nums; the header is a recessed surface strip, with a hairline between rows. Add data-num to right-align number columns. */
 .ak-table {
 	width: 100%;
 	border-collapse: separate;
@@ -255,7 +255,7 @@ body {
 	}
 }
 
-/* 結論級的大數字:display 字的數字加 muted 小標。一排最多四個。 */
+/* Conclusion-level big number: a figure in the display face with a muted label. At most four per row. */
 .ak-stat {
 	display: flex;
 	flex-direction: column;
@@ -263,7 +263,7 @@ body {
 	padding: 1rem 0;
 	border-top: 1px solid var(--ak-border);
 }
-/* ak-stat 的數字。 */
+/* The number in ak-stat. */
 .ak-stat-value {
 	font-family: var(--ak-font-display);
 	font-optical-sizing: auto;
@@ -273,13 +273,13 @@ body {
 	letter-spacing: -0.01em;
 	font-variant-numeric: tabular-nums;
 }
-/* ak-stat 的小標。 */
+/* The label in ak-stat. */
 .ak-stat-label {
 	font-size: 0.875rem;
 	color: var(--ak-text-muted);
 }
 
-/* 提示框:左側一條色線加淡底,語意由 ak-callout-info / -warning / -danger 決定。 */
+/* Callout: a colored line on the left with a light fill; ak-callout-info / -warning / -danger set the meaning. */
 .ak-callout {
 	border-inline-start: 2px solid var(--ak-border-strong);
 	background: var(--ak-sheen);
@@ -295,25 +295,25 @@ body {
 .ak-callout > :last-child {
 	margin-bottom: 0;
 }
-/* 說明性提示。 */
+/* Explanatory note. */
 .ak-callout-info {
 	border-color: var(--ak-info);
 	background: var(--ak-info-subtle);
 }
-/* 要注意但不擋路。 */
+/* Needs attention but doesn't block. */
 .ak-callout-warning {
 	border-color: var(--ak-warning);
 	background: var(--ak-warning-subtle);
 }
-/* 會出事。 */
+/* Something will go wrong. */
 .ak-callout-danger {
 	border-color: var(--ak-danger);
 	background: var(--ak-danger-subtle);
 }
 
-/* ---- 動作 ---- */
+/* ---- Actions ---- */
 
-/* 表單欄位:label 在上、控件在下,input / textarea / select 都給一樣的邊框與焦點環。 */
+/* Form field: label above, control below; input / textarea / select all get the same border and focus ring. */
 .ak-field {
 	display: flex;
 	flex-direction: column;
@@ -354,7 +354,7 @@ body {
 	color: var(--ak-text-faint);
 }
 
-/* 主動作按鈕:viridian 織體,一頁一顆。 */
+/* Primary action button: ink fill, one per page. */
 .ak-btn {
 	display: inline-flex;
 	align-items: center;
@@ -391,7 +391,7 @@ body {
 	cursor: not-allowed;
 }
 
-/* 次要按鈕:其他動作都用它。 */
+/* Secondary button: every other action uses it. */
 .ak-btn-secondary {
 	display: inline-flex;
 	align-items: center;

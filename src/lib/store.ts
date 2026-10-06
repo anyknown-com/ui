@@ -1,12 +1,12 @@
 import { useMemo, useRef, useSyncExternalStore } from "react"
 
 /**
- * 最小的外部 store:一個值、一組 listener。React 端一律經 `useStore`
- * (`useSyncExternalStore`)讀,不在 effect 裡同步。
+ * A minimal external store: one value, one set of listeners. React always reads it through
+ * `useStore` (`useSyncExternalStore`), never by syncing in an effect.
  */
 export type Store<T> = {
 	getSnapshot: () => T
-	/** 值沒變(`Object.is`)就不通知。 */
+	/** Doesn't notify when the value is unchanged (`Object.is`). */
 	set: (next: T | ((prev: T) => T)) => void
 	subscribe: (listener: () => void) => () => void
 }
@@ -34,11 +34,12 @@ export function createStore<T>(initial: T): Store<T> {
 type Readable<T> = Pick<Store<T>, "subscribe" | "getSnapshot">
 
 /**
- * 訂閱任何有 `subscribe` / `getSnapshot` 的 store(含 toast / dialog manager)。
+ * Subscribes to any store with `subscribe` / `getSnapshot` (including the toast / dialog managers).
  *
- * 給 `selector` 就只訂閱其中一塊:store 變了但選出來的值 `isEqual`(預設 `Object.is`)
- * 判定沒變,元件就不重畫,而且拿回的是上一次的同一個參考。選出新物件或陣列時傳
- * 一個淺比較的 `isEqual`,否則每次都算「變了」。
+ * With a `selector` it subscribes to one slice only: when the store changes but `isEqual`
+ * (default `Object.is`) finds the selected value unchanged, the component doesn't re-render and
+ * gets back the same reference as last time. When the selector builds a new object or array,
+ * pass a shallow-compare `isEqual`, or every change counts as "changed".
  *
  * ```ts
  * const all = useStore(store)
@@ -46,7 +47,8 @@ type Readable<T> = Pick<Store<T>, "subscribe" | "getSnapshot">
  * const ids = useStore(store, (s) => s.items.map((i) => i.id), (a, b) => a.join() === b.join())
  * ```
  *
- * `selector` 可以是 inline 函式:它換了就重選一次,沒換而 store 也沒變就直接回快取。
+ * `selector` can be an inline function: when it changes, it selects again; when neither it nor
+ * the store changed, the cached value comes straight back.
  */
 export function useStore<T>(store: Readable<T>): T
 export function useStore<T, S>(

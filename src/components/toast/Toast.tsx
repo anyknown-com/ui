@@ -385,9 +385,9 @@ export type ToastManager = {
 	subscribe: (listener: () => void) => () => void
 	/** The current toasts. */
 	getSnapshot: () => ToastState
-	/** @internal Toaster 用:預設 timeout、limit 與退場毫秒數(reduced motion 時 0)。 */
+	/** @internal For Toaster: the default timeout, limit and exit milliseconds (0 under reduced motion). */
 	configure: (config: { timeout: number; limit: number; exit?: number }) => void
-	/** @internal Toaster 用:hover / focus / 分頁隱藏時停住所有倒數。 */
+	/** @internal For Toaster: pauses every countdown on hover / focus / a hidden tab. */
 	pause: (reason: PauseReason) => void
 	/** @internal */
 	resume: (reason: PauseReason) => void

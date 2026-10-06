@@ -6,13 +6,14 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const FORCED = "@media (forced-colors: active)"
 
 /**
- * 全站疊層表,值在 `tokens.stylex.ts` 的 `zIndex`(順序的理由也寫在那裡)。
- * Base UI 的浮層一律 portal 到 body,跟 dialog / toast 同在一層比 z-index,
- * 各元件各寫一個數字就會出現「dialog 裡的 select 打不開」這種洞。
+ * The site-wide stacking table; the values live in `zIndex` in `tokens.stylex.ts` (the reasons
+ * for the order are there too). Base UI always portals its popups to body, where they compete on
+ * z-index with dialogs and toasts, so one number per component opens holes like "the select
+ * inside a dialog won't open".
  */
 export const layer = zIndex
 
-/** `zIndex` 做好的樣式,給只想掛一層的元件;自己寫 `zIndex: zIndex.popup` 也可以。 */
+/** Ready-made `zIndex` styles for components that only need a layer; writing `zIndex: zIndex.popup` yourself works too. */
 export const layerStyles = stylex.create({
 	dialogBackdrop: { zIndex: zIndex.dialogBackdrop },
 	dialog: { zIndex: zIndex.dialog },
@@ -27,9 +28,10 @@ export const growIn = stylex.keyframes({
 })
 
 /**
- * 給 Base UI popup 的 ref callback:退場一開始(`data-ending-style` 出現)就把焦點還給
- * 打開之前的地方。Base UI 要等退場的 transition 跑完、popup 拆掉才還焦點,不補這一手
- * 鍵盤使用者會卡在正在淡出的 popup 裡 120ms。拿不到可聚焦的原處就交回 Base UI 自己處理。
+ * A ref callback for Base UI popups: as soon as the exit starts (`data-ending-style` appears), it
+ * returns focus to where it was before the popup opened. Base UI only returns focus once the exit
+ * transition has finished and the popup is unmounted; without this, keyboard users are stuck in
+ * a fading popup for 120ms. If the original spot can't take focus, Base UI handles it as usual.
  */
 export function returnFocusOnExit(node: HTMLElement | null) {
 	if (node == null) return

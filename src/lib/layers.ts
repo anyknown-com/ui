@@ -1,11 +1,11 @@
 import { color } from "../tokens.stylex"
 
-/** rail → main → 訊息 → fold → 列。數字越大越深,面與面靠深淺分,不靠邊框。 */
+/** rail → main → message → fold → row. A higher number is deeper; surfaces separate by depth, not borders. */
 export type LayerName = "layer1" | "layer2" | "layer3" | "layer4" | "layer5"
 
 /**
- * hover 升一階:一塊面的 hover 底色就是下一階。
- * layer5 已經是最深的一階,再深的那一階沒有名字,用 borderStrong。
+ * Hover goes up one step: a surface's hover background is the next layer.
+ * layer5 is already the deepest; the step past it has no name, so it uses borderStrong.
  */
 export const layerUp: Record<LayerName, string> = {
 	layer1: color.layer2,

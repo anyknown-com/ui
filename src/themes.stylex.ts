@@ -120,6 +120,6 @@ export const darkTone = stylex.createTheme(tone, {
 	railLayer3: "#242424",
 })
 
-/** 套在 root element 上:`<div {...stylex.props(...light)}>` */
+/** Apply on the root element: `<div {...stylex.props(...light)}>` */
 export const light = [lightColor, lightShadow, lightTone] as const
 export const dark = [darkColor, darkShadow, darkTone] as const

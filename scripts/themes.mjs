@@ -49,7 +49,7 @@ ${block("light")}
 
 ${block("dark")}
 
-/** 套在 root element 上:\`<div {...stylex.props(...light)}>\` */
+/** Apply on the root element: \`<div {...stylex.props(...light)}>\` */
 export const light = [${names("light")}] as const
 export const dark = [${names("dark")}] as const
 `
