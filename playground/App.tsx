@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { color, corner, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import { Dialogs, Toaster } from "@anyknown/ui"
 import { BasicsDemos } from "./demos/basics"
 import { DesktopDemos } from "./demos/desktop"
@@ -47,9 +47,6 @@ const styles = stylex.create({
 		top: 0,
 		height: "100vh",
 		overflowY: "auto",
-		borderRightWidth: 1,
-		borderRightStyle: "solid",
-		borderRightColor: color.border,
 		padding: space.md,
 	},
 	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 600, margin: 0, marginBottom: space.md },
@@ -73,7 +70,15 @@ const styles = stylex.create({
 		paddingInline: space.xxs,
 		borderRadius: radius.sm,
 	},
-	main: { padding: space.lg, minWidth: 0 },
+	// 殼是桌面(body 的 layer1),內容是放在上面的主紙
+	main: {
+		padding: space.lg,
+		minWidth: 0,
+		marginBlock: space.xs,
+		marginInlineEnd: space.xs,
+		backgroundColor: color.layer2,
+		borderRadius: corner.sheet,
+	},
 })
 
 export function App() {

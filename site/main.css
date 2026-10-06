@@ -19,7 +19,7 @@
 
 body {
 	margin: 0;
-	background: var(--ak-bg);
+	background: var(--ak-layer1);
 	color: var(--ak-text);
 	font-family: "Figtree", system-ui, sans-serif;
 }

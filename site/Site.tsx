@@ -1,6 +1,6 @@
 import { Dialogs, Toaster } from "@anyknown/ui"
 import { dark, light } from "@anyknown/ui/themes.stylex"
-import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { color, corner, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { marked } from "marked"
 import { useEffect, useState } from "react"
@@ -136,12 +136,6 @@ const styles = stylex.create({
 		top: 0,
 		height: { default: "100vh", [MOBILE]: "auto" },
 		overflowY: { default: "auto", [MOBILE]: "visible" },
-		borderRightWidth: { default: 1, [MOBILE]: 0 },
-		borderRightStyle: "solid",
-		borderRightColor: color.border,
-		borderBottomWidth: { default: 0, [MOBILE]: 1 },
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		padding: space.md,
 	},
 	navHead: {
@@ -202,7 +196,15 @@ const styles = stylex.create({
 		borderRadius: radius.sm,
 	},
 	active: { color: color.text, backgroundColor: color.accentSubtle },
-	main: { padding: { default: space.lg, [MOBILE]: space.md }, minWidth: 0 },
+	// 殼是桌面(body 的 layer1),內容是放在上面的主紙;窄螢幕時主紙貼齊兩側與底
+	main: {
+		padding: { default: space.lg, [MOBILE]: space.md },
+		minWidth: 0,
+		marginBlock: { default: space.xs, [MOBILE]: 0 },
+		marginInlineEnd: { default: space.xs, [MOBILE]: 0 },
+		backgroundColor: color.layer2,
+		borderRadius: { default: corner.sheet, [MOBILE]: `${corner.sheet} ${corner.sheet} 0 0` },
+	},
 	content: { maxWidth: "56rem", marginInline: "auto" },
 })
 
