@@ -3,7 +3,8 @@ import { color, corner, font, motion, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
- * `.tbl`: a ledger. The head is one mono line, every row is 34px, identifiers and numbers are
+ * `.tbl`: a ledger, full width in its section and never in a card. The head is one mono line on a
+ * sunken `surface` strip, every row is 34px with a hairline under it, identifiers and numbers are
  * mono and numbers sit on the right. On a phone the head goes and each row wraps to two lines,
  * in the order the caller gives each cell.
  */
@@ -13,9 +14,6 @@ const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
 	table: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
 		color: color.text,
 		fontSize: type.t2,
 		lineHeight: type.body,
@@ -24,7 +22,8 @@ const styles = stylex.create({
 	cols: (columns: string) => ({ gridTemplateColumns: columns }),
 	head: {
 		alignItems: "center",
-		borderRadius: `${corner.card} ${corner.card} 0 0`,
+		backgroundColor: color.surface,
+		borderRadius: corner.small,
 		color: color.textMuted,
 		display: { default: "grid", [PHONE]: "none" },
 		fontFamily: font.mono,
@@ -33,11 +32,10 @@ const styles = stylex.create({
 		height: 28,
 		paddingInline: space.sm,
 	},
-	sticky: { backgroundColor: color.surface, position: "sticky", top: 0, zIndex: 1 },
+	sticky: { position: "sticky", top: 0, zIndex: 1 },
 	row: {
 		alignItems: "center",
-		borderRadius: { default: 0, ":last-child": `0 0 ${corner.card} ${corner.card}` },
-		boxShadow: `inset 0 1px 0 ${color.border}`,
+		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
 		columnGap: { default: space.sm, [PHONE]: space.xs },
 		display: { default: "grid", [PHONE]: "flex" },
 		flexWrap: "wrap",
@@ -51,17 +49,15 @@ const styles = stylex.create({
 	},
 	hover: { backgroundColor: { default: "transparent", ":hover": color.layer3 } },
 	detail: {
-		boxShadow: `inset 0 1px 0 ${color.border}`,
+		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
 		paddingBlock: `0 ${space.xs}`,
 		paddingInline: space.sm,
 	},
 	more: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: `0 0 ${corner.card} ${corner.card}`,
 		borderStyle: "none",
 		borderWidth: 0,
-		boxShadow: `inset 0 1px 0 ${color.border}`,
 		color: { default: color.textMuted, ":hover": color.text },
 		cursor: "pointer",
 		display: "flex",
@@ -71,7 +67,7 @@ const styles = stylex.create({
 		justifyContent: "center",
 		lineHeight: type.body,
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.accent}` },
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 		padding: 0,
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -79,7 +75,6 @@ const styles = stylex.create({
 		width: "100%",
 	},
 	scroll: {
-		borderRadius: corner.card,
 		maxHeight: "calc(100dvh - var(--akn-off, 22rem))",
 		minHeight: "12rem",
 		overflow: "auto",
