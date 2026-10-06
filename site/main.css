@@ -21,7 +21,7 @@ body {
 	margin: 0;
 	background: var(--ak-layer1);
 	color: var(--ak-text);
-	font-family: "Figtree", system-ui, sans-serif;
+	font-family: var(--ak-font-body);
 }
 
 /* NOTES.md / README 渲染出來的 markdown;StyleX 管不到 descendant,所以用一般 CSS。 */
