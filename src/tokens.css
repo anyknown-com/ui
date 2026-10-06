@@ -55,7 +55,8 @@ html {
 	--ak-font-body:
 		"Figtree Variable", "Figtree", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC",
 		"Microsoft JhengHei", system-ui, sans-serif;
-	--ak-font-mono: "Geist Mono Variable", "Geist Mono", "Noto Sans TC Variable", "Noto Sans TC", ui-monospace, monospace;
+	--ak-font-mono:
+		"Geist Mono Variable", "Geist Mono", "Noto Sans TC Variable", "Noto Sans TC", ui-monospace, monospace;
 
 	--ak-radius-sm: 0.375rem;
 	--ak-radius-md: 0.5rem;
