@@ -53,7 +53,7 @@ const styles = stylex.create({
 		width: "2.6rem",
 		textAlign: "end",
 		paddingInlineEnd: space.xs,
-		color: color.textFaint,
+		color: color.textMuted,
 		userSelect: "none",
 		fontSize: "11px",
 		lineHeight: 1.85,

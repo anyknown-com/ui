@@ -530,7 +530,7 @@ dragover 時虛線與圖示換 `signal`、底換 `signalSubtle`、
 
 - 行級增刪用 success / danger 的 **subtle 底**(不是飽和色),sign 與 stat 用對應 text 色
 - 行內 highlight 只標變動的字(`<mark>`,比行底再深一階的 hl 色)
-- mono 13px、雙欄行號(before / after),行號 faint、不可選取
+- mono 13px、雙欄行號(before / after),行號 `textMuted`、不可選取
 - 凹下去的 `surface`、`corner.card`,無框;標題列與行之間不畫線
 - 收合未變動區段:「⋯ N 行未變動」列可展開收合,`layer4` 底(hover `layer5`)不畫上下線
 - 檔案標題列:kind 色點(modified 黃 / added 綠 / deleted 紅)+ path + `+N −N` 統計;
@@ -611,7 +611,7 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 - `live` 的字只唸一次:`LiveDot` 帶 `role="status"` 唸狀態,看得到的字 `aria-hidden`
 
 ### list
-一張「點開來看」的清單(記憶、問題):`ListHead` 一行 `t1` faint 的欄名、底下一條細線;
+一張「點開來看」的清單(記憶、問題):`ListHead` 一行 `t1` `textMuted` 的欄名、底下一條細線;
 `ListRow` 每列是一顆 `Ghost`,40px、`t3`、hover `layer3`、圓角 `corner.control`,沒有框。
 跟 `Table` 不同:`Table` 是 mono 的帳本,這裡一個 mono 都沒有。
 

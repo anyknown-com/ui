@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, space, tone, type } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
@@ -117,7 +117,7 @@ const styles = stylex.create({
 		justifyContent: "space-between",
 		marginBlockStart: space.xxs,
 	},
-	faint: { color: tone.faint },
+	faint: { color: color.textMuted },
 })
 
 type Sx = { sx?: stylex.StyleXStyles }

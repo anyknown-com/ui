@@ -38,7 +38,7 @@ const styles = stylex.create({
 		outlineOffset: -1,
 		"::placeholder": { color: color.textFaint },
 	},
-	count: { fontFamily: font.mono, fontSize: "0.72rem", lineHeight: 1, color: color.textFaint },
+	count: { fontFamily: font.mono, fontSize: "0.72rem", lineHeight: 1, color: color.textMuted },
 	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
 	wrap: {
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },

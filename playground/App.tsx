@@ -57,7 +57,7 @@ const styles = stylex.create({
 		fontWeight: 600,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
-		color: color.textFaint,
+		color: color.textMuted,
 		marginBlock: space.sm,
 	},
 	link: {

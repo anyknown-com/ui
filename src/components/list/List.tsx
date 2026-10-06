@@ -16,7 +16,7 @@ const styles = stylex.create({
 		borderBlockEndColor: color.border,
 		borderBlockEndStyle: "solid",
 		borderBlockEndWidth: 1,
-		color: color.textFaint,
+		color: color.textMuted,
 		columnGap: 12,
 		display: "grid",
 		fontSize: type.t1,
@@ -25,7 +25,7 @@ const styles = stylex.create({
 		paddingInline: 8,
 	},
 	sort: {
-		color: { default: color.textFaint, ":hover": color.textMuted },
+		color: { default: color.textMuted, ":hover": color.text },
 		fontSize: type.t1,
 		height: "auto",
 		justifyContent: "flex-start",

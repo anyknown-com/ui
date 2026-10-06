@@ -41,7 +41,7 @@ const styles = stylex.create({
 	},
 	stateWarning: { color: color.warning },
 	stateAccent: { color: color.accent },
-	stateQuiet: { color: color.textFaint },
+	stateQuiet: { color: color.textMuted },
 	body: { display: "grid", gap: space.xs },
 	mono: {
 		fontFamily: font.mono,

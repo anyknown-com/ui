@@ -16,10 +16,10 @@ const styles = stylex.create({
 		fontWeight: 600,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
-		color: color.textFaint,
+		color: color.textMuted,
 		margin: 0,
 	},
-	sub: { fontFamily: font.mono, fontSize: "0.68rem", color: color.textFaint, margin: 0 },
+	sub: { fontFamily: font.mono, fontSize: "0.68rem", color: color.textMuted, margin: 0 },
 	body: { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm },
 	panel: {
 		borderWidth: 1,

@@ -15,7 +15,7 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	required: { color: color.danger },
-	optional: { fontWeight: 400, fontSize: text.xs, color: color.textFaint },
+	optional: { fontWeight: 400, fontSize: text.xs, color: color.textMuted },
 })
 
 export type LabelProps = ComponentProps<"label"> & {

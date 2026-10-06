@@ -128,7 +128,7 @@ const styles = stylex.create({
 	},
 	plain: { paddingBlock: `${space.xs} ${space.sm}`, paddingInline: space.sm },
 	text: { color: color.textMuted, fontSize: type.t2, lineHeight: type.body, margin: 0 },
-	faint: { color: tone.faint },
+	faint: { color: color.textMuted },
 	err: { color: color.danger },
 	acts: { alignItems: "center", display: "flex", gap: space.xs },
 	empty: {

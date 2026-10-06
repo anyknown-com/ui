@@ -25,7 +25,7 @@ const styles = stylex.create({
 	r: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
 	w: { backgroundColor: color.layer4, color: color.text },
 	d: { backgroundColor: color.dangerSubtle, color: color.danger },
-	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: tone.faint },
+	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
 	// 執行中 = agent 在做事
 	a: { backgroundColor: color.signalSubtle, color: color.signal },
 	f: {

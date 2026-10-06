@@ -126,7 +126,7 @@ const styles = stylex.create({
 		fontSize: text.xs,
 		fontWeight: 500,
 		lineHeight: text.leadingSnug,
-		color: color.textFaint,
+		color: color.textMuted,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 	},
@@ -150,7 +150,7 @@ const styles = stylex.create({
 		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
 	},
 	optionDisabled: { opacity: 0.5, cursor: "not-allowed" },
-	hint: { color: color.textFaint, fontSize: "0.72rem" },
+	hint: { color: color.textMuted, fontSize: "0.72rem" },
 	tick: { marginInlineStart: "auto", color: color.accent, display: "flex" },
 	empty: {
 		// Empty 一直都在 DOM 裡;有結果時它是空的,不能留一段 padding

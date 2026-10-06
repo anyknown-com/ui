@@ -115,7 +115,7 @@ const styles = stylex.create({
 		lineHeight: 1,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
-		color: color.textFaint,
+		color: color.textMuted,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 	},
@@ -138,7 +138,7 @@ const styles = stylex.create({
 		outlineOffset: -2,
 		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
 	},
-	kind: { color: color.textFaint, fontSize: "0.72rem", marginInlineStart: "auto" },
+	kind: { color: color.textMuted, fontSize: "0.72rem", marginInlineStart: "auto" },
 	hint: {
 		fontFamily: font.body,
 		fontSize: type.t1,
