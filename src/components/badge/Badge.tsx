@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps } from "react"
+import type { ComponentProps, Ref } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
@@ -113,7 +113,7 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 }
 
 /** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
-export type ChipProps = BadgeProps &
+export type ChipProps = Omit<BadgeProps, "ref"> &
 	(
 		| {
 				/** Shows a × button that calls this, for removing the chip (a filter, a tag). */
@@ -136,6 +136,8 @@ export type ChipProps = BadgeProps &
 		defaultPressed?: boolean
 		/** Called with the next state when a toggle chip is pressed. Giving it makes the chip a toggle. */
 		onPressedChange?: (pressed: boolean) => void
+		/** The chip's element: a `<span>`, or the `<button>` when the chip can be pressed. */
+		ref?: Ref<HTMLSpanElement | HTMLButtonElement>
 	}
 
 /**
@@ -182,6 +184,7 @@ export function Chip({
 	}
 	return (
 		<button
+			ref={ref as Ref<HTMLButtonElement> | undefined}
 			type="button"
 			aria-pressed={toggle ? isPressed : undefined}
 			onClick={() => {

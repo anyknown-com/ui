@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { createRef } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Badge, Chip } from "./Badge"
@@ -39,6 +40,21 @@ describe("Chip", () => {
 		const remove = screen.getByRole("button", { name: "移除篩選:工作區 anyknown" })
 		await userEvent.click(remove)
 		expect(onRemove).toHaveBeenCalledTimes(1)
+	})
+
+	test("ref reaches the element: the span of a label chip, the button of a pressable one", () => {
+		const label = createRef<HTMLSpanElement | HTMLButtonElement>()
+		const pressable = createRef<HTMLSpanElement | HTMLButtonElement>()
+		render(
+			<>
+				<Chip ref={label}>Label</Chip>
+				<Chip ref={pressable} onClick={() => {}}>
+					Press
+				</Chip>
+			</>,
+		)
+		expect(label.current?.tagName).toBe("SPAN")
+		expect(pressable.current).toBe(screen.getByRole("button", { name: "Press" }))
 	})
 
 	test("沒有 onRemove 就不必給 removeLabel", () => {
