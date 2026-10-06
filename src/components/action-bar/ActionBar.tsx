@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
 import { press, reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, motion, space, type } from "../../tokens.stylex"
 import { useMessageBody } from "../message/Message"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -32,7 +32,7 @@ const styles = stylex.create({
 		paddingInline: space.xs,
 		borderRadius: corner.pill,
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
 	done: { color: color.accent },
