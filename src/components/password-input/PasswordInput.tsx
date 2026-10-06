@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, useId, useState } from "react"
 import { reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -20,7 +20,7 @@ const styles = stylex.create({
 		placeItems: "center",
 		width: "1.75rem",
 		height: "1.75rem",
-		borderRadius: radius.sm,
+		borderRadius: corner.pill,
 		color: color.textMuted,
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
@@ -31,7 +31,7 @@ const styles = stylex.create({
 	bar: {
 		height: "0.25rem",
 		flex: 1,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.border,
 		transitionProperty: "background-color",
 		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
@@ -48,7 +48,7 @@ const styles = stylex.create({
 		gap: space.xxs,
 		backgroundColor: color.warningSubtle,
 		color: color.text,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		fontFamily: font.body,

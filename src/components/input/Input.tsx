@@ -1,13 +1,15 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
+// 輸入框是紙上凹下去的一格:surface 底 + 1px border(邊界要 3:1 才看得到,只靠底色不夠)。
+// focus 時框換 focusRing(= signal),外面再加一圈 2px 的淡環。
 export const controlStyles = stylex.create({
 	base: {
 		width: "100%",
-		// 沒有 border-box,minHeight 2.25rem 是「內容」36px,再加 padding+border → 54px;
+		// 沒有 border-box,minHeight 2.5rem 是「內容」40px,再加 padding+border;
 		// 元件不能靠 app 端有沒有 `*{box-sizing:border-box}` reset
 		boxSizing: "border-box",
 		backgroundColor: color.surface,
@@ -18,28 +20,32 @@ export const controlStyles = stylex.create({
 			":hover:not(:disabled)": color.borderStrong,
 			":focus-visible": color.focusRing,
 		},
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: text.sm,
-		// 單行控件的行高只要裝得下字:1.5 會把 md 撐到 39px,跟 button/select 的
-		// 2.25rem 對不齊(Textarea 自己蓋回 leadingRelaxed,多行照樣好讀)
+		// 單行控件的行高只要裝得下字:行高一大,md 會被撐得比 button 的 2.5rem 高
+		// (Textarea 自己蓋回 leadingRelaxed,多行照樣好讀)
 		lineHeight: text.leadingTight,
 		transitionProperty: "border-color",
 		transitionDuration: { default: motion.fast, "@media (prefers-reduced-motion: reduce)": "0s" },
 		transitionTimingFunction: motion.ease,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: -1,
+		outline: {
+			default: "none",
+			":focus-visible": `2px solid color-mix(in srgb, ${color.focusRing} 32%, transparent)`,
+		},
+		outlineOffset: 0,
 		cursor: { default: "auto", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
 		"::placeholder": { color: color.textFaint },
 	},
 	invalid: {
 		borderColor: { default: color.danger, ":hover:not(:disabled)": color.danger },
-		outlineColor: color.danger,
+		outlineColor: `color-mix(in srgb, ${color.danger} 32%, transparent)`,
 	},
-	md: { minHeight: "2.25rem", paddingBlock: space.xs, paddingInline: space.sm },
-	sm: { minHeight: "1.75rem", paddingBlock: space.xxs, paddingInline: space.xs, fontSize: text.xs },
+	// 跟 button 的 40 / 32 對齊
+	md: { minHeight: "2.5rem", paddingBlock: space.xs, paddingInline: space.sm },
+	sm: { minHeight: "2rem", paddingBlock: space.xxs, paddingInline: space.xs, fontSize: type.t2 },
 })
 
 const styles = stylex.create({
