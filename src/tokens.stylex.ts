@@ -33,6 +33,8 @@ export const color = stylex.defineVars({
 	info: { default: "#5D55C6", [DARK]: "#A8ABFC" },
 	infoSubtle: { default: "#EDEFFE", [DARK]: "#2C2C4E" },
 	focusRing: { default: "#5D55C6", [DARK]: "#A8ABFC" },
+	// dialog 的 backdrop:中性墨 32%,不加 blur(backdrop-filter 是反模式)。暗色用黑。
+	scrim: { default: "rgba(22, 26, 31, 0.32)", [DARK]: "rgba(0, 0, 0, 0.32)" },
 	bone: { default: "#E8E9ED", [DARK]: "#292B30" },
 	sheen: { default: "#F2F3F6", [DARK]: "#34373C" },
 	successHl: { default: "#C0EACD", [DARK]: "#19482C" },
