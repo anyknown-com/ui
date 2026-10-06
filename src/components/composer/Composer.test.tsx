@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Composer, type ComposerProps, type SourceRef } from "./Composer"
 
 const SOURCES: SourceRef[] = [
@@ -305,6 +306,37 @@ describe("Composer autoGrow", () => {
 		scrollHeight = 24
 		rerender(<Composer value="" onSubmit={() => {}} />)
 		expect(box.style.height).toBe("24px")
+	})
+})
+
+/**
+ * axe's aria-allowed-role says a textarea may take no role. The composer is a multi-line
+ * combobox on purpose: the role is what makes screen readers announce the @ / slash listbox
+ * and follow aria-activedescendant; ARIA has no multi-line combobox element to use instead.
+ */
+const TEXTAREA_COMBOBOX = { disable: ["aria-allowed-role"] }
+
+describe("Composer a11y", () => {
+	test("closed, with every control showing, has no axe violations", async () => {
+		const { container } = render(
+			<Composer
+				onSubmit={() => {}}
+				sources={sources}
+				models={["Fable 5", "Opus 5"]}
+				model="Fable 5"
+				onMicToggle={() => {}}
+				hint="Enter 送出"
+				defaultValue="草稿"
+			/>,
+		)
+		await expectNoAxeViolations(container, TEXTAREA_COMBOBOX)
+	})
+
+	test("with the listbox open has no axe violations", async () => {
+		const { container } = render(<Composer onSubmit={() => {}} sources={sources} />)
+		await userEvent.type(screen.getByRole("combobox", { name: "訊息" }), "@")
+		await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(3))
+		await expectNoAxeViolations(container, TEXTAREA_COMBOBOX)
 	})
 })
 
