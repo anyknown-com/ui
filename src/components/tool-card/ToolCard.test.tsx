@@ -129,6 +129,52 @@ describe("ToolCard regressions", () => {
 	})
 })
 
+describe("ToolCard open state", () => {
+	test("uncontrolled: defaultOpen overrides the per-tool default and onOpenChange reports clicks", async () => {
+		const onOpenChange = vi.fn()
+		render(<ToolCard tool="read" subtitle="a.ts" defaultOpen onOpenChange={onOpenChange} />)
+		const row = screen.getByRole("button")
+		expect(row).toHaveAttribute("aria-expanded", "true")
+		await userEvent.click(row)
+		expect(row).toHaveAttribute("aria-expanded", "false")
+		expect(onOpenChange).toHaveBeenCalledWith(false)
+	})
+
+	test("controlled: open wins and a click only asks", async () => {
+		const onOpenChange = vi.fn()
+		const { rerender } = render(
+			<ToolCard tool="shell" subtitle="ls" open={false} onOpenChange={onOpenChange} />,
+		)
+		const row = screen.getByRole("button")
+		expect(row).toHaveAttribute("aria-expanded", "false")
+		await userEvent.click(row)
+		expect(onOpenChange).toHaveBeenCalledWith(true)
+		expect(row).toHaveAttribute("aria-expanded", "false")
+		rerender(<ToolCard tool="shell" subtitle="ls" open onOpenChange={onOpenChange} />)
+		expect(row).toHaveAttribute("aria-expanded", "true")
+	})
+
+	test("controlled: an error does not force it open, and the auto-open is not reported", () => {
+		const onOpenChange = vi.fn()
+		const { rerender } = render(
+			<ToolCard tool="read" state="running" open={false} onOpenChange={onOpenChange} />,
+		)
+		rerender(<ToolCard tool="read" state="error" open={false} onOpenChange={onOpenChange} />)
+		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "false")
+		expect(onOpenChange).not.toHaveBeenCalled()
+	})
+
+	test("Enter and Space toggle the row", async () => {
+		render(<ToolCard tool="read" subtitle="a.ts" />)
+		const row = screen.getByRole("button")
+		row.focus()
+		await userEvent.keyboard("{Enter}")
+		expect(row).toHaveAttribute("aria-expanded", "true")
+		await userEvent.keyboard(" ")
+		expect(row).toHaveAttribute("aria-expanded", "false")
+	})
+})
+
 describe("ToolCard state transitions", () => {
 	test("a card that starts running and later errors opens itself", () => {
 		const { rerender } = render(<ToolCard tool="read" state="running" subtitle="a.ts" />)

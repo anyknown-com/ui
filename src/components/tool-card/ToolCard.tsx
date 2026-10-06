@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId, useState } from "react"
 import { reset } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
 import { color, corner, font, ink, shadow, space, type } from "../../tokens.stylex"
@@ -347,7 +348,19 @@ export type ToolCardProps = {
 	state?: ToolState
 	durationMs?: number
 	durationLabel?: string
+	/**
+	 * Whether the detail panel is shown. Pass it to control the card; it then no longer opens
+	 * itself on error, since you own the state. Pair it with `onOpenChange`.
+	 */
+	open?: boolean
+	/**
+	 * Whether the detail panel starts shown when `open` is not passed. Without it, `shell`,
+	 * `edit` and `write` start open, the rest start collapsed, and any card opens when it
+	 * errors.
+	 */
 	defaultOpen?: boolean
+	/** Called with the new state when the user opens or closes the card. Opening on error is not reported. */
+	onOpenChange?: (open: boolean) => void
 	retry?: ToolRetry
 	/** The retry line, shown and announced: when the next try starts and which try of how many it is. */
 	retryLabel?: (attempt: number, max: number, seconds: number) => string
@@ -366,7 +379,9 @@ export function ToolCard({
 	state = "completed",
 	durationMs,
 	durationLabel,
+	open: openProp,
 	defaultOpen,
+	onOpenChange,
 	retry,
 	retryLabel = (attempt, max, seconds) => `${seconds} 秒後重試(第 ${attempt} / ${max} 次)`,
 	runningLabel = "執行中",
@@ -377,14 +392,18 @@ export function ToolCard({
 	children,
 }: ToolCardProps) {
 	const detailId = useId()
-	const [open, setOpen] = useState(defaultOpen ?? (state === "error" || DEFAULT_OPEN_TOOLS.has(tool)))
+	// No onChange here: only the user's click reports through onOpenChange, not the error auto-open
+	const [open, setOpen] = useControllableState(
+		openProp,
+		defaultOpen ?? (state === "error" || DEFAULT_OPEN_TOOLS.has(tool)),
+	)
 	const [wasState, setWasState] = useState(state)
 
 	// A tool usually mounts as `running` and only later fails; NOTES says any
 	// error is expanded, so react to the transition, not just the initial state.
 	if (wasState !== state) {
 		setWasState(state)
-		if (state === "error" && defaultOpen == null) setOpen(true)
+		if (state === "error" && defaultOpen == null && openProp === undefined) setOpen(true)
 	}
 	const STATE_LABELS = { running: runningLabel, completed: completedLabel, error: errorLabel }
 	const retryText =
@@ -397,7 +416,10 @@ export function ToolCard({
 				type="button"
 				aria-expanded={open}
 				aria-controls={detailId}
-				onClick={() => setOpen((value) => !value)}
+				onClick={() => {
+					setOpen(!open)
+					onOpenChange?.(!open)
+				}}
 				{...stylex.props(reset.control, styles.row)}
 			>
 				<span
