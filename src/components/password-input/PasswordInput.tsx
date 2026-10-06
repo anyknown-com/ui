@@ -78,7 +78,6 @@ const styles = stylex.create({
 const strings = defineStrings({
 	"zh-TW": {
 		show: "顯示 passphrase",
-		hide: "隱藏 passphrase",
 		shown: "passphrase 已顯示",
 		capsLock: "Caps Lock 開著。",
 		mismatch: "再輸入一次同樣的 passphrase。",
@@ -90,7 +89,6 @@ const strings = defineStrings({
 	},
 	en: {
 		show: "Show passphrase",
-		hide: "Hide passphrase",
 		shown: "Passphrase shown",
 		capsLock: "Caps Lock is on.",
 		mismatch: "Enter the same passphrase again.",
@@ -189,10 +187,11 @@ export type PasswordInputProps = Omit<ComponentProps<"input">, "type" | "size" |
 	confirmOf?: string
 	/** The message when the field does not match `confirmOf`. Wins over `labels.mismatch`. */
 	mismatchLabel?: string
-	/** The reveal toggle's name while masked. Wins over `labels.show`. */
+	/**
+	 * The reveal toggle's name. It stays the same while the passphrase is shown; `aria-pressed`
+	 * says which state it is in. Wins over `labels.show`.
+	 */
 	showLabel?: string
-	/** The reveal toggle's name while shown. Wins over `labels.hide`. */
-	hideLabel?: string
 	/** Announced when the passphrase is revealed. Wins over `labels.shown`. */
 	shownStatus?: string
 	/** Forces the invalid state; otherwise it follows the mismatch and the enclosing field. */
@@ -214,7 +213,6 @@ export function PasswordInput({
 	confirmOf,
 	mismatchLabel,
 	showLabel,
-	hideLabel,
 	shownStatus,
 	invalid,
 	labels,
@@ -288,7 +286,7 @@ export function PasswordInput({
 				/>
 				<button
 					type="button"
-					aria-label={revealed ? (hideLabel ?? t.hide) : (showLabel ?? t.show)}
+					aria-label={showLabel ?? t.show}
 					aria-pressed={revealed}
 					onClick={(event) => {
 						setRevealed((shown) => !shown)

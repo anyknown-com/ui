@@ -42,7 +42,7 @@ describe("PasswordInput", () => {
 		expect(onKeyDown).toHaveBeenCalled()
 	})
 
-	test("starts masked and toggles to visible", async () => {
+	test("starts masked and toggles to visible; the name stays, aria-pressed flips", async () => {
 		render(<PasswordInput aria-label="Vault passphrase" />)
 		const input = screen.getByLabelText("Vault passphrase")
 		expect(input).toHaveAttribute("type", "password")
@@ -50,7 +50,12 @@ describe("PasswordInput", () => {
 		expect(toggle).toHaveAttribute("aria-pressed", "false")
 		await userEvent.click(toggle)
 		expect(input).toHaveAttribute("type", "text")
-		expect(screen.getByRole("button", { name: "隱藏 passphrase" })).toHaveAttribute("aria-pressed", "true")
+		expect(toggle).toHaveAccessibleName("顯示 passphrase")
+		expect(toggle).toHaveAttribute("aria-pressed", "true")
+		await userEvent.click(toggle)
+		expect(input).toHaveAttribute("type", "password")
+		expect(toggle).toHaveAccessibleName("顯示 passphrase")
+		expect(toggle).toHaveAttribute("aria-pressed", "false")
 	})
 
 	test("returns focus to the field after toggling", async () => {
@@ -145,6 +150,7 @@ describe("PasswordInput", () => {
 		await expectNoAxeViolations(container)
 		await userEvent.click(screen.getAllByRole("button", { name: "顯示 passphrase" })[0])
 		expect(screen.getByLabelText("passphrase")).toHaveAttribute("type", "text")
+		expect(screen.getAllByRole("button", { pressed: true })).toHaveLength(1)
 		await expectNoAxeViolations(container)
 	})
 
