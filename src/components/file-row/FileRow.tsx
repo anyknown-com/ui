@@ -2,19 +2,19 @@ import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
 import { reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, shadow, space, text, tone } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const spin = stylex.keyframes({ to: { rotate: "360deg" } })
 
 const styles = stylex.create({
+	// A rest card on the sheet: white in light, `surface` in dark (`tone.railLayer2`), the ring is
+	// its only edge.
 	list: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		backgroundColor: color.surface,
+		borderRadius: corner.card,
+		backgroundColor: tone.railLayer2,
+		boxShadow: shadow.rest,
 		overflow: "hidden",
 	},
 	row: {
@@ -73,7 +73,7 @@ const styles = stylex.create({
 		height: "1.6rem",
 		display: "grid",
 		placeItems: "center",
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.surface },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -95,7 +95,7 @@ const styles = stylex.create({
 	track: {
 		flex: 1,
 		height: "0.2rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: color.border,
 		overflow: "hidden",
 	},
@@ -109,7 +109,7 @@ const styles = stylex.create({
 		borderStyle: "solid",
 		borderColor: color.border,
 		borderTopColor: color.accent,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		animationName: { default: spin, [REDUCED]: "none" },
 		animationDuration: "1.2s",
 		animationTimingFunction: "linear",
