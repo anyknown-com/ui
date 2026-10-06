@@ -35,6 +35,26 @@ export const growIn = stylex.keyframes({
 	to: { opacity: 1, scale: "1 1" },
 })
 
+/**
+ * 給 Base UI popup 的 ref callback:退場一開始(`data-ending-style` 出現)就把焦點還給
+ * 打開之前的地方。Base UI 要等退場的 transition 跑完、popup 拆掉才還焦點,不補這一手
+ * 鍵盤使用者會卡在正在淡出的 popup 裡 120ms。拿不到可聚焦的原處就交回 Base UI 自己處理。
+ */
+export function returnFocusOnExit(node: HTMLElement | null) {
+	if (node == null) return
+	const doc = node.ownerDocument
+	// ref 掛上時 Base UI 還沒搬焦點,這時的 activeElement 就是打開它的那顆
+	const before = doc.activeElement
+	const observer = new MutationObserver(() => {
+		if (!node.hasAttribute("data-ending-style")) return
+		observer.disconnect()
+		if (!(before instanceof HTMLElement) || !before.isConnected || before === doc.body) return
+		if (node.contains(doc.activeElement)) before.focus({ preventScroll: true })
+	})
+	observer.observe(node, { attributes: true, attributeFilter: ["data-ending-style"] })
+	return () => observer.disconnect()
+}
+
 export const popupStyles = stylex.create({
 	// float 階:疊在紙上的紙。暗色靠 surfaceRaised 升一階,不畫邊框;
 	// 透明的框只為了 forced-colors —— 那裡陰影會消失,框會被換成系統色

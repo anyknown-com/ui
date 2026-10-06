@@ -2,7 +2,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog"
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import * as stylex from "@stylexjs/stylex"
 import { createContext, type ReactElement, type ReactNode, useContext, useRef, useState } from "react"
-import { layerStyles } from "../../lib/popup"
+import { layerStyles, returnFocusOnExit } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import type { StyleArg } from "../../lib/styled"
 import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
@@ -139,6 +139,7 @@ export function DialogContent({
 			<BaseDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
 			<BaseDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
 				<BaseDialog.Popup
+					ref={returnFocusOnExit}
 					{...stylex.props(
 						styles.popup,
 						size === "md" && styles.md,
@@ -227,6 +228,7 @@ function ConfirmContent({
 			<AlertDialog.Backdrop {...stylex.props(layerStyles.dialogBackdrop, styles.backdrop)} />
 			<AlertDialog.Viewport {...stylex.props(layerStyles.dialog, styles.viewport)}>
 				<AlertDialog.Popup
+					ref={returnFocusOnExit}
 					initialFocus={danger && cancelLabel != null ? cancelRef : undefined}
 					{...stylex.props(styles.popup)}
 				>

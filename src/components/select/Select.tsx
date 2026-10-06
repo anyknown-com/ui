@@ -2,7 +2,7 @@ import { Combobox } from "@base-ui/react/combobox"
 import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
-import { popupStyles } from "../../lib/popup"
+import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { color, corner, font, space, text, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 
@@ -364,6 +364,7 @@ export function Select({
 			<Combobox.Portal>
 				<Combobox.Positioner align="start" sideOffset={6} {...stylex.props(popupStyles.positioner)}>
 					<Combobox.Popup
+						ref={returnFocusOnExit}
 						aria-labelledby={nameId}
 						{...stylex.props(popupStyles.surface, popupStyles.anchorWidth)}
 					>

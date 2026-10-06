@@ -152,8 +152,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   `backdrop-filter` 是 DESIGN.md 的反模式。ConfirmContent 的取消鈕是 secondary
 - popup 是 `border-box`:`size` 的寬度含 padding,375 寬時不會比視窗寬
 - 退場走 Base UI 的 `[data-ending-style]`:popup 淡到 0、縮到 0.98,backdrop 淡到 0,
-  120ms ease-out,reduced motion 時沒有。Base UI 等 transition 跑完才拆,焦點在拆的時候還回
-  trigger,所以會晚 120ms。命令式 `dialog.open` 那一套是 store 拿掉就拆,沒有退場
+  120ms ease-out,reduced motion 時沒有。Base UI 等 transition 跑完才拆,也要拆了才還焦點;
+  popup 掛著 `lib/popup.ts` 的 `returnFocusOnExit`,`data-ending-style` 一出現就先把焦點還給
+  打開前的地方,不等淡出。命令式 `dialog.open` 那一套是 store 拿掉就拆,沒有退場
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
 - **`confirmLabel` 必填,沒有預設**(ConfirmDialog 與 `dialog.confirm` 都是)。「確認」說不出
@@ -231,7 +232,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   (暗色因此升一階)、`shadow.float`、`corner.float`(16),不畫框。框是 1px 透明的 ——
   forced-colors 下陰影會消失,透明框會被換成系統色,浮層才有邊。Composer 的浮層也吃這一份
 - 退場也在這一份:Base UI 關的時候掛 `[data-ending-style]`,surface 淡到 0(120ms ease-out,
-  reduced motion 時沒有),跑完才拆。Composer 的浮層不是 Base UI,沒有退場
+  reduced motion 時沒有),跑完才拆。Base UI 要拆了才還焦點,所以 popup 要掛
+  `ref={returnFocusOnExit}`,退場一開始就還(Select 與 dialog 已經掛了)。Composer 的浮層不是
+  Base UI,沒有退場
 - popover 面板 16px padding,寬度上限 `min(22rem, 100vw − 2rem)`,窄螢幕上長說明會折行
 
 疊層值集中在 `lib/popup.ts` 的 `layer`,元件不自己寫 magic number —— Base UI 的浮層一律
