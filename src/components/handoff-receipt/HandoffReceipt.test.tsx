@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { HandoffReceipt } from "./HandoffReceipt"
 
 const props = {
@@ -124,6 +125,18 @@ describe("HandoffReceipt open state", () => {
 		expect(row).toHaveAttribute("aria-expanded", "false")
 		rerender(<HandoffReceipt {...props} open onOpenChange={onOpenChange} />)
 		expect(row).toHaveAttribute("aria-expanded", "true")
+	})
+})
+
+describe("HandoffReceipt axe", () => {
+	test("collapsed", async () => {
+		const { container } = render(<HandoffReceipt {...props} />)
+		await expectNoAxeViolations(container)
+	})
+
+	test("open", async () => {
+		const { container } = render(<HandoffReceipt {...props} reason="hard-limit" defaultOpen />)
+		await expectNoAxeViolations(container)
 	})
 })
 
