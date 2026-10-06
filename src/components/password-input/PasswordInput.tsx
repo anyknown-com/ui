@@ -3,7 +3,7 @@ import { type ComponentProps, type KeyboardEvent, useId, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -26,7 +26,7 @@ const styles = stylex.create({
 		color: color.textMuted,
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
 	meter: { display: "grid", gap: space.xxs, marginTop: space.xxs },
 	bars: { display: "flex", gap: space.xxs },
@@ -40,7 +40,7 @@ const styles = stylex.create({
 		outline: { default: null, [FORCED]: "1px solid GrayText" },
 		outlineOffset: -1,
 		transitionProperty: "background-color",
-		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
 	},
 	barWeak: { backgroundColor: { default: color.danger, [FORCED]: "CanvasText" } },
 	barFair: { backgroundColor: { default: color.warning, [FORCED]: "CanvasText" } },
