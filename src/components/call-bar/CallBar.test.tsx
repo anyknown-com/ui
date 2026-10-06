@@ -77,6 +77,14 @@ describe("CallBar", () => {
 		await expectNoAxeViolations(container)
 	})
 
+	test("the mute button keeps its tooltip while muted", async () => {
+		const user = userEvent.setup()
+		render(<CallBar status="listening" seconds={0} muted onMute={() => {}} onHangUp={() => {}} />)
+		await user.tab()
+		expect(screen.getByRole("button", { name: "靜音", pressed: true })).toHaveFocus()
+		expect(await screen.findByText("靜音", { selector: ":not(button)" })).toBeInTheDocument()
+	})
+
 	test("follow the LocaleProvider; labels still win", () => {
 		render(
 			<LocaleProvider locale="en">

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, type } from "../../tokens.stylex"
+import { color, corner, font, ink, type } from "../../tokens.stylex"
 import { formatClock } from "../../lib/format"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { IconButton } from "../icon-button/IconButton"
@@ -85,8 +85,11 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		fontVariantNumeric: "tabular-nums",
 	},
+	// IconButton's `open` wash, drawn here because `open` would drop the button's tooltip.
 	// The pressed wash is a background, which forced colors drop: draw a ring instead.
 	mutedButton: {
+		backgroundColor: ink.n8,
+		color: color.text,
 		borderStyle: { default: "none", [FORCED]: "solid" },
 		borderWidth: { default: 0, [FORCED]: 1 },
 		borderColor: { default: null, [FORCED]: "ButtonText" },
@@ -125,7 +128,6 @@ export function CallBar({ status, seconds, muted, onMute, onHangUp, labels, sx }
 			<IconButton
 				label={words.mute}
 				aria-pressed={muted}
-				open={muted}
 				onClick={() => onMute(!muted)}
 				sx={muted && styles.mutedButton}
 			>
