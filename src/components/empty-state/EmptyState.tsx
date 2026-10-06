@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ElementType, ReactNode } from "react"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	root: {
@@ -10,21 +10,13 @@ const styles = stylex.create({
 		textAlign: "center",
 		paddingBlock: space.xl,
 		paddingInline: space.lg,
-		borderWidth: 1,
-		borderStyle: "dashed",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		// 紙裡凹下去的一塊:底色分區,不框虛線
+		backgroundColor: color.surface,
+		borderRadius: corner.card,
 		fontFamily: font.body,
 	},
-	icon: {
-		display: "grid",
-		placeItems: "center",
-		width: "2.6rem",
-		height: "2.6rem",
-		borderRadius: radius.full,
-		backgroundColor: color.accentSubtle,
-		color: color.accent,
-	},
+	// 線條 icon、跟文字同一個墨色,不墊圓底
+	icon: { display: "grid", placeItems: "center", color: color.textMuted },
 	title: {
 		fontFamily: font.display,
 		fontSize: text.base,
