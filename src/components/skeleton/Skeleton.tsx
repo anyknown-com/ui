@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, radius, space } from "../../tokens.stylex"
+import { color, corner, motion, radius, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // Forced colors drop the bone colour and the sheen: each bone keeps a GrayText border instead.
@@ -29,7 +29,7 @@ const styles = stylex.create({
 		backgroundSize: "220% 100%",
 		animationName: { default: shimmer, [REDUCED]: "none" },
 		animationDuration: { default: "1.6s", [REDUCED]: "2.4s" },
-		animationTimingFunction: { default: "linear", [REDUCED]: "ease-in-out" },
+		animationTimingFunction: { default: motion.linear, [REDUCED]: motion.easeInOut },
 		animationIterationCount: "infinite",
 	},
 	line: { height: "0.8rem" },
