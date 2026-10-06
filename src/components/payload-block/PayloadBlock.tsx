@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, corner, font, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
 import { IconButton } from "../icon-button/IconButton"
 import { CheckGlyph, CopyGlyph } from "../icon/glyphs"
@@ -39,25 +40,30 @@ const styles = stylex.create({
 	icon: { flexShrink: 0, height: 14, pointerEvents: "none", width: 14 },
 })
 
+const strings = defineStrings({
+	"zh-TW": { copy: "複製", copied: "已複製" },
+	en: { copy: "Copy", copied: "Copied" },
+})
+
+/** The PayloadBlock's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type PayloadBlockLabels = StringsOf<typeof strings>
+
 export type PayloadBlockProps = {
 	/** What is shown and copied, like `JSON.stringify(input, null, 2)`. */
 	code: string
 	/** Draws `code` coloured; its result goes where the plain `<pre>` would. */
 	highlight?: (code: string) => ReactNode
-	/** @default "複製" */
+	/** The copy button's name. Wins over `labels.copy`. */
 	copyLabel?: string
-	/** @default "已複製" */
+	/** The copy button's name after a copy. Wins over `labels.copied`. */
 	copiedLabel?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<PayloadBlockLabels>
 	sx?: stylex.StyleXStyles
 }
 
-export function PayloadBlock({
-	code,
-	highlight,
-	copyLabel = "複製",
-	copiedLabel = "已複製",
-	sx,
-}: PayloadBlockProps) {
+export function PayloadBlock({ code, highlight, copyLabel, copiedLabel, labels, sx }: PayloadBlockProps) {
+	const t = useStrings(strings, labels)
 	const { copied, copy } = useCopy(COPIED_MS)
 	const Glyph = copied ? CheckGlyph : CopyGlyph
 
@@ -67,7 +73,7 @@ export function PayloadBlock({
 				{highlight ? highlight(code) : <pre {...stylex.props(styles.plain)}>{code}</pre>}
 			</div>
 			<IconButton
-				label={copied ? copiedLabel : copyLabel}
+				label={copied ? (copiedLabel ?? t.copied) : (copyLabel ?? t.copy)}
 				size="sm"
 				onClick={() => copy(code)}
 				sx={styles.copy}

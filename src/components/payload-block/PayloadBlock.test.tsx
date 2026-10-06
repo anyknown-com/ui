@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { PayloadBlock } from "./PayloadBlock"
 
 const CODE = JSON.stringify({ url: "https://example.com" }, null, 2)
@@ -25,5 +26,22 @@ describe("PayloadBlock", () => {
 		await user.click(screen.getByRole("button", { name: "複製" }))
 		expect(writeText).toHaveBeenCalledWith(CODE)
 		expect(await screen.findByRole("button", { name: "已複製" })).toBeInTheDocument()
+	})
+
+	test("reads English under an en LocaleProvider", async () => {
+		const user = userEvent.setup()
+		vi.spyOn(navigator.clipboard, "writeText")
+		render(
+			<LocaleProvider locale="en">
+				<PayloadBlock code={CODE} />
+			</LocaleProvider>,
+		)
+		await user.click(screen.getByRole("button", { name: "Copy" }))
+		expect(await screen.findByRole("button", { name: "Copied" })).toBeInTheDocument()
+	})
+
+	test("copyLabel wins over labels.copy", () => {
+		render(<PayloadBlock code={CODE} copyLabel="Prop" labels={{ copy: "Labels" }} />)
+		expect(screen.getByRole("button", { name: "Prop" })).toBeInTheDocument()
 	})
 })
