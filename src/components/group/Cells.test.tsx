@@ -25,6 +25,22 @@ function Glyph(props: SVGProps<SVGSVGElement> & { strokeWidth?: number }) {
 	return <svg data-testid="glyph" {...props} />
 }
 
+/**
+ * jsdom 不展開帶 var() 的 outline 簡寫,computed style 量不到;改讀注入的規則:
+ * 這個元素自己的 class 在 `:focus-within` 時宣告的 outline。
+ */
+function focusWithinOutline(element: HTMLElement) {
+	for (const sheet of Array.from(document.styleSheets)) {
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSStyleRule) || !rule.selectorText.includes(":focus-within")) continue
+			const owner = rule.selectorText.match(/^\.([\w-]+)/)?.[1]
+			const outline = rule.style.getPropertyValue("outline")
+			if (owner != null && element.classList.contains(owner) && outline) return outline
+		}
+	}
+	return null
+}
+
 describe("GroupCell", () => {
 	test("有 onPress 就是一顆按鈕,後面一個 chevron", () => {
 		const onPress = vi.fn()
@@ -67,12 +83,26 @@ describe("InputCell", () => {
 		expect(input).toHaveAttribute("placeholder", "STRIPE_KEY")
 		expect(onChange).toHaveBeenCalledWith("SENTRY_TOKEN")
 	})
+
+	// 欄位自己的框與環被拿掉了,焦點只能靠整列的 2px 環看出來
+	test("focus draws a solid ring around the row", () => {
+		render(<InputCell label="名稱" />)
+		const row = screen.getByRole("textbox", { name: "名稱" }).closest("label") as HTMLElement
+		expect(focusWithinOutline(row)).toMatch(/^2px solid var\(/)
+		expect(row).toHaveStyle({ outlineOffset: "-2px" })
+	})
 })
 
 describe("TextCell", () => {
 	test("是一個多行輸入", () => {
 		render(<TextCell aria-label="說明" defaultValue="給 AI 看的" />)
 		expect(screen.getByRole("textbox", { name: "說明" })).toHaveValue("給 AI 看的")
+	})
+
+	test("focus draws a solid ring around the row", () => {
+		render(<TextCell aria-label="說明" />)
+		const row = screen.getByRole("textbox", { name: "說明" }).parentElement as HTMLElement
+		expect(focusWithinOutline(row)).toMatch(/^2px solid var\(/)
 	})
 })
 

@@ -54,9 +54,12 @@ const styles = stylex.create({
 	warn: { color: color.warning },
 	check: { color: color.accent, flexShrink: 0, height: 18, width: 18 },
 	chevron: { color: color.textFaint, flexShrink: 0, height: 16, width: 16 },
+	// 裡面的欄位拿掉了自己的框與環,焦點改由整列畫:底色一階不到 3:1,所以再加一圈 2px 的環
 	inputCell: {
 		alignItems: "center",
 		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
+		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outlineOffset: -2,
 		color: color.text,
 		cursor: "text",
 		display: "grid",
@@ -83,6 +86,8 @@ const styles = stylex.create({
 	},
 	textCell: {
 		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
+		outline: { default: "none", ":focus-within": `2px solid ${color.focusRing}` },
+		outlineOffset: -2,
 		color: color.text,
 		fontSize: type.t3,
 		lineHeight: type.body,

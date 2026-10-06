@@ -614,6 +614,9 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 - 卡裡的列是 cell:`GroupCell`(字、第二行 `detail`、右邊 `value` / `control`)、
   `InputCell`(96px 的名字欄 + 沒框的 Input)、`TextCell`(會長高的 Textarea)、
   `SliderCell`(名字與讀數一行、slider 在下)。44px、左右 16px、`t3`
+- `InputCell` / `TextCell` 裡的欄位拿掉了自己的框與環,焦點由整列畫:`:focus-within` 時底升到
+  `layer4`,再加一圈 2px `focusRing`(`outlineOffset: -2`,畫在卡的圓角裡面)。只有底色的話
+  對比 1.09:1,看不出焦點在哪
 - 列與列之間的細線是 cell 自己的 `background-image`,寬 `100% - 16px` 靠右,
   **不是**卡的 `gap` 或 `border`:第一列沒有線,線從左邊 16px 起
 - `GroupCell` 有 `onPress` 就整列是一顆 `Ghost`;沒有 `tone`、不是選項(`checked`)才畫
