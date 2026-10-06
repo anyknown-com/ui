@@ -7,6 +7,7 @@ import { type VoiceState, voicePath } from "../../lib/voice"
 import { color, corner, font, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
 	voice: {
@@ -19,11 +20,20 @@ const styles = stylex.create({
 		paddingInlineStart: space.sm,
 		paddingInlineEnd: space.md,
 		fontFamily: font.body,
+		// Forced colors drop the surface pill; an outline keeps its edge.
+		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	viz: { width: "3rem", height: "1.5rem", flex: "none", overflow: "visible" },
-	fibre: { fill: "none", stroke: color.textFaint, strokeWidth: 1.6, strokeLinecap: "round" },
+	// Forced colors: idle reads GrayText, active reads Highlight, and the drawn shape and the
+	// status text differ as well, so the state never rests on colour alone.
+	fibre: {
+		fill: "none",
+		stroke: { default: color.textFaint, [FORCED]: "GrayText" },
+		strokeWidth: 1.6,
+		strokeLinecap: "round",
+	},
 	// 聽、想、說都是 agent 正在做事:signal
-	fibreActive: { stroke: color.signal },
+	fibreActive: { stroke: { default: color.signal, [FORCED]: "Highlight" } },
 	label: { fontSize: type.t2, color: color.textMuted },
 	labelStrong: { fontWeight: 500, color: color.text },
 	motionLabel: {
