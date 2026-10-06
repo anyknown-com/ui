@@ -5,7 +5,9 @@ import type { ApiComponent, TokenGroup } from "../scripts/api-docs.mjs"
 import api from "./generated/api.json"
 import tokens from "./generated/tokens.json"
 import readme from "../README.md?raw"
+import changelog from "../CHANGELOG.md?raw"
 import contributing from "../CONTRIBUTING.md?raw"
+import migration from "../MIGRATION.md?raw"
 import componentsReadme from "../src/components/README.md?raw"
 import decisions from "../src/components/COMPONENTS.md?raw"
 import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
@@ -31,6 +33,8 @@ export const GUIDES: Guide[] = [
 	{ key: "accessibility", title: "Accessibility", body: accessibility, file: "docs/guides/accessibility.md" },
 	{ key: "i18n", title: "Internationalization", body: i18n, file: "docs/guides/i18n.md" },
 	{ key: "text-layout", title: "Text layout", body: textLayout, file: "docs/guides/text-layout.md" },
+	{ key: "migration", title: "Migrating to 0.10", body: migration, file: "MIGRATION.md" },
+	{ key: "changelog", title: "Changelog", body: changelog, file: "CHANGELOG.md" },
 	{ key: "readme", title: "Package README", body: readme, file: "README.md" },
 	{
 		key: "components",

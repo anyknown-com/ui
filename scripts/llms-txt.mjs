@@ -52,6 +52,18 @@ const GUIDES = [
 		note: "measureTextHeight, the optional Pretext engine, Textarea auto-grow.",
 	},
 	{
+		slug: "migration",
+		file: "MIGRATION.md",
+		title: "Migrating to 0.10",
+		note: "Every breaking change and deprecation from 0.9 to 0.10 with before/after code.",
+	},
+	{
+		slug: "changelog",
+		file: "CHANGELOG.md",
+		title: "Changelog",
+		note: "What changed in each release.",
+	},
+	{
 		slug: "readme",
 		file: "README.md",
 		title: "Package README",

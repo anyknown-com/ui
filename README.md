@@ -2,6 +2,8 @@
 
 The design system shared by every AnyKnown product, built with [StyleX](https://stylexjs.com), React 19 and Base UI.
 
+What changed in each release is in [CHANGELOG.md](./CHANGELOG.md); upgrading from 0.9 is covered step by step in [MIGRATION.md](./MIGRATION.md).
+
 ## Structure
 
 - `src/tokens.stylex.ts`: semantic tokens (color, font, type, space, radius, corner, motion, shadow, tone and more). Light is the default; dark follows the OS. **The single source of truth.**
@@ -55,6 +57,8 @@ Without it nothing breaks; turbo falls back to the local cache. The inputs of `b
 ## Releasing
 
 The package is published as ESM + d.ts. **The StyleX calls stay in the output** and the consumer's bundler compiles them (the standard approach for StyleX libraries).
+
+Every release gets a `CHANGELOG.md` entry (Keep a Changelog: Breaking / Added / Changed / Deprecated / Fixed / Accessibility), and a breaking release also gets a section in `MIGRATION.md` with before/after code.
 
 The version is **set by a git tag**. Push a `v*` tag and `.github/workflows/release.yml` runs the full gate, then publishes. If the tag doesn't match `version` in `package.json`, the workflow fails and nothing is published.
 
