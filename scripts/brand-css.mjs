@@ -7,37 +7,23 @@
 import { readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { declarations } from "./tokens-css.mjs"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 
 const FONTS =
 	'@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap");'
 
-/** tokens.css 裡 `selector {` 到對應 `}` 之間的宣告行。 */
-function block(css, selector) {
-	const start = css.indexOf(`${selector} {`)
-	if (start < 0) throw new Error(`tokens.css: 找不到 ${selector}`)
-	const open = css.indexOf("{", start)
-	let depth = 1
-	let i = open + 1
-	for (; depth > 0; i++) {
-		if (css[i] === "{") depth++
-		else if (css[i] === "}") depth--
-	}
-	return css
-		.slice(open + 1, i - 1)
-		.split("\n")
-		.map((l) => l.trim())
-		.filter((l) => l.startsWith("--"))
-		.map((l) => `\t${l}`)
-		.join("\n")
-}
+/** 宣告表寫回 CSS 行。值可能被 oxfmt 折成多行(字型),所以從解析過的 Map 重寫,不逐行抄。 */
+const lines = (decls) => [...decls].map(([name, value]) => `\t${name}: ${value};`).join("\n")
 
 export function generate() {
 	const src = readFileSync(join(root, "src/brand.css"), "utf8")
 	const tokens = readFileSync(join(root, "src/tokens.css"), "utf8")
-	const light = block(tokens, ":root")
-	const dark = block(tokens, '[data-theme="dark"]')
+	const darkDecls = declarations(tokens, '[data-theme="dark"]')
+	// 淺色主題只需要有暗色變體的那些;space、type 這類不分主題的值 :root 已經給了
+	const light = lines([...declarations(tokens, ":root")].filter(([name]) => darkDecls.has(name)))
+	const dark = lines(darkDecls)
 
 	const themes = `/* 手動主題:由 scripts/brand-css.mjs 生成 */
 /* 手動鎖定淺色;放在 html 上就整頁鎖,放在子樹上只鎖那塊。 */
