@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { breakpoint, color, font, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
+import { useControllableState } from "../../lib/useControllableState"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
 import { CheckGlyph } from "../icon/glyphs"
@@ -217,14 +218,24 @@ export function TextCell({ sx, ...props }: TextCellProps) {
 }
 
 export type SliderCellProps = {
+	/** The setting's name, written on the left and read as the slider's name. */
 	label: string
-	value: number
+	/** The current value, for a controlled cell. Pair it with `onValueChange`. */
+	value?: number
+	/** The starting value of an uncontrolled cell. @default min */
+	defaultValue?: number
+	/** The lowest value. */
 	min: number
+	/** The highest value. */
 	max: number
+	/** Values snap to multiples of this, counted from `min`. */
 	step: number
 	/** The reading on the right of the label, and what a screen reader says for the value. */
 	text: (value: number) => string
-	onChange: (value: number) => void
+	/** Every value the slider moves to, as it moves. */
+	onValueChange?: (value: number) => void
+	/** @deprecated Use `onValueChange`; it is called with the same value. */
+	onChange?: (value: number) => void
 	/** Once per gesture: save here. See `Slider`. */
 	onValueCommit?: (value: number) => void
 	sx?: stylex.StyleXStyles
@@ -234,28 +245,35 @@ export type SliderCellProps = {
 export function SliderCell({
 	label,
 	value,
+	defaultValue,
 	min,
 	max,
 	step,
 	text,
+	onValueChange,
 	onChange,
 	onValueCommit,
 	sx,
 }: SliderCellProps) {
+	// 右邊的讀數要跟著拖,所以值放在這一層,不交給 Slider 自己管
+	const [current, setCurrent] = useControllableState(value, defaultValue ?? min, (next: number) => {
+		onValueChange?.(next)
+		onChange?.(next)
+	})
 	return (
 		<div {...stylex.props(styles.sliderCell, sx)}>
 			<div {...stylex.props(styles.sliderLine)}>
 				<span>{label}</span>
-				<span {...stylex.props(styles.sliderValue)}>{text(value)}</span>
+				<span {...stylex.props(styles.sliderValue)}>{text(current)}</span>
 			</div>
 			<Slider
 				aria-label={label}
 				min={min}
 				max={max}
 				step={step}
-				value={value}
+				value={current}
 				valueText={text}
-				onChange={onChange}
+				onValueChange={setCurrent}
 				onValueCommit={onValueCommit}
 			/>
 		</div>

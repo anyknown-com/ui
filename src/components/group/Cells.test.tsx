@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { type SVGProps, useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { GroupCell, InputCell, SliderCell, TextCell } from "./Cells"
 import { ActionIcon, IconTile, LetterTile } from "./Tiles"
 
@@ -118,6 +119,65 @@ describe("SliderCell", () => {
 		expect(screen.getByText("90%")).toBeInTheDocument()
 		expect(screen.getByRole("slider", { name: "交接時機" })).toHaveAttribute("aria-valuetext", "90%")
 		expect(onCommit).toHaveBeenCalledExactlyOnceWith(0.9)
+	})
+
+	test("uncontrolled: defaultValue starts it and the reading follows the keys", async () => {
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(
+			<SliderCell
+				label="交接時機"
+				min={0.5}
+				max={0.9}
+				step={0.05}
+				defaultValue={0.7}
+				text={(v) => `${Math.round(v * 100)}%`}
+				onValueChange={onValueChange}
+			/>,
+		)
+		expect(screen.getByText("70%")).toBeInTheDocument()
+		await user.tab()
+		await user.keyboard("{Home}")
+		expect(screen.getByText("50%")).toBeInTheDocument()
+		expect(onValueChange).toHaveBeenCalledExactlyOnceWith(0.5)
+	})
+
+	test("controlled with onValueChange", async () => {
+		const onValueChange = vi.fn()
+		const user = userEvent.setup()
+		render(
+			<SliderCell
+				label="交接時機"
+				min={0}
+				max={1}
+				step={0.1}
+				value={0.4}
+				text={(v) => `${Math.round(v * 100)}%`}
+				onValueChange={onValueChange}
+			/>,
+		)
+		await user.tab()
+		await user.keyboard("{End}")
+		expect(onValueChange).toHaveBeenCalledWith(1)
+		expect(screen.getByText("40%")).toBeInTheDocument()
+	})
+})
+
+describe("cells axe", () => {
+	test("every cell kind, with a checked choice and a disabled field", async () => {
+		const { container } = render(
+			<div>
+				<GroupCell label="模型" value="Opus" onPress={() => {}} />
+				<GroupCell label="自動" checked onPress={() => {}} />
+				<GroupCell label="刪除" tone="danger" onPress={() => {}} />
+				<GroupCell label="帳號" detail="solemnis" icon={<IconTile icon={Glyph} />} />
+				<InputCell label="名稱" placeholder="STRIPE_KEY" />
+				<InputCell label="停用" disabled />
+				<TextCell aria-label="說明" />
+				<SliderCell label="交接" min={0} max={1} step={0.1} defaultValue={0.5} text={String} />
+			</div>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
 

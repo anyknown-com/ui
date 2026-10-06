@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
+import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, motion, space, tone, type } from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
-import type { ReactNode } from "react"
+import { type ReactNode, createContext, useContext, useId, useMemo } from "react"
 import { icon } from "../icon/icon"
 
 /**
@@ -161,10 +162,36 @@ export function Group({ header, footer, children, sx }: GroupProps) {
 	)
 }
 
-export type GroupItemProps = { children: ReactNode; go?: boolean } & Sx
+type Disclosure = { open: boolean; setOpen: (open: boolean) => void; panelId: string }
 
-export function GroupItem({ children, go = false, sx }: GroupItemProps) {
-	return <div {...stylex.props(styles.item, go && styles.go, sx)}>{children}</div>
+const ItemContext = createContext<Disclosure | null>(null)
+
+export type GroupItemProps = {
+	/** A `GroupRow` and, under it, the `Expand` it opens. */
+	children: ReactNode
+	/** The whole item washes on hover, for a row that is a way in. */
+	go?: boolean
+	/** Whether the item's `Expand` is open, for a controlled item. Pair it with `onOpenChange`. */
+	open?: boolean
+	/** Whether the item's `Expand` starts open, for an uncontrolled item. @default false */
+	defaultOpen?: boolean
+	/** Called when a `GroupRow` with `expands` opens or shuts the item. */
+	onOpenChange?: (open: boolean) => void
+} & Sx
+
+/**
+ * One line of a `Group` with room under it: a `GroupRow`, and the `Expand` that row unfolds.
+ * The item owns the open state; a row with `expands` toggles it and the `Expand` follows it.
+ */
+export function GroupItem({ children, go = false, open, defaultOpen = false, onOpenChange, sx }: GroupItemProps) {
+	const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange)
+	const panelId = useId()
+	const disclosure = useMemo(() => ({ open: isOpen, setOpen, panelId }), [isOpen, setOpen, panelId])
+	return (
+		<div {...stylex.props(styles.item, go && styles.go, sx)}>
+			<ItemContext value={disclosure}>{children}</ItemContext>
+		</div>
+	)
 }
 
 /** @deprecated Use `GroupItem`; the generic name will be removed in a future major. */
@@ -240,13 +267,22 @@ export function Sep() {
 }
 
 export type GroupRowProps = {
+	/** What leads the line: a `Mark`, a tile. */
 	mark?: ReactNode
+	/** The thing's name; truncates, with the full name on hover when it is a string. */
 	name: ReactNode
 	/** What follows the name after a `·`: a `Status`, a mono value, a tag. */
 	children?: ReactNode
+	/** The row's own controls on the right (a `Ghost`, a `Switch`). */
 	actions?: ReactNode
 	/** The whole line is the way in; a chevron says so. */
 	onPress?: () => void
+	/**
+	 * The whole line opens and shuts the `Expand` of the `GroupItem` it sits in, and says so
+	 * with `aria-expanded`. Runs before `onPress` when both are given.
+	 */
+	expands?: boolean
+	/** A right-pointing chevron at the end: the row leads somewhere. */
 	chevron?: boolean
 	sx?: stylex.StyleXStyles
 }
@@ -254,7 +290,19 @@ export type GroupRowProps = {
 /** @deprecated Use `GroupRowProps`. */
 export type RowProps = GroupRowProps
 
-export function GroupRow({ mark, name, children, actions, onPress, chevron = false, sx }: GroupRowProps) {
+/** A thing's line in a `Group`: its mark, its name, its state after a `·`, its actions. */
+export function GroupRow({
+	mark,
+	name,
+	children,
+	actions,
+	onPress,
+	expands = false,
+	chevron = false,
+	sx,
+}: GroupRowProps) {
+	const item = useContext(ItemContext)
+	const toggles = expands && item != null
 	const inner = (
 		<>
 			{mark}
@@ -268,8 +316,16 @@ export function GroupRow({ mark, name, children, actions, onPress, chevron = fal
 
 	return (
 		<div {...stylex.props(styles.row, sx)}>
-			{onPress ? (
-				<button type="button" onClick={onPress} {...stylex.props(styles.rowgo)}>
+			{onPress || toggles ? (
+				<button
+					type="button"
+					{...(toggles ? { "aria-expanded": item.open, "aria-controls": item.panelId } : {})}
+					onClick={() => {
+						if (toggles) item.setOpen(!item.open)
+						onPress?.()
+					}}
+					{...stylex.props(styles.rowgo)}
+				>
 					{inner}
 				</button>
 			) : (
@@ -289,17 +345,29 @@ export function GroupRow({ mark, name, children, actions, onPress, chevron = fal
 export const Row = GroupRow
 
 export type ExpandProps = {
-	open: boolean
+	/**
+	 * Open or shut. Leave it out inside a `GroupItem` to follow the item's state (its `open` /
+	 * `defaultOpen` / `onOpenChange`, toggled by a `GroupRow` with `expands`); outside one, an
+	 * `Expand` without `open` stays shut.
+	 */
+	open?: boolean
 	/** `plain` drops the mark indent, for a form that is not under a row's mark. */
 	plain?: boolean
+	/** What unfolds; not rendered while shut. */
 	children: ReactNode
 	sx?: stylex.StyleXStyles
 }
 
 /** `.exp`: what a row opens, unfolding under it in 200ms and taking no room when shut. */
-export function Expand({ open, plain = false, children, sx }: ExpandProps) {
+export function Expand({ open: ownOpen, plain = false, children, sx }: ExpandProps) {
+	const item = useContext(ItemContext)
+	const open = ownOpen ?? item?.open ?? false
 	return (
-		<div {...(open ? {} : { inert: true })} {...stylex.props(styles.expand, open && styles.shown, sx)}>
+		<div
+			{...(item ? { id: item.panelId } : {})}
+			{...(open ? {} : { inert: true })}
+			{...stylex.props(styles.expand, open && styles.shown, sx)}
+		>
 			<div {...stylex.props(styles.clip)}>
 				<div {...stylex.props(styles.in, plain && styles.plain)}>{open ? children : null}</div>
 			</div>
