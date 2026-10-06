@@ -162,7 +162,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 
 ### toast
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作
-按鈕(「已刪除 · 復原」)。danger / success 用色點區分。
+按鈕(「已刪除 · 復原」)。danger / success 用色點區分。**有動作鈕或 danger 的那則不自動消失**,
+等使用者自己關 —— 鍵盤使用者要 Tab 過整頁才到得了,5 秒不夠(WCAG 2.2.1);呼叫端明確給
+`timeout` 才倒數。
 
 - 長相是 float 階的白紙:`surfaceRaised` 底、`shadow.float`、`corner.float`(16)、不畫框。
   左邊一個 20px 的槽放色點(default 墨色、success 綠、danger 紅)或 loading 的轉圈
@@ -187,6 +189,8 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   倒數線是 CSS 動畫,`animationPlayState` 跟著同一個 `paused` 走;重新倒數靠 `epoch` 換 key
   重播。全部關掉時順手清掉 hover / focus —— viewport 縮成 0,mouseleave 不一定會來,
   不清的話下一則會永遠停住
+- **F8 把焦點跳到通知區**(`aria-keyshortcuts="F8"`,沒有通知時不搶鍵),Tab 進去按動作或
+  關閉;Esc 把焦點還給按 F8 之前的地方。用鍵盤關掉一則時焦點留在通知區,關掉最後一則就還回去
 - 無障礙:viewport 是常駐的 `role="region"` + `aria-live="polite"`;每則是
   `role="status"`(`aria-atomic`,去重 / promise 更新時整則重念),danger 是 `role="alert"`。
   色點之外有視覺隱藏的「成功:/ 錯誤:」;每則都有一顆「關閉通知」

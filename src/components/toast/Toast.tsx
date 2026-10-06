@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { createContext, useCallback, useContext, useState, useSyncExternalStore } from "react"
+import { createContext, useCallback, useContext, useRef, useState, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
@@ -12,6 +12,8 @@ import { Spin } from "../spin/Spin"
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const DEFAULT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 3
+/** 把焦點跳到通知區的快捷鍵(跟 Radix 同一顆;F6 是瀏覽器自己在區塊間跳的鍵)。 */
+const HOTKEY = "F8"
 
 const slideIn = stylex.keyframes({
 	from: { opacity: 0, translate: "1rem 0" },
@@ -29,6 +31,9 @@ const styles = stylex.create({
 		display: "flex",
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
+		borderRadius: corner.float,
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: 2,
 	},
 	fromBottom: { flexDirection: "column-reverse" },
 	fromTop: { flexDirection: "column" },
@@ -182,7 +187,10 @@ export type ToastAction = { label: string; onClick: () => void }
 export type ToastOptions = {
 	description?: string
 	action?: ToastAction
-	/** 毫秒;0 = 不自動消失。沒給就用 Toaster 的 `timeout`。 */
+	/**
+	 * 毫秒;0 = 不自動消失。沒給就用 Toaster 的 `timeout` —— 但有 `action` 或 `danger` 的那則
+	 * 不自動消失(WCAG 2.2.1:鍵盤使用者要 Tab 很久才到得了),要倒數就明確給一個值。
+	 */
 	timeout?: number
 	/** 同一個 key 正在顯示時,不疊新的一則:原地更新那則、重新倒數、計數 +1(顯示 ×N)。 */
 	key?: string
@@ -270,7 +278,9 @@ export function createToastManager(): ToastManager {
 	/** 重新倒數:回傳帶新 duration / epoch 的那則。 */
 	function arm(record: ToastRecord): ToastRecord {
 		stop(record.id)
-		const duration = record.loading ? 0 : (record.timeout ?? config.timeout)
+		// 有按鈕要按、或是錯誤:等使用者自己關,除非呼叫端明確給了 timeout
+		const persistent = record.action != null || record.type === "danger"
+		const duration = record.loading ? 0 : (record.timeout ?? (persistent ? 0 : config.timeout))
 		if (duration > 0) {
 			const timer: Timer = { remaining: duration, startedAt: 0 }
 			timers.set(record.id, timer)
@@ -428,11 +438,27 @@ export function Toaster({
 		() => false,
 	)
 	const fromBottom = position.startsWith("bottom")
+	const region = useRef<HTMLDivElement | null>(null)
+	// 按 F8 之前焦點在哪;Esc 或最後一則關掉時還回去
+	const returnTo = useRef<HTMLElement | null>(null)
 
 	const connect = useCallback(
 		(node: HTMLDivElement) => {
+			region.current = node
 			own.configure({ timeout, limit })
 			const doc = node.ownerDocument
+			const hotkey = (event: KeyboardEvent) => {
+				if (event.key !== HOTKEY || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+				if (own.getSnapshot().toasts.length === 0) return
+				event.preventDefault()
+				if (!node.contains(doc.activeElement)) returnTo.current = doc.activeElement as HTMLElement | null
+				node.focus()
+			}
+			const escape = (event: KeyboardEvent) => {
+				if (event.key !== "Escape" || returnTo.current == null) return
+				returnTo.current.focus()
+				returnTo.current = null
+			}
 			const sync = () => (doc.hidden ? own.pause("hidden") : own.resume("hidden"))
 			const enter = () => own.pause("hover")
 			const leave = () => own.resume("hover")
@@ -442,12 +468,17 @@ export function Toaster({
 			}
 			sync()
 			doc.addEventListener("visibilitychange", sync)
+			doc.addEventListener("keydown", hotkey)
+			node.addEventListener("keydown", escape)
 			node.addEventListener("mouseenter", enter)
 			node.addEventListener("mouseleave", leave)
 			node.addEventListener("focusin", focusIn)
 			node.addEventListener("focusout", focusOut)
 			return () => {
 				doc.removeEventListener("visibilitychange", sync)
+				doc.removeEventListener("keydown", hotkey)
+				node.removeEventListener("keydown", escape)
+				region.current = null
 				node.removeEventListener("mouseenter", enter)
 				node.removeEventListener("mouseleave", leave)
 				node.removeEventListener("focusin", focusIn)
@@ -460,6 +491,20 @@ export function Toaster({
 		[own, timeout, limit],
 	)
 
+	// 關掉焦點所在的那則時,焦點不能掉回 body:還有別則就留在通知區,沒了就還給按 F8 前的地方
+	const dismiss = (id: string) => {
+		const node = region.current
+		const inside = node?.contains(node.ownerDocument.activeElement) ?? false
+		const last = own.getSnapshot().toasts.length <= 1
+		own.close(id)
+		if (!inside) return
+		if (!last) node?.focus()
+		else if (returnTo.current != null) {
+			returnTo.current.focus()
+			returnTo.current = null
+		}
+	}
+
 	if (!client) return null
 
 	return (
@@ -469,7 +514,9 @@ export function Toaster({
 					ref={connect}
 					role="region"
 					aria-label="通知"
+					aria-keyshortcuts={HOTKEY}
 					aria-live="polite"
+					tabIndex={-1}
 					{...stylex.props(
 						layerStyles.toast,
 						styles.viewport,
@@ -478,7 +525,7 @@ export function Toaster({
 					)}
 				>
 					{toasts.map((record) => (
-						<ToastItem key={record.id} record={record} paused={paused} manager={own} />
+						<ToastItem key={record.id} record={record} paused={paused} onClose={dismiss} />
 					))}
 				</div>,
 				document.body,
@@ -487,9 +534,9 @@ export function Toaster({
 	)
 }
 
-type ToastItemProps = { record: ToastRecord; paused: boolean; manager: ToastManager }
+type ToastItemProps = { record: ToastRecord; paused: boolean; onClose: (id: string) => void }
 
-function ToastItem({ record, paused, manager }: ToastItemProps) {
+function ToastItem({ record, paused, onClose }: ToastItemProps) {
 	const reduced = usePrefersReducedMotion()
 	const tone = TONE[record.type in TONE ? record.type : "default"]
 	const action = record.action
@@ -529,7 +576,7 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 					type="button"
 					onClick={() => {
 						action.onClick()
-						manager.close(record.id)
+						onClose(record.id)
 					}}
 					{...stylex.props(reset.control, styles.action)}
 				>
@@ -539,7 +586,7 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 			<button
 				type="button"
 				aria-label="關閉通知"
-				onClick={() => manager.close(record.id)}
+				onClick={() => onClose(record.id)}
 				{...stylex.props(reset.control, styles.close, twoLine && styles.closeTwoLine)}
 			>
 				<XGlyph {...stylex.props(styles.closeGlyph)} />

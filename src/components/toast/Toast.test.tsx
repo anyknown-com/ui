@@ -101,6 +101,40 @@ describe("Toast", () => {
 	})
 })
 
+describe("Toast keyboard access", () => {
+	test("F8 moves focus to the notifications and Escape returns it", async () => {
+		render(<Harness />)
+		const trigger = screen.getByRole("button", { name: "default" })
+		await userEvent.click(trigger)
+		await screen.findByText("交接摘要已複製")
+		expect(viewport()).toHaveAttribute("aria-keyshortcuts", "F8")
+		await userEvent.keyboard("{F8}")
+		expect(viewport()).toHaveFocus()
+		await userEvent.keyboard("{Escape}")
+		expect(trigger).toHaveFocus()
+	})
+
+	test("closing the last toast from the keyboard hands focus back", async () => {
+		render(<Harness />)
+		const trigger = screen.getByRole("button", { name: "default" })
+		await userEvent.click(trigger)
+		await screen.findByText("交接摘要已複製")
+		await userEvent.keyboard("{F8}")
+		await userEvent.tab()
+		expect(screen.getByRole("button", { name: "關閉通知" })).toHaveFocus()
+		await userEvent.keyboard("{Enter}")
+		expect(trigger).toHaveFocus()
+	})
+
+	test("F8 does nothing while there is nothing to read", async () => {
+		render(<Harness />)
+		const trigger = screen.getByRole("button", { name: "default" })
+		trigger.focus()
+		await userEvent.keyboard("{F8}")
+		expect(trigger).toHaveFocus()
+	})
+})
+
 describe("Toast regressions", () => {
 	test("the countdown line pauses when the viewport is hovered", async () => {
 		render(<Harness />)
@@ -143,6 +177,32 @@ describe("toast manager", () => {
 		expect(screen.queryByText("短")).not.toBeInTheDocument()
 		act(() => vi.advanceTimersByTime(60_000))
 		expect(screen.getByText("常駐")).toBeInTheDocument()
+	})
+
+	test("a toast with an action waits to be dismissed", () => {
+		const manager = setup({ timeout: 3000 })
+		act(() => void manager.add({ title: "已刪除", action: { label: "復原", onClick: () => {} } }))
+		act(() => vi.advanceTimersByTime(60_000))
+		expect(screen.getByText("已刪除")).toBeInTheDocument()
+		expect(document.querySelector("[data-countdown]")).toBeNull()
+	})
+
+	test("a danger toast waits to be dismissed", () => {
+		const manager = setup({ timeout: 3000 })
+		act(() => void manager.add({ title: "無法連到 vault", type: "danger" }))
+		act(() => vi.advanceTimersByTime(60_000))
+		expect(screen.getByRole("alert")).toHaveTextContent("無法連到 vault")
+	})
+
+	test("an explicit timeout still counts down an action or danger toast", () => {
+		const manager = setup({ timeout: 3000 })
+		act(() => {
+			manager.add({ title: "已刪除", action: { label: "復原", onClick: () => {} }, timeout: 8000 })
+			manager.add({ title: "離線", type: "danger", timeout: 8000 })
+		})
+		act(() => vi.advanceTimersByTime(8000))
+		expect(screen.queryByText("已刪除")).not.toBeInTheDocument()
+		expect(screen.queryByText("離線")).not.toBeInTheDocument()
 	})
 
 	test("update patches the toast in place and restarts its timer", () => {
