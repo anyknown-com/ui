@@ -23,7 +23,7 @@ const styles = stylex.create({
 		transitionProperty: "background-color",
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
-	over: { backgroundColor: color.signalSubtle },
+	over: { backgroundColor: color.accentSubtle },
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
 	stitch: { position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" },
 	// The stitch runs 1.5px inside the zone, so its corner is the zone's less that.
@@ -37,7 +37,7 @@ const styles = stylex.create({
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
 	seamOver: {
-		stroke: color.signal,
+		stroke: color.accent,
 		animationName: { default: sew, [REDUCED]: "none" },
 		animationDuration: "0.5s",
 		animationTimingFunction: "linear",
@@ -48,7 +48,7 @@ const styles = stylex.create({
 		transitionProperty: "color",
 		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
 	},
-	iconOver: { color: color.signal },
+	iconOver: { color: color.text },
 	title: { margin: 0, fontSize: text.sm, color: color.text },
 	hint: { color: color.textMuted, fontSize: "0.78rem" },
 	pick: {

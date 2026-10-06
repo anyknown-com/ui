@@ -511,7 +511,7 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 
 ### dropzone
 拖放上傳區:idle 是凹下去的 `surface` 底 + `borderStrong` 虛線(`corner.card`)、
-dragover 時虛線與圖示換 `signal`、底換 `signalSubtle`、
+dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放不是 agent 在做事,不用藍)、
 **選檔按鈕 fallback**(drag 永遠不是唯一入口,膠囊、`accentSubtle` 底、無框)、
 上傳中列表(檔名 + 膠囊進度條 + 取消,跟檔案列一樣是 rest 卡片)、超限錯誤列。
 
