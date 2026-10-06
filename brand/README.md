@@ -1,10 +1,11 @@
 # brand
 
-`brand-icon.svg` 是 Anyknown 的 mark，各產品共用。`fill="currentColor"`，所以直接 inline 進
-DOM 就跟著文字顏色走；要當檔案用就自己指定 `color`。
+`brand-icon.svg` is the Anyknown mark, shared by every product. It uses `fill="currentColor"`, so inlined in the
+DOM it follows the text color; when you use it as a file, set `color` yourself.
 
-不進 npm package（`package.json` 的 `files` 只有 `dist` 與 `LICENSE`）——這是品牌資產不是元件，
-需要的產品從這裡複製一份過去。目前的複本：`product/apps/mobile/assets/source/brand-icon.svg`。
+It is not in the npm package (`files` in `package.json` lists only `dist` and `LICENSE`). It is a brand asset, not a
+component; products that need it copy it from here. Current copy: `product/apps/mobile/assets/source/brand-icon.svg`.
 
-`icons/` 是 Senlima 自繪的 24px 線條 icon（memory / questions / input-mode），`stroke="currentColor"`、
-stroke-width 2，跟元件裡的 icon 同一套規格。用法同上：inline 進 DOM，或複製到產品裡。
+`icons/` holds 24px line icons drawn by Senlima (memory / questions / input-mode), with `stroke="currentColor"` and
+stroke-width 2, the same spec as the icons in the components. Use them the same way: inline them in the DOM, or copy
+them into the product.
