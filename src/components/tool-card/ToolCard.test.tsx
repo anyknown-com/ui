@@ -18,6 +18,12 @@ describe("ToolCard", () => {
 		expect(screen.getByText(/filePath/)).toBeVisible()
 	})
 
+	test("a clipped subtitle keeps the full path on hover", () => {
+		const path = "apps/desktop/src/renderer/thread/tool-part.tsx"
+		render(<ToolCard tool="read" subtitle={path} />)
+		expect(screen.getByText(path)).toHaveAttribute("title", path)
+	})
+
 	test("shell and error default to expanded, read defaults to collapsed", () => {
 		const { unmount } = render(<ToolCard tool="shell" subtitle="pnpm test" />)
 		expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true")

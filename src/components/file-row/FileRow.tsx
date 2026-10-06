@@ -242,7 +242,7 @@ export function FileRow({
 				<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 					{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
 				</span>
-				<span role="gridcell" {...stylex.props(styles.name)}>
+				<span role="gridcell" title={item.name} {...stylex.props(styles.name)}>
 					{item.name}
 				</span>
 				<span role="gridcell" aria-colspan={3} {...stylex.props(styles.busyCell)}>
@@ -298,7 +298,7 @@ export function FileRow({
 			<span role="gridcell" aria-hidden="true" {...stylex.props(styles.iconCell)}>
 				{icon ?? (item.kind === "folder" ? <FolderIcon /> : <FileIcon />)}
 			</span>
-			<span role="gridcell" {...stylex.props(styles.name)}>
+			<span role="gridcell" title={item.name} {...stylex.props(styles.name)}>
 				{item.name}
 			</span>
 			<span role="gridcell" {...stylex.props(styles.size)}>

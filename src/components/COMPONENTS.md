@@ -335,6 +335,7 @@ product 殼的訊息泡泡(0.9):整寬、上下 12、`t3` / `body`。人說的�
   標題的動詞已經說了
 - 輸入 / 輸出 / 錯誤是凹下去的 `surface`(錯誤是 `dangerSubtle`),無框,`corner.small`
   (卡片圓角減 padding 已經 ≤ 0,取最小階)
+- subtitle 一行放不下時切成 `…`,`title` 帶全文;展開後整段折行顯示,不切
 
 ### reasoning-fold
 思考過程的摺疊列:預設收合只留「思考了 N 秒」,串流中撐開、標籤 shimmer「思考中…」。
@@ -522,6 +523,8 @@ dragover 時虛線換 `accent`、圖示換 `text`、底換 `accentSubtle`(拖放
 檔案列表的一列:類型圖示 + 檔名 + 大小(mono、tabular)+ 修改時間 + hover 才浮現的
 動作與選取 checkbox;另有資料夾列與加密中 / 上傳中的 busy 列。
 
+- 檔名放不下時切成 `…`,`title` 帶全名(附件方塊的名字、`Group` 的列名與狀態、`Pill`、
+  `Cell mono`、`Subject` 也一樣:切掉的字一律 hover 看得到全文)
 - `FileList` 是紙上的 rest 卡片:`shadow.rest` 的環就是唯一的邊、`corner.card`,列與列之間
   髮線。底色淺色是白、暗色升一階到 `surface`(`tone.railLayer2` 剛好是這一對)
 

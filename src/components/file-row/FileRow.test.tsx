@@ -18,6 +18,11 @@ describe("FileRow", () => {
 		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "false")
 	})
 
+	test("a clipped name keeps the full name on hover", () => {
+		render(<FileRow item={FILE} />)
+		expect(screen.getByText("護照掃描.pdf")).toHaveAttribute("title", "護照掃描.pdf")
+	})
+
 	test("the checkbox names what it selects", () => {
 		render(<FileRow item={FILE} />)
 		expect(screen.getByRole("checkbox", { name: "選取 護照掃描.pdf" })).toBeInTheDocument()

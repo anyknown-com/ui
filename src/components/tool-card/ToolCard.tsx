@@ -69,10 +69,13 @@ const styles = stylex.create({
 		color: color.textMuted,
 		fontFamily: font.mono,
 		fontSize: type.t2,
+		minWidth: 0,
 		overflow: "hidden",
 		textOverflow: "ellipsis",
 		whiteSpace: "nowrap",
 	},
+	// 展開時路徑整段顯示,折行而不切掉
+	subtitleOpen: { overflowWrap: "anywhere", whiteSpace: "normal" },
 	track: {
 		position: "relative",
 		height: 6,
@@ -424,7 +427,11 @@ export function ToolCard({
 				<span {...stylex.props(styles.main)}>
 					<span {...stylex.props(styles.line)}>
 						<span {...stylex.props(styles.title)}>{title ?? VERBS[tool] ?? tool}</span>
-						{subtitle != null && <span {...stylex.props(styles.subtitle)}>{subtitle}</span>}
+						{subtitle != null && (
+							<span title={subtitle} {...stylex.props(styles.subtitle, open && styles.subtitleOpen)}>
+								{subtitle}
+							</span>
+						)}
 					</span>
 					{state === "running" && (
 						<span aria-hidden="true" {...stylex.props(styles.track)}>

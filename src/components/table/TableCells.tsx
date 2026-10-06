@@ -107,6 +107,7 @@ export type CellProps = {
 export function Cell({ children, mono, num, faint, order, prefixed, pushed, grow, hidden, sx }: CellProps) {
 	return (
 		<span
+			{...(mono === true && typeof children === "string" ? { title: children } : {})}
 			{...stylex.props(
 				styles.cell,
 				mono === true && styles.mono,
@@ -193,11 +194,13 @@ export type SubjectProps = {
 
 /** `.subj`: a mono identifier that is also the way to filter by it. */
 export function Subject({ children, onPress, title, order, grow, sx }: SubjectProps) {
+	// 名字被切掉時,hover 要看得到全名
+	const full = title ?? (typeof children === "string" ? children : undefined)
 	return (
 		<button
 			type="button"
 			onClick={onPress}
-			{...(title ? { title } : {})}
+			{...(full ? { title: full } : {})}
 			{...stylex.props(
 				styles.subject,
 				order !== undefined && styles.order(order),

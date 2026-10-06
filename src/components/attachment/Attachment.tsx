@@ -83,7 +83,9 @@ export function AttachmentTile({ name, label, preview, sx }: AttachmentTileProps
 				<FileGlyph {...stylex.props(styles.glyph)} strokeWidth={ICON_STROKE} />
 			)}
 			<figcaption {...stylex.props(styles.caption, image && styles.onImage)}>
-				<span {...stylex.props(styles.name)}>{name}</span>
+				<span title={name} {...stylex.props(styles.name)}>
+					{name}
+				</span>
 				<span {...stylex.props(styles.meta, image && styles.onImage)}>{label}</span>
 			</figcaption>
 		</figure>

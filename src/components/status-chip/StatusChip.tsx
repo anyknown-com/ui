@@ -91,7 +91,10 @@ export type PillProps = {
 /** `.pill-s`: the 22px mono pills a fold's first line is made of. */
 export function Pill({ status, title = false, children, sx }: PillProps) {
 	return (
-		<span {...stylex.props(styles.pill, status !== undefined && styles.status, title && styles.title, sx)}>
+		<span
+			{...(title && typeof children === "string" ? { title: children } : {})}
+			{...stylex.props(styles.pill, status !== undefined && styles.status, title && styles.title, sx)}
+		>
 			{status !== undefined && (
 				<span
 					aria-hidden="true"

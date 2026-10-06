@@ -216,7 +216,9 @@ export function Status(props: StatusProps) {
 			{shape !== undefined && (
 				<span {...stylex.props(styles.dot, DOT_TONE[hue], styles[shape])} aria-hidden="true" />
 			)}
-			<span {...stylex.props(styles.statusText)}>{children}</span>
+			<span {...(typeof children === "string" ? { title: children } : {})} {...stylex.props(styles.statusText)}>
+				{children}
+			</span>
 		</span>
 	)
 }
@@ -245,7 +247,9 @@ export function Row({ mark, name, children, actions, onPress, chevron = false, s
 	const inner = (
 		<>
 			{mark}
-			<span {...stylex.props(styles.name)}>{name}</span>
+			<span {...(typeof name === "string" ? { title: name } : {})} {...stylex.props(styles.name)}>
+				{name}
+			</span>
 			{children !== undefined && <Sep />}
 			{children}
 		</>
