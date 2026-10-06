@@ -1,3 +1,4 @@
+import { useDirection } from "@base-ui/react/direction-provider"
 import * as stylex from "@stylexjs/stylex"
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useId, useRef, useState } from "react"
 import type { StyleArg } from "../../lib/styled"
@@ -112,7 +113,9 @@ export type SliderProps = {
 
 /**
  * A value on a range, dragged along a track or moved with the keys: arrows move 5% of the
- * range, PageUp / PageDown `largeStep`, Home / End to either end.
+ * range, PageUp / PageDown `largeStep`, Home / End to either end. Under `dir="rtl"` the track
+ * fills from the right, ArrowLeft raises the value and a drag measures from the right edge;
+ * `<DirectionProvider direction="rtl">` mirrors the keys and the drag as well.
  */
 export function Slider({
 	value,
@@ -135,6 +138,7 @@ export function Slider({
 	const thumb = useRef<HTMLSpanElement>(null)
 	const [dragging, setDragging] = useState(false)
 	const gesture = useRef({ from: 0, to: 0 })
+	const providerRtl = useDirection() === "rtl"
 	const [raw, setValue] = useControllableState(value, defaultValue ?? min, (next: number) => {
 		onValueChange?.(next)
 		onChange?.(next)
@@ -164,6 +168,12 @@ export function Slider({
 		commit()
 	}
 
+	// The thumb sits by inset-inline-start, so the side it starts from follows the CSS direction.
+	function isRtl() {
+		const track = control.current
+		return providerRtl || (track != null && getComputedStyle(track).direction === "rtl")
+	}
+
 	function ratioAt(clientX: number) {
 		const track = control.current
 		const knob = thumb.current
@@ -171,7 +181,8 @@ export function Slider({
 		const rect = track.getBoundingClientRect()
 		const span = rect.width - knob.offsetWidth
 		if (span <= 0) return ratio
-		return (clientX - rect.left - knob.offsetWidth / 2) / span
+		const fromStart = isRtl() ? rect.right - clientX : clientX - rect.left
+		return (fromStart - knob.offsetWidth / 2) / span
 	}
 
 	function drag(event: ReactPointerEvent<HTMLDivElement>) {
@@ -214,9 +225,12 @@ export function Slider({
 					if (disabled) return
 					const nudge = (max - min) * ARROW_FRACTION
 					const page = largeStep ?? (max - min) * PAGE_FRACTION
+					const inline = isRtl() ? -nudge : nudge
 					begin()
-					if (event.key === "ArrowRight" || event.key === "ArrowUp") emit(current + nudge)
-					else if (event.key === "ArrowLeft" || event.key === "ArrowDown") emit(current - nudge)
+					if (event.key === "ArrowRight") emit(current + inline)
+					else if (event.key === "ArrowLeft") emit(current - inline)
+					else if (event.key === "ArrowUp") emit(current + nudge)
+					else if (event.key === "ArrowDown") emit(current - nudge)
 					else if (event.key === "PageUp") emit(current + page)
 					else if (event.key === "PageDown") emit(current - page)
 					else if (event.key === "Home") emit(min)

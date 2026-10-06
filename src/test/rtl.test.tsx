@@ -1,8 +1,7 @@
-import { DirectionProvider } from "@base-ui/react/direction-provider"
-import { act, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { type ReactNode, useState } from "react"
-import { afterAll, beforeAll, describe, expect, test } from "vitest"
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest"
 import { ActionBar } from "../components/action-bar/ActionBar"
 import { Button } from "../components/button/Button"
 import { Composer } from "../components/composer/Composer"
@@ -11,6 +10,7 @@ import { Slider } from "../components/slider/Slider"
 import { Switch } from "../components/switch/Switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../components/tabs/Tabs"
 import { Toaster, createToastManager } from "../components/toast/Toast"
+import { DirectionProvider } from "../lib/direction"
 
 // Right-to-left, as far as jsdom can tell. jsdom has no layout: it does not compute
 // `direction`, does not resolve `inset-inline-*` to a side, and StyleX styles arrive as class
@@ -26,8 +26,9 @@ import { Toaster, createToastManager } from "../components/toast/Toast"
 // browser.
 //
 // Two facts these tests pin:
-// - Base UI components (Tabs, the dropdown's submenu) read direction from Base UI's
-//   `<DirectionProvider>`, not from the `dir` attribute. An RTL app needs both.
+// - Base UI components (Tabs, the dropdown's submenu) read direction from our
+//   `<DirectionProvider>`, not from the `dir` attribute. An RTL app needs both. Slider reads
+//   either.
 // - Portalled layers (toasts, menus) inherit direction from `<html>`, not from a `dir` on a
 //   wrapper, so the document is set to RTL here, as an RTL app would.
 
@@ -94,15 +95,81 @@ describe("RTL", () => {
 		expect(physicalInlineStyles(container)).toEqual([])
 	})
 
-	// Known gap: the thumb moves with inset-inline-start, so under RTL a higher value sits
-	// further left, but ArrowRight still raises the value (and pointer math reads clientX
-	// from the left edge). Flip this to `test` when Slider mirrors its keys.
-	test.fails("Slider: ArrowLeft raises the value, toward the inline end", async () => {
+	test("Slider: ArrowLeft raises the value, toward the inline end; Up / Down do not flip", async () => {
 		render(<Volume />)
 		const slider = screen.getByRole("slider", { name: "Volume" })
 		slider.focus()
 		await userEvent.keyboard("{ArrowLeft}")
-		expect(Number(slider.getAttribute("aria-valuenow"))).toBeGreaterThan(0.5)
+		expect(slider).toHaveAttribute("aria-valuenow", "0.55")
+		await userEvent.keyboard("{ArrowRight}{ArrowRight}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.45")
+		await userEvent.keyboard("{ArrowUp}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.5")
+	})
+
+	test("Slider: a drag measures from the right edge", () => {
+		render(<Volume />)
+		const slider = screen.getByRole("slider", { name: "Volume" })
+		slider.setPointerCapture = vi.fn()
+		vi.spyOn(slider, "getBoundingClientRect").mockReturnValue(
+			DOMRect.fromRect({ x: 0, y: 0, width: 100, height: 24 }),
+		)
+		fireEvent.pointerDown(slider, { pointerId: 1, clientX: 20 })
+		expect(slider).toHaveAttribute("aria-valuenow", "0.8")
+		fireEvent.pointerUp(slider, { pointerId: 1, clientX: 20 })
+	})
+
+	test("Slider: a DirectionProvider mirrors the keys even inside dir=ltr", async () => {
+		render(
+			<div dir="ltr">
+				<Rtl>
+					<Volume />
+				</Rtl>
+			</div>,
+		)
+		const slider = screen.getByRole("slider", { name: "Volume" })
+		slider.focus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(slider).toHaveAttribute("aria-valuenow", "0.55")
+	})
+
+	test("Tabs: wrapping, Home and End follow the list order under RTL", async () => {
+		render(
+			<Rtl>
+				<Tabs defaultValue="a" variant="pills">
+					<TabsList aria-label="Views">
+						<TabsTab value="a">A</TabsTab>
+						<TabsTab value="b">B</TabsTab>
+						<TabsTab value="c">C</TabsTab>
+					</TabsList>
+					<TabsPanel value="a">Panel A</TabsPanel>
+				</Tabs>
+			</Rtl>,
+		)
+		screen.getByRole("tab", { name: "A" }).focus()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(screen.getByRole("tab", { name: "C" })).toHaveFocus()
+		await userEvent.keyboard("{ArrowLeft}")
+		expect(screen.getByRole("tab", { name: "A" })).toHaveFocus()
+		await userEvent.keyboard("{End}")
+		expect(screen.getByRole("tab", { name: "C" })).toHaveFocus()
+		await userEvent.keyboard("{Home}")
+		expect(screen.getByRole("tab", { name: "A" })).toHaveFocus()
+	})
+
+	test("Tabs: without a DirectionProvider, the dir attribute alone does not mirror the keys", async () => {
+		render(
+			<Tabs defaultValue="a">
+				<TabsList aria-label="Views">
+					<TabsTab value="a">A</TabsTab>
+					<TabsTab value="b">B</TabsTab>
+				</TabsList>
+				<TabsPanel value="a">Panel A</TabsPanel>
+			</Tabs>,
+		)
+		screen.getByRole("tab", { name: "A" }).focus()
+		await userEvent.keyboard("{ArrowRight}")
+		expect(screen.getByRole("tab", { name: "B" })).toHaveFocus()
 	})
 
 	test("DropdownMenu: ArrowLeft opens a submenu under a DirectionProvider", async () => {
@@ -121,6 +188,8 @@ describe("RTL", () => {
 		await userEvent.keyboard("{ArrowLeft}")
 		expect(await screen.findByRole("menuitem", { name: "Archive" })).toBeInTheDocument()
 		expect(physicalInlineStyles()).toEqual([])
+		await userEvent.keyboard("{ArrowRight}")
+		expect(screen.queryByRole("menuitem", { name: "Archive" })).not.toBeInTheDocument()
 	})
 
 	test("Toast: the portalled region inherits RTL from the document and F8 still reaches it", async () => {

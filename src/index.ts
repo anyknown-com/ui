@@ -229,6 +229,7 @@ export {
 	type StringTable,
 	type Word,
 } from "./lib/i18n"
+export { DirectionProvider, type DirectionProviderProps } from "./lib/direction"
 export {
 	setTextLayoutEngine,
 	measureTextHeight,

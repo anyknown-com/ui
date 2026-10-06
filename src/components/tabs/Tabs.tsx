@@ -127,7 +127,10 @@ export type TabsProps = {
 	children: ReactNode
 }
 
-/** A set of panels where one shows at a time, switched by a row of tabs. */
+/**
+ * A set of panels where one shows at a time, switched by a row of tabs. ArrowLeft / ArrowRight
+ * move between tabs; under `<DirectionProvider direction="rtl">` they swap, so ArrowLeft is next.
+ */
 export function Tabs({ variant = "underline", children, ...props }: TabsProps) {
 	return (
 		<VariantContext value={variant}>

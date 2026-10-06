@@ -1,3 +1,4 @@
+import { useDirection } from "@base-ui/react/direction-provider"
 import { Menu } from "@base-ui/react/menu"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
@@ -42,6 +43,8 @@ const styles = stylex.create({
 		color: color.textMuted,
 	},
 	arrow: { marginInlineStart: "auto", color: color.textFaint, display: "flex" },
+	// The submenu opens on the inline end, which is the left under RTL: the chevron points there.
+	arrowRtl: { transform: "scaleX(-1)" },
 	tick: { width: "0.9rem", flex: "none", color: color.accent, display: "flex", justifyContent: "center" },
 	groupLabel: {
 		fontSize: type.t1,
@@ -198,8 +201,12 @@ export type DropdownSubProps = {
 	children: ReactNode
 }
 
-/** A nested menu: ArrowRight or hover opens it, ArrowLeft or Escape closes it. */
+/**
+ * A nested menu: ArrowRight or hover opens it, ArrowLeft or Escape closes it. Under
+ * `<DirectionProvider direction="rtl">` it opens to the left and the arrow keys swap.
+ */
 export function DropdownSub({ label, icon, disabled, children }: DropdownSubProps) {
+	const rtl = useDirection() === "rtl"
 	return (
 		<Menu.SubmenuRoot>
 			<Menu.SubmenuTrigger disabled={disabled} className={itemClassName()}>
@@ -209,7 +216,7 @@ export function DropdownSub({ label, icon, disabled, children }: DropdownSubProp
 					</span>
 				)}
 				{label}
-				<span {...stylex.props(styles.arrow)}>
+				<span {...stylex.props(styles.arrow, rtl && styles.arrowRtl)}>
 					<ChevronRight />
 				</span>
 			</Menu.SubmenuTrigger>
