@@ -168,7 +168,7 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   左邊一個 20px 的槽放色點(default 墨色、success 綠、danger 紅)或 loading 的轉圈
   (`signal` 色,`toast.promise` 等待中),換狀態時標題不跳。有說明的那則標題 500 字重、
   點與按鈕對齊第一行。去重計數是標題右邊的膠囊,只顯示數字(讀屏仍念「×N」)。
-  動作鈕與關閉鈕都是膠囊;倒數線退到圓角內側
+  動作鈕與關閉鈕都是膠囊;倒數是內距裡貼著底邊的一條細膠囊,填充往起點退
 
 - **狀態自己養,不靠 Base UI toast**。`createToastManager()` 跑在 `lib/store.ts`
   (`subscribe` / `getSnapshot` / `set`,React 端走 `useSyncExternalStore`),計時器也在

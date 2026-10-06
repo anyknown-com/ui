@@ -106,7 +106,7 @@ describe("Toast regressions", () => {
 		render(<Harness />)
 		await userEvent.click(screen.getByRole("button", { name: "default" }))
 		await screen.findByText("交接摘要已複製")
-		const line = document.querySelector("path[pathLength]") as SVGPathElement
+		const line = document.querySelector("[data-countdown]") as HTMLElement
 		expect(line.getAttribute("style")).toContain("running")
 		await userEvent.hover(viewport())
 		await waitFor(() => expect(line.getAttribute("style")).toContain("paused"))

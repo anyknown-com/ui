@@ -19,8 +19,8 @@ const slideIn = stylex.keyframes({
 })
 
 const drain = stylex.keyframes({
-	from: { strokeDashoffset: 0 },
-	to: { strokeDashoffset: -100 },
+	from: { translate: "0 0" },
+	to: { translate: "-100% 0" },
 })
 
 const styles = stylex.create({
@@ -62,26 +62,28 @@ const styles = stylex.create({
 	},
 	// 有說明的那則:點與按鈕對齊第一行
 	twoLine: { alignItems: "flex-start" },
-	// 退到圓角內側,線頭不會被 16px 的角切掉
+	// 倒數是內距裡、貼著底邊的一條細膠囊:凹下去的軌,填充往起點退
 	countdown: {
 		position: "absolute",
-		top: 0,
-		insetInlineStart: corner.float,
-		width: `calc(100% - 2 * ${corner.float})`,
-		height: 5,
+		insetInlineStart: space.md,
+		insetInlineEnd: space.sm,
+		bottom: space.xxs,
+		height: 3,
+		borderRadius: corner.pill,
+		backgroundColor: color.accentSubtle,
+		overflow: "hidden",
 	},
 	countLine: {
-		fill: "none",
-		strokeWidth: 1.5,
-		strokeLinecap: "round",
-		strokeDasharray: 100,
+		display: "block",
+		height: "100%",
+		borderRadius: corner.pill,
 		animationName: drain,
 		animationTimingFunction: "linear",
 		animationFillMode: "forwards",
 	},
-	lineDefault: { stroke: color.textFaint },
-	lineSuccess: { stroke: color.success },
-	lineDanger: { stroke: color.danger },
+	lineDefault: { backgroundColor: color.textFaint },
+	lineSuccess: { backgroundColor: color.success },
+	lineDanger: { backgroundColor: color.danger },
 	running: (ms: number, paused: boolean) => ({
 		animationDuration: `${ms}ms`,
 		animationPlayState: paused ? "paused" : "running",
@@ -501,19 +503,12 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 			{...stylex.props(styles.toast, twoLine && styles.twoLine)}
 		>
 			{!reduced && record.duration > 0 && (
-				<svg
-					key={record.epoch}
-					viewBox="0 0 320 6"
-					preserveAspectRatio="none"
-					aria-hidden="true"
-					{...stylex.props(styles.countdown)}
-				>
-					<path
-						d="M0 3H320"
-						pathLength="100"
+				<span key={record.epoch} aria-hidden="true" {...stylex.props(styles.countdown)}>
+					<span
+						data-countdown=""
 						{...stylex.props(styles.countLine, tone.line, styles.running(record.duration, paused))}
 					/>
-				</svg>
+				</span>
 			)}
 			<span aria-hidden="true" {...stylex.props(styles.mark)}>
 				{record.loading ? <Spin sx={styles.spin} /> : <span {...stylex.props(styles.dot, tone.dot)} />}
