@@ -69,13 +69,7 @@ const styles = stylex.create({
 	},
 })
 
-const LEVEL_LABELS = [
-	"passphrase 無法找回,忘了就只能靠復原金鑰。",
-	"弱 — 再長一點。",
-	"可 — 建議混入更多種字元。",
-	"強",
-	"很強",
-]
+const LEVEL_LABELS = ["至少 12 個字元。", "弱，至少要 12 個字元。", "可 — 建議混入更多種字元。", "強", "很強"]
 
 /** Length thresholds (8 / 12 / 20) × character classes. 12 matches storage's MIN_LENGTH. */
 export function defaultScorer(value: string): number {
@@ -163,7 +157,7 @@ export function PasswordInput({
 	capsLockWarning = true,
 	capsLockLabel = "Caps Lock 開著。",
 	confirmOf,
-	mismatchLabel = "兩次輸入的 passphrase 不一樣。",
+	mismatchLabel = "再輸入一次同樣的 passphrase。",
 	showLabel = "顯示 passphrase",
 	hideLabel = "隱藏 passphrase",
 	shownStatus = "passphrase 已顯示",

@@ -144,13 +144,8 @@ export function StorageDemos() {
 	return (
 		<>
 			<Demo id="password-input" title="password-input">
-				<Field label="Vault passphrase" help="passphrase 無法找回,忘了就只能靠復原金鑰。">
-					<PasswordInput
-						meter
-						value={passphrase}
-						onValueChange={setPassphrase}
-						placeholder="至少 12 個字元"
-					/>
+				<Field label="Vault passphrase" help="至少 12 個字元。passphrase 無法找回,忘了就只能靠復原金鑰。">
+					<PasswordInput meter value={passphrase} onValueChange={setPassphrase} />
 				</Field>
 				<Field label="再輸入一次 passphrase">
 					<PasswordInput confirmOf={passphrase} />

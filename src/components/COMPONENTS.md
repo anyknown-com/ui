@@ -538,6 +538,10 @@ chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `Ic
 密碼與 vault passphrase 欄:顯示 / 隱藏切換、四段強度計(長度 + 字元類別評分)、
 Caps Lock 警告、confirm 欄不一致錯誤。
 
+- 要求寫在看得到、唸得到的地方,不放 placeholder(一打字就不見,讀屏也不一定唸)。強度計
+  空的時候說「至少 12 個字元。」、弱的時候說「弱，至少要 12 個字元。」—— 說目標,不只說不夠;
+  confirm 欄不一致說「再輸入一次同樣的 passphrase。」。表單裡把要求放在 Field 的 `help`
+
 ### recovery-key
 復原金鑰展示卡,建立 vault 或重發金鑰時**顯示一次**。
 
