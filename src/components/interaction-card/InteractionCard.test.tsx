@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { type DecisionBlock, DecisionCard, PermissionCard } from "./InteractionCard"
 
 const BLOCKS: DecisionBlock[] = [
@@ -127,6 +128,44 @@ describe("DecisionCard", () => {
 	})
 })
 
+describe("InteractionCard axe", () => {
+	test("PermissionCard has no axe violations pending, allowed or rejected", async () => {
+		const { container, rerender } = render(
+			<PermissionCard verb="執行指令" subject="pnpm publish" policyHint="依專案政策詢問" />,
+		)
+		await expectNoAxeViolations(container)
+		rerender(<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已允許一次" }} />)
+		await expectNoAxeViolations(container)
+		rerender(
+			<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已拒絕", rejected: true }} />,
+		)
+		await expectNoAxeViolations(container)
+	})
+
+	test("DecisionCard has no axe violations blocking, waiting, multi-select and resolved", async () => {
+		const multi: DecisionBlock[] = [
+			{ kind: "markdown", id: "why", text: "先選一個方向。" },
+			{
+				kind: "options",
+				id: "memories",
+				label: "帶哪些記憶?",
+				multiple: true,
+				required: true,
+				options: [
+					{ value: "pnpm", label: "偏好 pnpm", recommended: true },
+					{ value: "cf", label: "部署走 Cloudflare" },
+				],
+			},
+		]
+		const { container, rerender } = render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} blocking />)
+		await expectNoAxeViolations(container)
+		rerender(<DecisionCard title="先出哪一版?" blocks={multi} deadlineLabel="等你 · 2h 後照建議" />)
+		await expectNoAxeViolations(container)
+		rerender(<DecisionCard title="先出哪一版?" blocks={BLOCKS} resolved={{ text: "已決定 · 三檔方案" }} />)
+		await expectNoAxeViolations(container)
+	})
+})
+
 describe("InteractionCard locale", () => {
 	test("PermissionCard words follow the locale; labels and single-word props win", async () => {
 		const onReply = vi.fn()
@@ -197,7 +236,7 @@ describe("PermissionCard regressions", () => {
 describe("DecisionCard regressions", () => {
 	test("an unlabelled options block still names its group", () => {
 		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
-		expect(screen.getByRole("group", { name: "先出哪一版?" })).toHaveAttribute("aria-required", "true")
+		expect(screen.getByRole("radiogroup", { name: "先出哪一版?" })).toHaveAttribute("aria-required", "true")
 	})
 })
 

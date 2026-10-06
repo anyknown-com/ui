@@ -510,12 +510,8 @@ export function DecisionCard({
 						if (block.multiple) {
 							const picks = Array.isArray(selected) ? selected : []
 							return (
-								<fieldset
-									key={block.id}
-									aria-label={groupLabel}
-									aria-required={block.required || undefined}
-									{...stylex.props(styles.options)}
-								>
+								// role=group 不支援 aria-required,必填只靠送出鈕停用來表達
+								<fieldset key={block.id} aria-label={groupLabel} {...stylex.props(styles.options)}>
 									{block.label != null && <legend {...stylex.props(styles.question)}>{block.label}</legend>}
 									{block.options.map((option) => (
 										<Checkbox
@@ -538,6 +534,8 @@ export function DecisionCard({
 								key={block.id}
 								name={`${base}${block.id}`}
 								legend={block.label}
+								// radiogroup 才能帶 aria-required;fieldset 預設的 group 不行
+								role="radiogroup"
 								aria-label={groupLabel}
 								aria-required={block.required || undefined}
 								variant="card"
