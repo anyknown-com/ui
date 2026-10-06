@@ -29,7 +29,7 @@ const styles = stylex.create({
 	mono: { fontFamily: font.mono, fontSize: type.t2 },
 })
 
-type TextProps = ComponentProps<"p"> & {
+export type TextProps = ComponentProps<"p"> & {
 	as?: ElementType
 	variant?: "display" | "title" | "body" | "caption" | "mono"
 	sx?: StyleArg

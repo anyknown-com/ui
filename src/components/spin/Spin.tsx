@@ -23,6 +23,8 @@ const styles = stylex.create({
 	small: { borderWidth: 1.5, height: 9, width: 9 },
 })
 
-export function Spin({ small = false, sx }: { small?: boolean; sx?: stylex.StyleXStyles }) {
+export type SpinProps = { small?: boolean; sx?: stylex.StyleXStyles }
+
+export function Spin({ small = false, sx }: SpinProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.root, small && styles.small, sx)} />
 }

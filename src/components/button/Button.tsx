@@ -88,7 +88,7 @@ const styles = stylex.create({
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
 
-type ButtonProps = ComponentProps<"button"> & {
+export type ButtonProps = ComponentProps<"button"> & {
 	variant?: Variant
 	size?: "xs" | "sm" | "md" | "lg"
 	/** Square, no side padding — for a button whose whole label is one icon. */

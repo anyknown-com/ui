@@ -161,7 +161,9 @@ export function Group({ header, footer, children, sx }: GroupProps) {
 	)
 }
 
-export function Item({ children, go = false, sx }: { children: ReactNode; go?: boolean } & Sx) {
+export type ItemProps = { children: ReactNode; go?: boolean } & Sx
+
+export function Item({ children, go = false, sx }: ItemProps) {
 	return <div {...stylex.props(styles.item, go && styles.go, sx)}>{children}</div>
 }
 
@@ -315,15 +317,21 @@ export function Note({ children, faint = false, err = false, sx }: NoteProps) {
 	)
 }
 
-export function Acts({ children, sx }: { children: ReactNode } & Sx) {
+export type ActsProps = { children: ReactNode } & Sx
+
+export function Acts({ children, sx }: ActsProps) {
 	return <div {...stylex.props(styles.acts, sx)}>{children}</div>
 }
 
+export type EmptyProps = { children: ReactNode } & Sx
+
 /** `.empty`: nothing here yet, said inside the group in one muted line. */
-export function Empty({ children, sx }: { children: ReactNode } & Sx) {
+export function Empty({ children, sx }: EmptyProps) {
 	return <p {...stylex.props(styles.empty, sx)}>{children}</p>
 }
 
-export function Tag({ children, sx }: { children: ReactNode } & Sx) {
+export type TagProps = { children: ReactNode } & Sx
+
+export function Tag({ children, sx }: TagProps) {
 	return <span {...stylex.props(styles.tag, sx)}>{children}</span>
 }

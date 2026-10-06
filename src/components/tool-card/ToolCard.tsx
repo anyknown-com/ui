@@ -449,7 +449,9 @@ export function ToolCard({
 	)
 }
 
-export function ToolInput({ json, label = "輸入" }: { json: unknown; label?: string }) {
+export type ToolInputProps = { json: unknown; label?: string }
+
+export function ToolInput({ json, label = "輸入" }: ToolInputProps) {
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
@@ -460,7 +462,9 @@ export function ToolInput({ json, label = "輸入" }: { json: unknown; label?: s
 	)
 }
 
-export function ToolOutput({ text: value, label = "輸出" }: { text: string; label?: string }) {
+export type ToolOutputProps = { text: string; label?: string }
+
+export function ToolOutput({ text: value, label = "輸出" }: ToolOutputProps) {
 	return (
 		<>
 			<span {...stylex.props(styles.ioLabel)}>{label}</span>
@@ -517,11 +521,15 @@ export function SubagentLine({ model, now, toolCount }: SubagentLineProps) {
 	)
 }
 
-export function SubagentSummary({ children }: { children: ReactNode }) {
+export type SubagentSummaryProps = { children: ReactNode }
+
+export function SubagentSummary({ children }: SubagentSummaryProps) {
 	return <div {...stylex.props(styles.summary)}>{children}</div>
 }
 
-export function SubagentThread({ task, children }: { task?: ReactNode; children?: ReactNode }) {
+export type SubagentThreadProps = { task?: ReactNode; children?: ReactNode }
+
+export function SubagentThread({ task, children }: SubagentThreadProps) {
 	return (
 		<div {...stylex.props(styles.nested)}>
 			{task != null && <p {...stylex.props(styles.quote)}>{task}</p>}
@@ -530,6 +538,8 @@ export function SubagentThread({ task, children }: { task?: ReactNode; children?
 	)
 }
 
-export function SubagentText({ children }: { children: ReactNode }) {
+export type SubagentTextProps = { children: ReactNode }
+
+export function SubagentText({ children }: SubagentTextProps) {
 	return <p {...stylex.props(styles.nestedText)}>{children}</p>
 }

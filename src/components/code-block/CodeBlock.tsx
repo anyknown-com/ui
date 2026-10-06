@@ -138,6 +138,8 @@ export function CodeBlock({
 	)
 }
 
-export function InlineCode(props: ComponentProps<"code">) {
+export type InlineCodeProps = ComponentProps<"code">
+
+export function InlineCode(props: InlineCodeProps) {
 	return <code {...props} {...styled(props, styles.inline)} />
 }

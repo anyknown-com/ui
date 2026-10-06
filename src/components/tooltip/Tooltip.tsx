@@ -1,6 +1,6 @@
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip"
 import * as stylex from "@stylexjs/stylex"
-import { type ReactElement, type ReactNode, useId, useState } from "react"
+import { type ComponentProps, type ReactElement, type ReactNode, useId, useState } from "react"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
@@ -33,6 +33,8 @@ const styles = stylex.create({
 		animationTimingFunction: motion.ease,
 	},
 })
+
+export type TooltipProviderProps = ComponentProps<typeof BaseTooltip.Provider>
 
 export const TooltipProvider = BaseTooltip.Provider
 

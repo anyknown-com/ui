@@ -109,7 +109,9 @@ export function Tr({ columns, children, hover = false, sx }: TrProps) {
 	return <div {...stylex.props(styles.row, styles.cols(columns), hover && styles.hover, sx)}>{children}</div>
 }
 
-export function Detail({ id, children, sx }: { id?: string; children: ReactNode } & Sx) {
+export type DetailProps = { id?: string; children: ReactNode } & Sx
+
+export function Detail({ id, children, sx }: DetailProps) {
 	return (
 		<div {...(id ? { id } : {})} {...stylex.props(styles.detail, sx)}>
 			{children}
@@ -117,8 +119,10 @@ export function Detail({ id, children, sx }: { id?: string; children: ReactNode 
 	)
 }
 
+export type MoreRowProps = { children: ReactNode; onPress: () => void } & Sx
+
 /** `.moreRow`: the last line of a ledger that has more, 40px, centred. */
-export function MoreRow({ children, onPress, sx }: { children: ReactNode; onPress: () => void } & Sx) {
+export function MoreRow({ children, onPress, sx }: MoreRowProps) {
 	return (
 		<button type="button" onClick={onPress} {...stylex.props(styles.more, sx)}>
 			{children}
@@ -140,11 +144,13 @@ function fit(node: HTMLDivElement | null) {
 	return () => window.removeEventListener("resize", measure)
 }
 
+export type ListScrollProps = { children: ReactNode } & Sx
+
 /**
  * `.listscroll`: a ledger that scrolls on its own to the bottom of the window, the head stuck to
  * its top.
  */
-export function ListScroll({ children, sx }: { children: ReactNode } & Sx) {
+export function ListScroll({ children, sx }: ListScrollProps) {
 	return (
 		<div ref={fit} {...stylex.props(styles.scroll, sx)}>
 			{children}

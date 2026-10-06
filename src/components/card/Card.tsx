@@ -15,7 +15,7 @@ const styles = stylex.create({
 	},
 })
 
-type CardProps = ComponentProps<"div"> & { sx?: StyleArg }
+export type CardProps = ComponentProps<"div"> & { sx?: StyleArg }
 
 export function Card({ sx, ...props }: CardProps) {
 	return <div {...props} {...styled(props, styles.base, sx)} />

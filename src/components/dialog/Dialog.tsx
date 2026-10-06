@@ -100,15 +100,21 @@ export function Dialog({ children, ...props }: DialogProps) {
 	return <BaseDialog.Root {...props}>{children}</BaseDialog.Root>
 }
 
-export function DialogTrigger({ children }: { children: ReactElement }) {
+export type DialogTriggerProps = { children: ReactElement }
+
+export function DialogTrigger({ children }: DialogTriggerProps) {
 	return <BaseDialog.Trigger render={children} />
 }
 
-export function DialogClose({ children }: { children: ReactElement }) {
+export type DialogCloseProps = { children: ReactElement }
+
+export function DialogClose({ children }: DialogCloseProps) {
 	return <BaseDialog.Close render={children} />
 }
 
-export function DialogActions({ children }: { children: ReactNode }) {
+export type DialogActionsProps = { children: ReactNode }
+
+export function DialogActions({ children }: DialogActionsProps) {
 	return <div {...stylex.props(styles.actions)}>{children}</div>
 }
 

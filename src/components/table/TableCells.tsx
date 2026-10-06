@@ -150,8 +150,10 @@ export function StatusCell({ children, warn = false, order, pushed, sx }: Status
 	)
 }
 
+export type BreakProps = { order?: number }
+
 /** The line break a phone row wraps at; nothing on a desk. */
-export function Break({ order }: { order?: number }) {
+export function Break({ order }: BreakProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.brk, order !== undefined && styles.order(order))} />
 }
 

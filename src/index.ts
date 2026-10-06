@@ -1,6 +1,6 @@
-export { Button } from "./components/button/Button"
-export { Card } from "./components/card/Card"
-export { Text } from "./components/text/Text"
+export { Button, type ButtonProps } from "./components/button/Button"
+export { Card, type CardProps } from "./components/card/Card"
+export { Text, type TextProps } from "./components/text/Text"
 
 export { Input, type InputProps } from "./components/input/Input"
 export { Textarea, type TextareaProps } from "./components/textarea/Textarea"
@@ -48,7 +48,10 @@ export {
 } from "./components/dialog/Dialog"
 export type {
 	DialogProps,
+	DialogTriggerProps,
 	DialogContentProps,
+	DialogActionsProps,
+	DialogCloseProps,
 	ConfirmDialogProps,
 	DialogsProps,
 	DialogManager,
@@ -74,7 +77,12 @@ export type {
 	ToastState,
 	ToastManager,
 } from "./components/toast/Toast"
-export { Tooltip, TooltipProvider, type TooltipProps } from "./components/tooltip/Tooltip"
+export {
+	Tooltip,
+	TooltipProvider,
+	type TooltipProps,
+	type TooltipProviderProps,
+} from "./components/tooltip/Tooltip"
 export {
 	Popover,
 	PopoverTrigger,
@@ -83,7 +91,14 @@ export {
 	PopoverDescription,
 	PopoverClose,
 } from "./components/popover/Popover"
-export type { PopoverProps, PopoverContentProps } from "./components/popover/Popover"
+export type {
+	PopoverProps,
+	PopoverTriggerProps,
+	PopoverContentProps,
+	PopoverTitleProps,
+	PopoverDescriptionProps,
+	PopoverCloseProps,
+} from "./components/popover/Popover"
 export { Tabs, TabsList, TabsTab, TabsPanel } from "./components/tabs/Tabs"
 export type { TabsProps, TabsListProps, TabsTabProps, TabsPanelProps } from "./components/tabs/Tabs"
 export { Badge, Chip, type BadgeProps, type ChipProps } from "./components/badge/Badge"
@@ -127,8 +142,13 @@ export type {
 	ToolCardProps,
 	ToolState,
 	ToolRetry,
+	ToolInputProps,
+	ToolOutputProps,
 	ToolErrorProps,
 	SubagentLineProps,
+	SubagentSummaryProps,
+	SubagentThreadProps,
+	SubagentTextProps,
 } from "./components/tool-card/ToolCard"
 export { ReasoningFold, type ReasoningFoldProps } from "./components/reasoning-fold/ReasoningFold"
 export { ActionBar } from "./components/action-bar/ActionBar"
@@ -138,7 +158,12 @@ export type {
 	CopyActionProps,
 	RegenerateActionProps,
 } from "./components/action-bar/ActionBar"
-export { CodeBlock, InlineCode, type CodeBlockProps } from "./components/code-block/CodeBlock"
+export {
+	CodeBlock,
+	InlineCode,
+	type CodeBlockProps,
+	type InlineCodeProps,
+} from "./components/code-block/CodeBlock"
 export { PayloadBlock, type PayloadBlockProps } from "./components/payload-block/PayloadBlock"
 export { PermissionCard, DecisionCard } from "./components/interaction-card/InteractionCard"
 export type {
@@ -210,7 +235,7 @@ export { Ghost, GhostLink, type GhostProps, type GhostLinkProps } from "./compon
 export { IconButton, type IconButtonProps } from "./components/icon-button/IconButton"
 export { ICON_STROKE, icon } from "./components/icon/icon"
 export { Segmented, type SegmentedProps } from "./components/segmented/Segmented"
-export { Spin } from "./components/spin/Spin"
+export { Spin, type SpinProps } from "./components/spin/Spin"
 export { Pill, StatusChip, type PillProps, type StatusChipProps } from "./components/status-chip/StatusChip"
 export { StatusBadge, type StatusBadgeProps } from "./components/status-badge/StatusBadge"
 export {
@@ -225,12 +250,17 @@ export {
 	Sep,
 	Status,
 	Tag,
+	type ActsProps,
+	type EmptyProps,
 	type ExpandProps,
 	type GroupProps,
+	type ItemProps,
 	type MarkProps,
+	type NoteProps,
 	type RowProps,
 	type StatusProps,
 	type StatusTone,
+	type TagProps,
 } from "./components/group/Group"
 export {
 	GroupCell,
@@ -264,9 +294,18 @@ export {
 	StatBar,
 	StatLine,
 	Sub,
+	type BProps,
 	type BarsProps,
+	type FaintProps,
+	type FootNoteProps,
+	type HintProps,
 	type PageHeadProps,
+	type PanelProps,
 	type SectionLabelProps,
+	type SnippetProps,
+	type StatBarProps,
+	type StatLineProps,
+	type SubProps,
 } from "./components/page/Page"
 export {
 	Dot,
@@ -274,7 +313,11 @@ export {
 	SettingsRow,
 	SettingsRows,
 	Value,
+	type DotProps,
+	type HelpProps,
 	type SettingsRowProps,
+	type SettingsRowsProps,
+	type ValueProps,
 } from "./components/settings-rows/SettingsRows"
 export {
 	ListHead,
@@ -286,5 +329,29 @@ export {
 	type ListSortProps,
 	type WeightDotProps,
 } from "./components/list/List"
-export { Detail, Head, ListScroll, MoreRow, Table, Tr, type TableProps } from "./components/table/Table"
-export { Break, Cell, StatusCell, Subject, Toggle, type CellProps } from "./components/table/TableCells"
+export {
+	Detail,
+	Head,
+	ListScroll,
+	MoreRow,
+	Table,
+	Tr,
+	type DetailProps,
+	type HeadProps,
+	type ListScrollProps,
+	type MoreRowProps,
+	type TableProps,
+	type TrProps,
+} from "./components/table/Table"
+export {
+	Break,
+	Cell,
+	StatusCell,
+	Subject,
+	Toggle,
+	type BreakProps,
+	type CellProps,
+	type StatusCellProps,
+	type SubjectProps,
+	type ToggleProps,
+} from "./components/table/TableCells"

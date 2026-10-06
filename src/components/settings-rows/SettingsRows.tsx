@@ -49,7 +49,9 @@ const styles = stylex.create({
 
 type Sx = { sx?: stylex.StyleXStyles }
 
-export function SettingsRows({ children, sx }: { children: ReactNode } & Sx) {
+export type SettingsRowsProps = { children: ReactNode } & Sx
+
+export function SettingsRows({ children, sx }: SettingsRowsProps) {
 	return <div {...stylex.props(styles.rows, sx)}>{children}</div>
 }
 
@@ -72,16 +74,22 @@ export function SettingsRow({ label, help, children, sx }: SettingsRowProps) {
 	)
 }
 
+export type HelpProps = { children: ReactNode } & Sx
+
 /** `.help` inline: a muted reading on a row's label line. */
-export function Help({ children, sx }: { children: ReactNode } & Sx) {
+export function Help({ children, sx }: HelpProps) {
 	return <span {...stylex.props(styles.help, sx)}>{children}</span>
 }
 
+export type ValueProps = { children: ReactNode } & Sx
+
 /** `.val`: a mono reading, like `•••• 9b7c`. */
-export function Value({ children, sx }: { children: ReactNode } & Sx) {
+export function Value({ children, sx }: ValueProps) {
 	return <span {...stylex.props(styles.value, sx)}>{children}</span>
 }
 
-export function Dot({ sx }: Sx) {
+export type DotProps = Sx
+
+export function Dot({ sx }: DotProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.dot, sx)} />
 }

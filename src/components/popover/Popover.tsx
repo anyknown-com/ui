@@ -39,21 +39,27 @@ export function Popover({ children, ...props }: PopoverProps) {
 	return <BasePopover.Root {...props}>{children}</BasePopover.Root>
 }
 
-export function PopoverTrigger({ children }: { children: ReactElement }) {
+export type PopoverTriggerProps = { children: ReactElement }
+
+export function PopoverTrigger({ children }: PopoverTriggerProps) {
 	return <BasePopover.Trigger render={children} />
 }
 
-export const PopoverTitle = ({ children }: { children: ReactNode }) => (
+export type PopoverTitleProps = { children: ReactNode }
+
+export const PopoverTitle = ({ children }: PopoverTitleProps) => (
 	<BasePopover.Title {...stylex.props(styles.title)}>{children}</BasePopover.Title>
 )
 
-export const PopoverDescription = ({ children }: { children: ReactNode }) => (
+export type PopoverDescriptionProps = { children: ReactNode }
+
+export const PopoverDescription = ({ children }: PopoverDescriptionProps) => (
 	<BasePopover.Description {...stylex.props(styles.description)}>{children}</BasePopover.Description>
 )
 
-export const PopoverClose = ({ children }: { children: ReactElement }) => (
-	<BasePopover.Close render={children} />
-)
+export type PopoverCloseProps = { children: ReactElement }
+
+export const PopoverClose = ({ children }: PopoverCloseProps) => <BasePopover.Close render={children} />
 
 type PopoverContentBase = {
 	side?: "top" | "bottom" | "left" | "right"

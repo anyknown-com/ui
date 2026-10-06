@@ -143,8 +143,10 @@ export function PageHead({ title, lead, summary, actions, sx }: PageHeadProps) {
 	)
 }
 
+export type BProps = { children: ReactNode }
+
 /** A number inside a summary or a stat line: mono, in the text colour. */
-export function B({ children }: { children: ReactNode }) {
+export function B({ children }: BProps) {
 	return <b {...stylex.props(styles.b)}>{children}</b>
 }
 
@@ -159,24 +161,34 @@ export function SectionLabel({ children, end, first = false, sx }: SectionLabelP
 	)
 }
 
-export function Sub({ children, sx }: { children: ReactNode } & Sx) {
+export type SubProps = { children: ReactNode } & Sx
+
+export function Sub({ children, sx }: SubProps) {
 	return <p {...stylex.props(styles.sub, sx)}>{children}</p>
 }
 
-export function FootNote({ children, sx }: { children: ReactNode } & Sx) {
+export type FootNoteProps = { children: ReactNode } & Sx
+
+export function FootNote({ children, sx }: FootNoteProps) {
 	return <p {...stylex.props(styles.foot, sx)}>{children}</p>
 }
 
-export function Hint({ children, sx }: { children: ReactNode } & Sx) {
+export type HintProps = { children: ReactNode } & Sx
+
+export function Hint({ children, sx }: HintProps) {
 	return <p {...stylex.props(styles.hint, sx)}>{children}</p>
 }
 
-export function Snippet({ children, sx }: { children: ReactNode } & Sx) {
+export type SnippetProps = { children: ReactNode } & Sx
+
+export function Snippet({ children, sx }: SnippetProps) {
 	return <pre {...stylex.props(styles.code, sx)}>{children}</pre>
 }
 
+export type PanelProps = { children: ReactNode; padded?: boolean } & Sx
+
 /** `.dpanel`: the sunken surface a section's rows sit on, no ring; `padded` when it holds prose. */
-export function Panel({ children, padded = false, sx }: { children: ReactNode; padded?: boolean } & Sx) {
+export function Panel({ children, padded = false, sx }: PanelProps) {
 	return <div {...stylex.props(styles.panel, padded && styles.padded, sx)}>{children}</div>
 }
 
@@ -186,7 +198,9 @@ export function StatLine({ children, sx }: StatLineProps) {
 	return <span {...stylex.props(styles.stat, sx)}>{children}</span>
 }
 
-export function StatBar({ percent, label, text }: { percent: number; label?: string; text?: string }) {
+export type StatBarProps = { percent: number; label?: string; text?: string }
+
+export function StatBar({ percent, label, text }: StatBarProps) {
 	const value = Math.max(0, Math.min(100, percent))
 
 	return (
@@ -238,6 +252,8 @@ export function Bars({ values, tip, from, to, sx }: BarsProps) {
 	)
 }
 
-export function Faint({ children, sx }: { children: ReactNode } & Sx) {
+export type FaintProps = { children: ReactNode } & Sx
+
+export function Faint({ children, sx }: FaintProps) {
 	return <span {...stylex.props(styles.faint, sx)}>{children}</span>
 }
