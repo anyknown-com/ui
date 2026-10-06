@@ -39,7 +39,7 @@ const styles = stylex.create({
 	motionLabel: {
 		display: { default: "none", [REDUCED]: "inline" },
 		fontFamily: font.mono,
-		fontSize: "0.62rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		letterSpacing: "0.06em",
