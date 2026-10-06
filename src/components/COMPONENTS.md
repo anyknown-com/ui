@@ -97,13 +97,15 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
   每動一次給一次;值沒變就不給。拖一下 PATCH 一次就是接錯了事件
 
 ### select
-觸發鈕 + popover(頂部搜尋框 + 分組列表)。
+觸發鈕 + popover(頂部搜尋框 + 分組列表)。觸發鈕直接套 input 的 `controlStyles`(底色、框、
+focus 跟輸入框是同一個),浮層是 float 階(見 popover);選項內角 12 = 浮層 16 − 4 padding。
+群組標題是句首大寫的小字,不是全大寫 mono。
 
 - 定案要有:text search filter(空結果顯示帶查詢字的 empty state)、multiple
   (trigger 內顯示可個別移除的 chips)、options grouping(過濾後空群組自動隱藏)
 
 ### dropdown
-動作選單(相對於 Select 的「選值」)。
+動作選單(相對於 Select 的「選值」)。浮層是 float 階(見 popover),項目內角 12。
 
 - 定案要有:多層 submenu(不限一層)、group label、separator、checkbox item、
   快捷鍵提示、danger item
@@ -129,8 +131,13 @@ secondary 深一階(`layer5`),ghost 類是透明 → `accentSubtle` / `dangerSub
 - children 包在 `position: relative` 的 span 裡
 
 ### dialog
-模態對話框:半透明 blur backdrop、scale+fade 進場、Esc / backdrop 關閉。
+模態對話框:scale+fade 進場、Esc / backdrop 關閉。
 danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
+
+- 長相是 modal 階:`surfaceRaised` 底、`shadow.modal`、`corner.modal`(24)、28px padding,
+  不畫框。backdrop 是 `color.scrim`(中性墨 32%,暗色是黑 32%),**不加 blur** ——
+  `backdrop-filter` 是 DESIGN.md 的反模式。ConfirmContent 的取消鈕是 secondary
+- popup 是 `border-box`:`size` 的寬度含 padding,375 寬時不會比視窗寬
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
 - 寬度三階 `size`:`sm`(預設 24rem)/ `md`(40rem)/ `full`(64rem 寬、46rem 高的沉浸式)。
@@ -157,6 +164,12 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 非阻斷通知:右下角疊放、slide+fade 進場、5 秒自動消失(hover 暫停),可帶一個動作
 按鈕(「已刪除 · 復原」)。danger / success 用色點區分。
 
+- 長相是 float 階的白紙:`surfaceRaised` 底、`shadow.float`、`corner.float`(16)、不畫框。
+  左邊一個 20px 的槽放色點(default 墨色、success 綠、danger 紅)或 loading 的轉圈
+  (`signal` 色,`toast.promise` 等待中),換狀態時標題不跳。有說明的那則標題 500 字重、
+  點與按鈕對齊第一行。去重計數是標題右邊的膠囊,只顯示數字(讀屏仍念「×N」)。
+  動作鈕與關閉鈕都是膠囊;倒數線退到圓角內側
+
 - **狀態自己養,不靠 Base UI toast**。`createToastManager()` 跑在 `lib/store.ts`
   (`subscribe` / `getSnapshot` / `set`,React 端走 `useSyncExternalStore`),計時器也在
   manager 裡。改這裡之前要知道:live region、暫停、limit 現在都是我們的責任,沒有人替我們兜
@@ -180,12 +193,18 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
 - viewport 的 hover / focus / visibility 監聽掛在 ref callback 裡(含 cleanup),不用 `useEffect`
 
 ### tooltip
-純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,反色小氣泡,只放一行文字(可附 Kbd)。
-**絕不放互動內容**。
+純提示浮層:hover 與鍵盤 focus 延遲 400ms 顯示,只放一行文字(可附 Kbd)。
+**絕不放互動內容**。長相跟 popover 同一階(float:`surfaceRaised` 底、`shadow.float`),
+不再是反色氣泡;尺寸小,圓角用 `corner.control`(12)而不是 16。
 
 ### popover
 定位浮層基礎件:trigger 錨定的 surface 卡片。select / dropdown / combobox 都疊在它上面,
 也直接承載富內容(記憶詳情、成員卡片)。
+
+- 長相是 float 階,集中在 `lib/popup.ts` 的 `popupStyles.surface`:`surfaceRaised` 底
+  (暗色因此升一階)、`shadow.float`、`corner.float`(16),不畫框。框是 1px 透明的 ——
+  forced-colors 下陰影會消失,透明框會被換成系統色,浮層才有邊。Composer 的浮層也吃這一份
+- popover 面板 16px padding,寬度上限 `min(22rem, 100vw − 2rem)`,窄螢幕上長說明會折行
 
 疊層值集中在 `lib/popup.ts` 的 `layer`,元件不自己寫 magic number —— Base UI 的浮層一律
 portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會出洞:
@@ -261,7 +280,8 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 
 ### empty-state
 空狀態 = 行動邀請:icon + 一句說明 + 主要動作。文案永遠說「下一步做什麼」,
-不只陳述「沒有東西」。
+不只陳述「沒有東西」。長相是紙裡凹下去的一塊(`surface` 底、`corner.card`),不框虛線;
+icon 是跟文字同色的線條,不墊圓底。
 
 ### scrollbar
 不是元件,是一份全域 CSS(`@anyknown/ui/scrollbar.css`)。StyleX 做不了
@@ -306,7 +326,7 @@ product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3
 
 ### action-bar
 assistant 訊息底部的 hover 動作列。**高度永遠保留**(pb + 負 mb 技法),hover 只切
-opacity —— turn 節奏零跳動。
+opacity —— turn 節奏零跳動。每顆是 ghost 膠囊,hover 才有 `accentSubtle` 底。
 
 ### code-block
 header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
@@ -454,6 +474,8 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 
 - 分段 mono(4 字一組)、預設模糊遮罩(hover / focus / 點擊才顯示)、一鍵複製(變 ✓)、
   下載 .txt、警告卡、「我已抄下」checkbox **gate 住主要按鈕**
+- 長相是 rest 卡片(`shadow.rest`、`corner.card`;暗色底升一階);金鑰區與警告是卡片裡凹下去
+  的塊,不畫框;動作鈕是 secondary 膠囊
 
 ### dropzone
 拖放上傳區:虛線框 idle、dragover 高亮(accent 邊框 + accentSubtle 底)、
@@ -489,7 +511,7 @@ Caps Lock 警告、confirm 欄不一致錯誤。
   「載入更多」待在清單裡才跟得上捲動
 
 ### ghost / icon-button / segmented / spin / status-chip
-小控件,從 product 的 ui-next 搬來:`Ghost` / `GhostLink` 是沒有底的文字鈕,
+小控件,從 product 的 ui-next 搬來:`Ghost` / `GhostLink` 是沒有底的文字膠囊(hover 才有底),
 `IconButton` 一定帶 Tooltip(名字就是 tooltip),`Segmented` 是 `aria-pressed` 的按鈕組不是
 tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字母的狀態碼
 (`r` `w` `d` `n` `a` `f` `plain`),`Pill` 是 fold 第一行的 22px mono 藥丸。
