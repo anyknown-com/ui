@@ -70,6 +70,20 @@ describe("PasswordInput", () => {
 		expect(label).toHaveAttribute("aria-live", "polite")
 	})
 
+	test("the strength word is only rewritten when the level changes", async () => {
+		render(<PasswordInput aria-label="Vault passphrase" meter />)
+		const input = screen.getByLabelText("Vault passphrase")
+		await userEvent.type(input, "a")
+		const label = screen.getByText("弱，至少要 12 個字元。")
+		const changes: MutationRecord[] = []
+		const observer = new MutationObserver((records) => changes.push(...records))
+		observer.observe(label, { childList: true, characterData: true, subtree: true })
+		await userEvent.type(input, "bcd")
+		observer.disconnect()
+		expect(changes).toHaveLength(0)
+		expect(label).toHaveAttribute("aria-live", "polite")
+	})
+
 	test("the bars are decorative", () => {
 		const { container } = render(<PasswordInput aria-label="Vault passphrase" meter />)
 		expect(container.querySelectorAll("[aria-hidden='true']").length).toBeGreaterThan(0)

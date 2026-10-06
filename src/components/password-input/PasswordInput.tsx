@@ -8,6 +8,7 @@ import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
 	field: { position: "relative" },
@@ -29,17 +30,21 @@ const styles = stylex.create({
 	},
 	meter: { display: "grid", gap: space.xxs, marginTop: space.xxs },
 	bars: { display: "flex", gap: space.xxs },
+	// forced colors 會把底色換掉:空格只剩框,填滿的塗成 CanvasText,格數仍看得出來
 	bar: {
 		height: "0.25rem",
 		flex: 1,
 		borderRadius: corner.pill,
-		backgroundColor: color.border,
+		backgroundColor: { default: color.border, [FORCED]: "Canvas" },
+		forcedColorAdjust: "none",
+		outline: { default: null, [FORCED]: "1px solid GrayText" },
+		outlineOffset: -1,
 		transitionProperty: "background-color",
 		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
 	},
-	barWeak: { backgroundColor: color.danger },
-	barFair: { backgroundColor: color.warning },
-	barStrong: { backgroundColor: color.accent },
+	barWeak: { backgroundColor: { default: color.danger, [FORCED]: "CanvasText" } },
+	barFair: { backgroundColor: { default: color.warning, [FORCED]: "CanvasText" } },
+	barStrong: { backgroundColor: { default: color.accent, [FORCED]: "CanvasText" } },
 	label: { fontFamily: font.body, fontSize: type.t1, color: color.textMuted, minHeight: "1.2em", margin: 0 },
 	labelWeak: { color: color.danger },
 	warningIcon: { color: color.warning, flex: "none" },
