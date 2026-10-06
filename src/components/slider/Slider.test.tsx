@@ -18,6 +18,20 @@ function Effort({ start = 0, onCommit }: { start?: number; onCommit?: (value: nu
 	)
 }
 
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
 /** jsdom lays nothing out: give the track a 100px width and let it take pointer capture. */
 function track(slider: HTMLElement) {
 	slider.setPointerCapture = vi.fn()
@@ -189,6 +203,23 @@ describe("Slider", () => {
 		await user.keyboard("{ArrowRight}")
 		expect(onChange).toHaveBeenCalledWith(0.05)
 		expect(onValueChange).toHaveBeenCalledWith(0.05)
+	})
+
+	test("forced-colors: track border, Highlight fill and thumb, Highlight focus ring", () => {
+		const { container } = render(<Slider defaultValue={0.5} aria-label="音量" />)
+		const slider = screen.getByRole("slider")
+		const [fill, thumb] = container.querySelectorAll("[role='slider'] > span")
+		expect(forcedCss(slider)).toMatch(/border-width: 1px/)
+		expect(forcedCss(slider)).toMatch(/focus-visible.*solid highlight/i)
+		expect(forcedCss(fill)).toMatch(/background-color: highlight/i)
+		expect(forcedCss(thumb)).toMatch(/border-color: highlight/i)
+	})
+
+	test("forced-colors: a disabled slider draws in GrayText", () => {
+		const { container } = render(<Slider defaultValue={0.5} aria-label="音量" disabled />)
+		const [fill, thumb] = container.querySelectorAll("[role='slider'] > span")
+		expect(forcedCss(fill)).toMatch(/graytext/i)
+		expect(forcedCss(thumb)).toMatch(/graytext/i)
 	})
 
 	test("axe: labelled, valued, and disabled", async () => {

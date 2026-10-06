@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "./Tabs"
 
 function ThreadTabs({ variant }: { variant?: "underline" | "pills" }) {
@@ -78,4 +79,81 @@ describe("Tabs regressions", () => {
 		expect(disabled).toHaveAttribute("aria-disabled", "true")
 		expect(disabled.className).not.toBe(enabled.className)
 	})
+})
+
+describe("Tabs state", () => {
+	test("uncontrolled: defaultValue picks the tab, onValueChange hears a switch", async () => {
+		const onValueChange = vi.fn()
+		render(
+			<Tabs defaultValue="memory" onValueChange={onValueChange}>
+				<TabsList aria-label="檢視">
+					<TabsTab value="chat">對話</TabsTab>
+					<TabsTab value="memory">記憶</TabsTab>
+				</TabsList>
+				<TabsPanel value="chat">a</TabsPanel>
+				<TabsPanel value="memory">b</TabsPanel>
+			</Tabs>,
+		)
+		expect(screen.getByRole("tab", { name: "記憶" })).toHaveAttribute("aria-selected", "true")
+		await userEvent.click(screen.getByRole("tab", { name: "對話" }))
+		expect(screen.getByRole("tab", { name: "對話" })).toHaveAttribute("aria-selected", "true")
+		expect(onValueChange.mock.calls[0][0]).toBe("chat")
+	})
+
+	test("controlled: the selected tab follows value only", async () => {
+		const onValueChange = vi.fn()
+		render(
+			<Tabs value="chat" onValueChange={onValueChange}>
+				<TabsList aria-label="檢視">
+					<TabsTab value="chat">對話</TabsTab>
+					<TabsTab value="memory">記憶</TabsTab>
+				</TabsList>
+				<TabsPanel value="chat">a</TabsPanel>
+				<TabsPanel value="memory">b</TabsPanel>
+			</Tabs>,
+		)
+		await userEvent.click(screen.getByRole("tab", { name: "記憶" }))
+		expect(onValueChange.mock.calls[0][0]).toBe("memory")
+		expect(screen.getByRole("tab", { name: "對話" })).toHaveAttribute("aria-selected", "true")
+	})
+})
+
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
+describe("Tabs in forced-colors", () => {
+	test("the underline indicator is Highlight; a disabled tab is GrayText", () => {
+		render(<ThreadTabs />)
+		const indicator = screen.getByRole("tablist").lastElementChild as HTMLElement
+		expect(forcedCss(indicator)).toMatch(/background-color: highlight/i)
+		expect(forcedCss(screen.getByRole("tab", { name: "換班紀錄" }))).toMatch(/color: graytext/i)
+	})
+
+	test("pills: a Highlight pill under HighlightText words", () => {
+		render(<ThreadTabs variant="pills" />)
+		const indicator = screen.getByRole("tablist").lastElementChild as HTMLElement
+		expect(forcedCss(indicator)).toMatch(/background-color: highlight/i)
+		expect(forcedCss(screen.getByRole("tab", { name: "對話" }))).toMatch(/color: highlighttext/i)
+	})
+})
+
+test("axe: underline and pills, with a disabled tab", async () => {
+	const { container } = render(
+		<>
+			<ThreadTabs />
+			<ThreadTabs variant="pills" />
+		</>,
+	)
+	await expectNoAxeViolations(container)
 })

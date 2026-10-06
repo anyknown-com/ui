@@ -123,6 +123,20 @@ describe("Button loading", () => {
 	})
 })
 
+test("forced-colors: a ButtonText frame, GrayText when disabled", () => {
+	render(<Button>儲存</Button>)
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules))
+			if (rule instanceof CSSMediaRule && rule.media.mediaText.includes("forced-colors")) css += rule.cssText
+	const button = screen.getByRole("button")
+	const owned = [...button.classList].filter((name) => css.includes(`.${name}`))
+	expect(owned.length).toBeGreaterThan(0)
+	expect(css).toMatch(/border-width: 1px/)
+	expect(css).toMatch(/border-color: buttontext/i)
+	expect(css).toMatch(/:disabled[^{]*\{ border-color: graytext/i)
+})
+
 test("axe: variants, icon, disabled and loading", async () => {
 	const { container } = render(
 		<>

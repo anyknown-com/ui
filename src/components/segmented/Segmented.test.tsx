@@ -12,6 +12,20 @@ const LANGUAGES: SegmentedOption<string>[] = [
 	{ value: "ja", label: "日本語" },
 ]
 
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
 function Controlled({ onValueChange }: { onValueChange?: (value: string) => void }) {
 	const [value, setValue] = useState("en")
 	return (
@@ -123,6 +137,14 @@ describe("Segmented", () => {
 		await user.tab()
 		expect(document.body).toHaveFocus()
 		for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled()
+	})
+
+	test("forced-colors: the checked segment is Highlight with HighlightText words", () => {
+		render(<Segmented options={LANGUAGES} defaultValue="zh" label="語言" />)
+		const css = forcedCss(screen.getByRole("radio", { name: "繁體中文" }))
+		expect(css).toMatch(/background-color: highlight/i)
+		expect(css).toMatch(/color: highlighttext/i)
+		expect(css).toMatch(/focus-visible.*solid highlighttext/i)
 	})
 
 	test("axe: checked, unchecked, disabled", async () => {

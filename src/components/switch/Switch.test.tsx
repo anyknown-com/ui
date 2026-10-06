@@ -54,6 +54,44 @@ describe("Switch in a Field", () => {
 	})
 })
 
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
+describe("Switch in forced-colors", () => {
+	test("the track gets a frame; on is a Highlight track with a HighlightText thumb", () => {
+		render(
+			<>
+				<Switch aria-label="off" />
+				<Switch aria-label="on" defaultChecked />
+			</>,
+		)
+		const track = (name: string) => screen.getByRole("switch", { name }).parentElement as HTMLElement
+		const thumb = (name: string) => track(name).lastElementChild as HTMLElement
+		expect(forcedCss(track("off"))).toMatch(/border-width: 1px/)
+		expect(forcedCss(track("off"))).toMatch(/background-color: canvas/i)
+		expect(forcedCss(thumb("off"))).toMatch(/background-color: buttontext/i)
+		expect(forcedCss(track("on"))).toMatch(/background-color: highlight/i)
+		expect(forcedCss(thumb("on"))).toMatch(/background-color: highlighttext/i)
+	})
+
+	test("disabled draws in GrayText", () => {
+		render(<Switch aria-label="on" disabled defaultChecked />)
+		const track = screen.getByRole("switch").parentElement as HTMLElement
+		expect(forcedCss(track)).toMatch(/background-color: graytext/i)
+	})
+})
+
 describe("Switch target and a11y", () => {
 	test("the hit area is at least 24px tall although the track is 22px", () => {
 		render(<Switch aria-label="喚醒" />)

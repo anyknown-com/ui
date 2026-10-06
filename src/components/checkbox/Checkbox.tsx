@@ -3,10 +3,11 @@ import { type ComponentProps, type ReactNode, useCallback, useId } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type StyleArg, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 const HIT = "max(24px, 1.5rem)"
 
 const CHECK_D = "M6 12.4 L10.2 16.6 L18.2 7.4"
@@ -41,20 +42,36 @@ const styles = stylex.create({
 		marginTop: "0.16rem",
 		borderWidth: 1.5,
 		borderStyle: "solid",
-		borderColor: color.borderControl,
+		borderColor: { default: color.borderControl, [FORCED]: "ButtonText" },
 		borderRadius: corner.small,
-		backgroundColor: color.bg,
+		backgroundColor: { default: color.bg, [FORCED]: "Canvas" },
 		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":has(:focus-visible)": `2px solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":has(:focus-visible)": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
+		// forced-colors 會把墨色底洗掉,勾選就看不出來:方框自己給系統色
+		forcedColorAdjust: "none",
 	},
-	boxOn: { borderColor: color.accent, backgroundColor: color.accent },
+	boxOn: {
+		borderColor: { default: color.accent, [FORCED]: "Highlight" },
+		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+	},
 	boxInvalid: { borderColor: color.danger },
+	boxDisabled: { borderColor: { default: color.borderControl, [FORCED]: "GrayText" } },
+	boxOnDisabled: {
+		borderColor: { default: color.accent, [FORCED]: "GrayText" },
+		backgroundColor: { default: color.accent, [FORCED]: "GrayText" },
+	},
 	svg: { display: "block", width: "100%", height: "100%" },
 	mark: {
 		fill: "none",
-		stroke: color.accentText,
+		stroke: { default: color.accentText, [FORCED]: "HighlightText" },
 		strokeWidth: 2.4,
 		strokeLinecap: "round",
 		strokeLinejoin: "round",
@@ -106,13 +123,21 @@ export function Checkbox({
 	)
 
 	const filled = isChecked || indeterminate
+	const disabled = Boolean(field.disabled ?? props.disabled)
 	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
 		.filter(Boolean)
 		.join(" ")
 
 	return (
 		<label {...stylex.props(styles.root, sx)}>
-			<span {...stylex.props(styles.box, filled && styles.boxOn, invalid && styles.boxInvalid)}>
+			<span
+				{...stylex.props(
+					styles.box,
+					filled && styles.boxOn,
+					invalid && styles.boxInvalid,
+					disabled && (filled ? styles.boxOnDisabled : styles.boxDisabled),
+				)}
+			>
 				<input
 					type="checkbox"
 					{...props}

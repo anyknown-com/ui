@@ -99,6 +99,48 @@ describe("Checkbox description", () => {
 	})
 })
 
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
+describe("Checkbox in forced-colors", () => {
+	const box = (name: string) => screen.getByRole("checkbox", { name }).parentElement as HTMLElement
+
+	test("unchecked is a ButtonText frame on Canvas; checked fills with Highlight", () => {
+		render(
+			<>
+				<Checkbox label="off" />
+				<Checkbox label="on" defaultChecked />
+			</>,
+		)
+		expect(forcedCss(box("off"))).toMatch(/border-color: buttontext/i)
+		expect(forcedCss(box("off"))).toMatch(/background-color: canvas/i)
+		expect(forcedCss(box("on"))).toMatch(/background-color: highlight/i)
+		expect(forcedCss(box("on"))).toMatch(/has\(:focus-visible\).*solid highlight/i)
+	})
+
+	test("disabled draws in GrayText, checked or not", () => {
+		render(
+			<>
+				<Checkbox label="off" disabled />
+				<Checkbox label="on" disabled defaultChecked />
+			</>,
+		)
+		expect(forcedCss(box("off"))).toMatch(/border-color: graytext/i)
+		expect(forcedCss(box("on"))).toMatch(/background-color: graytext/i)
+	})
+})
+
 describe("Checkbox target and a11y", () => {
 	test("the hit area is 24×24 even though the box is drawn smaller", () => {
 		render(<Checkbox aria-label="選取" />)

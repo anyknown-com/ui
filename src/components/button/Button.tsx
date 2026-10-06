@@ -5,6 +5,8 @@ import { press, type StyleArg, styled } from "../../lib/styled"
 import { color, corner, font, space, type } from "../../tokens.stylex"
 import { Spin } from "../spin/Spin"
 
+const FORCED = "@media (forced-colors: active)"
+
 const styles = stylex.create({
 	base: {
 		position: "relative",
@@ -17,7 +19,10 @@ const styles = stylex.create({
 		fontWeight: 500,
 		lineHeight: type.dense,
 		borderRadius: corner.pill,
-		borderWidth: 0,
+		// forced-colors 會洗掉底色,膠囊就只剩字:那裡補一圈框,停用的是 GrayText
+		borderStyle: "solid",
+		borderWidth: { default: 0, [FORCED]: 1 },
+		borderColor: { default: "transparent", [FORCED]: { default: "ButtonText", ":disabled": "GrayText" } },
 		backgroundColor: "transparent",
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },

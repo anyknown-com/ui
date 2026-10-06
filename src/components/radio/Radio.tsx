@@ -1,11 +1,12 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type ReactNode, useId } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { useFieldControl } from "../label/fieldContext"
 import { useRadioGroup } from "./RadioGroup"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 const HIT = "max(24px, 1.5rem)"
 
 const styles = stylex.create({
@@ -50,21 +51,37 @@ const styles = stylex.create({
 		marginTop: "0.16rem",
 		borderWidth: 1.5,
 		borderStyle: "solid",
-		borderColor: color.borderControl,
+		borderColor: { default: color.borderControl, [FORCED]: "ButtonText" },
 		borderRadius: corner.pill,
-		backgroundColor: color.bg,
+		backgroundColor: { default: color.bg, [FORCED]: "Canvas" },
 		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":has(:focus-visible)": `2px solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":has(:focus-visible)": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
+		// forced-colors 會把墨色底洗掉,選中就看不出來:圓點自己給系統色
+		forcedColorAdjust: "none",
 	},
 	// 選中是墨色實心,中間一顆 accentText 的點(跟 checkbox 的勾同一個配色)
-	dotOn: { borderColor: color.accent, backgroundColor: color.accent },
+	dotOn: {
+		borderColor: { default: color.accent, [FORCED]: "Highlight" },
+		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+	},
+	dotDisabled: { borderColor: { default: color.borderControl, [FORCED]: "GrayText" } },
+	dotOnDisabled: {
+		borderColor: { default: color.accent, [FORCED]: "GrayText" },
+		backgroundColor: { default: color.accent, [FORCED]: "GrayText" },
+	},
 	fill: {
 		width: "0.4rem",
 		height: "0.4rem",
 		borderRadius: corner.pill,
-		backgroundColor: color.accentText,
+		backgroundColor: { default: color.accentText, [FORCED]: "HighlightText" },
 		scale: "0",
 		transitionProperty: "scale",
 		transitionDuration: { default: "160ms", [REDUCED]: "0s" },
@@ -88,6 +105,7 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 	const descriptionId = `${base}description`
 	const { invalid: _invalid, id: _fieldId, ...field } = useFieldControl(props)
 	const checked = group.value === value
+	const isDisabled = disabled ?? field.disabled ?? group.disabled
 	const describedBy = [description != null ? descriptionId : null, field["aria-describedby"]]
 		.filter(Boolean)
 		.join(" ")
@@ -100,7 +118,13 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 				group.variant === "card" && checked && styles.cardOn,
 			)}
 		>
-			<span {...stylex.props(styles.dot, checked && styles.dotOn)}>
+			<span
+				{...stylex.props(
+					styles.dot,
+					checked && styles.dotOn,
+					isDisabled && (checked ? styles.dotOnDisabled : styles.dotDisabled),
+				)}
+			>
 				<input
 					type="radio"
 					{...props}
@@ -110,7 +134,7 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 					checked={checked}
 					aria-labelledby={label != null ? labelId : undefined}
 					aria-describedby={describedBy || undefined}
-					disabled={disabled ?? field.disabled ?? group.disabled}
+					disabled={isDisabled}
 					onChange={(event) => {
 						if (event.currentTarget.checked) group.select(value)
 						onChange?.(event)

@@ -2,9 +2,10 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, createContext, useContext } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, ink, motion, radius, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, ink, motion, radius, shadow, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 const VariantContext = createContext<"underline" | "pills">("underline")
 
@@ -43,9 +44,26 @@ const styles = stylex.create({
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
-	tabDisabled: { opacity: 0.4, cursor: "not-allowed", color: color.textFaint },
+	tabDisabled: {
+		opacity: 0.4,
+		cursor: "not-allowed",
+		color: { default: color.textFaint, [FORCED]: "GrayText" },
+		forcedColorAdjust: "none",
+	},
 	tabSelectedUnderline: { color: color.accent },
-	tabSelectedPills: { color: color.text, backgroundColor: "transparent" },
+	// forced-colors:選中的那格疊在 Highlight 的藥丸上,字要 HighlightText
+	tabSelectedPills: {
+		color: { default: color.text, [FORCED]: "HighlightText" },
+		backgroundColor: "transparent",
+		forcedColorAdjust: "none",
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
+	},
 	pillTab: { zIndex: 1 },
 	// Base UI 給的 --active-tab-left 是從清單「左緣」量的物理距離(RTL 也是),所以這裡錨在
 	// left: 0 而不是 insetInlineStart —— 後者在 RTL 會從右緣起算,指示條往反方向跑
@@ -56,7 +74,9 @@ const styles = stylex.create({
 		height: 2,
 		width: "var(--active-tab-width)",
 		translate: "var(--active-tab-left)",
-		backgroundColor: color.accent,
+		// forced-colors 會把底色洗成 Canvas,底線就不見了
+		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+		forcedColorAdjust: "none",
 		transitionProperty: "translate, width",
 		transitionDuration: { default: "240ms", [REDUCED]: "0s" },
 		transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
@@ -71,7 +91,9 @@ const styles = stylex.create({
 		translate: "var(--active-tab-left) var(--active-tab-top)",
 		// 內層圓角 = 軌道 12 − 內距 4
 		borderRadius: radius.md,
-		backgroundColor: color.surfaceRaised,
+		// forced-colors 會拿掉陰影、洗掉底色:藥丸改成 Highlight
+		backgroundColor: { default: color.surfaceRaised, [FORCED]: "Highlight" },
+		forcedColorAdjust: "none",
 		// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊
 		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
 		pointerEvents: "none",

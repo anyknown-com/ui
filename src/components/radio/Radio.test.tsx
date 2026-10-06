@@ -82,6 +82,40 @@ describe("RadioGroup uncontrolled", () => {
 	})
 })
 
+/** The declarations StyleX put under `@media (forced-colors: active)` for this element's classes. */
+function forcedCss(element: Element) {
+	let css = ""
+	for (const sheet of Array.from(document.styleSheets))
+		for (const rule of Array.from(sheet.cssRules)) {
+			if (!(rule instanceof CSSMediaRule) || !rule.media.mediaText.includes("forced-colors")) continue
+			for (const inner of Array.from(rule.cssRules)) {
+				const owner = inner instanceof CSSStyleRule ? inner.selectorText.match(/^\.([\w-]+)/)?.[1] : null
+				if (owner != null && element.classList.contains(owner)) css += `${inner.cssText}\n`
+			}
+		}
+	return css
+}
+
+describe("Radio in forced-colors", () => {
+	test("checked fills with Highlight, disabled draws in GrayText", () => {
+		render(
+			<>
+				<RadioGroup legend="一" defaultValue="a">
+					<Radio value="a" label="A" />
+					<Radio value="b" label="B" />
+				</RadioGroup>
+				<RadioGroup legend="二" defaultValue="c" disabled>
+					<Radio value="c" label="C" />
+				</RadioGroup>
+			</>,
+		)
+		const dot = (name: string) => screen.getByRole("radio", { name }).parentElement as HTMLElement
+		expect(forcedCss(dot("A"))).toMatch(/background-color: highlight/i)
+		expect(forcedCss(dot("B"))).toMatch(/border-color: buttontext/i)
+		expect(forcedCss(dot("C"))).toMatch(/background-color: graytext/i)
+	})
+})
+
 describe("Radio target and a11y", () => {
 	test("the hit area is 24×24 even though the dot is drawn smaller", () => {
 		render(
