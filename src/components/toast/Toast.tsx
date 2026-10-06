@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import { press, reset } from "../../lib/styled"
-import { color, corner, font, motion, shadow, space, type as scale } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, shadow, space, type as scale } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
@@ -40,7 +40,7 @@ const styles = stylex.create({
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
 		borderRadius: corner.float,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	fromBottom: { flexDirection: "column-reverse" },
@@ -70,14 +70,14 @@ const styles = stylex.create({
 		lineHeight: scale.snug,
 		color: color.text,
 		animationName: { default: slideIn, [REDUCED]: "none" },
-		animationDuration: "180ms",
-		animationTimingFunction: "ease-out",
+		animationDuration: motion.quick,
+		animationTimingFunction: motion.easeOut,
 	},
 	// 關掉之後淡出 120ms 才拿掉;reduced motion 時 Toaster 把退場設成 0,直接拿掉
 	leaving: {
 		animationName: { default: fadeOut, [REDUCED]: "none" },
 		animationDuration: motion.fast,
-		animationTimingFunction: "ease-out",
+		animationTimingFunction: motion.easeOut,
 		animationFillMode: "forwards",
 		pointerEvents: "none",
 	},
@@ -154,7 +154,7 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		borderRadius: corner.pill,
 		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	close: {
@@ -167,7 +167,7 @@ const styles = stylex.create({
 		color: { default: color.textFaint, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
 	// 對齊第一行(20px 行高)的中線

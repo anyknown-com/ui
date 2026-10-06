@@ -26,7 +26,7 @@ const styles = stylex.create({
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		fontFamily: font.body,
-		fontSize: "0.75rem",
+		fontSize: type.t2,
 		lineHeight: type.snug,
 		animationName: { default: fade, [REDUCED]: "none" },
 		animationDuration: motion.fast,

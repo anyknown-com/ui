@@ -2,13 +2,13 @@ import { Menu } from "@base-ui/react/menu"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 import { popupStyles } from "../../lib/popup"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
 	popup: { minWidth: "14rem", padding: space.xxs, margin: 0 },
-	subPopup: { animationDuration: { default: "120ms", [REDUCED]: "0s" } },
+	subPopup: { animationDuration: { default: motion.fast, [REDUCED]: "0s" } },
 	item: {
 		position: "relative",
 		display: "flex",
@@ -27,9 +27,9 @@ const styles = stylex.create({
 	},
 	highlighted: {
 		backgroundColor: color.accentSubtle,
-		outline: `2px solid ${color.focusRing}`,
+		outline: `${focusRing.width} solid ${color.focusRing}`,
 		outlineOffset: -2,
-		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
+		"@media (forced-colors: active)": { outline: `${focusRing.width} solid Highlight` },
 	},
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
 	danger: { color: color.danger },
@@ -37,7 +37,7 @@ const styles = stylex.create({
 	shortcut: {
 		marginInlineStart: "auto",
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		lineHeight: 1,
 		color: color.textMuted,
 	},

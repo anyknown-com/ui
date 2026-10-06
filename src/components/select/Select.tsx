@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
-import { breakpoint, color, corner, font, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 
 export type SelectItemProps = {
@@ -87,7 +87,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		color: color.textMuted,
 		lineHeight: 1,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
 		borderRadius: corner.small,
 	},
@@ -145,9 +145,9 @@ const styles = stylex.create({
 	},
 	optionHighlighted: {
 		backgroundColor: color.accentSubtle,
-		outline: `2px solid ${color.focusRing}`,
+		outline: `${focusRing.width} solid ${color.focusRing}`,
 		outlineOffset: -2,
-		"@media (forced-colors: active)": { outline: "2px solid Highlight" },
+		"@media (forced-colors: active)": { outline: `${focusRing.width} solid Highlight` },
 	},
 	optionDisabled: { opacity: 0.5, cursor: "not-allowed" },
 	hint: { color: color.textMuted, fontSize: type.t1 },
