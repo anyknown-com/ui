@@ -34,7 +34,6 @@ const strings = defineStrings({
 		muted: "已靜音",
 		call: "通話",
 		mute: "靜音",
-		unmute: "取消靜音",
 		hangUp: "掛斷",
 	},
 	en: {
@@ -48,14 +47,14 @@ const strings = defineStrings({
 		muted: "Muted",
 		call: "Call",
 		mute: "Mute",
-		unmute: "Unmute",
 		hangUp: "Hang up",
 	},
 })
 
 /**
  * The CallBar's built-in words (follow `<LocaleProvider>`): one per `CallStatus`, plus `muted`,
- * the group name `call`, and the button names `mute`, `unmute` and `hangUp`.
+ * the group name `call`, and the button names `mute` and `hangUp`. The mute button keeps its
+ * name and reports its state with `aria-pressed`.
  */
 export type CallBarLabels = StringsOf<typeof strings>
 
@@ -124,7 +123,8 @@ export function CallBar({ status, seconds, muted, onMute, onHangUp, labels, sx }
 			<span>{muted ? words.muted : words[status]}</span>
 			<span {...stylex.props(styles.timer)}>{formatClock(seconds)}</span>
 			<IconButton
-				label={muted ? words.unmute : words.mute}
+				label={words.mute}
+				aria-pressed={muted}
 				open={muted}
 				onClick={() => onMute(!muted)}
 				sx={muted && styles.mutedButton}

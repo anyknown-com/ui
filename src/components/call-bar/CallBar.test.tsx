@@ -23,12 +23,16 @@ describe("CallBar", () => {
 		const { rerender } = render(
 			<CallBar status="speaking" seconds={3} muted={false} onMute={onMute} onHangUp={() => {}} />,
 		)
-		await user.click(screen.getByRole("button", { name: "靜音" }))
+		const mute = screen.getByRole("button", { name: "靜音" })
+		expect(mute).toHaveAttribute("aria-pressed", "false")
+		await user.click(mute)
 		expect(onMute).toHaveBeenLastCalledWith(true)
 
 		rerender(<CallBar status="speaking" seconds={3} muted onMute={onMute} onHangUp={() => {}} />)
 		expect(screen.getByText("已靜音")).toBeInTheDocument()
-		await user.click(screen.getByRole("button", { name: "取消靜音" }))
+		// A toggle keeps its name; the state lives in aria-pressed (WAI-ARIA APG button pattern).
+		expect(screen.getByRole("button", { name: "靜音", pressed: true })).toBeInTheDocument()
+		await user.click(screen.getByRole("button", { name: "靜音" }))
 		expect(onMute).toHaveBeenLastCalledWith(false)
 	})
 
@@ -87,7 +91,7 @@ describe("CallBar", () => {
 			</LocaleProvider>,
 		)
 		expect(screen.getByRole("group", { name: "Call" })).toHaveTextContent("Muted")
-		expect(screen.getByRole("button", { name: "Unmute" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Mute", pressed: true })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "End call" })).toBeInTheDocument()
 	})
 })
