@@ -1,7 +1,7 @@
 import { Menu } from "@base-ui/react/menu"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
-import { popupStyles } from "../../lib/popup"
+import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -227,7 +227,9 @@ export function DropdownMenu({
 			<Menu.Trigger render={trigger as never} />
 			<Menu.Portal>
 				<Menu.Positioner side={side} align={align} sideOffset={6} {...stylex.props(popupStyles.positioner)}>
-					<Menu.Popup {...stylex.props(popupStyles.surface, styles.popup)}>{children}</Menu.Popup>
+					<Menu.Popup ref={returnFocusOnExit} {...stylex.props(popupStyles.surface, styles.popup)}>
+						{children}
+					</Menu.Popup>
 				</Menu.Positioner>
 			</Menu.Portal>
 		</Menu.Root>

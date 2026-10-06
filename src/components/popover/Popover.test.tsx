@@ -1,8 +1,22 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
 import { Button } from "../button/Button"
 import { Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger } from "./Popover"
+
+/** jsdom has no animations; hold every exit (`data-ending-style`) until `finish()`. */
+function holdExits() {
+	let finish!: () => void
+	const finished = new Promise<void>((resolve) => (finish = resolve))
+	const held = { finished, pending: false, playState: "running" }
+	Element.prototype.getAnimations = function (this: Element) {
+		return (this.hasAttribute("data-ending-style") ? [held] : []) as unknown as Animation[]
+	}
+	return {
+		finish: () => act(async () => finish()),
+		restore: () => delete (Element.prototype as Partial<Element>).getAnimations,
+	}
+}
 
 function MemoryPopover() {
 	return (
@@ -46,6 +60,25 @@ describe("Popover", () => {
 		await userEvent.keyboard("{Escape}")
 		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
 		expect(trigger).toHaveFocus()
+	})
+
+	test("Escape hands focus back to the trigger as the exit starts, not after it", async () => {
+		const exits = holdExits()
+		try {
+			render(<MemoryPopover />)
+			const trigger = screen.getByRole("button", { name: "部署走 Cloudflare" })
+			await userEvent.click(trigger)
+			const panel = await screen.findByRole("dialog")
+			await waitFor(() => expect(panel.contains(document.activeElement)).toBe(true))
+			await userEvent.keyboard("{Escape}")
+			await waitFor(() => expect(panel).toHaveAttribute("data-ending-style"))
+			expect(panel).toBeInTheDocument()
+			expect(trigger).toHaveFocus()
+			await exits.finish()
+			await waitFor(() => expect(panel).not.toBeInTheDocument())
+		} finally {
+			exits.restore()
+		}
 	})
 
 	test("clicking outside closes it", async () => {

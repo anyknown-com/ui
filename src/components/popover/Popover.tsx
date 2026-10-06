@@ -1,7 +1,7 @@
 import { Popover as BasePopover } from "@base-ui/react/popover"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactElement, ReactNode } from "react"
-import { popupStyles } from "../../lib/popup"
+import { popupStyles, returnFocusOnExit } from "../../lib/popup"
 import { styled } from "../../lib/styled"
 import { color, font, space, type } from "../../tokens.stylex"
 
@@ -89,7 +89,11 @@ export function PopoverContent({
 				sideOffset={sideOffset}
 				{...stylex.props(popupStyles.positioner)}
 			>
-				<BasePopover.Popup {...rest} {...styled(rest, popupStyles.surface, styles.panel)}>
+				<BasePopover.Popup
+					ref={returnFocusOnExit}
+					{...rest}
+					{...styled(rest, popupStyles.surface, styles.panel)}
+				>
 					{children}
 				</BasePopover.Popup>
 			</BasePopover.Positioner>

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
@@ -11,6 +11,20 @@ import {
 	DropdownSeparator,
 	DropdownSub,
 } from "./DropdownMenu"
+
+/** jsdom has no animations; hold every exit (`data-ending-style`) until `finish()`. */
+function holdExits() {
+	let finish!: () => void
+	const finished = new Promise<void>((resolve) => (finish = resolve))
+	const held = { finished, pending: false, playState: "running" }
+	Element.prototype.getAnimations = function (this: Element) {
+		return (this.hasAttribute("data-ending-style") ? [held] : []) as unknown as Animation[]
+	}
+	return {
+		finish: () => act(async () => finish()),
+		restore: () => delete (Element.prototype as Partial<Element>).getAnimations,
+	}
+}
 
 function ThreadMenu({ onSelect }: { onSelect?: () => void }) {
 	const [showReceipts, setShowReceipts] = useState(false)
@@ -100,6 +114,49 @@ describe("DropdownMenu", () => {
 		await userEvent.keyboard("{Escape}")
 		await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
 		expect(trigger).toHaveFocus()
+	})
+})
+
+describe("DropdownMenu focus return", () => {
+	test("Escape hands focus back to the trigger as the exit starts, not after it", async () => {
+		const exits = holdExits()
+		try {
+			render(<ThreadMenu />)
+			const trigger = screen.getByRole("button", { name: "Thread 動作" })
+			await userEvent.click(trigger)
+			const menu = await screen.findByRole("menu")
+			await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true))
+			await userEvent.keyboard("{Escape}")
+			await waitFor(() => expect(menu).toHaveAttribute("data-ending-style"))
+			expect(menu).toBeInTheDocument()
+			expect(trigger).toHaveFocus()
+			await exits.finish()
+			await waitFor(() => expect(menu).not.toBeInTheDocument())
+		} finally {
+			exits.restore()
+		}
+	})
+
+	test("choosing an item in a submenu hands focus back to the menu's trigger", async () => {
+		const exits = holdExits()
+		try {
+			render(<ThreadMenu />)
+			const trigger = screen.getByRole("button", { name: "Thread 動作" })
+			trigger.focus()
+			// opening from the keyboard highlights the first item
+			await userEvent.keyboard("{Enter}")
+			await screen.findByRole("menu")
+			await userEvent.keyboard("{ArrowDown}{ArrowRight}")
+			const item = await screen.findByRole("menuitem", { name: "Markdown" })
+			await waitFor(() => expect(item).toHaveFocus())
+			await userEvent.keyboard("{Enter}")
+			await waitFor(() => expect(trigger).toHaveFocus())
+			await exits.finish()
+			await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
+			expect(trigger).toHaveFocus()
+		} finally {
+			exits.restore()
+		}
 	})
 })
 
