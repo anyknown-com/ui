@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { ListHead, ListRow, ListSort, WeightDot } from "./List"
 
 describe("ListHead / ListSort", () => {
@@ -14,9 +16,42 @@ describe("ListHead / ListSort", () => {
 				<ListSort onClick={() => onOrder("recent")}>建立</ListSort>
 			</ListHead>,
 		)
-		expect(screen.getByRole("button", { name: "狀態 ↓" })).toBeInTheDocument()
+		const sorted = screen.getByRole("button", { name: "狀態，排序中" })
+		expect(sorted).toHaveTextContent("狀態 ↓")
 		fireEvent.click(screen.getByRole("button", { name: "建立" }))
 		expect(onOrder).toHaveBeenCalledWith("recent")
+	})
+
+	test("the sorted word follows the LocaleProvider and labels", () => {
+		render(
+			<LocaleProvider locale="en">
+				<ListSort active>Status</ListSort>
+				<ListSort active labels={{ sorted: (column) => `${column} (ordered)` }}>
+					Created
+				</ListSort>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Status, sorted" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Created (ordered)" })).toBeInTheDocument()
+	})
+
+	test("axe: a head with a sorted column, rows, a disabled row and dots", async () => {
+		const { container } = render(
+			<div>
+				<ListHead>
+					<ListSort active>狀態</ListSort>
+					<span>記憶</span>
+				</ListHead>
+				<ListRow>
+					<WeightDot weight="heavy" />
+					<span>房租上限</span>
+				</ListRow>
+				<ListRow disabled>
+					<span>停用</span>
+				</ListRow>
+			</div>,
+		)
+		await expectNoAxeViolations(container)
 	})
 
 	test("不能排序的表頭可以整個對讀屏藏起來", () => {

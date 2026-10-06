@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { color, corner, type } from "../../tokens.stylex"
 import type { HTMLAttributes, ReactNode } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { Ghost, type GhostProps } from "../ghost/Ghost"
 
 /**
@@ -74,18 +75,34 @@ export function ListHead({ children, sx, ...props }: ListHeadProps) {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": { sorted: (column: string) => `${column}，排序中` },
+	en: { sorted: (column: string) => `${column}, sorted` },
+})
+
+/** ListSort's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type ListLabels = StringsOf<typeof strings>
+
 export type ListSortProps = Omit<GhostProps, "children"> & {
+	/** The column's name. */
 	children: string
-	/** The list is ordered by this column: the name goes dark and an arrow follows it. */
+	/** The list is ordered by this column: the name goes dark, an arrow follows it, and its name says "sorted". */
 	active?: boolean
+	/** Override built-in words for this column; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<ListLabels>
 }
 
 /** A column name in a `ListHead` that orders the list by it. */
-export function ListSort({ children, active = false, sx, ...props }: ListSortProps) {
+export function ListSort({ children, active = false, labels, sx, ...props }: ListSortProps) {
+	const t = useStrings(strings, labels)
 	return (
-		<Ghost {...props} sx={[styles.sort, active && styles.current, sx]}>
+		<Ghost
+			{...(active ? { "aria-label": t.sorted(children) } : {})}
+			{...props}
+			sx={[styles.sort, active && styles.current, sx]}
+		>
 			{children}
-			{active ? " ↓" : ""}
+			{active && <span aria-hidden="true"> ↓</span>}
 		</Ghost>
 	)
 }
