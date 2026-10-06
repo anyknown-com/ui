@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { RecoveryKey } from "./RecoveryKey"
 
 const KEY = "K7PQ-WM2X-9RDF-H4TN"
@@ -49,6 +50,16 @@ describe("RecoveryKey", () => {
 		await userEvent.click(screen.getByRole("button", { name: "複製" }))
 		expect(await screen.findByRole("status")).toHaveTextContent("已複製")
 		expect(screen.getByRole("status")).toBe(status)
+	})
+
+	test("has no axe violations before and after copying and revealing", async () => {
+		Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+		const { container } = render(<RecoveryKey value={KEY} />)
+		await expectNoAxeViolations(container)
+		await userEvent.click(screen.getByRole("button", { name: "複製" }))
+		await screen.findByRole("button", { name: "已複製" })
+		await userEvent.click(screen.getByRole("button", { name: "顯示復原金鑰" }))
+		await expectNoAxeViolations(container)
 	})
 
 	test("download builds a text blob with the given filename", async () => {
