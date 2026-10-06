@@ -478,13 +478,20 @@ Caps Lock 警告、confirm 欄不一致錯誤。
   的塊,不畫框;動作鈕是 secondary 膠囊
 
 ### dropzone
-拖放上傳區:虛線框 idle、dragover 高亮(accent 邊框 + accentSubtle 底)、
-**選檔按鈕 fallback**(drag 永遠不是唯一入口)、上傳中列表(檔名 + 進度條 + 取消)、
-超限錯誤列。
+拖放上傳區:idle 是凹下去的 `surface` 底 + `borderStrong` 虛線(`corner.card`)、
+dragover 時虛線與圖示換 `signal`、底換 `signalSubtle`、
+**選檔按鈕 fallback**(drag 永遠不是唯一入口,膠囊、`accentSubtle` 底、無框)、
+上傳中列表(檔名 + 膠囊進度條 + 取消,跟檔案列一樣是 rest 卡片)、超限錯誤列。
+
+- 虛線是 SVG `rect`,內縮 1.5px,所以它的 `rx` 用 CSS 算成 `corner.card − 1.5px`,
+  圓角跟著 token 走,不寫死
 
 ### file-row
 檔案列表的一列:類型圖示 + 檔名 + 大小(mono、tabular)+ 修改時間 + hover 才浮現的
 動作與選取 checkbox;另有資料夾列與加密中 / 上傳中的 busy 列。
+
+- `FileList` 是紙上的 rest 卡片:`shadow.rest` 的環就是唯一的邊、`corner.card`,列與列之間
+  髮線。底色淺色是白、暗色升一階到 `surface`(`tone.railLayer2` 剛好是這一對)
 
 ### diff-viewer
 行級 unified diff + 行內字級 highlight。給 plan 審查 takeover 與 i18n 譯文對照用。
@@ -504,8 +511,12 @@ Caps Lock 警告、confirm 欄不一致錯誤。
 - inline edit:雙擊 cell → 輸入框,Enter 確認、Esc 取消、**blur 視同確認**;
   空值顯示 faint 的 `—`
 - 選取列 checkbox,header checkbox 全選 / 半選(indeterminate)
-- **sticky header 用 `inset box-shadow` 當底線** —— `border-collapse` 下 border 不會
-  跟著 sticky
+- 表格滿版放在自己的段落裡,**不包進卡片**:捲動區沒有框、沒有底。表頭是凹下去的
+  `surface` 條(兩端 `corner.small`),欄名是 mono 小寫,不做全大寫加字距;列與列之間一條
+  `border` 髮線(畫在每格底部),hover 升到 `layer3`
+- `border-collapse: separate` + `border-spacing: 0`:表頭條的圓角要畫在 th 上,collapse 下
+  cell 的圓角不算數;separate 下 sticky 的表頭也不用再靠 `inset box-shadow` 假裝底線
+- 窄螢幕時表格在捲動區裡橫向捲,不撐寬頁面
 - 空結果:置中訊息帶查詢字 + 「清除過濾」動作
 - 捲動區高度 `maxHeight`(預設 20rem),`footer` 渲染在列之後、**捲動區之內** ——
   「載入更多」待在清單裡才跟得上捲動
@@ -527,9 +538,19 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 `Table` + `Tr` + `Cell` 是低階的表格零件(要排序、分頁用 `DataTable`)。字級用 `type`、
 圓角用 `corner`、hover 用 `ink`。
 
+- 頁面是桌面(`layer1`),內容放在白色主紙(`layer2`、`corner.sheet`)上;主紙是殼的事,
+  這些零件都假設自己在紙上
+- `SettingsRows`、`Panel` 是紙上凹下去的 `surface` 區塊(`corner.card`),**不加框**;
+  列與列之間一條髮線
+- `Table` 滿版、不進卡片:沒有底、沒有框。`Head` 是凹下去的 `surface` 條(`corner.small`),
+  每一列底下一條髮線(最後一列沒有),`Detail` 同樣畫在底下
+- `Card` 是紙上的 rest 卡片:`shadow.rest` 的環 + `corner.card`,沒有另外的邊框。卡片裡要分區
+  用凹下去的 `surface`,不要卡片裡再放卡片
+
 ### group(分組清單)
 設定頁的分組清單,照 product 殼對過稿的 `ios/` 原樣搬來(0.9)。`Group` 上面一行 muted 的
-`header`、中間一張 `layer3` 的卡(圓角 10、沒有邊框)、下面一段 muted 的 `footer`;
+`header`、中間一塊紙上凹下去的 `surface` 區塊(`corner.card`、沒有邊框、沒有陰影)、
+下面一段 muted 的 `footer`;
 0.8 的有框 `surface` 卡沒有人用,直接換掉。
 
 - 卡裡的列是 cell:`GroupCell`(字、第二行 `detail`、右邊 `value` / `control`)、
@@ -539,7 +560,7 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
   **不是**卡的 `gap` 或 `border`:第一列沒有線,線從左邊 16px 起
 - `GroupCell` 有 `onPress` 就整列是一顆 `Ghost`;沒有 `tone`、不是選項(`checked`)才畫
   chevron —— 「新增」「刪除」這種動作列與單選的選項都不是「點進去」
-- 列前面的東西:`IconTile`(28px `layer4` 方塊 + 16px glyph)、`LetterTile`(同一塊寫
+- 列前面的東西:`IconTile`(28px `layer4` 方塊、`corner.small` + 16px glyph)、`LetterTile`(同一塊寫
   第一個字母)、`ActionIcon`(沒有方塊的 18px glyph,動作列用)。glyph 收 lucide 的元件,
   這個套件不依賴 lucide
 - 0.8 的 `Item` / `Row` 還在,放進新的卡裡:`Item` 自己把字級壓回 `t2`,hover 升到 `layer4`
@@ -558,7 +579,7 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 
 ### list
 一張「點開來看」的清單(記憶、問題):`ListHead` 一行 `t1` faint 的欄名、底下一條細線;
-`ListRow` 每列是一顆 `Ghost`,40px、`t3`、hover `layer3`、圓角 `radius.md`,沒有框。
+`ListRow` 每列是一顆 `Ghost`,40px、`t3`、hover `layer3`、圓角 `corner.control`,沒有框。
 跟 `Table` 不同:`Table` 是 mono 的帳本,這裡一個 mono 都沒有。
 
 - **欄寬是呼叫端的**:同一個 grid template 用 `sx` 給表頭與每一列。手機上怎麼排
