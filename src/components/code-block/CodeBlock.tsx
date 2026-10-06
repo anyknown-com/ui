@@ -3,7 +3,7 @@ import type { ComponentProps } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -48,7 +48,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
 	copied: { color: color.accent },
@@ -62,7 +62,7 @@ const styles = stylex.create({
 		fontSize: type.code,
 		lineHeight: type.snug,
 		color: color.text,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	code: { font: "inherit" },
