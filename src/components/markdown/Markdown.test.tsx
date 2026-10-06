@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Markdown } from "./Markdown"
 
 // jsdom builds MathML elements without a `style` object, so Temml's own `node.style[x] = …` throws
@@ -136,6 +137,29 @@ describe("Markdown", () => {
 		beforeEach(() => {
 			calls.length = 0
 			stub.throws = false
+		})
+
+		test("has no axe violations with code, tables, task lists and maths", async () => {
+			const source = [
+				"# 標題",
+				"段落有 `code`、**粗**、[連結](https://anyknown.com) 與 $E = mc^2$。",
+				"```ts\nconst a = 1\n```",
+				"| a | b |\n| --- | ---: |\n| 1 | 2 |",
+				"- [x] 做完了\n- [ ] 還沒",
+				"> 引言",
+				"<b>不解析</b>",
+			].join("\n\n")
+			const { container } = render(
+				<>
+					<Markdown>{source}</Markdown>
+					<Markdown tables="ruled">{"| a | b |\n| --- | --- |\n| 1 | 2 |"}</Markdown>
+					<Markdown>{"$$\\int_0^1 x\\,dx$$"}</Markdown>
+				</>,
+			)
+			await expectNoAxeViolations(container)
+			// and again once the renderer has had its turn
+			await waitFor(() => expect(calls.length).toBeGreaterThan(0))
+			await expectNoAxeViolations(container)
 		})
 
 		test("$…$ is handed to the renderer as inline maths", async () => {
