@@ -37,11 +37,8 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	danger: {
-		backgroundColor: {
-			default: "transparent",
-			":hover": `color-mix(in srgb, ${color.warning} 10%, transparent)`,
-		},
-		color: { default: color.warning, ":hover": color.warning },
+		backgroundColor: { default: "transparent", ":hover": color.dangerSubtle },
+		color: { default: color.danger, ":hover": color.danger },
 	},
 })
 

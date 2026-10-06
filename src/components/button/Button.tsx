@@ -77,10 +77,10 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 	},
 	danger: {
-		color: color.accentText,
+		color: color.onDangerSolid,
 		backgroundColor: {
-			default: color.danger,
-			":hover": `color-mix(in srgb, ${color.danger} 86%, ${color.bg})`,
+			default: color.dangerSolid,
+			":hover": `color-mix(in srgb, ${color.dangerSolid} 86%, ${color.bg})`,
 		},
 	},
 	// 「白底紅字」:份量走 ghost,語意走 danger token(和 interaction-card 收據列

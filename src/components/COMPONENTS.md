@@ -125,7 +125,7 @@ secondary 深一階(`layer5`),ghost 類是透明 → `accentSubtle` / `dangerSub
 | `primary` | `accent`(墨色) | `accentText` | 主要動作,一個畫面一顆 |
 | `secondary` | `accentSubtle`(凹下去,無框) | `text` | 次要動作 |
 | `ghost` | 透明 | `textMuted` | 安靜的第三選項 |
-| `danger` | `danger` | `accentText` | 不可逆的破壞性動作 |
+| `danger` | `dangerSolid` | `onDangerSolid` | 不可逆的刪除,一個畫面最多一顆 |
 | `dangerGhost` | 透明 | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
 
 - children 包在 `position: relative` 的 span 裡

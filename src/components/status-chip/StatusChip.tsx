@@ -5,8 +5,8 @@ import { Spin } from "../spin/Spin"
 
 /**
  * `.tchip` / `.achip`: a mono word in a 16px pill. `r` read-only (outline), `w` writes (layer),
- * `d` destructive (warning fill), `n` unmarked (faint outline), `a` active (accent, spinning),
- * `f` failed (warning outline + dot), `plain` the catalogue's auth chip.
+ * `d` destructive (danger on dangerSubtle), `n` unmarked (outline), `a` active (signal, spinning),
+ * `f` failed (danger outline + dot), `plain` the catalogue's auth chip.
  */
 
 const styles = stylex.create({
@@ -24,16 +24,16 @@ const styles = stylex.create({
 	},
 	r: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
 	w: { backgroundColor: color.layer4, color: color.text },
-	d: { backgroundColor: color.warning, color: color.bg },
+	d: { backgroundColor: color.dangerSubtle, color: color.danger },
 	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: tone.faint },
 	// 執行中 = agent 在做事
 	a: { backgroundColor: color.signalSubtle, color: color.signal },
 	f: {
-		boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color.warning} 55%, transparent)`,
-		color: color.warning,
+		boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color.danger} 55%, transparent)`,
+		color: color.danger,
 	},
 	plain: { backgroundColor: color.layer3, color: color.textMuted, textAlign: "center" },
-	dot: { backgroundColor: color.warning, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	dot: { backgroundColor: color.danger, borderRadius: "50%", flex: "none", height: 6, width: 6 },
 	pill: {
 		alignItems: "center",
 		backgroundColor: color.layer3,
