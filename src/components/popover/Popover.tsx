@@ -8,7 +8,10 @@ import { color, font, space, text } from "../../tokens.stylex"
 const styles = stylex.create({
 	panel: {
 		minWidth: "11rem",
-		padding: space.sm,
+		// 窄螢幕上長的說明要折行,不能把浮層推出視窗
+		maxWidth: "min(22rem, calc(100vw - 2rem))",
+		boxSizing: "border-box",
+		padding: space.md,
 		fontFamily: font.body,
 		fontSize: text.sm,
 		color: color.text,

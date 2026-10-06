@@ -2,7 +2,7 @@ import { Menu } from "@base-ui/react/menu"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 import { popupStyles } from "../../lib/popup"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -14,7 +14,8 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: "0.55rem",
-		borderRadius: radius.sm,
+		// 內角 = popup 的 16 − 4 padding
+		borderRadius: corner.control,
 		paddingBlock: "0.42rem",
 		paddingInline: space.xs,
 		fontFamily: font.body,
@@ -43,12 +44,9 @@ const styles = stylex.create({
 	arrow: { marginInlineStart: "auto", color: color.textFaint, display: "flex" },
 	tick: { width: "0.9rem", flex: "none", color: color.accent, display: "flex", justifyContent: "center" },
 	groupLabel: {
-		fontFamily: font.mono,
-		fontSize: "0.65rem",
-		fontWeight: 600,
-		lineHeight: 1,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
+		fontSize: text.xs,
+		fontWeight: 500,
+		lineHeight: text.leadingSnug,
 		color: color.textFaint,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,

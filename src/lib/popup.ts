@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, radius, shadow } from "../tokens.stylex"
+import { color, corner, shadow } from "../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -36,13 +36,16 @@ export const growIn = stylex.keyframes({
 })
 
 export const popupStyles = stylex.create({
+	// float 階:疊在紙上的紙。暗色靠 surfaceRaised 升一階,不畫邊框;
+	// 透明的框只為了 forced-colors —— 那裡陰影會消失,框會被換成系統色
 	surface: {
-		backgroundColor: color.surface,
+		backgroundColor: color.surfaceRaised,
+		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		boxShadow: shadow.popover,
+		borderColor: "transparent",
+		borderRadius: corner.float,
+		boxShadow: shadow.float,
 		overflow: "hidden",
 		transformOrigin: "var(--transform-origin)",
 		animationName: { default: growIn, [REDUCED]: "none" },

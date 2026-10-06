@@ -3,9 +3,8 @@ import * as stylex from "@stylexjs/stylex"
 import { Children, type ReactElement, type ReactNode, isValidElement, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
-
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
+import { color, corner, font, space, text } from "../../tokens.stylex"
+import { controlStyles } from "../input/Input"
 
 export type SelectItemProps = {
 	value: string
@@ -62,31 +61,14 @@ function collect(children: ReactNode): { options: Option[]; groups: Group[] } {
 }
 
 const styles = stylex.create({
+	// 外框、底色、focus 都是 input 的 controlStyles;這裡只補 trigger 自己的排法
 	trigger: {
-		width: "100%",
-		minHeight: "2.25rem",
-		// multiple 的 trigger 是 div(不是原生 button,拿不到 UA 的 border-box)
-		boxSizing: "border-box",
 		display: "flex",
 		alignItems: "center",
 		gap: space.xxs,
 		flexWrap: "wrap",
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong },
-		borderRadius: radius.md,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
-		fontFamily: font.body,
-		fontSize: text.sm,
-		color: color.text,
-		cursor: "pointer",
+		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		textAlign: "start",
-		transitionProperty: "border-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: -1,
 	},
 	placeholder: { color: color.textFaint },
 	caret: { marginInlineStart: "auto", color: color.textFaint, flex: "none" },
@@ -96,7 +78,7 @@ const styles = stylex.create({
 		gap: space.xxs,
 		backgroundColor: color.accentSubtle,
 		color: color.text,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		paddingBlock: "0.1rem",
 		paddingInline: space.xxs,
 		fontSize: text.xs,
@@ -107,7 +89,7 @@ const styles = stylex.create({
 		lineHeight: 1,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 1,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 	},
 	search: {
 		display: "flex",
@@ -125,6 +107,8 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: text.sm,
 		color: color.text,
+		// 打開就落在這裡,閃動的游標就是焦點;UA 的框會把搜尋列框成第二個輸入框
+		outline: "none",
 		"::placeholder": { color: color.textFaint },
 	},
 	srOnly: {
@@ -139,12 +123,9 @@ const styles = stylex.create({
 	},
 	list: { maxHeight: "14rem", overflowY: "auto", padding: space.xxs, margin: 0 },
 	groupLabel: {
-		fontFamily: font.mono,
-		fontSize: "0.65rem",
-		fontWeight: 600,
-		lineHeight: 1,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
+		fontSize: text.xs,
+		fontWeight: 500,
+		lineHeight: text.leadingSnug,
 		color: color.textFaint,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
@@ -153,7 +134,8 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		borderRadius: radius.sm,
+		// 內角 = popup 的 16 − 4 padding
+		borderRadius: corner.control,
 		paddingBlock: "0.42rem",
 		paddingInline: space.xs,
 		fontSize: text.sm,
@@ -171,7 +153,8 @@ const styles = stylex.create({
 	hint: { color: color.textFaint, fontSize: "0.72rem" },
 	tick: { marginInlineStart: "auto", color: color.accent, display: "flex" },
 	empty: {
-		paddingBlock: space.md,
+		// Empty 一直都在 DOM 裡;有結果時它是空的,不能留一段 padding
+		paddingBlock: { default: space.md, ":empty": 0 },
 		paddingInline: space.sm,
 		fontSize: text.xs,
 		color: color.textMuted,
@@ -339,7 +322,7 @@ export function Select({
 				aria-labelledby={triggerLabelledBy}
 				nativeButton={!multiple}
 				render={multiple ? <div /> : undefined}
-				{...stylex.props(styles.trigger)}
+				{...stylex.props(controlStyles.base, controlStyles.md, styles.trigger)}
 			>
 				{multiple ? (
 					selectedList.length === 0 ? (
