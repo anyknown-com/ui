@@ -2,7 +2,7 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs"
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, createContext, useContext } from "react"
 import { styled } from "../../lib/styled"
-import { color, font, ink, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, ink, motion, radius, shadow, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -20,11 +20,9 @@ const styles = stylex.create({
 		// 只包住自己的 pills:整條拉滿時,4px 的內距在一大片空白旁邊會看起來像沒有間距
 		width: "fit-content",
 		maxWidth: "100%",
+		// 凹下去的 surface 軌道,不加框;選中的那格是浮在上面的一張紙
 		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		padding: space.xxs,
 		gap: "0.15rem",
 	},
@@ -38,7 +36,7 @@ const styles = stylex.create({
 		color: { default: color.textMuted, ":hover": color.text },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
-		borderRadius: radius.sm,
+		borderRadius: radius.md,
 		cursor: "pointer",
 		transitionProperty: "color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -69,9 +67,10 @@ const styles = stylex.create({
 		width: "var(--active-tab-width)",
 		height: "var(--active-tab-height)",
 		translate: "var(--active-tab-left) var(--active-tab-top)",
-		borderRadius: radius.sm,
+		// 內層圓角 = 軌道 12 − 內距 4
+		borderRadius: radius.md,
 		backgroundColor: color.surfaceRaised,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
+		boxShadow: shadow.rest,
 		pointerEvents: "none",
 		transitionProperty: "translate, width",
 		transitionDuration: { default: "240ms", [REDUCED]: "0s" },

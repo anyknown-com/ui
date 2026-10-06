@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, corner, font, motion, radius, shadow, space, type } from "../../tokens.stylex"
 
-/** `.seg`: a few words in one outline; the chosen one sits on a layer. */
+/** `.seg`: a few words on a sunken track; the chosen one is a sheet of paper raised on it. */
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const PHONE = "@media (max-width: 45rem)"
@@ -9,18 +9,21 @@ const PHONE = "@media (max-width: 45rem)"
 const styles = stylex.create({
 	root: {
 		alignSelf: "flex-start",
-		borderRadius: corner.md,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
+		// 在 grid 裡也只包住自己的選項:軌道拉滿整列會像一條空的輸入框
+		justifySelf: "start",
+		backgroundColor: color.surface,
+		borderRadius: corner.control,
 		display: "inline-flex",
 		gap: 2,
 		maxWidth: "100%",
 		overflowX: { default: "visible", [PHONE]: "auto" },
-		padding: 2,
+		padding: space.xxs,
 		scrollbarWidth: "none",
 	},
 	item: {
 		backgroundColor: { default: "transparent", ":hover": "transparent" },
-		borderRadius: corner.sm,
+		// 內層圓角 = 外框 12 − 內距 4
+		borderRadius: radius.md,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -30,15 +33,15 @@ const styles = stylex.create({
 		height: { default: 28, [PHONE]: 40 },
 		lineHeight: type.body,
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.accent}` },
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 		paddingBlock: 0,
 		paddingInline: space.sm,
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionProperty: "background-color, color",
+		transitionProperty: "background-color, color, box-shadow",
 		whiteSpace: "nowrap",
 	},
-	on: { backgroundColor: color.layer4, color: color.text },
+	on: { backgroundColor: color.surfaceRaised, boxShadow: shadow.rest, color: color.text },
 })
 
 export type SegmentedProps<T extends string> = {
