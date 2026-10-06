@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useRef, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, motion, space, type } from "../../tokens.stylex"
@@ -169,6 +170,30 @@ function SearchIcon() {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		filterPlaceholder: "過濾…",
+		count: (shown: number, total: number) => `${shown} / ${total}`,
+		select: (key: string) => `選取 ${key}`,
+		selectAll: "全選",
+		edit: (column: string, key: string) => `編輯 ${key} 的 ${column}`,
+		clearFilter: "清除過濾",
+		noMatch: (query: string) => `找不到符合「${query}」的資料。`,
+	},
+	en: {
+		filterPlaceholder: "Filter…",
+		count: (shown: number, total: number) => `${shown} / ${total}`,
+		select: (key: string) => `Select ${key}`,
+		selectAll: "Select all",
+		edit: (column: string, key: string) => `Edit ${column} of ${key}`,
+		clearFilter: "Clear filter",
+		noMatch: (query: string) => `Nothing matches “${query}”.`,
+	},
+})
+
+/** DataTable's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type DataTableLabels = StringsOf<typeof strings>
+
 /** The column a table is ordered by and which way, or `null` for the rows' own order. */
 export type SortState = { col: string; dir: "asc" | "desc" } | null
 
@@ -226,14 +251,21 @@ export type DataTableProps<Row> = {
 	emptyState?: (query: string) => ReactNode
 	/** Shows a "clear filter" link in the empty row; it empties the filter, then calls this. */
 	onClearFilter?: () => void
+	/** Override built-in words for this table; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DataTableLabels>
+	/** @deprecated Use `labels={{ count }}`. */
 	countLabel?: (shown: number, total: number) => string
+	/** @deprecated Use `labels={{ select }}`. */
 	selectLabel?: (key: string) => string
+	/** @deprecated Use `labels={{ selectAll }}`. */
 	selectAllLabel?: string
+	/** @deprecated Use `labels={{ edit }}`. */
 	editLabel?: (column: string, key: string) => string
+	/** @deprecated Use `labels={{ clearFilter }}`. */
 	clearLabel?: string
-	/** 捲動區的高度上限。 @default "20rem" */
+	/** The scroll area's maximum height. @default "20rem" */
 	maxHeight?: string | number
-	/** 跟著列一起捲的結尾 —— 「載入更多」要待在清單裡,不是待在清單外。 */
+	/** An end that scrolls with the rows: "load more" belongs inside the list, not under it. */
 	footer?: ReactNode
 	sx?: StyleArg
 }
@@ -263,7 +295,7 @@ export function DataTable<Row>({
 	filter: filterProp,
 	defaultFilter,
 	onFilterChange,
-	filterPlaceholder = "過濾…",
+	filterPlaceholder,
 	sort: sortProp,
 	defaultSort = null,
 	onSortChange,
@@ -272,15 +304,26 @@ export function DataTable<Row>({
 	onSelectedChange,
 	emptyState,
 	onClearFilter,
-	countLabel = (shown, all) => `${shown} / ${all}`,
-	selectLabel = (key) => `選取 ${key}`,
-	selectAllLabel = "全選",
-	editLabel = (column, key) => `編輯 ${key} 的 ${column}`,
-	clearLabel = "清除過濾",
+	labels,
+	countLabel,
+	selectLabel,
+	selectAllLabel,
+	editLabel,
+	clearLabel,
 	maxHeight = "20rem",
 	footer,
 	sx,
 }: DataTableProps<Row>) {
+	// 舊的單字 props 還認得,而且比 labels 優先(它們只會是呼叫端特地給的)
+	const t = useStrings(strings, {
+		...labels,
+		...(filterPlaceholder !== undefined && { filterPlaceholder }),
+		...(countLabel !== undefined && { count: countLabel }),
+		...(selectLabel !== undefined && { select: selectLabel }),
+		...(selectAllLabel !== undefined && { selectAll: selectAllLabel }),
+		...(editLabel !== undefined && { edit: editLabel }),
+		...(clearLabel !== undefined && { clearFilter: clearLabel }),
+	})
 	const [editing, setEditing] = useState<{ key: string; col: string } | null>(null)
 	const cancelling = useRef(false)
 	const [draft, setDraft] = useState("")
@@ -364,15 +407,15 @@ export function DataTable<Row>({
 						</span>
 						<input
 							type="search"
-							aria-label={filterPlaceholder}
-							placeholder={filterPlaceholder}
+							aria-label={t.filterPlaceholder}
+							placeholder={t.filterPlaceholder}
 							value={filter}
 							onChange={(event) => setFilter(event.currentTarget.value)}
 							{...stylex.props(styles.filterInput)}
 						/>
 					</div>
 					<span aria-live="polite" {...stylex.props(styles.count)}>
-						{countLabel(visible.length, total ?? rows.length)}
+						{t.count(visible.length, total ?? rows.length)}
 					</span>
 				</div>
 			)}
@@ -391,7 +434,7 @@ export function DataTable<Row>({
 										ref={selectAll}
 										type="checkbox"
 										checked={allSelected}
-										aria-label={selectAllLabel}
+										aria-label={t.selectAll}
 										onChange={(event) => toggleAll(event.currentTarget.checked)}
 										{...stylex.props(styles.checkbox)}
 									/>
@@ -430,7 +473,7 @@ export function DataTable<Row>({
 						{visible.length === 0 ? (
 							<tr>
 								<td colSpan={columns.length + (selected != null ? 1 : 0)} {...stylex.props(styles.emptyRow)}>
-									{emptyState?.(filter) ?? `找不到符合「${filter}」的資料。`}
+									{emptyState?.(filter) ?? t.noMatch(filter)}
 									{onClearFilter != null && (
 										<>
 											{" "}
@@ -442,7 +485,7 @@ export function DataTable<Row>({
 												}}
 												{...stylex.props(reset.control, styles.clear)}
 											>
-												{clearLabel}
+												{t.clearFilter}
 											</button>
 										</>
 									)}
@@ -459,7 +502,7 @@ export function DataTable<Row>({
 												<input
 													type="checkbox"
 													checked={isSelected}
-													aria-label={selectLabel(key)}
+													aria-label={t.select(key)}
 													onChange={(event) => {
 														const next = new Set(selected)
 														if (event.currentTarget.checked) next.add(key)
@@ -496,7 +539,7 @@ export function DataTable<Row>({
 													{isEditing ? (
 														<input
 															ref={focusOnMount}
-															aria-label={editLabel(column.header, key)}
+															aria-label={t.edit(column.header, key)}
 															value={draft}
 															onChange={(event) => setDraft(event.currentTarget.value)}
 															onBlur={(event) =>

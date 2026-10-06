@@ -2,6 +2,8 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useMemo, useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Badge } from "../badge/Badge"
 import { DataTable, type DataTableColumn, type SortState } from "./DataTable"
 
@@ -252,6 +254,58 @@ describe("DataTable uncontrolled state", () => {
 		expect(box).toHaveValue("")
 		expect(onFilterChange).toHaveBeenCalledWith("")
 		expect(onClearFilter).toHaveBeenCalledOnce()
+	})
+})
+
+describe("DataTable words", () => {
+	test("follow the LocaleProvider, and labels override one of them", async () => {
+		render(
+			<LocaleProvider locale="en">
+				<DataTable
+					label="Dictionary"
+					rows={[] as Entry[]}
+					total={3}
+					rowKey={(row) => row.key}
+					columns={KEY_COLUMN}
+					defaultFilter="zzz"
+					defaultSelected={new Set()}
+					onClearFilter={() => {}}
+					labels={{ clearFilter: "Show everything" }}
+				/>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("searchbox", { name: "Filter…" })).toBeInTheDocument()
+		expect(screen.getByRole("checkbox", { name: "Select all" })).toBeInTheDocument()
+		expect(screen.getByText("Nothing matches “zzz”.")).toBeInTheDocument()
+		expect(screen.getByText("0 / 3")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Show everything" })).toBeInTheDocument()
+	})
+
+	test("the deprecated word props still win", () => {
+		render(
+			<LocaleProvider locale="en">
+				<DataTable
+					label="Dictionary"
+					rows={ENTRIES}
+					rowKey={(row) => row.key}
+					columns={KEY_COLUMN}
+					defaultSelected={new Set()}
+					selectAllLabel="All rows"
+					selectLabel={(key) => `Pick ${key}`}
+					labels={{ selectAll: "ignored" }}
+				/>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("checkbox", { name: "All rows" })).toBeInTheDocument()
+		expect(screen.getByRole("checkbox", { name: "Pick nav.projects" })).toBeInTheDocument()
+	})
+
+	test("axe: filter, sort, selection and an edit in progress", async () => {
+		const { container } = render(<Dictionary />)
+		await userEvent.click(screen.getByRole("button", { name: /^key/ }))
+		await userEvent.click(screen.getByRole("checkbox", { name: "選取 nav.projects" }))
+		await userEvent.dblClick(screen.getByText("專案"))
+		await expectNoAxeViolations(container)
 	})
 })
 

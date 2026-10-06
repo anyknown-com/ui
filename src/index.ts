@@ -249,6 +249,7 @@ export { DiffViewer, type DiffViewerProps, type DiffFile } from "./components/di
 export type { DiffViewerLabels } from "./components/diff-viewer/DiffViewer"
 export { DataTable } from "./components/data-table/DataTable"
 export type { DataTableProps, DataTableColumn, SortState } from "./components/data-table/DataTable"
+export type { DataTableLabels } from "./components/data-table/DataTable"
 export { Markdown, type MarkdownProps, type MarkdownBlock } from "./components/markdown/Markdown"
 export type { MarkdownLabels } from "./components/markdown/Markdown"
 export { Formula, type FormulaProps } from "./components/markdown/Formula"
