@@ -10,16 +10,20 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ## 表單
 
 ### input / textarea
-單行與多行文字輸入,共用 border / focus / error 的樣式語言。
+單行與多行文字輸入,共用 border / focus / error 的樣式語言(`controlStyles`)。
+
+- 紙上凹下去的一格:`surface` 底 + 1px `border`(邊界要 3:1 才看得到,只靠底色不夠),
+  `corner.control`(12px)。focus 時框換 `focusRing`(= `signal`),外面再一圈 2px、32% 的
+  `signal` 淡環;invalid 時框與環都換成 `danger`
 
 - **控件自己要寫 `boxSizing: border-box`**。`<input>` / `<textarea>` 拿的是瀏覽器預設的
-  content-box,`minHeight: 2.25rem` 會變成「內容」36px 再加 padding + border,md 實際
-  長到 54px(還會因為 `width: 100%` 超出容器 26px)。不能靠 app 端剛好有
+  content-box,`minHeight` 會變成「內容」的高再加 padding + border(舊的 36px md 實際
+  長到 54px,還會因為 `width: 100%` 超出容器 26px)。不能靠 app 端剛好有
   `*{box-sizing:border-box}`。同一個坑也修了 Select 的 multiple trigger(那顆是 div,
   拿不到 UA 的 border-box)
-- **單行控件行高用 `leadingTight`**。1.5 會把 md 撐到 39px,和 button / select 差 3px。
+- **單行控件行高用 `leadingTight`**。行高一大就會把 md 撐得比 button 高,並排時對不齊。
   Textarea 自己蓋回 `leadingRelaxed`,多行照樣好讀
-- 尺寸:md / sm / button / select = 36 / 28 / 36 / 36px,textarea 72px
+- 尺寸:md / sm = 40 / 32px,跟 button 的預設與小顆對齊;textarea 72px
 - **`autoGrow` 依序走三條路**:
   1. 支援 `field-sizing: content`(Chrome / Edge 123、Safari 26.2、Firefox 152 起)→ 純 CSS,
      不寫 inline height
@@ -58,22 +62,24 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ### checkbox
 原生 `<input type="checkbox">` 隱藏 + 自繪 box。
 
-- 未勾是 `bg` 上一圈 1.5px `borderStrong`;勾選 / indeterminate 是 `accent` 實心方塊,
-  上面一筆 `accentText` 的勾(或一橫),`stroke-dashoffset` 160ms 畫出來
+- 未勾是 `bg` 上一圈 1.5px `borderStrong`;勾選 / indeterminate 是 `accent`(墨色)實心方塊,
+  上面一筆 `accentText` 的勾(或一橫),`stroke-dashoffset` 160ms 畫出來。圓角 `corner.small`
 - dasharray(32)要比路徑(約 18)長:曾用 24 配 28 的路徑,unchecked 時會漏出尾巴
 - field context 的 `invalid` 畫成 `danger` 邊框
 
 ### radio
 原生 `<input type="radio">` + `fieldset/legend`。`variant="card"` 選中時亮整張。
 
-- 標準構成:外環 + 空隙 + 內圓。選中時外環與內圓都是 `accent`,內圓 scale 0 → 1
-  160ms ease-out,不過衝
+- 未選是 `bg` 上一圈 1.5px `borderStrong`;選中是 `accent`(墨色)實心圓,中間一顆
+  `accentText` 的點(跟 checkbox 的勾同一組配色),點 scale 0 → 1 160ms ease-out,不過衝
+- `card` 的框是 `corner.control`
 
 ### switch
 即時生效的開關(相對於 Checkbox 的「提交後生效」)。原生 checkbox + `role="switch"`。
 
-- 軌道是實心藥丸:關 `borderStrong`、開 `accent`。thumb 關的時候永遠是白的(用 `bg`
-  在暗色下會變成黑鈕),開的時候是 `accentText`
+- 軌道是實心膠囊:關 `borderStrong`、開 `accent`(墨色)。thumb 是浮在軌道上的圓鈕,帶
+  `shadow.rest`。關的時候永遠是白的(用 `bg` 在暗色下會變成黑鈕),開的時候是 `accentText`
+  —— 淺色是白;暗色的墨是淺色,鈕跟著反成深色,不然白鈕放在近白的軌道上分不出來
 - thumb 滑動 180ms ease-out,**不過衝** —— 曾用 `cubic-bezier(.34,1.56,.64,1)` 的雙彈跳,
   過衝一律不要
 - 設定列的慣用排版:文字在左、開關在右
@@ -84,7 +90,7 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 - **刻意不用 Base UI**:它的方向鍵一次走 `step`,要「拖曳連續、方向鍵 5%」就得跟它搶
   keydown;一顆單向的 `role="slider"` 自己寫比較誠實
 - 方向鍵 ±5%(range 的,不是 step 的)、Home / End 到底,值一律 clamp 再 snap 回 step
-- 軌道 `layer4`、填滿 `borderStrong`、握把 `surfaceRaised` + `shadow.raised`
+- 軌道 `layer4`、填滿 `borderStrong`、握把是膠囊形的 `surfaceRaised` + `shadow.rest`
 - 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)
 - `valueText` 唸的是標籤不是數字:0.62 要唸成「多」
 - 存檔接 `onValueCommit` 不接 `onChange`:拖曳放開(含 pointercancel)給一次、方向鍵 / Home / End
@@ -107,12 +113,15 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 ## 基礎
 
 ### button
-平的:一個 background、hover 往頁面底色混 14%(ghost 類是透明 → `bone` / `dangerSubtle`)。
+膠囊(`corner.pill`)。高度 lg / md / sm = 48 / 40 / 32,預設 md 40 是觸控的高;xs 28 只給
+擠的工具列,不在三階裡。`icon` 是正圓,直徑跟著那一階的高。hover:實心的往頁面底色混 14%,
+secondary 深一階(`layer5`),ghost 類是透明 → `accentSubtle` / `dangerSubtle`。
+按下去 `scale: 0.98`,120ms ease-out;reduced motion 不縮。
 
 | variant | 底 | 標籤色 | 用在 |
 | --- | --- | --- | --- |
-| `primary` | `accent` | `accentText` | 主要動作,一個畫面一顆 |
-| `secondary` | `bone` | `text` | 次要動作 |
+| `primary` | `accent`(墨色) | `accentText` | 主要動作,一個畫面一顆 |
+| `secondary` | `accentSubtle`(凹下去,無框) | `text` | 次要動作 |
 | `ghost` | 透明 | `textMuted` | 安靜的第三選項 |
 | `danger` | `danger` | `accentText` | 不可逆的破壞性動作 |
 | `dangerGhost` | 透明 | `danger` | 「白底紅字」:要看得出語意但不搶份量 |
@@ -205,7 +214,8 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
   disabled tab 保持可聚焦不被跳過 —— 這是 APG 預設。可見的 disabled 樣式要用
   `state.disabled`,寫 `:disabled` 永遠不會命中
 - underline 240ms `cubic-bezier(.16,1,.3,1)`,兩邊各自單調往目標走,**無倒退無過衝**
-- pills:選取高亮是一顆平的藥丸(`surfaceRaised` + 1px `border`)在 tab 底下滑
+- pills:軌道是凹下去的 `surface`(`corner.control`,不加框),選中的那格是浮起來的一張紙
+  (`surfaceRaised` + `shadow.rest`)在 tab 底下滑。內層圓角 = 12 − 內距 4 = 8
 - indicator 位置不自己量:Base UI 的 `Tabs.Indicator` 本來就把 `--active-tab-*` 寫成
   inline style,藥丸的 `width` / `height` / `translate` 直接吃那些變數
 - 走過的彎路:底線的「鬆緊彈性」(雙彈簧 + 拉伸下垂)——「太誇張了」;
@@ -214,6 +224,8 @@ portal 到 body,跟 dialog / toast 同在 body 層比 z-index,各寫各的就會
 ### badge / chip
 badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位,同一家族。
 
+- 膠囊(`corner.pill`)。`neutral` / `mono` 是凹下去的 `accentSubtle` 底、不加框;框只留給
+  `outline` 這一種
 - chip 的 `×`:負 block margin 讓圓鈕不撐高 chip,`::after` 補到 24px 命中區
   (WCAG 2.2)而不影響版面 —— 這一招可以套到其他小命中區
 - `removeLabel` 只在給了 `onRemove` 時必填;沒有 × 就沒有要唸的東西
@@ -222,7 +234,7 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
   可按的 chip 不轉發 `ref`(那會是 button 的 ref,不是 span 的)
 
 ### kbd
-快捷鍵標示:surface 底 + border + 1px 下緣陰影做出按鍵感,Geist Mono,
+快捷鍵標示:surface 底 + border + 1px 下緣陰影做出按鍵感,`corner.small`,Geist Mono,
 單鍵 / 組合 / 序列三種排法。
 
 ### skeleton
@@ -230,7 +242,10 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 避免載入完成時跳版。
 
 ### progress
-1. **bar(determinate)** — 4px 的 `border` 軌 + `accent` 實心填充,寬度跟著 value 走
+進度條說的是「agent 正在做事」,所以填充用 `signal`;ring / ball 是讀數(context 用量),
+不是工作中,留墨色 `accent`。
+
+1. **bar(determinate)** — 6px 的 `accentSubtle` 膠囊軌 + `signal` 實心填充,寬度跟著 value 走
    (進度更新頻繁,用短的 linear transition,expo 會拖在後面)
 2. **bar(indeterminate)** — 40% 的一段 1.8s linear 滑過去;底下一行 mono 說現在在做什麼。
    reduced motion 時停在原地
@@ -238,6 +253,8 @@ badge 是唯讀語意標籤,chip 是可互動(可移除、可按)的篩選單位
 4. **spinner** — 一段 `currentColor` 的弧 0.8s linear 在轉
 5. **ball** — 跟 ring 同一張圖,只是尺寸不同;API 留著
 
+- 坑:軌是 `<span>`,要自己寫 `display: block`。determinate 外層是 block 的 div,span 留在
+  inline 時寬高都不生效,整條看不見(indeterminate 外層是 grid,子元素自動 blockify 才沒事)
 - **零 rAF**:determinate 靠 CSS transition,indeterminate 靠 CSS animation
 - indeterminate **不設 `aria-valuenow`、不顯示百分比** —— 沒有真實進度可報
 - spinner 用 `role=status`;它不從內容取名,所以 `aria-label` 與視覺隱藏的內文都要
@@ -419,6 +436,7 @@ chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `Ic
 ### live-dot
 「還在跑」的一顆呼吸點。給工具紀錄的當前動作、sub thread 的進行中狀態。
 
+- 點是 `signal`:「還在跑」就是 agent 正在做事
 - 呼吸只到 0.35 就回來:淡到底會變成閃爍,那是警報不是「還在跑」
 - 1.6s `ease-in-out` 無限循環,`prefers-reduced-motion` 直接停住(點還在,只是不動)
 - 預設 `aria-hidden` —— 一顆點沒有要唸的東西;給 `label` 才升成 `role="status"`
@@ -471,10 +489,15 @@ Caps Lock 警告、confirm 欄不一致錯誤。
   「載入更多」待在清單裡才跟得上捲動
 
 ### ghost / icon-button / segmented / spin / status-chip
-平面語言的小控件,從 product 的 ui-next 原樣搬來:`Ghost` / `GhostLink` 是沒有底的文字鈕,
+小控件,從 product 的 ui-next 搬來:`Ghost` / `GhostLink` 是沒有底的文字鈕,
 `IconButton` 一定帶 Tooltip(名字就是 tooltip),`Segmented` 是 `aria-pressed` 的按鈕組不是
 tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字母的狀態碼
 (`r` `w` `d` `n` `a` `f` `plain`),`Pill` 是 fold 第一行的 22px mono 藥丸。
+
+- `IconButton` 是正圓(`corner.pill`),按下去 0.98,focus 環是 `focusRing`
+- `Segmented` 跟 pills tabs 同一個語言:凹下去的 `surface` 軌道(`corner.control`,不加框),
+  選中的那格是 `surfaceRaised` + `shadow.rest` 的一張紙。在 grid 裡也只包住自己的選項
+- `StatusChip` 的 `a`(執行中)與 `Pill` 的 `live` 點用 `signal`:那是 agent 正在做事
 
 ### group / page / settings-rows / table
 頁面骨架的零件:`Group` + `Row` / `Item` 是一張清單卡(見下一節),`PageHead` / `SectionLabel` /
@@ -505,8 +528,8 @@ tabs,`Spin` 是按鈕裡那顆 12px 的環,`StatusChip` 的 variant 是一個字
 
 ### status-badge
 一個東西自己在跑時(AI 在操作的畫面)放在它頭上的狀態藥丸:`t2`、上下 4 左右 10、
-全圓角。`live` 是 `layer4` 底 + 呼吸的 `LiveDot`、`warn` 是 22% 的 warning 底配 warning 字、
-`plain` 是 `layer4` 底配 muted 字。
+膠囊。`live` 是 `signalSubtle` 底配 `signal` 字 + 呼吸的 `LiveDot`(AI 在做事)、`warn` 是 22%
+的 warning 底配 warning 字、`plain` 是 `accentSubtle` 底配 muted 字。
 
 - 不是 `Pill`(fold 第一行 22px 的 mono 藥丸),也不是 `StatusChip`(16px 的工具狀態碼)
 - `live` 的字只唸一次:`LiveDot` 帶 `role="status"` 唸狀態,看得到的字 `aria-hidden`
