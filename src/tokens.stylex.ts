@@ -1,93 +1,99 @@
 import * as stylex from "@stylexjs/stylex"
 
 // Semantic tokens for all AnyKnown products, in the 軟材 (tactile) language:
-// white paper on a cool grey desk, ink text, ink accent, iris `signal` for agent activity
-// and focus. Spec: docs/plans/02-tactile.md. Colour values come from scripts/palette.mjs
-// (OKLCH → hex); change them there and paste the output back here.
+// white paper on a neutral grey desk (chroma 0), ink text, ink accent, ink links, blue `signal`
+// for agent activity, focus and progress. Spec: docs/plans/02-tactile.md. Colour values come
+// from scripts/palette.mjs (12-step OKLCH scales → hex); change the scale there, rerun it and
+// paste the output back here. Never hand-tune a single value.
 // Light is the primary mode; dark follows the OS unless a theme from themes.stylex.ts is applied.
 
 const DARK = "@media (prefers-color-scheme: dark)"
 
 export const color = stylex.defineVars({
-	bg: { default: "#FFFFFF", [DARK]: "#15171B" },
-	surface: { default: "#F4F5F8", [DARK]: "#1D1F24" },
-	surfaceRaised: { default: "#FFFFFF", [DARK]: "#24272B" },
-	border: { default: "#E0E2E6", [DARK]: "#303338" },
-	borderStrong: { default: "#C6C9CE", [DARK]: "#454950" },
+	bg: { default: "#FFFFFF", [DARK]: "#121212" },
+	surface: { default: "#F9F9F9", [DARK]: "#181818" },
+	surfaceRaised: { default: "#FFFFFF", [DARK]: "#1F1F1F" },
+	border: { default: "#DFDFDF", [DARK]: "#2B2B2B" },
+	borderStrong: { default: "#D3D3D3", [DARK]: "#4A4A4A" },
 	// 控制項邊界(input、checkbox、radio、switch 關):對底色要 3:1 才算看得到
-	borderControl: { default: "#81858C", [DARK]: "#6F737A" },
-	text: { default: "#161A1F", [DARK]: "#EFF0F3" },
-	textMuted: { default: "#5B5F67", [DARK]: "#B7BBC1" },
-	textFaint: { default: "#7C8088", [DARK]: "#83868C" },
-	accent: { default: "#1B1E24", [DARK]: "#EFF0F3" },
-	accentText: { default: "#FFFFFF", [DARK]: "#15171B" },
-	accentSubtle: { default: "#E9EBEF", [DARK]: "#2B2E33" },
-	// 鳶尾紫:只給 agent 正在做事、焦點環、目前選中的導覽項。不當按鈕底色,不拿來裝飾。
-	signal: { default: "#5D55C6", [DARK]: "#A8ABFC" },
-	signalSubtle: { default: "#EDEFFE", [DARK]: "#2C2C4E" },
-	danger: { default: "#C72E2B", [DARK]: "#FA887D" },
-	dangerSubtle: { default: "#FFEEEC", [DARK]: "#46221E" },
-	success: { default: "#227849", [DARK]: "#66C189" },
-	successSubtle: { default: "#E7F8EC", [DARK]: "#193323" },
-	warning: { default: "#A85B05", [DARK]: "#F2B458" },
-	warningSubtle: { default: "#FFF2DE", [DARK]: "#402C12" },
+	borderControl: { default: "#808080", [DARK]: "#747474" },
+	text: { default: "#171717", [DARK]: "#F0F0F0" },
+	textMuted: { default: "#5C5C5C", [DARK]: "#BABABA" },
+	textFaint: { default: "#808080", [DARK]: "#868686" },
+	accent: { default: "#171717", [DARK]: "#F0F0F0" },
+	accentText: { default: "#FFFFFF", [DARK]: "#121212" },
+	accentSubtle: { default: "#EDEDED", [DARK]: "#242424" },
+	// 連結:墨色加底線,不用藍
+	link: { default: "#171717", [DARK]: "#F0F0F0" },
+	// 藍:只給 agent 正在做事、焦點環、進度。不當按鈕底色,不拿來裝飾。
+	signal: { default: "#0169DA", [DARK]: "#89BAFE" },
+	signalSubtle: { default: "#E9F2FF", [DARK]: "#101E33" },
+	danger: { default: "#CA322E", [DARK]: "#FE8C80" },
+	dangerSubtle: { default: "#FEECEA", [DARK]: "#301512" },
+	// 只給不可復原的刪除按鈕;onDangerSolid 是上面的字
+	dangerSolid: { default: "#CA322E", [DARK]: "#D23934" },
+	onDangerSolid: { default: "#FFFFFF", [DARK]: "#FFFFFF" },
+	success: { default: "#246E3A", [DARK]: "#76CF8A" },
+	successSubtle: { default: "#E4F7E7", [DARK]: "#0C2412" },
+	warning: { default: "#955E02", [DARK]: "#FAB45F" },
+	warningSubtle: { default: "#FFEEDC", [DARK]: "#2B1A04" },
 	// info 併進 signal:資訊提示跟「agent 在跟你說話」是同一件事。focusRing 也是 signal。
-	info: { default: "#5D55C6", [DARK]: "#A8ABFC" },
-	infoSubtle: { default: "#EDEFFE", [DARK]: "#2C2C4E" },
-	focusRing: { default: "#5D55C6", [DARK]: "#A8ABFC" },
-	// dialog 的 backdrop:中性墨 32%,不加 blur(backdrop-filter 是反模式)。暗色用黑。
-	scrim: { default: "rgba(22, 26, 31, 0.32)", [DARK]: "rgba(0, 0, 0, 0.32)" },
-	bone: { default: "#E8E9ED", [DARK]: "#292B30" },
-	sheen: { default: "#F2F3F6", [DARK]: "#34373C" },
-	successHl: { default: "#C0EACD", [DARK]: "#19482C" },
-	dangerHl: { default: "#FFD4CE", [DARK]: "#632D28" },
+	info: { default: "#0169DA", [DARK]: "#89BAFE" },
+	infoSubtle: { default: "#E9F2FF", [DARK]: "#101E33" },
+	focusRing: { default: "#0169DA", [DARK]: "#89BAFE" },
+	// dialog 的 backdrop:黑 32%,不加 blur(backdrop-filter 是反模式)。
+	scrim: { default: "rgba(0, 0, 0, 0.32)", [DARK]: "rgba(0, 0, 0, 0.32)" },
+	bone: { default: "#EDEDED", [DARK]: "#1F1F1F" },
+	sheen: { default: "#F9F9F9", [DARK]: "#242424" },
+	successHl: { default: "#C5EDCC", [DARK]: "#0B3719" },
+	dangerHl: { default: "#FFD6D0", [DARK]: "#4C1D19" },
 	// 分層底色:rail → main → 訊息 → fold → 列,越深的一階數字越大。
 	// 面與面靠深淺分,不靠邊框;hover 升一階,對應表在 lib/layers.ts。
-	layer1: { default: "#EDEFF3", [DARK]: "#0D0E11" },
-	layer2: { default: "#FFFFFF", [DARK]: "#15171B" },
-	layer3: { default: "#F4F5F8", [DARK]: "#1D1F24" },
-	layer4: { default: "#E9EBEF", [DARK]: "#24272B" },
-	layer5: { default: "#DDE0E4", [DARK]: "#2D3036" },
+	layer1: { default: "#F2F2F2", [DARK]: "#0A0A0A" },
+	layer2: { default: "#FFFFFF", [DARK]: "#121212" },
+	layer3: { default: "#F9F9F9", [DARK]: "#181818" },
+	layer4: { default: "#EDEDED", [DARK]: "#242424" },
+	layer5: { default: "#E6E6E6", [DARK]: "#2B2B2B" },
 })
 
-// 三階 elevation,越靠近使用者陰影越深。淺色用中性墨(hue 262)染色,暗色用黑;
+// 三階 elevation,越靠近使用者陰影越深。陰影一律用黑,不染色;
 // rest 的 1px 環是 border 色(暗色只有環,底色升一階由元件給 surface)。
 // float、modal 在暗色要配 surfaceRaised 底。
 export const shadow = stylex.defineVars({
 	// 紙上的卡片:tool card、檔案列、附件
 	rest: {
-		default: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
-		[DARK]: "0 0 0 1px #303338",
+		default: "0 0 0 1px #DFDFDF, 0 2px 6px rgba(0, 0, 0, 0.05)",
+		[DARK]: "0 0 0 1px #2B2B2B",
 	},
 	// popover、dropdown、select、tooltip、toast
 	float: {
-		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
 	// dialog、sheet
 	modal: {
-		default: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
+		default: "0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16)",
 		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
 	},
 	// 舊名,值跟著最接近的新階走,元件改完前不會跟新階打架。新程式碼用上面三個。
 	raised: {
-		default: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
-		[DARK]: "0 0 0 1px #303338",
+		default: "0 0 0 1px #DFDFDF, 0 2px 6px rgba(0, 0, 0, 0.05)",
+		[DARK]: "0 0 0 1px #2B2B2B",
 	},
 	popover: {
-		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
 	pop: {
-		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
 	dock: {
-		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
 		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
 	},
 	sheet: {
-		default: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
+		default: "0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16)",
 		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
 	},
 })
@@ -156,10 +162,10 @@ export const type = stylex.defineVars({
 })
 
 export const tone = stylex.defineVars({
-	layer6: { default: "#D1D4DA", [DARK]: "#373B41" },
-	faint: { default: "#7C8088", [DARK]: "#83868C" },
-	railLayer2: { default: "#FFFFFF", [DARK]: "#1D1F24" },
-	railLayer3: { default: "#E9EBEF", [DARK]: "#24272B" },
+	layer6: { default: "#D3D3D3", [DARK]: "#373737" },
+	faint: { default: "#808080", [DARK]: "#868686" },
+	railLayer2: { default: "#FFFFFF", [DARK]: "#1F1F1F" },
+	railLayer3: { default: "#EDEDED", [DARK]: "#242424" },
 })
 
 // 圓角跟尺寸走:越靠近使用者越圓。巢狀時內層圓角 = 外層 − padding。
