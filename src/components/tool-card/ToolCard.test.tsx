@@ -176,6 +176,23 @@ describe("ToolCard open state", () => {
 	})
 })
 
+describe("ToolCard status announcements", () => {
+	test("one polite status region, outside the row, whose text changes only with the state", () => {
+		const { rerender } = render(
+			<ToolCard tool="fetch" state="running" durationLabel="00:01" progress={0.1} />,
+		)
+		const status = screen.getByRole("status")
+		expect(screen.getAllByRole("status")).toHaveLength(1)
+		expect(screen.getByRole("button")).not.toContainElement(status)
+		expect(status).toHaveTextContent(/^執行中$/)
+		// the clock and the bar tick; the announcement does not
+		rerender(<ToolCard tool="fetch" state="running" durationLabel="00:02" progress={0.5} />)
+		expect(status).toHaveTextContent(/^執行中$/)
+		rerender(<ToolCard tool="fetch" state="completed" durationLabel="00:03" />)
+		expect(status).toHaveTextContent(/^完成$/)
+	})
+})
+
 describe("ToolCard progress", () => {
 	test("indeterminate by default: no progressbar is exposed", () => {
 		render(<ToolCard tool="fetch" state="running" subtitle="example.com" />)
