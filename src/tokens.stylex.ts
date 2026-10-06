@@ -46,18 +46,46 @@ export const color = stylex.defineVars({
 	layer5: { default: "#DDE0E4", [DARK]: "#2D3036" },
 })
 
+// 三階 elevation,越靠近使用者陰影越深。淺色用中性墨(hue 262)染色,暗色用黑;
+// rest 的 1px 環是 border 色(暗色只有環,底色升一階由元件給 surface)。
+// float、modal 在暗色要配 surfaceRaised 底。
 export const shadow = stylex.defineVars({
-	popover: {
-		default: "0 8px 24px rgba(35, 33, 29, 0.1)",
-		[DARK]: "0 8px 24px rgba(0, 0, 0, 0.4)",
+	// 紙上的卡片:tool card、檔案列、附件
+	rest: {
+		default: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
+		[DARK]: "0 0 0 1px #303338",
 	},
+	// popover、dropdown、select、tooltip、toast
+	float: {
+		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	},
+	// dialog、sheet
+	modal: {
+		default: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
+		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
+	},
+	// 舊名,值跟著最接近的新階走,元件改完前不會跟新階打架。新程式碼用上面三個。
 	raised: {
-		default: "0 1px 2px rgba(35, 33, 29, 0.08)",
-		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.3)",
+		default: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
+		[DARK]: "0 0 0 1px #303338",
 	},
-	pop: "0 10px 36px rgba(0, 0, 0, 0.22)",
-	sheet: "0 16px 50px rgba(0, 0, 0, 0.24)",
-	dock: "0 12px 40px rgba(0, 0, 0, 0.14)",
+	popover: {
+		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	},
+	pop: {
+		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	},
+	dock: {
+		default: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	},
+	sheet: {
+		default: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
+		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
+	},
 })
 
 export const font = stylex.defineVars({

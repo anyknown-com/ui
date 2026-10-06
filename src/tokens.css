@@ -41,8 +41,11 @@ html {
 	--ak-layer4: #e9ebef;
 	--ak-layer5: #dde0e4;
 
-	--ak-shadow-popover: 0 8px 24px rgba(35, 33, 29, 0.1);
-	--ak-shadow-raised: 0 1px 2px rgba(35, 33, 29, 0.08);
+	--ak-shadow-rest: 0 0 0 1px #e0e2e6, 0 2px 6px rgba(22, 26, 31, 0.05);
+	--ak-shadow-float: 0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1);
+	--ak-shadow-modal: 0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16);
+	--ak-shadow-popover: 0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1);
+	--ak-shadow-raised: 0 0 0 1px #e0e2e6, 0 2px 6px rgba(22, 26, 31, 0.05);
 
 	--ak-font-display:
 		"Geist Variable", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui,
@@ -101,8 +104,11 @@ html {
 		--ak-layer4: #24272b;
 		--ak-layer5: #2d3036;
 
-		--ak-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.4);
-		--ak-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+		--ak-shadow-rest: 0 0 0 1px #303338;
+		--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+		--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6);
+		--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+		--ak-shadow-raised: 0 0 0 1px #303338;
 	}
 }
 
@@ -116,8 +122,11 @@ html {
 	--ak-sheen: #34373c;
 	--ak-success-hl: #19482c;
 	--ak-danger-hl: #632d28;
-	--ak-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.4);
-	--ak-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--ak-shadow-rest: 0 0 0 1px #303338;
+	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+	--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6);
+	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+	--ak-shadow-raised: 0 0 0 1px #303338;
 	--ak-bg: #15171b;
 	--ak-surface: #1d1f24;
 	--ak-surface-raised: #24272b;

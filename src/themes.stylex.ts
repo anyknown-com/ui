@@ -41,8 +41,14 @@ export const lightColor = stylex.createTheme(color, {
 })
 
 export const lightShadow = stylex.createTheme(shadow, {
-	popover: "0 8px 24px rgba(35, 33, 29, 0.1)",
-	raised: "0 1px 2px rgba(35, 33, 29, 0.08)",
+	rest: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
+	float: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+	modal: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
+	raised: "0 0 0 1px #E0E2E6, 0 2px 6px rgba(22, 26, 31, 0.05)",
+	popover: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+	pop: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+	dock: "0 1px 2px rgba(22, 26, 31, 0.06), 0 10px 24px rgba(22, 26, 31, 0.1)",
+	sheet: "0 2px 4px rgba(22, 26, 31, 0.06), 0 24px 56px rgba(22, 26, 31, 0.16)",
 })
 
 export const lightTone = stylex.createTheme(tone, {
@@ -87,8 +93,14 @@ export const darkColor = stylex.createTheme(color, {
 })
 
 export const darkShadow = stylex.createTheme(shadow, {
-	popover: "0 8px 24px rgba(0, 0, 0, 0.4)",
-	raised: "0 1px 2px rgba(0, 0, 0, 0.3)",
+	rest: "0 0 0 1px #303338",
+	float: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	modal: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
+	raised: "0 0 0 1px #303338",
+	popover: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	pop: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	dock: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
+	sheet: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
 })
 
 export const darkTone = stylex.createTheme(tone, {
