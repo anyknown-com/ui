@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
-import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 import { Checkbox } from "../checkbox/Checkbox"
 import { Radio } from "../radio/Radio"
@@ -23,8 +23,8 @@ const styles = stylex.create({
 		gap: space.sm,
 		fontFamily: font.body,
 		transitionProperty: "box-shadow",
-		transitionDuration: { default: "180ms", [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
+		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	// forced colors 下陰影和環都會消失:等你回覆的卡片改畫一圈 CanvasText
 	permissionPending: {
@@ -65,7 +65,7 @@ const styles = stylex.create({
 		whiteSpace: "pre",
 		margin: 0,
 		color: color.text,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
 	actions: { display: "flex", gap: space.xs, flexWrap: "wrap" },
@@ -144,7 +144,7 @@ const styles = stylex.create({
 		minHeight: "2.4rem",
 		transitionProperty: "border-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 		"::placeholder": { color: color.textFaint },
 	},
