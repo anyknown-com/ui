@@ -239,7 +239,7 @@ export function DesktopDemos() {
 				/>
 			</Demo>
 
-			<Demo id="handoff-receipt" title="handoff-receipt" note="展開時左右兩段線接上,中間打一個結。">
+			<Demo id="handoff-receipt" title="handoff-receipt" note="分隔線中間一顆膠囊;點開看交接摘要。">
 				<HandoffReceipt
 					at="14:32"
 					ctxPercent={50}
@@ -276,7 +276,11 @@ export function DesktopDemos() {
 				/>
 			</Demo>
 
-			<Demo id="voice-indicator" title="voice-indicator" note="同一條纖維的四種狀態。">
+			<Demo
+				id="voice-indicator"
+				title="voice-indicator"
+				note="一條波形的四種狀態:閒置是灰的,聆聽、思考、說話是紫的。"
+			>
 				<VoiceIndicator state={voice} />
 				<Row>
 					{VOICE_STATES.map((state) => (

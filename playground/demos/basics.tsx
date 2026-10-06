@@ -135,7 +135,7 @@ export function BasicsDemos() {
 			<Demo
 				id="button"
 				title="button"
-				note="沒有 background:實心是紗織出來的。hover 帶動掃過的紗,按住把布壓出一個窩,放開回彈時光從按點掃出;拖出去放開 = 取消,不播觸發視覺。"
+				note="膠囊,預設高 40。主動作是墨色實心,一頁一顆;secondary 是凹下去的灰底,ghost 只在 hover 有底。按下縮到 0.98,reduced-motion 時不縮。"
 			>
 				<Row>
 					<Button>建立 thread</Button>
@@ -165,7 +165,7 @@ export function BasicsDemos() {
 						<MemoryIcon />
 						帶圖示
 					</Button>
-					<Button variant="secondary">很長的一顆按鈕,看寬布的織法有沒有接好</Button>
+					<Button variant="secondary">很長的一顆按鈕,看長文字會不會撐破膠囊</Button>
 				</Row>
 			</Demo>
 
@@ -291,7 +291,7 @@ export function BasicsDemos() {
 			<Demo
 				id="toast"
 				title="toast"
-				note="倒數是一條退織的線;hover、focus、切走分頁都會停住。loading 不倒數;同 key 原地更新並計數。"
+				note="底邊的細膠囊是倒數;hover、focus、切走分頁都會停住。loading 不倒數;同 key 原地更新並計數。"
 			>
 				<Row>
 					<Button variant="secondary" onClick={() => toast("交接摘要已複製")}>
@@ -486,7 +486,7 @@ export function BasicsDemos() {
 			<Demo
 				id="progress"
 				title="progress"
-				note="一個凹進去的容器,裡面長出一塊布 —— 就是 button 那塊,同一組紗與落影。環形同理:布在後面,弧形只是取景框。"
+				note="凹下去的軌加一段紫色填充,表示 agent 正在做事;不定量時填充在軌上滑過。環形與圓球是讀數,用墨色。"
 			>
 				<Progress value={percent} aria-label="同步 thread" valueText={`${percent}% · 3 則訊息交接中`} />
 				<Row>
@@ -508,7 +508,7 @@ export function BasicsDemos() {
 				<EmptyState
 					icon={<MemoryIcon />}
 					title="還沒有記憶"
-					description="線還沒開始織。開始第一個 thread,重要的事會自動留下來,換班時帶得走。"
+					description="開始第一個 thread,重要的事會自動留下來,換班時帶得走。"
 					action={<Button>開始第一個 thread</Button>}
 				/>
 				<EmptyState

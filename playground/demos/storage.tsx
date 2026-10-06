@@ -148,7 +148,7 @@ export function StorageDemos() {
 				<RecoveryKey value="K7PQ-WM2X-9RDF-H4TN-ZC8B-JE6V-A3YS-UG5L" ack={ack} onAckChange={setAck} />
 			</Demo>
 
-			<Demo id="dropzone" title="dropzone" note="dragover 時虛線蟻行,像把檔案縫進 vault。">
+			<Demo id="dropzone" title="dropzone" note="拖檔案進來時,虛線變紫並開始流動,底色換成淡紫。">
 				<Dropzone
 					maxSize={10 * 1024 * 1024}
 					onFiles={(files) =>
