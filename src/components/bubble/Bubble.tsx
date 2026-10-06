@@ -24,6 +24,8 @@ const styles = stylex.create({
 		borderRadius: BUBBLE_CORNER,
 		borderEndEndRadius: corner.small,
 		paddingInline: 16,
+		// forced colors 會換掉底色,泡泡只剩框才跟回覆分得開
+		outline: { default: null, "@media (forced-colors: active)": "1px solid CanvasText" },
 	},
 	assistant: {},
 	markdown: { fontSize: type.t3, lineHeight: type.body },
