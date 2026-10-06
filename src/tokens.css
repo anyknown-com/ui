@@ -1,6 +1,7 @@
 /* Tokens as plain CSS variables — for non-StyleX consumers
  * (desktop uses Tailwind v4 @theme; reference these vars there).
- * Source of truth: tokens.stylex.ts. Keep values in sync manually for now. */
+ * Generated from tokens.stylex.ts by scripts/tokens-css.mjs — do not edit by hand.
+ * Regenerate: pnpm gen:tokens-css (src/tokens-css.test.ts fails when out of sync). */
 
 /* 展開/收合讓頁面長高時捲軸出現 → 置中內容左移;永遠留捲軸的位置。 */
 html {
@@ -39,7 +40,6 @@ html {
 	--ak-sheen: #f9f9f9;
 	--ak-success-hl: #c5edcc;
 	--ak-danger-hl: #ffd6d0;
-
 	--ak-layer1: #f2f2f2;
 	--ak-layer2: #ffffff;
 	--ak-layer3: #f9f9f9;
@@ -49,8 +49,8 @@ html {
 	--ak-shadow-rest: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
 	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
 	--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16);
-	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
 	--ak-shadow-raised: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
+	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
 
 	--ak-font-display:
 		"Figtree Variable", "Figtree", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC",
@@ -61,10 +61,63 @@ html {
 	--ak-font-mono:
 		"Geist Mono Variable", "Geist Mono", "Noto Sans TC Variable", "Noto Sans TC", ui-monospace, monospace;
 
+	--ak-space-xxs: 0.25rem;
+	--ak-space-xs: 0.5rem;
+	--ak-space-sm: 0.75rem;
+	--ak-space-md: 1rem;
+	--ak-space-lg: 1.5rem;
+	--ak-space-xl: 2rem;
+	--ak-space-xxl: 3rem;
+
 	--ak-radius-sm: 0.375rem;
 	--ak-radius-md: 0.5rem;
 	--ak-radius-lg: 0.75rem;
 	--ak-radius-xl: 1rem;
+	--ak-radius-full: 9999px;
+
+	--ak-motion-fast: 120ms;
+	--ak-motion-quick: 160ms;
+	--ak-motion-normal: 200ms;
+	--ak-motion-slide: 240ms;
+	--ak-motion-slow: 400ms;
+	--ak-motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+	--ak-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--ak-motion-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+	--ak-motion-linear: linear;
+	--ak-motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	--ak-z-index-dialog-backdrop: 70;
+	--ak-z-index-dialog: 71;
+	--ak-z-index-popup: 75;
+	--ak-z-index-tooltip: 78;
+	--ak-z-index-toast: 80;
+
+	--ak-icon-size-xs: 12px;
+	--ak-icon-size-sm: 14px;
+	--ak-icon-size-md: 16px;
+	--ak-icon-size-base: 18px;
+	--ak-icon-size-lg: 20px;
+
+	--ak-focus-ring-width: 2px;
+
+	--ak-type-t1: 0.6875rem;
+	--ak-type-t2: 0.8125rem;
+	--ak-type-t3: 0.9375rem;
+	--ak-type-t4: 1.0625rem;
+	--ak-type-t5: 1.375rem;
+	--ak-type-t6: 1.75rem;
+	--ak-type-t7: 2.25rem;
+	--ak-type-code: 0.8125rem;
+	--ak-type-phone-input: 1rem;
+	--ak-type-body: 1.6;
+	--ak-type-tight: 1.35;
+	--ak-type-snug: 1.45;
+	--ak-type-dense: 1.2;
+
+	--ak-tone-layer6: #d3d3d3;
+	--ak-tone-faint: #808080;
+	--ak-tone-rail-layer2: #ffffff;
+	--ak-tone-rail-layer3: #ededed;
 
 	--ak-corner-small: 6px;
 	--ak-corner-control: 12px;
@@ -74,13 +127,14 @@ html {
 	--ak-corner-modal: 24px;
 	--ak-corner-pill: 9999px;
 
-	--ak-motion-fast: 120ms;
-	--ak-motion-normal: 200ms;
-	--ak-motion-slow: 400ms;
-	--ak-motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-	--ak-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-	/* 過衝曲線:全站規則是「動畫不回彈」,沒有元件在用,新的也不要用 */
-	--ak-motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--ak-ink-n4: color-mix(in srgb, currentColor 4%, transparent);
+	--ak-ink-n5: color-mix(in srgb, currentColor 5%, transparent);
+	--ak-ink-n6: color-mix(in srgb, currentColor 6%, transparent);
+	--ak-ink-n8: color-mix(in srgb, currentColor 8%, transparent);
+	--ak-ink-n10: color-mix(in srgb, currentColor 10%, transparent);
+	--ak-ink-n12: color-mix(in srgb, currentColor 12%, transparent);
+	--ak-ink-n14: color-mix(in srgb, currentColor 14%, transparent);
+	--ak-ink-n18: color-mix(in srgb, currentColor 18%, transparent);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -116,7 +170,6 @@ html {
 		--ak-sheen: #242424;
 		--ak-success-hl: #0b3719;
 		--ak-danger-hl: #4c1d19;
-
 		--ak-layer1: #0a0a0a;
 		--ak-layer2: #121212;
 		--ak-layer3: #181818;
@@ -126,26 +179,17 @@ html {
 		--ak-shadow-rest: 0 0 0 1px #2b2b2b;
 		--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
 		--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6);
-		--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
 		--ak-shadow-raised: 0 0 0 1px #2b2b2b;
+		--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+
+		--ak-tone-layer6: #373737;
+		--ak-tone-faint: #868686;
+		--ak-tone-rail-layer2: #1f1f1f;
+		--ak-tone-rail-layer3: #242424;
 	}
 }
 
 [data-theme="dark"] {
-	--ak-layer1: #0a0a0a;
-	--ak-layer2: #121212;
-	--ak-layer3: #181818;
-	--ak-layer4: #242424;
-	--ak-layer5: #2b2b2b;
-	--ak-bone: #1f1f1f;
-	--ak-sheen: #242424;
-	--ak-success-hl: #0b3719;
-	--ak-danger-hl: #4c1d19;
-	--ak-shadow-rest: 0 0 0 1px #2b2b2b;
-	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
-	--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6);
-	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
-	--ak-shadow-raised: 0 0 0 1px #2b2b2b;
 	--ak-bg: #121212;
 	--ak-surface: #181818;
 	--ak-surface-raised: #1f1f1f;
@@ -173,4 +217,24 @@ html {
 	--ak-info-subtle: #101e33;
 	--ak-focus-ring: #89bafe;
 	--ak-scrim: rgba(0, 0, 0, 0.32);
+	--ak-bone: #1f1f1f;
+	--ak-sheen: #242424;
+	--ak-success-hl: #0b3719;
+	--ak-danger-hl: #4c1d19;
+	--ak-layer1: #0a0a0a;
+	--ak-layer2: #121212;
+	--ak-layer3: #181818;
+	--ak-layer4: #242424;
+	--ak-layer5: #2b2b2b;
+
+	--ak-shadow-rest: 0 0 0 1px #2b2b2b;
+	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+	--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6);
+	--ak-shadow-raised: 0 0 0 1px #2b2b2b;
+	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
+
+	--ak-tone-layer6: #373737;
+	--ak-tone-faint: #868686;
+	--ak-tone-rail-layer2: #1f1f1f;
+	--ak-tone-rail-layer3: #242424;
 }
