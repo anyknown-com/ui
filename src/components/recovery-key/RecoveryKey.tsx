@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
@@ -132,37 +133,88 @@ function WarningIcon() {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		intro: "這是你的復原金鑰。忘記 passphrase 時,它是唯一能開回 vault 的東西 — 只會顯示這一次。",
+		warning: "我們沒有你的金鑰副本,遺失就無法復原。把它抄在紙上,或存進密碼管理器。",
+		ack: "我已把復原金鑰抄下並存放在安全的地方。",
+		reveal: "顯示復原金鑰",
+		hide: "隱藏復原金鑰",
+		veil: "hover 或點一下顯示",
+		copy: "複製",
+		copied: "✓ 已複製",
+		download: "下載 .txt",
+	},
+	en: {
+		intro:
+			"This is your recovery key. If you forget your passphrase, it is the only way back into your vault — and it is shown only this once.",
+		warning:
+			"We don't keep a copy of your key, so if you lose it, it can't be recovered. Write it down on paper or save it in a password manager.",
+		ack: "I've written down my recovery key and stored it somewhere safe.",
+		reveal: "Show recovery key",
+		hide: "Hide recovery key",
+		veil: "Hover or tap to show",
+		copy: "Copy",
+		copied: "✓ Copied",
+		download: "Download .txt",
+	},
+})
+
+/**
+ * RecoveryKey's built-in words (follow `<LocaleProvider>`): the intro, warning and
+ * acknowledgement, the reveal / copy / download buttons and the veil hint. Override any with `labels`.
+ */
+export type RecoveryKeyLabels = StringsOf<typeof strings>
+
 export type RecoveryKeyProps = {
+	/** The recovery key, dash-separated groups (`K7PQ-WM2X-…`). */
 	value: string
+	/** Whether the acknowledgement checkbox is ticked (controlled). */
 	ack?: boolean
+	/** Called when the acknowledgement checkbox changes. */
 	onAckChange?: (ack: boolean) => void
+	/** The downloaded file's name. */
 	filename?: string
+	/** The text above the key. Wins over `labels.intro`. */
 	intro?: ReactNode
+	/** The warning note under the buttons. Wins over `labels.warning`. */
 	warning?: ReactNode
+	/** The acknowledgement checkbox's label. Wins over `labels.ack`. */
 	ackLabel?: ReactNode
+	/** The reveal button while the key is blurred. Wins over `labels.reveal`. */
 	revealLabel?: string
+	/** The reveal button while the key is shown. Wins over `labels.hide`. */
 	hideLabel?: string
+	/** The hint over the blurred key. Wins over `labels.veil`. */
 	veilLabel?: string
+	/** The copy button. Wins over `labels.copy`. */
 	copyLabel?: string
+	/** The copy button right after copying. Wins over `labels.copied`. */
 	copiedLabel?: string
+	/** The download button. Wins over `labels.download`. */
 	downloadLabel?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<RecoveryKeyLabels>
 }
 
+/** Shows a one-time recovery key, blurred until hovered or revealed, with copy, download and an acknowledgement. */
 export function RecoveryKey({
 	value,
 	ack,
 	onAckChange,
 	filename = "anyknown-storage-recovery-key.txt",
-	intro = "這是你的復原金鑰。忘記 passphrase 時,它是唯一能開回 vault 的東西 — 只會顯示這一次。",
-	warning = "我們沒有你的金鑰副本,遺失就無法復原。把它抄在紙上,或存進密碼管理器。",
-	ackLabel = "我已把復原金鑰抄下並存放在安全的地方。",
-	revealLabel = "顯示復原金鑰",
-	hideLabel = "隱藏復原金鑰",
-	veilLabel = "hover 或點一下顯示",
-	copyLabel = "複製",
-	copiedLabel = "✓ 已複製",
-	downloadLabel = "下載 .txt",
+	intro,
+	warning,
+	ackLabel,
+	revealLabel,
+	hideLabel,
+	veilLabel,
+	copyLabel,
+	copiedLabel,
+	downloadLabel,
+	labels,
 }: RecoveryKeyProps) {
+	const t = useStrings(strings, labels)
 	const [revealed, setRevealed] = useState(false)
 	const { copied, copy } = useCopy()
 
@@ -175,7 +227,7 @@ export function RecoveryKey({
 
 	return (
 		<div {...stylex.props(styles.card)}>
-			<p {...stylex.props(styles.intro)}>{intro}</p>
+			<p {...stylex.props(styles.intro)}>{intro ?? t.intro}</p>
 			<div {...stylex.props(styles.keyBox, revealed && styles.keyRevealed)}>
 				{/* The key itself is plain text so screen readers can read it out; the
 				    blur is purely visual and the reveal is the button below. */}
@@ -188,7 +240,7 @@ export function RecoveryKey({
 					))}
 				</div>
 				<span aria-hidden="true" {...stylex.props(styles.veil)}>
-					{veilLabel}
+					{veilLabel ?? t.veil}
 				</span>
 			</div>
 			<div {...stylex.props(styles.actions)}>
@@ -198,7 +250,7 @@ export function RecoveryKey({
 					onClick={() => setRevealed((shown) => !shown)}
 					{...stylex.props(styles.button)}
 				>
-					{revealed ? hideLabel : revealLabel}
+					{revealed ? (hideLabel ?? t.hide) : (revealLabel ?? t.reveal)}
 				</button>
 				<button
 					type="button"
@@ -206,18 +258,18 @@ export function RecoveryKey({
 					{...stylex.props(styles.button, copied && styles.copied)}
 				>
 					{!copied && <CopyIcon />}
-					{copied ? copiedLabel : copyLabel}
+					{copied ? (copiedLabel ?? t.copied) : (copyLabel ?? t.copy)}
 				</button>
 				<button type="button" onClick={download} {...stylex.props(styles.button)}>
 					<DownloadIcon />
-					{downloadLabel}
+					{downloadLabel ?? t.download}
 				</button>
 			</div>
 			<div role="note" {...stylex.props(styles.warning)}>
 				<WarningIcon />
-				<p {...stylex.props(styles.warningText)}>{warning}</p>
+				<p {...stylex.props(styles.warningText)}>{warning ?? t.warning}</p>
 			</div>
-			<Checkbox checked={ack} onCheckedChange={onAckChange} label={ackLabel} />
+			<Checkbox checked={ack} onCheckedChange={onAckChange} label={ackLabel ?? t.ack} />
 		</div>
 	)
 }
