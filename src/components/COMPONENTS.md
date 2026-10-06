@@ -13,8 +13,10 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
 單行與多行文字輸入,共用 border / focus / error 的樣式語言(`controlStyles`)。
 
 - 紙上凹下去的一格:`surface` 底 + 1px `border`(邊界要 3:1 才看得到,只靠底色不夠),
-  `corner.control`(12px)。focus 時框換 `focusRing`(= `signal`),外面再一圈 2px、32% 的
-  `signal` 淡環;invalid 時框與環都換成 `danger`
+  `corner.control`(12px)。focus 時框換 `focusRing`(= `signal`),外面再一圈 2px 實心的
+  `focusRing`(`outlineOffset: 1`)。以前是 32% 的淡環,對底色不到 3:1,看不出焦點;
+  invalid 時框留 `danger`,focus 的環照樣是實心 `focusRing`。Select / Textarea /
+  PasswordInput 都吃同一份 `controlStyles`
 
 - **控件自己要寫 `boxSizing: border-box`**。`<input>` / `<textarea>` 拿的是瀏覽器預設的
   content-box,`minHeight` 會變成「內容」的高再加 padding + border(舊的 36px md 實際
