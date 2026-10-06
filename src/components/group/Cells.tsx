@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, font, text, type } from "../../tokens.stylex"
+import { color, font, text as textSize, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
@@ -82,7 +82,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: { default: type.t3, [PHONE]: text.base },
+		fontSize: { default: type.t3, [PHONE]: textSize.base },
 		height: 44,
 		minHeight: 0,
 		outline: "none",
@@ -105,7 +105,7 @@ const styles = stylex.create({
 		borderRadius: 0,
 		borderWidth: 0,
 		boxShadow: "none",
-		fontSize: { default: type.t3, [PHONE]: text.base },
+		fontSize: { default: type.t3, [PHONE]: textSize.base },
 		lineHeight: type.body,
 		minHeight: 0,
 		outline: "none",
