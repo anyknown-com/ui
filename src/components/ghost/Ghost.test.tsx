@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { createRef } from "react"
 import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
+import { forcedCss } from "../../test/forcedCss"
 import { Ghost, GhostLink } from "./Ghost"
 
 describe("Ghost", () => {
@@ -70,4 +71,11 @@ test("axe: ghost, danger, disabled and a link", async () => {
 		</>,
 	)
 	await expectNoAxeViolations(container)
+})
+
+test("forced-colors: a ButtonText outline on hover, a Highlight ring on focus", () => {
+	render(<Ghost>編輯</Ghost>)
+	const css = forcedCss(screen.getByRole("button", { name: "編輯" }))
+	expect(css).toMatch(/:hover:not\(:disabled\)[^{]*\{ outline: 1px solid buttontext/i)
+	expect(css).toMatch(/:focus-visible[^{]*\{ outline: \S+ solid highlight/i)
 })

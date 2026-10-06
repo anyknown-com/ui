@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
+import { forcedCss } from "../../test/forcedCss"
 import { PlusGlyph } from "../icon/glyphs"
 import { IconButton } from "./IconButton"
 
@@ -84,4 +85,15 @@ test("axe: plain, current, open with a badge, disabled", async () => {
 		</>,
 	)
 	await expectNoAxeViolations(container)
+})
+
+test("forced-colors: a ButtonText outline on hover, a Highlight ring on focus", () => {
+	render(
+		<IconButton label="新增">
+			<PlusGlyph />
+		</IconButton>,
+	)
+	const css = forcedCss(screen.getByRole("button", { name: "新增" }))
+	expect(css).toMatch(/:hover:not\(:disabled\)[^{]*\{ outline: 1px solid buttontext/i)
+	expect(css).toMatch(/:focus-visible[^{]*\{ outline: \S+ solid highlight/i)
 })

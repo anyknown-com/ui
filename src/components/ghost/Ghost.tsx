@@ -3,6 +3,8 @@ import { press } from "../../lib/styled"
 import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import type { ButtonHTMLAttributes, Ref } from "react"
 
+const FORCED = "@media (forced-colors: active)"
+
 /** `.ghost`: a word that is a button. 28px, muted until the pointer is on it; `danger` is warning. */
 
 const styles = stylex.create({
@@ -24,7 +26,15 @@ const styles = stylex.create({
 		margin: 0,
 		minHeight: { default: 0, [breakpoint.phone]: 40 },
 		opacity: { default: 1, ":disabled": 0.4 },
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		// Forced colors drop the hover wash, which is the only edge a ghost has: draw one instead.
+		outline: {
+			default: "none",
+			":hover:not(:disabled)": { default: null, [FORCED]: "1px solid ButtonText" },
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
 		paddingBlock: 0,
 		paddingInline: space.xs,

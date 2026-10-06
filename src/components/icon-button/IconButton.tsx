@@ -4,6 +4,8 @@ import { color, corner, focusRing, font, ink, type } from "../../tokens.stylex"
 import { Tooltip } from "../tooltip/Tooltip"
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
 
+const FORCED = "@media (forced-colors: active)"
+
 /**
  * `.ib`: a circle that holds one glyph. Nothing at rest, an ink wash under the pointer, the
  * name in a tooltip; a badge in the corner when it counts something.
@@ -26,7 +28,15 @@ const styles = stylex.create({
 		justifyItems: "center",
 		lineHeight: "inherit",
 		margin: 0,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		// Forced colors drop the hover wash, which is the only edge the circle has: draw one instead.
+		outline: {
+			default: "none",
+			":hover:not(:disabled)": { default: null, [FORCED]: "1px solid ButtonText" },
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
 		padding: 0,
 		placeItems: "center",
