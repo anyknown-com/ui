@@ -1,37 +1,39 @@
-# popup 疊層低於 dialog：Select/Dropdown/Popover 在 Dialog 裡打不開
+# Popups stack below dialogs: Select, Dropdown and Popover don't open inside a Dialog
 
-## 現象與重現
+Status: fixed in 1889fc7 and released in v0.4.1. The layer table now lives in `src/lib/popup.ts` as `layer`.
 
-product（app.anyknown.com）Runs 頁的「New run」對話框：Provider 下拉點開後畫面上什麼都沒有。選項其實有渲染（accessibility tree 看得到、鍵盤也能操作），只是被 dialog 蓋住 —— 對 mouse 使用者等於壞掉。light/dark 都一樣。
+## Symptom and repro
 
-本 repo 重現：playground 或任何 app，把 `Select`（或 `DropdownMenu` / `Popover`）放進 `DialogContent` 再打開。
+In product (app.anyknown.com), the "New run" dialog on the Runs page: clicking the Provider dropdown shows nothing. The options do render (they are in the accessibility tree and work from the keyboard), but the dialog covers them, so for mouse users it is broken. Light and dark behave the same.
 
-## 原因
+Repro in this repo: in the playground or any app, put a `Select` (or `DropdownMenu` / `Popover`) inside `DialogContent` and open it.
 
-疊層值各寫各的，popup 層低於 dialog 層：
+## Cause
 
-| 層 | 值 | 位置 |
+Each layer sets its own z-index, and the popup layer sits below the dialog layer:
+
+| Layer | Value | Location |
 | --- | --- | --- |
-| popup positioner（select / dropdown / popover / composer 共用） | 40 | `src/lib/popup.ts` `popupStyles.positioner` |
-| tooltip positioner | 60 | `src/components/tooltip/Tooltip.tsx` |
-| dialog backdrop | 70 | `src/components/dialog/Dialog.tsx` |
-| dialog viewport | 71 | `src/components/dialog/Dialog.tsx` |
-| toast | 80 | `src/components/toast/Toast.tsx` |
+| Popup positioner (shared by select, dropdown, popover, composer) | 40 | `src/lib/popup.ts` `popupStyles.positioner` |
+| Tooltip positioner | 60 | `src/components/tooltip/Tooltip.tsx` |
+| Dialog backdrop | 70 | `src/components/dialog/Dialog.tsx` |
+| Dialog viewport | 71 | `src/components/dialog/Dialog.tsx` |
+| Toast | 80 | `src/components/toast/Toast.tsx` |
 
-Base UI 的 popup 都 portal 到 body，所以 popup 跟 dialog 同在 body 層比 z-index；40 < 71，dialog 裡打開的浮層永遠在下面。tooltip 60 也一樣：dialog 內元素的 tooltip 會被蓋住。
+Base UI portals every popup to `body`, so popups and dialogs compete by z-index at the same level. Since 40 < 71, a popup opened inside a dialog always ends up underneath. The tooltip at 60 has the same problem: tooltips on elements inside a dialog are covered.
 
-## 修法
+## Fix
 
-1. `src/lib/popup.ts` 加一個集中疊層表並 export，其他元件引用、不再各寫 magic number：
-   - dialogBackdrop 70、dialog 71、popup 75、tooltip 78、toast 80
-   - 語意：popup 要壓過 dialog（浮層本來就是當下互動的最上層）；tooltip 壓過 popup（popup 內元素也能有 tooltip）；toast 永遠最上（非阻斷通知不能被 modal 蓋掉）。
-   - popup 40 → 75 對非 dialog 情境無影響：popup 是 portal 到 body 的暫態層，modal 打開時 Base UI 會關掉外面的 popup，不存在「頁面上的 popup 意外壓過後來的 dialog」。
-2. `popupStyles.positioner` 用新值；`Tooltip.tsx`、`Dialog.tsx`、`Toast.tsx` 改引用同一張表。`Composer.tsx` 也用 `popupStyles`，順帶被修正，確認它自己的 `zIndex: 10`（內部元素）不受影響。
-3. 測試：`select/Select.test.tsx` 加一個「Select 在 Dialog 內打開，positioner z-index 大於 dialog viewport」的 case（jsdom 讀 computed style 或直接斷言 class 對應的 style；做不到就退而斷言兩處引用同一組常數且 popup > dialog）。
-4. 動之前先讀 `src/components/COMPONENTS.md` 的 dialog / popover / tooltip 節（repo 規矩）；改完更新 popover 那節，寫下疊層表與理由。
-5. verify：`pnpm check && pnpm test`；`pnpm playground` 開 dialog+select 組合實際點一次；發佈前 `pnpm verify:pack`。
+1. Add one shared layer table to `src/lib/popup.ts` and export it; other components import it instead of hard-coding their own numbers:
+   - dialogBackdrop 70, dialog 71, popup 75, tooltip 78, toast 80
+   - Meaning: popups sit above dialogs (a floating layer is the top of whatever the user is doing right now); tooltips sit above popups (elements inside a popup can have tooltips too); toasts are always on top (a non-blocking notice must never be hidden by a modal).
+   - Raising popups from 40 to 75 changes nothing outside dialogs: a popup is a transient layer portaled to `body`, and Base UI closes outside popups when a modal opens, so a page popup can never end up over a dialog opened after it.
+2. `popupStyles.positioner` uses the new value; `Tooltip.tsx`, `Dialog.tsx` and `Toast.tsx` import the same table. `Composer.tsx` also uses `popupStyles`, so it gets the fix too; confirm its own `zIndex: 10` (for an inner element) is unaffected.
+3. Tests: add a case to `select/Select.test.tsx` that opens a Select inside a Dialog and checks the positioner's z-index is above the dialog viewport (read the computed style in jsdom, or assert the style the class maps to; if neither works, assert both places use the same constants and popup > dialog).
+4. Before making changes, read the dialog, popover and tooltip sections of `src/components/COMPONENTS.md` (repo rules). After the change, update the popover section with the layer table and the reasoning.
+5. Verify: `pnpm check && pnpm test`; open the dialog + select combination in `pnpm playground` and click through it once; run `pnpm verify:pack` before release.
 
-## 發佈與下游
+## Release and downstream
 
-- patch release（`@anyknown/ui` 現版 0.4.x 線）。
-- 發佈後 product repo `pnpm up @anyknown/ui` 帶到新版，回 Runs 的「New run」實測下拉可見（發現此 bug 的地方，2026-08-31 product phase-06 走查記錄）。
+- Patch release (`@anyknown/ui` was on the 0.4.x line).
+- After release, run `pnpm up @anyknown/ui` in the product repo and check on the Runs page's "New run" dialog that the dropdown is visible (that is where the bug was found, in the product phase-06 walkthrough notes of 2026-08-31).

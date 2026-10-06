@@ -1,105 +1,107 @@
-# design.md：讓外部 agent 也能做出 AnyKnown 的一次性頁面
+# design.md: letting outside agents build one-off AnyKnown pages
 
-參考 Vercel 的做法（vercel.com/blog/how-our-agents-build-on-brand-pages-with-design-md）：一份講判斷的文件、一份有界詞彙的公開 stylesheet、一個把回饋分流回去的評估迴圈。三層缺一不可，只給 token 表 agent 還是會做出通用 SaaS dashboard。
+Status: built. The visual language this plan was written against (Ledger: warm paper, a viridian accent, serif headings, a woven button fill) has since been replaced by Tactile; see [02-tactile.md](02-tactile.md). The parts of this plan that described the old look now describe the current system. The structure (DESIGN.md, `brand.css`, the eval loop) is unchanged.
 
-目標讀者兩種：內部各 app 的 agent（已經用 `@anyknown/ui` + StyleX），以及外部 agent（v0 / Claude / Codex）產出不進 repo 的一次性 HTML 頁面：報告、提案、benchmark、活動頁。後者沒有 bundler、沒有 React，只能吃純 CSS 與純文件。
+Based on Vercel's approach (vercel.com/blog/how-our-agents-build-on-brand-pages-with-design-md): one document of judgment, one public stylesheet with a bounded vocabulary, and an eval loop that routes feedback back into them. All three layers are needed; give an agent only a token table and it still builds a generic SaaS dashboard.
 
-## 現況對照
+There are two kinds of reader: agents inside our apps (which already use `@anyknown/ui` with StyleX), and outside agents (v0, Claude, Codex) that produce one-off HTML pages that never enter the repo: reports, proposals, benchmarks, event pages. The outside agents have no bundler and no React; they can only consume plain CSS and plain documents.
 
-| Vercel | 本 repo 現況 | 缺 |
+## Where we stand
+
+| Vercel | This repo today | Missing |
 | --- | --- | --- |
-| design.md（判斷） | 五份指南全是工程向（元件決策、織體幾何、a11y 債） | 一份講「頁面該怎麼組、什麼不准出現」的文件 |
-| vercel-brand.css（有界詞彙） | `tokens.css`（`--ak-*` 變數） | 變數不是詞彙：外部 agent 拿到變數還是自己排版。缺 class 級的 stylesheet |
-| 評估迴圈 | 內部規矩：mock + agent-browser light/dark 截圖、CEO 看過才算 | 固定場景、可數的機械錯誤、回饋分流的落點 |
-| 公開管道 | `llms.txt` / `llms-full.txt` / `docs/*.md` | 加 `design.md` 與 `brand.css` 兩個穩定網址 |
+| design.md (judgment) | Five guides, all engineering-oriented (component decisions, a11y debt) | A document on how to put a page together and what must never appear |
+| vercel-brand.css (bounded vocabulary) | `tokens.css` (`--ak-*` variables) | Variables aren't a vocabulary: an outside agent with only variables still does its own layout. We need a class-level stylesheet |
+| Eval loop | Internal rule: mock + agent-browser light/dark screenshots, done only once the CEO has looked | Fixed scenarios, countable mechanical errors, a place for each kind of feedback to land |
+| Public channels | `llms.txt` / `llms-full.txt` / `docs/*.md` | Two stable URLs: `design.md` and `brand.css` |
 
-## 一、`DESIGN.md`（手寫，只寫判斷）
+## 1. `DESIGN.md` (handwritten, judgment only)
 
-放 repo 根，跟 README 平行。內容只寫程式碼與 token 裡看不出來的東西，不抄任何數值（數值由第三節生成接在後面）。章節：
+Lives at the repo root, next to the README. It covers only what the code and tokens can't tell you and copies no values (values are generated and appended, see section 3). Sections:
 
-1. 這是什麼：Ledger 的氣質一段話。暖紙底、墨字、viridian 只給一個主動作；serif 只給標題與大數字，內文一律 Geist；元件沒有 background，實心是線織出來的。
-2. 先框讀者任務再選結構。每種一次性頁面先答「讀者打開這頁要決定什麼」，再從幾個骨架挑：單欄長文（報告）、結論在前＋證據網格（提案、benchmark）、控制項在前（互動規劃頁）。同一套字級與間距，結構跟著讀者目標走。
-3. 證據怎麼擺：比較用的數字放同一把尺上（同一欄、同一單位、同一基準）；證據表滿版不縮進卡片；一頁只有一個主圖，其他都是表。
-4. 層級與排版：一頁一個 display 級標題；`text.xl` 以上只准出現在段落起頭；正文行長 60–75 字；間距只用 `space.*` 階，不准 13px 這種自創值。
-5. 文案：句首大寫不 Title Case、按鈕動詞開頭、錯誤說怎麼修不說對不起、數字用 tabular。
-6. 動態：只有 ease-out 與 linear，沒有回彈；能不動就不動。
-7. 反模式清單，逐條點名，這是 agent 最需要的一節：通用 SaaS 三欄 KPI 卡；漸層卡片與玻璃霧面；彩色圓底 icon；每段一張 hero 圖；同一頁兩個主色按鈕；把表格塞進卡片再加陰影；自創 hex；`useEffect`（內部 agent）；overshoot bezier。
-8. 交付檢查：光暗兩色都要看；縮到 375 寬要能讀；截圖跟 ui.anyknown.com 的元件放一起看不出是兩家。
+1. What this is: one paragraph on the visual tone. Today that is Tactile: white paper on a neutral gray desk, ink for the primary action and links, blue only for agent activity, focus and progress; Figtree with Noto Sans TC for text, Geist Mono for data.
+2. Frame the reader's task, then pick a structure. For every one-off page, first answer "what does the reader need to decide when they open this?", then pick from a few skeletons: single-column long read (report), conclusion first plus evidence grid (proposal, benchmark), controls first (interactive planning page). Same type scale and spacing; structure follows the reader's goal.
+3. Laying out evidence: numbers that are compared go on the same ruler (same column, same unit, same baseline); evidence tables run full width, never inset in a card; one main chart per page, everything else is a table.
+4. Hierarchy and type: one display heading per page; `text.xl` and up only at the start of a block; body lines 60–75 characters; spacing only from the `space.*` steps, never made-up values such as 13px.
+5. Copy: sentence case, not Title Case; buttons start with a verb; errors say how to fix, not sorry; numbers are tabular.
+6. Motion: only ease-out and linear, no bounce; if it can stay still, keep it still.
+7. Anti-patterns, each by name. This is the section agents need most: the generic SaaS row of three KPI cards; gradient cards and frosted glass; icons on colored circles; a hero image per section; two primary buttons on one page; a table stuffed into a card with a shadow; made-up hex; `useEffect` (internal agents); overshoot béziers.
+8. Pre-delivery check: look at both light and dark; it must read at 375px wide; a screenshot next to the components on ui.anyknown.com shouldn't look like it came from somewhere else.
 
-寫法照 `writing-and-planning-style`：不用粗體、句子短、每條規則附一句為什麼。
+Written per `writing-and-planning-style`: no bold, short sentences, and every rule comes with one sentence of why.
 
-## 二、`brand.css`（有界詞彙，純 CSS）
+## 2. `brand.css` (bounded vocabulary, plain CSS)
 
-給沒有 bundler 的頁面，一個檔案 `<link>` 進來就能用。來源 `src/brand.css`，build 時把 `tokens.css` 內聯進去（單檔、不用管相對路徑），加 Google Fonts 的 `@import`（Newsreader、Geist、Geist Mono 三個都在 Google Fonts 上，外部頁面沒有 `@fontsource`）。
+For pages without a bundler: one file to `<link>` and it works. The source is `src/brand.css`. At build time `tokens.css` is inlined into it (one file, no relative paths to manage) and a Google Fonts `@import` is added (Figtree, Noto Sans TC and Geist Mono are all on Google Fonts; outside pages have no `@fontsource`).
 
-詞彙刻意小，十五個左右，全部 `ak-` 前綴：
+The vocabulary is small on purpose, around fifteen classes, all prefixed `ak-`:
 
-- 骨架：`ak-page`（最大寬、左右留白、bg）、`ak-section`、`ak-grid-2` / `ak-grid-3`
-- 文字：`ak-display`、`ak-h1`、`ak-h2`、`ak-prose`（含 p / ul / ol / a / code 的階層）、`ak-muted`、`ak-mono`
-- 證據：`ak-table`（滿版、tabular-nums、斑馬用 bone）、`ak-stat`（大數字 serif + 小標 muted）、`ak-callout`（info / warning / danger 三色由 modifier 決定）
-- 動作：`ak-btn`、`ak-btn-secondary`；`ak-btn` 的實心用 `weave.ts` 在 build 時預渲染成 SVG data URI 當 background，靜態織體即可，不做 silk 動態。這一步保住品牌辨識，不然外部頁面的按鈕就是一顆 viridian 色塊。
+- Skeleton: `ak-page` (max width, side margins, background), `ak-section`, `ak-grid-2` / `ak-grid-3`
+- Text: `ak-display`, `ak-h1`, `ak-h2`, `ak-prose` (with styles for p / ul / ol / a / code), `ak-muted`, `ak-mono`
+- Evidence: `ak-table` (full width, tabular-nums), `ak-stat` (big number plus a muted label), `ak-callout` (info / warning / danger set by a modifier)
+- Actions: `ak-btn`, `ak-btn-secondary`. `ak-btn` is the solid ink primary action, drawn from the same tokens as the component library's Button, so a button on an outside page is recognizably ours.
 
-沒有 card、沒有 hero、沒有 badge 一堆變體。詞彙不在表上就是不准用，這正是「有界」的意思。
+No card, no hero, no pile of badge variants. A class that isn't in the vocabulary is not allowed; that is what "bounded" means.
 
-dark 跟隨 OS，跟 `tokens.css` 一致；`.ak-theme-light` / `.ak-theme-dark` 兩個 class 給要手動切的頁面。
+Dark follows the OS, as in `tokens.css`; two classes, `.ak-theme-light` / `.ak-theme-dark`, are for pages that need to lock a theme by hand.
 
-出口：`site/dist/brand.css`，網址 `https://ui.anyknown.com/brand.css`；同時進 package `exports` 的 `./brand.css`，內部想做靜態頁也能用。
+Output: `site/dist/brand.css`, served at `https://ui.anyknown.com/brand.css`; it is also in the package `exports` as `./brand.css`, so internal static pages can use it too.
 
-## 三、生成與發佈（`scripts/llms-txt.mjs` 擴充）
+## 3. Generation and publishing (extending `scripts/llms-txt.mjs`)
 
-1. `design.md` = `DESIGN.md` 原文 + 生成附錄：token 表（從 `tokens.stylex.ts` 讀，light / dark 兩欄）、`brand.css` 的 class 清單（從 css 掃 `.ak-` selector，附一句用途，用途寫在 css 註解裡、掃出來）。數字永遠不手抄，跟 `gen:themes` 同一思路。
-2. 出 `site/dist/design.md`，`llms.txt` 第一條指過去，並註明 `brand.css` 的網址與最短用法（一段 HTML 範例：link brand.css、`ak-page` 包起來、一個 `ak-h1` 一段 `ak-prose` 一張 `ak-table`）。
-3. `scripts/design-check.mjs` 進 `pnpm check`：DESIGN.md 裡提到的每個 `ak-*` class 都要存在於 `brand.css`，反過來 `brand.css` 每個 class 都要在 DESIGN.md 出現過一次。文件與詞彙不同步就擋。
+1. `design.md` = the `DESIGN.md` source + a generated appendix: the token table (read from `tokens.stylex.ts`, with light and dark columns) and the `brand.css` class list (scanned from the `.ak-` selectors in the CSS, each with a one-line purpose written in a CSS comment and scanned out). Numbers are never copied by hand; same idea as `gen:themes`.
+2. Write `site/dist/design.md`. The first entry in `llms.txt` points to it, along with the `brand.css` URL and the shortest working example (a snippet of HTML: link `brand.css`, wrap the page in `ak-page`, add one `ak-h1`, one `ak-prose` and one `ak-table`).
+3. `scripts/design-check.mjs` joins `pnpm check`: every `ak-*` class mentioned in DESIGN.md must exist in `brand.css`, and every class in `brand.css` must appear in DESIGN.md at least once. If the document and the vocabulary drift apart, the check fails.
 
-## 四、評估迴圈
+## 4. Eval loop
 
-沒有這層，前兩層寫完就會慢慢過期。
+Without this layer, the first two slowly go stale.
 
-1. 固定五個場景放 `site/eval/scenarios/`，每個一段 prompt 加一份假資料：product 的 usage 月報、call 的定價比較、storage 的功能提案、一場 benchmark、一頁活動報名。場景不換，才量得出差異。
-2. 跑法：subagent 帶 `design.md` + `brand.css` 各產一頁，再不帶各產一頁；agent-browser 光暗各截一張。照 `e2e-subagent-user-story` 的規矩分批、每批最多三個。
-3. `scripts/design-lint.mjs` 對產出的 HTML 數機械錯誤：自創 hex、`--ak-*` 以外的顏色、詞彙外的 class、非 token 字體、overshoot easing、內聯 style。有數字才知道文件有沒有用；Vercel 的 57% 就是這樣量的。
-4. 回饋分流，每次走查後固定做：判斷型的修正寫進 `DESIGN.md`；重複出現的排版需求加進 `brand.css`（同時 DESIGN.md 加一條）；能用規則抓的丟進 `design-lint.mjs`。同一個問題三個地方只能落一個，落在最靠近機器的那個。
-5. 成功指標不是零錯，是同類抱怨在下一輪同類場景出現的次數下降。
+1. Five fixed scenarios in `site/eval/scenarios/`, each a prompt plus fake data: a usage report for product, a pricing comparison for call, a feature proposal for storage, a benchmark, and an event sign-up page. The scenarios don't change, so differences can be measured.
+2. How to run: a subagent builds one page per scenario with `design.md` + `brand.css`, and one without; agent-browser takes one light and one dark screenshot of each. Follow the `e2e-subagent-user-story` rules: run in batches of at most three.
+3. `scripts/design-lint.mjs` counts mechanical errors in the output HTML: made-up hex, colors other than `--ak-*`, out-of-vocabulary classes, non-token fonts, overshoot easing, inline styles. Only with numbers do we know whether the document helps; Vercel's 57% was measured this way.
+4. Route the feedback, every time after a walkthrough: judgment fixes go into `DESIGN.md`; layout needs that keep coming up go into `brand.css` (with a matching line in DESIGN.md); anything a rule can catch goes into `design-lint.mjs`. Each problem lands in exactly one of the three places, the one closest to the machine.
+5. Success isn't zero errors; it is the same kind of complaint showing up less often in the next round of the same kind of scenario.
 
-## 順序與驗收
+## Order and acceptance
 
-1. `DESIGN.md` 初稿 → 驗：CEO 讀過一遍，反模式清單每條他都同意。
-2. `brand.css` + 織體 SVG 預渲染 → 驗：一頁純 HTML 範例用 `site` 開起來，光暗截圖放在 playground 的 Button 旁邊看不出兩家。
-3. 生成與 check → 驗：`pnpm site:build` 出 `design.md` / `brand.css`，`pnpm check` 對故意寫錯的 class 會紅。
-4. 五個場景第一輪 → 驗：有無 design.md 的機械錯誤數對比，寫進本檔末尾當基線。
-5. minor release，README 的「基礎設施現況」表加兩個網址。
+1. First draft of `DESIGN.md` → check: the CEO reads it once and agrees with every anti-pattern on the list.
+2. `brand.css` → check: a plain HTML example opened through `site`, with light and dark screenshots placed next to the playground's Button, doesn't look like two brands.
+3. Generation and check → check: `pnpm site:build` outputs `design.md` / `brand.css`, and `pnpm check` fails on a deliberately wrong class.
+4. First round of the five scenarios → check: compare mechanical error counts with and without design.md, and record them at the end of this file as the baseline.
+5. Minor release; add the two URLs to the infrastructure table in the README.
 
-## 不做
+## Not doing
 
-- 不做 Slack 裡的 design-agent，我們的入口是 Claude Code。
-- 不做 class 級的完整元件庫（dialog、select 那些）；一次性頁面不需要互動元件，需要就回到 `@anyknown/ui`。
-- 不做多品牌／多主題，只有 Ledger。
+- No design agent in Slack; our entry point is Claude Code.
+- No class-level component library (dialog, select and the like); one-off pages don't need interactive components, and when they do, they go back to `@anyknown/ui`.
+- No multiple brands or themes; there is one visual language.
 
-## 第一輪基線(2026-09-02)
+## First-round baseline (2026-09-02)
 
-五個場景各兩頁,sonnet subagent 產出,`node scripts/design-lint.mjs site/eval/out/*.html`:
+Two pages per scenario, built by sonnet subagents, measured with `node scripts/design-lint.mjs site/eval/out/*.html`:
 
 | | hex | color | class | font | easing | inline |
 | --- | --- | --- | --- | --- | --- | --- |
-| 帶 design.md + brand.css(5 頁合計) | 0 | 0 | 0 | 0 | 0 | 0 |
-| 不帶(5 頁合計) | 79 | 9 | 229 | 7 | 0 | 17 |
+| With design.md + brand.css (5 pages total) | 0 | 0 | 0 | 0 | 0 | 0 |
+| Without (5 pages total) | 79 | 9 | 229 | 7 | 0 | 17 |
 
-不帶的五頁全部長成通用 SaaS:KPI 卡一排、表格塞卡片、彩色圓底 icon、全大寫 eyebrow、結論放最後一格深色框。帶的五頁機械錯誤為零,肉眼跟 example.html 是同一家。
+All five pages without the document came out as generic SaaS: a row of KPI cards, tables stuffed into cards, icons on colored circles, all-caps eyebrows, the conclusion in a dark box at the very end. The five pages with it had zero mechanical errors and looked like they came from the same place as `example.html`.
 
-這輪的回饋分流:
+Feedback routing for this round:
 
-- 報名頁的表單控件沒有詞彙可用,agent 留了原生 input。加 `ak-field` 進 brand.css,DESIGN.md 第 2 節骨架三加一句。
-- 沒有判斷型修正;沒有新的 lint 規則。
+- The sign-up page's form controls had no vocabulary, so the agent left native inputs. Added `ak-field` to brand.css and one sentence to the third skeleton in section 2 of DESIGN.md.
+- No judgment fixes; no new lint rules.
 
-下一輪看的不是這張表(帶的已經是零),是判斷型的問題:結論有沒有放在第一屏、stat 是不是只放結論級數字、一頁是不是只有一顆 `ak-btn`。這些 lint 抓不到,要人看。
+The next round doesn't look at this table (the pages with the document are already at zero). It looks at judgment problems: whether the conclusion is on the first screen, whether stats hold only conclusion-level numbers, whether a page has only one `ak-btn`. Lint can't catch these; a person has to look.
 
-## 第二輪(2026-09-02,同日)
+## Second round (2026-09-02, same day)
 
-第一輪帶文件的五頁人工看過,判斷型問題五條:每頁反射式開三個 stat 且多半是表裡原數;兩欄滿版表數字被推到最右;同單位數字拆成多張表;callout 獨占 section 或重複 lede;報名頁表單不在第一屏。分流:stat 濫用與兩欄表能數,進 lint(`stat`、`table2`);其餘寫進 DESIGN.md 第 2、3 節。design.md 重生成後再產五頁:
+A person reviewed the five first-round pages built with the document and found five judgment problems: every page reflexively opened with three stats, mostly numbers already in the table; two-column full-width tables pushed the numbers to the far right; numbers in the same unit were split across several tables; callouts took up a section of their own or repeated the lede; the sign-up form wasn't on the first screen. Routing: stat misuse and two-column tables are countable, so they went into lint (`stat`, `table2`); the rest went into sections 2 and 3 of DESIGN.md. After regenerating design.md, five new pages were built:
 
 | | stat | table2 |
 | --- | --- | --- |
-| 第一輪(帶文件) | 6 | 5 |
-| 第二輪(帶文件) | 4 | 1 |
+| Round one (with the document) | 6 | 5 |
+| Round two (with the document) | 4 | 1 |
 
-肉眼:同單位併成一張表(02)、報名頁表單第一屏加「剩 12 個名額」貼按鈕(05)、callout 貼著表(03)都照做了。沒收斂的是 stat 放表裡原數(01 三個、02 一個);規則再改成正面寫法「stat 放表裡算出來的差:倍數、差額、剩餘」,下一輪看這一項。
+By eye: same-unit numbers were merged into one table (02), the sign-up page put the form on the first screen with 「剩 12 個名額」 ("12 seats left") next to the button (05), and the callout sat next to its table (03). What didn't converge is stats repeating table values (three in 01, one in 02). The rule was rewritten in positive form, "a stat holds a difference computed from the table: a ratio, a delta, what's left", and the next round checks this item.
