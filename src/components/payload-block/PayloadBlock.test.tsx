@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { PayloadBlock } from "./PayloadBlock"
 
 const CODE = JSON.stringify({ url: "https://example.com" }, null, 2)
@@ -43,5 +44,20 @@ describe("PayloadBlock", () => {
 	test("copyLabel wins over labels.copy", () => {
 		render(<PayloadBlock code={CODE} copyLabel="Prop" labels={{ copy: "Labels" }} />)
 		expect(screen.getByRole("button", { name: "Prop" })).toBeInTheDocument()
+	})
+
+	test("has no axe violations, plain and highlighted, before and after a copy", async () => {
+		const user = userEvent.setup()
+		vi.spyOn(navigator.clipboard, "writeText")
+		const { container } = render(
+			<>
+				<PayloadBlock code={CODE} />
+				<PayloadBlock code={CODE} highlight={(code) => <code>{code}</code>} />
+			</>,
+		)
+		await expectNoAxeViolations(container)
+		await user.click(screen.getAllByRole("button", { name: "複製" })[0] as HTMLElement)
+		await screen.findByRole("button", { name: "已複製" })
+		await expectNoAxeViolations(container)
 	})
 })
