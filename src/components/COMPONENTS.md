@@ -336,6 +336,8 @@ product 殼的訊息泡泡(0.9):整寬、上下 12、`t3` / `body`。人說的�
   標題的動詞已經說了
 - 輸入 / 輸出 / 錯誤是凹下去的 `surface`(錯誤是 `dangerSubtle`),無框,`corner.small`
   (卡片圓角減 padding 已經 ≤ 0,取最小階)
+- 展開內容(io 標籤與輸入 / 輸出)、重試列、subagent 的第二行都從標題那條邊開始
+  (卡片 padding + 36px 圖示底 + 間距),不各自對齊卡片左緣
 - subtitle 一行放不下時切成 `…`,`title` 帶全文;展開後整段折行顯示,不切
 - 重試列一句話講完「什麼時候、第幾次、最多幾次」:「3 秒後重試(第 2 / 3 次)」,畫面與
   live region 同一句。句子是 `retryLabel(attempt, max, seconds)`;不寫「重試中…3 秒後」這種

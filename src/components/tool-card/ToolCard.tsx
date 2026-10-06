@@ -124,9 +124,11 @@ const styles = stylex.create({
 		animationTimingFunction: "linear",
 		animationIterationCount: "infinite",
 	},
+	// 展開內容、io 標籤與重試列都從標題那條邊開始(INDENT),跟 subagent 的第二行同一條線
 	detail: {
 		paddingBlockEnd: space.sm,
-		paddingInline: space.md,
+		paddingInlineStart: INDENT,
+		paddingInlineEnd: space.md,
 		display: { default: "grid", ":is([hidden])": "none" },
 		gap: space.xxs,
 	},
@@ -180,7 +182,8 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xxs,
 		paddingBlockEnd: space.sm,
-		paddingInline: space.md,
+		paddingInlineStart: INDENT,
+		paddingInlineEnd: space.md,
 		fontFamily: font.body,
 		fontSize: type.t2,
 		color: color.warning,
