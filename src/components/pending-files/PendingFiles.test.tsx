@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { PendingFiles } from "./PendingFiles"
 
 describe("PendingFiles", () => {
@@ -30,5 +31,20 @@ describe("PendingFiles", () => {
 			/>,
 		)
 		expect(screen.getByRole("button", { name: "Remove receipt.pdf" })).toBeInTheDocument()
+	})
+
+	test("reads English under an en LocaleProvider, and labels override the table", () => {
+		render(
+			<LocaleProvider locale="en">
+				<PendingFiles files={[{ id: "a", name: "receipt.pdf" }]} onRemove={() => {}} />
+				<PendingFiles
+					files={[{ id: "b", name: "photo.png" }]}
+					onRemove={() => {}}
+					labels={{ remove: (name) => `Drop ${name}` }}
+				/>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Remove receipt.pdf" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Drop photo.png" })).toBeInTheDocument()
 	})
 })
