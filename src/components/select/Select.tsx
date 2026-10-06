@@ -61,6 +61,9 @@ function collect(children: ReactNode): { options: Option[]; groups: Group[] } {
 	return { options, groups }
 }
 
+// Windows 高對比:顏色換成系統色;焦點環明確給 Highlight
+const FORCED = "@media (forced-colors: active)"
+
 const styles = stylex.create({
 	// 外框、底色、focus 都是 input 的 controlStyles;這裡只補 trigger 自己的排法
 	trigger: {
@@ -88,7 +91,13 @@ const styles = stylex.create({
 		cursor: "pointer",
 		color: color.textMuted,
 		lineHeight: 1,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 1,
 		borderRadius: corner.small,
 	},

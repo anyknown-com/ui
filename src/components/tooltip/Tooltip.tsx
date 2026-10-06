@@ -6,6 +6,8 @@ import { layerStyles } from "../../lib/popup"
 import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Windows 高對比:陰影會消失、顏色換成系統色;邊界與焦點環明確給 CanvasText / Highlight
+const FORCED = "@media (forced-colors: active)"
 
 const fade = stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } })
 
@@ -20,7 +22,7 @@ const styles = stylex.create({
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "transparent",
+		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
 		borderRadius: corner.control,
 		boxShadow: shadow.float,
 		paddingBlock: space.xxs,

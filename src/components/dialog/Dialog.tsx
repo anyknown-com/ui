@@ -10,6 +10,8 @@ import { color, corner, focusRing, font, motion, shadow, space, type } from "../
 import { Button } from "../button/Button"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Windows 高對比:陰影會消失、顏色換成系統色;邊界與焦點環明確給 CanvasText / Highlight
+const FORCED = "@media (forced-colors: active)"
 
 // 退場:Base UI 關的時候先掛 data-ending-style,等 transition 跑完才拆 —— 淡到 0,dialog 再縮到 0.98
 const ENDING = ":is([data-ending-style])"
@@ -43,7 +45,7 @@ const styles = stylex.create({
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "transparent",
+		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
 		borderRadius: corner.modal,
 		boxShadow: shadow.modal,
 		// 28px
@@ -56,7 +58,13 @@ const styles = stylex.create({
 		animationName: { default: grow, [REDUCED]: "none" },
 		animationDuration: motion.quick,
 		animationTimingFunction: motion.easeOut,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: -2,
 		opacity: { default: 1, [ENDING]: 0 },
 		scale: { default: 1, [ENDING]: 0.98 },

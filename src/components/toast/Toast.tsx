@@ -11,6 +11,8 @@ import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Windows 高對比:陰影會消失、顏色換成系統色;邊界與焦點環明確給 CanvasText / Highlight
+const FORCED = "@media (forced-colors: active)"
 const DEFAULT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 3
 /** 退場的毫秒數:這段時間裡那則還在畫面上淡出,但已經不在無障礙樹上、也不算進 limit。 */
@@ -40,7 +42,13 @@ const styles = stylex.create({
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
 		borderRadius: corner.float,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
 	},
 	fromBottom: { flexDirection: "column-reverse" },
@@ -59,7 +67,7 @@ const styles = stylex.create({
 		backgroundColor: color.surfaceRaised,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "transparent",
+		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
 		borderRadius: corner.float,
 		boxShadow: shadow.float,
 		paddingBlock: space.sm,
@@ -159,7 +167,13 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		borderRadius: corner.pill,
 		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: 2,
 	},
 	close: {
@@ -172,7 +186,13 @@ const styles = stylex.create({
 		color: { default: color.textFaint, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: -1,
 	},
 	// 對齊第一行(20px 行高)的中線

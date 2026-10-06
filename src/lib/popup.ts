@@ -2,6 +2,8 @@ import * as stylex from "@stylexjs/stylex"
 import { color, corner, focusRing, motion, shadow, zIndex } from "../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+// Windows 高對比:陰影會消失、顏色換成系統色;邊界與焦點環明確給 CanvasText / Highlight
+const FORCED = "@media (forced-colors: active)"
 
 /**
  * 全站疊層表,值在 `tokens.stylex.ts` 的 `zIndex`(順序的理由也寫在那裡)。
@@ -56,7 +58,7 @@ export const popupStyles = stylex.create({
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "transparent",
+		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
 		borderRadius: corner.float,
 		boxShadow: shadow.float,
 		overflow: "hidden",
@@ -69,7 +71,13 @@ export const popupStyles = stylex.create({
 		transitionProperty: "opacity",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outline: {
+			default: "none",
+			":focus-visible": {
+				default: `${focusRing.width} solid ${color.focusRing}`,
+				[FORCED]: `${focusRing.width} solid Highlight`,
+			},
+		},
 		outlineOffset: -2,
 	},
 	anchorWidth: { width: "var(--anchor-width)" },
