@@ -154,6 +154,9 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   trigger,所以會晚 120ms。命令式 `dialog.open` 那一套是 store 拿掉就拆,沒有退場
 
 - ConfirmDialog 免費繼承 Button —— Base UI 的 render prop 會把 children 併進來
+- **`confirmLabel` 必填,沒有預設**(ConfirmDialog 與 `dialog.confirm` 都是)。「確認」說不出
+  按下去會怎樣;要動詞開頭、說出後果:「刪除記憶」「封存 thread」。只有呼叫端知道後果,所以
+  不給預設。`dialog.alert` 只有一顆「知道了」,不改變任何東西,保留預設
 - 寬度三階 `size`:`sm`(預設 24rem)/ `md`(40rem)/ `full`(64rem 寬、46rem 高的沉浸式)。
   **原本刻意不給 `size`**,理由是尺寸的組合無限;改口是因為「沉浸式」那個組合(寬 + 高 +
   不自己捲)每個使用端都抄一次同一段 `sx`,那就是一個階不是一個偏好。階外的仍然走 `sx`
@@ -161,7 +164,7 @@ danger confirm 變體給不可復原的動作(刪除記憶、清空 thread)。
   標頭與 `children`(篩選 chips 那排)釘住,只有 `body` 捲 —— 沉浸式清單捲起來標頭不能跟著跑
 - **命令式的那一套跟 toast 同形**:`dialog.open(({ close }) => <DialogContent …/>, { role? })`
   回傳 `{ id, close(result?), result }`;`dialog.close(id, result?)`、`dialog.closeAll()`;
-  `dialog.confirm({ title, description?, confirmLabel?, cancelLabel?, tone? })` → `Promise<boolean>`、
+  `dialog.confirm({ title, description?, confirmLabel, cancelLabel?, tone? })` → `Promise<boolean>`、
   `dialog.alert(…)` → `Promise<void>`,長相就是 ConfirmDialog 那張卡(共用 `ConfirmContent`)。
   畫面要在 app 裡掛一個 `<Dialogs />`;`createDialogManager()` + `<Dialogs manager>` 做 scope,
   包在裡面的 `useDialog()` 拿到那個 manager,外面拿到預設的 `dialog`。受控的 `Dialog` 照舊

@@ -169,7 +169,8 @@ export type ConfirmDialogProps = {
 	title: ReactNode
 	description?: ReactNode
 	danger?: boolean
-	confirmLabel?: string
+	/** Verb first and names the consequence: 「刪除記憶」, not 「確認」. No default. */
+	confirmLabel: string
 	cancelLabel?: string
 	onConfirm: () => void
 }
@@ -179,7 +180,7 @@ export function ConfirmDialog({
 	title,
 	description,
 	danger = false,
-	confirmLabel = "確認",
+	confirmLabel,
 	cancelLabel = "取消",
 	onConfirm,
 	...props
@@ -282,8 +283,8 @@ export type DialogEntry = {
 export type ConfirmOptions = {
 	title: ReactNode
 	description?: ReactNode
-	/** @default "確認" */
-	confirmLabel?: string
+	/** Verb first and names the consequence: 「封存 thread」, not 「確認」. No default. */
+	confirmLabel: string
 	/** @default "取消" */
 	cancelLabel?: string
 	/** `danger`:紅色確認鈕,焦點先落在取消。 @default "default" */
@@ -348,7 +349,7 @@ export function createDialogManager(): DialogManager {
 			const [first] = store.getSnapshot()
 			if (first != null) close(first.id)
 		},
-		confirm({ title, description, confirmLabel = "確認", cancelLabel = "取消", tone = "default" }) {
+		confirm({ title, description, confirmLabel, cancelLabel = "取消", tone = "default" }) {
 			const handle = push<boolean>(
 				({ close: done }) => (
 					<ConfirmContent

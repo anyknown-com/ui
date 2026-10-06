@@ -113,7 +113,7 @@ function StackedSettings() {
 					const ok = await dialog.confirm({
 						title: "刪除這個工作區?",
 						description: "疊在設定上面;Esc 只關這一層。",
-						confirmLabel: "刪除",
+						confirmLabel: "刪除工作區",
 						tone: "danger",
 					})
 					toast(ok ? "已刪除工作區" : "保留工作區")
@@ -229,7 +229,7 @@ export function BasicsDemos() {
 						title="刪除這則記憶?"
 						description="「部署走 Cloudflare」會從工作區移除,此動作無法復原。"
 						danger
-						confirmLabel="刪除"
+						confirmLabel="刪除記憶"
 						onConfirm={() =>
 							toast("已刪除「部署走 Cloudflare」", { action: { label: "復原", onClick: () => {} } })
 						}
@@ -263,7 +263,7 @@ export function BasicsDemos() {
 							const ok = await dialog.confirm({
 								title: "封存這個 thread?",
 								description: "封存後仍可從側欄找回。",
-								confirmLabel: "封存",
+								confirmLabel: "封存 thread",
 							})
 							toast(ok ? "已封存" : "沒有封存")
 						}}

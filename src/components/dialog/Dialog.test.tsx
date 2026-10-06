@@ -141,6 +141,25 @@ describe("ConfirmDialog", () => {
 		await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument())
 	})
 
+	// 「確認」說不出按下去會怎樣;動詞開頭、說出後果的字只有呼叫端知道,所以沒有預設
+	test("confirmLabel is required and is the only confirm wording", async () => {
+		// @ts-expect-error confirmLabel has no default
+		const missing = <ConfirmDialog title="刪除這則記憶?" onConfirm={() => {}} />
+		expect(missing).toBeTruthy()
+		render(
+			<ConfirmDialog
+				trigger={<Button>封存</Button>}
+				title="封存這個 thread?"
+				confirmLabel="封存 thread"
+				onConfirm={() => {}}
+			/>,
+		)
+		await userEvent.click(screen.getByRole("button", { name: "封存" }))
+		await screen.findByRole("alertdialog")
+		expect(screen.getByRole("button", { name: "封存 thread" })).toBeInTheDocument()
+		expect(screen.queryByRole("button", { name: "確認" })).not.toBeInTheDocument()
+	})
+
 	test("danger confirm starts focused on cancel", async () => {
 		render(
 			<ConfirmDialog
@@ -238,15 +257,26 @@ describe("dialog store", () => {
 		await userEvent.click(screen.getByRole("button", { name: "刪除" }))
 		await expect(answer).resolves.toBe(true)
 
-		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?" })))
+		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?", confirmLabel: "封存 thread" })))
 		await userEvent.click(await screen.findByRole("button", { name: "取消" }))
 		await expect(answer).resolves.toBe(false)
 
-		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?" })))
+		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?", confirmLabel: "封存 thread" })))
 		await screen.findByRole("alertdialog")
 		await userEvent.keyboard("{Escape}")
 		await expect(answer).resolves.toBe(false)
 		await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument())
+	})
+
+	test("confirm needs a confirmLabel; it labels the button", async () => {
+		render(<Dialogs />)
+		// @ts-expect-error confirmLabel has no default
+		const check = () => dialogManager.confirm({ title: "封存 thread?" })
+		expect(check).toBeTypeOf("function")
+		let answer: Promise<boolean> = Promise.resolve(false)
+		act(() => void (answer = dialogManager.confirm({ title: "封存 thread?", confirmLabel: "封存 thread" })))
+		await userEvent.click(await screen.findByRole("button", { name: "封存 thread" }))
+		await expect(answer).resolves.toBe(true)
 	})
 
 	test("alert has one button and resolves when it is pressed", async () => {
@@ -268,7 +298,9 @@ describe("dialog store", () => {
 					<DialogContent title="設定">
 						<Opener
 							label="刪除工作區"
-							onOpen={(dialog) => (inner = dialog.confirm({ title: "真的要刪除?" }))}
+							onOpen={(dialog) =>
+								(inner = dialog.confirm({ title: "真的要刪除?", confirmLabel: "刪除工作區" }))
+							}
 						/>
 					</DialogContent>
 				)),
@@ -291,7 +323,7 @@ describe("dialog store", () => {
 		let answer: Promise<boolean> = Promise.resolve(true)
 		act(() => {
 			bottom = dialogManager.open(() => <DialogContent title="底下" />)
-			answer = dialogManager.confirm({ title: "上面" })
+			answer = dialogManager.confirm({ title: "上面", confirmLabel: "刪除" })
 		})
 		await screen.findByRole("alertdialog")
 		act(() => bottom?.close())
@@ -300,7 +332,7 @@ describe("dialog store", () => {
 
 		act(() => {
 			dialogManager.open(() => <DialogContent title="一" />)
-			answer = dialogManager.confirm({ title: "二" })
+			answer = dialogManager.confirm({ title: "二", confirmLabel: "刪除" })
 		})
 		await screen.findByRole("alertdialog")
 		act(() => dialogManager.closeAll())
