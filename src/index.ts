@@ -243,6 +243,7 @@ export { RecoveryKey, type RecoveryKeyProps } from "./components/recovery-key/Re
 export type { RecoveryKeyLabels } from "./components/recovery-key/RecoveryKey"
 export { Dropzone, UploadList } from "./components/dropzone/Dropzone"
 export type { DropzoneProps, UploadListProps, UploadJob, Rejection } from "./components/dropzone/Dropzone"
+export type { DropzoneLabels } from "./components/dropzone/Dropzone"
 export { FileRow, FileList } from "./components/file-row/FileRow"
 export type { FileRowProps, FileListProps, FileItem, FileRowAction } from "./components/file-row/FileRow"
 export type { FileRowLabels } from "./components/file-row/FileRow"

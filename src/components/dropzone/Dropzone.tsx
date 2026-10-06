@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
 import { color, corner, font, motion, shadow, space, tone, type } from "../../tokens.stylex"
@@ -169,21 +170,77 @@ function isFileDrag(event: DragEvent) {
 	return Array.from(event.dataTransfer?.types ?? []).includes("Files")
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		title: "把檔案拖到這裡上傳",
+		hint: "加密在你的裝置上完成,才會離開瀏覽器。",
+		pick: "選擇檔案",
+		uploads: "上傳中的檔案",
+		cancel: (name: string) => `取消上傳 ${name}`,
+		queued: "排隊中",
+		encrypting: "加密中",
+		uploading: "上傳中",
+		done: "完成",
+		failed: "失敗",
+		// 唸給螢幕閱讀器的一句:檔名接狀態;狀態字當一句話唸時要句尾
+		announce: (name: string, status: string) => `${name}:${status}`,
+		sentence: (status: string) => `${status}。`,
+		failure: "上傳失敗。再試一次，或換一個檔案。",
+		tooBig: (limit: string) => `超過 ${limit} 上限，沒有上傳。換一個小於 ${limit} 的檔案。`,
+	},
+	en: {
+		title: "Drop files here to upload",
+		hint: "Files are encrypted on your device before they leave the browser.",
+		pick: "Choose files",
+		uploads: "Uploads",
+		cancel: (name: string) => `Cancel upload of ${name}`,
+		queued: "Queued",
+		encrypting: "Encrypting",
+		uploading: "Uploading",
+		done: "Done",
+		failed: "Failed",
+		announce: (name: string, status: string) => `${name}: ${status}`,
+		sentence: (status: string) => `${status}.`,
+		failure: "Upload failed. Try again, or pick another file.",
+		tooBig: (limit: string) => `Over the ${limit} limit, so it was not uploaded. Pick a file under ${limit}.`,
+	},
+})
+
+/** Dropzone's and UploadList's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type DropzoneLabels = StringsOf<typeof strings>
+
+/** A file turned away, and why: over `maxSize`, outside `accept`, or a second file when `multiple` is off. */
 export type Rejection = { file: File; reason: "size" | "type" | "count" }
 
 export type DropzoneProps = {
+	/** The files that passed the checks, from a drop or the picker. */
 	onFiles: (files: File[]) => void
+	/** The files that did not pass, each with its reason. */
 	onReject?: (rejections: Rejection[]) => void
+	/** The largest file accepted, in bytes. @default Infinity */
 	maxSize?: number
+	/** More than one file per drop or pick. @default true */
 	multiple?: boolean
+	/** Like the input's `accept`: `.pdf`, `image/*`, `application/zip`, comma-separated. Also enforced on drops. */
 	accept?: string
+	/** Ignores drops and disables the picker. */
 	disabled?: boolean
+	/** The headline; defaults to the locale's "drop files here". */
 	title?: ReactNode
+	/** The smaller line under it; defaults to the locale's encryption note. */
 	hint?: ReactNode
+	/** The picker button's text; defaults to the locale's "choose files". */
 	pickLabel?: string
+	/** Override built-in words for this zone; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DropzoneLabels>
+	/** Replaces the title and hint. */
 	children?: ReactNode
 }
 
+/**
+ * A place to drop files, with a real "choose files" button so dragging is never the only way
+ * in. `accept`, `maxSize` and `multiple` are checked on drops too.
+ */
 export function Dropzone({
 	onFiles,
 	onReject,
@@ -191,11 +248,13 @@ export function Dropzone({
 	multiple = true,
 	accept,
 	disabled = false,
-	title = "把檔案拖到這裡上傳",
-	hint = "加密在你的裝置上完成,才會離開瀏覽器。",
-	pickLabel = "選擇檔案",
+	title,
+	hint,
+	pickLabel,
+	labels,
 	children,
 }: DropzoneProps) {
+	const t = useStrings(strings, labels)
 	const input = useRef<HTMLInputElement>(null)
 	const depth = useRef(0)
 	const [over, setOver] = useState(false)
@@ -270,8 +329,8 @@ export function Dropzone({
 			<UploadIcon over={over} />
 			{children ?? (
 				<>
-					<p {...stylex.props(styles.title)}>{title}</p>
-					<small {...stylex.props(styles.hint)}>{hint}</small>
+					<p {...stylex.props(styles.title)}>{title ?? t.title}</p>
+					<small {...stylex.props(styles.hint)}>{hint ?? t.hint}</small>
 				</>
 			)}
 			<button
@@ -280,7 +339,7 @@ export function Dropzone({
 				onClick={() => input.current?.click()}
 				{...stylex.props(styles.pick, press.button)}
 			>
-				{pickLabel}
+				{pickLabel ?? t.pick}
 			</button>
 			<input
 				ref={input}
@@ -301,10 +360,15 @@ export function Dropzone({
 }
 
 export type UploadJob = {
+	/** Unique among the jobs; what `onCancel` gets. */
 	id: string
+	/** The file's name. */
 	name: string
+	/** Bytes. */
 	size: number
+	/** Where the job is; `failed` shows the reason in danger. */
 	state: "queued" | "encrypting" | "uploading" | "done" | "failed"
+	/** 0–100; given, a progress bar is drawn. */
 	progress?: number
 	/** Why it failed, in words; replaces the default copy. */
 	error?: string
@@ -312,39 +376,37 @@ export type UploadJob = {
 	limit?: number
 }
 
-const JOB_STATE_LABEL: Record<UploadJob["state"], string> = {
-	queued: "排隊中",
-	encrypting: "加密中",
-	uploading: "上傳中",
-	done: "完成",
-	failed: "失敗",
-}
-
 export type UploadListProps = {
+	/** The jobs, in order. */
 	jobs: UploadJob[]
+	/** Shows a cancel button on every job not yet done. */
 	onCancel?: (id: string) => void
+	/** The list's accessible name; defaults to the locale's "uploads". */
 	label?: string
+	/** Override built-in words for this list; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<DropzoneLabels>
 }
 
-function failure(job: UploadJob) {
+function failure(job: UploadJob, t: DropzoneLabels) {
 	if (job.error != null) return job.error
-	if (job.limit == null) return "上傳失敗。再試一次，或換一個檔案。"
-	const limit = formatBytes(job.limit)
-	return `超過 ${limit} 上限，沒有上傳。換一個小於 ${limit} 的檔案。`
+	if (job.limit == null) return t.failure
+	return t.tooBig(formatBytes(job.limit))
 }
 
-export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: UploadListProps) {
+/** The uploads under a `Dropzone`: one line each with its state and progress, announced politely. */
+export function UploadList({ jobs, onCancel, label, labels }: UploadListProps) {
+	const t = useStrings(strings, labels)
 	return (
 		<>
 			{/* 只唸狀態字。live region 包住整張清單的話,裡面的取消鈕在 modal 開著時也還露在外面 */}
 			<p role="status" {...stylex.props(styles.srOnly)}>
 				{jobs.map((job) => (
 					<span key={job.id}>
-						{`${job.name}:${job.state === "failed" ? failure(job) : `${JOB_STATE_LABEL[job.state]}。`}`}
+						{t.announce(job.name, job.state === "failed" ? failure(job, t) : t.sentence(t[job.state]))}
 					</span>
 				))}
 			</p>
-			<ul aria-label={label} {...stylex.props(styles.jobs, jobs.length === 0 && styles.srOnly)}>
+			<ul aria-label={label ?? t.uploads} {...stylex.props(styles.jobs, jobs.length === 0 && styles.srOnly)}>
 				{jobs.map((job) => {
 					const failed = job.state === "failed"
 					return (
@@ -353,7 +415,7 @@ export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: Upl
 							{onCancel != null && job.state !== "done" && (
 								<button
 									type="button"
-									aria-label={`取消上傳 ${job.name}`}
+									aria-label={t.cancel(job.name)}
 									onClick={() => onCancel(job.id)}
 									{...stylex.props(reset.control, styles.cancel)}
 								>
@@ -366,14 +428,15 @@ export function UploadList({ jobs, onCancel, label = "上傳中的檔案" }: Upl
 									aria-valuemin={0}
 									aria-valuemax={100}
 									aria-valuenow={Math.round(job.progress)}
-									aria-valuetext={`${job.name} ${JOB_STATE_LABEL[job.state]} ${Math.round(job.progress)}%`}
+									aria-label={job.name}
+									aria-valuetext={`${job.name} ${t[job.state]} ${Math.round(job.progress)}%`}
 									{...stylex.props(styles.track)}
 								>
 									<b {...stylex.props(styles.bar, styles.fill(job.progress))} />
 								</div>
 							)}
 							<span {...stylex.props(styles.status, failed && styles.statusError)}>
-								{failed ? failure(job) : `${JOB_STATE_LABEL[job.state]} · ${formatBytes(job.size)}`}
+								{failed ? failure(job, t) : `${t[job.state]} · ${formatBytes(job.size)}`}
 							</span>
 						</li>
 					)

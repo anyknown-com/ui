@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Dropzone, type UploadJob, UploadList } from "./Dropzone"
 
 function file(name: string, size: number, type = "text/plain") {
@@ -151,5 +153,40 @@ describe("UploadList", () => {
 		expect(status).toHaveTextContent("護照掃描.pdf:上傳中。")
 		expect(status).toHaveTextContent("big.mov:超過 10 MB 上限")
 		expect(status.querySelector("button")).toBeNull()
+	})
+})
+
+describe("Dropzone and UploadList words", () => {
+	test("follow the LocaleProvider; labels and content props override", () => {
+		render(
+			<LocaleProvider locale="en">
+				<Dropzone onFiles={() => {}} labels={{ pick: "Browse" }} />
+				<UploadList jobs={JOBS} onCancel={() => {}} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByText("Drop files here to upload")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Browse" })).toBeInTheDocument()
+		expect(screen.getByRole("list", { name: "Uploads" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Cancel upload of 護照掃描.pdf" })).toBeInTheDocument()
+		expect(screen.getByRole("status")).toHaveTextContent("護照掃描.pdf: Uploading.")
+		expect(screen.getByRole("list")).toHaveTextContent("Over the 10 MB limit")
+	})
+
+	test("title, hint and pickLabel still win over the locale", () => {
+		render(<Dropzone onFiles={() => {}} title="拖進來" hint="最多 10 MB" pickLabel="挑檔案" />)
+		expect(screen.getByText("拖進來")).toBeInTheDocument()
+		expect(screen.getByText("最多 10 MB")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "挑檔案" })).toBeInTheDocument()
+	})
+
+	test("axe: zone idle and disabled, a list with progress, failure and cancel", async () => {
+		const { container } = render(
+			<>
+				<Dropzone onFiles={() => {}} />
+				<Dropzone onFiles={() => {}} disabled />
+				<UploadList jobs={JOBS} onCancel={() => {}} />
+			</>,
+		)
+		await expectNoAxeViolations(container)
 	})
 })
