@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -24,7 +24,7 @@ const styles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: { default: color.border, ":hover": color.borderStrong, ":focus-visible": color.focusRing },
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: text.sm,
@@ -39,25 +39,31 @@ const styles = stylex.create({
 		"::placeholder": { color: color.textFaint },
 	},
 	count: { fontFamily: font.mono, fontSize: "0.72rem", lineHeight: 1, color: color.textFaint },
+	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
 	wrap: {
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		borderRadius: corner.small,
 		overflow: "auto",
 		marginTop: space.xs,
 	},
 	capped: (maxHeight: string | number) => ({ maxHeight }),
-	table: { width: "100%", borderCollapse: "collapse", fontFamily: font.body, fontSize: text.sm },
+	table: {
+		width: "100%",
+		borderCollapse: "separate",
+		borderSpacing: 0,
+		fontFamily: font.body,
+		fontSize: text.sm,
+	},
 	th: {
 		position: "sticky",
 		insetBlockStart: 0,
 		zIndex: 1,
 		backgroundColor: color.surface,
-		boxShadow: `inset 0 -1px ${color.border}`,
+		borderStartStartRadius: { default: 0, ":first-child": corner.small },
+		borderEndStartRadius: { default: 0, ":first-child": corner.small },
+		borderStartEndRadius: { default: 0, ":last-child": corner.small },
+		borderEndEndRadius: { default: 0, ":last-child": corner.small },
 		textAlign: "start",
 		padding: 0,
 		whiteSpace: "nowrap",
@@ -76,10 +82,8 @@ const styles = stylex.create({
 		fontSize: "0.68rem",
 		fontWeight: 600,
 		lineHeight: 1,
-		letterSpacing: "0.07em",
-		textTransform: "uppercase",
 		color: { default: color.textMuted, ":hover": color.text },
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
@@ -91,19 +95,17 @@ const styles = stylex.create({
 		fontSize: "0.68rem",
 		fontWeight: 600,
 		lineHeight: 1,
-		letterSpacing: "0.07em",
-		textTransform: "uppercase",
 		color: color.textMuted,
 	},
 	arrow: { color: color.accent, fontSize: "0.6rem" },
 	row: {
-		backgroundColor: { default: "transparent", ":hover": color.bg },
+		backgroundColor: { default: "transparent", ":hover": color.layer3 },
 	},
 	rowSelected: { backgroundColor: color.accentSubtle },
 	td: {
-		borderTopWidth: 1,
-		borderTopStyle: "solid",
-		borderTopColor: color.border,
+		borderBottomWidth: 1,
+		borderBottomStyle: "solid",
+		borderBottomColor: color.border,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		verticalAlign: "middle",
@@ -118,7 +120,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: text.sm,
 		boxShadow: `inset 0 0 0 2px ${color.focusRing}`,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		paddingInline: "0.2rem",
 		marginInline: "-0.2rem",
 		backgroundColor: color.surface,
@@ -137,9 +139,6 @@ const styles = stylex.create({
 		paddingInline: space.md,
 		textAlign: "center",
 		color: color.textMuted,
-		borderTopWidth: 1,
-		borderTopStyle: "solid",
-		borderTopColor: color.border,
 	},
 	clear: {
 		color: color.accent,
