@@ -129,11 +129,12 @@ export function Segmented<T extends string>({
 		if (one.value !== selected) setSelected(one.value)
 	}
 
-	function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+	function onKeyDown(event: KeyboardEvent<HTMLButtonElement>, from: SegmentedOption<T>) {
 		const enabled = options.filter(usable)
-		if (enabled.length === 0) return
-		const at = enabled.findIndex((one) => one.value === (event.target as HTMLElement).dataset.value)
-		const rtl = getComputedStyle(event.currentTarget).direction === "rtl"
+		const group = event.currentTarget.parentElement
+		if (enabled.length === 0 || group == null) return
+		const at = enabled.indexOf(from)
+		const rtl = getComputedStyle(group).direction === "rtl"
 		let next: number
 		switch (event.key) {
 			case "ArrowRight":
@@ -160,7 +161,7 @@ export function Segmented<T extends string>({
 		event.preventDefault()
 		const target = enabled[(next + enabled.length) % enabled.length]
 		choose(target)
-		const radios = event.currentTarget.querySelectorAll<HTMLElement>('[role="radio"]')
+		const radios = group.querySelectorAll<HTMLElement>('[role="radio"]')
 		for (const radio of radios) if (radio.dataset.value === target.value) radio.focus()
 	}
 
@@ -169,7 +170,6 @@ export function Segmented<T extends string>({
 			role="radiogroup"
 			aria-label={label}
 			aria-disabled={disabled || undefined}
-			onKeyDown={onKeyDown}
 			{...stylex.props(styles.root, sx)}
 		>
 			{options.map((one) => {
@@ -185,6 +185,7 @@ export function Segmented<T extends string>({
 						disabled={off}
 						tabIndex={one.value === tabStop ? 0 : -1}
 						onClick={() => choose(one)}
+						onKeyDown={(event) => onKeyDown(event, one)}
 						{...stylex.props(styles.item, on && styles.on, off && styles.disabled, press.button)}
 					>
 						{one.label}
