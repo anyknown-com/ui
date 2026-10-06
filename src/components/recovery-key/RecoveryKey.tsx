@@ -1,18 +1,17 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, tone } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
+	// rest 階的卡片:淺色是白紙,暗色底色升一階(railLayer2 剛好是 bg / surface 這一對)
 	card: {
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		backgroundColor: tone.railLayer2,
+		borderRadius: corner.card,
+		boxShadow: shadow.rest,
 		padding: space.md,
 		display: "grid",
 		gap: space.sm,
@@ -21,11 +20,9 @@ const styles = stylex.create({
 	intro: { margin: 0, fontSize: text.xs, color: color.textMuted },
 	keyBox: {
 		position: "relative",
-		backgroundColor: color.bg,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		// 卡片裡凹下去的一塊,不加框
+		backgroundColor: color.surface,
+		borderRadius: corner.control,
 		padding: space.md,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -76,34 +73,30 @@ const styles = stylex.create({
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong },
-		borderRadius: radius.md,
+		// secondary 膠囊:凹下去的 accentSubtle 底,無框
+		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		borderWidth: 0,
+		borderRadius: corner.pill,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: "0.82rem",
 		fontWeight: 500,
 		lineHeight: 1,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
+		height: "2rem",
+		paddingInline: space.sm,
 		cursor: "pointer",
-		transitionProperty: "border-color, color",
+		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 1,
 	},
-	copied: { color: color.accent, borderColor: color.accent },
+	copied: { color: color.success },
 	warning: {
 		display: "flex",
 		gap: space.xs,
 		backgroundColor: color.warningSubtle,
 		color: color.text,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: `color-mix(in srgb, ${color.warning} 40%, transparent)`,
-		borderRadius: radius.md,
+		borderRadius: corner.control,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
 		fontSize: "0.82rem",
