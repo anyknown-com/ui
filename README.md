@@ -116,9 +116,9 @@ import { color, space } from "@anyknown/ui/tokens.stylex"
 
 app 自己的樣式一律引用 tokens,不寫死色值。`playground/` 就是照這套設定跑的,可以當範本。
 
-## 視覺方向:平面、neutral
+## 視覺方向:軟材
 
-白紙(#FFFFFF)、墨色文字、墨色 accent(#1D1D1F);標題與內文都是 Geist,時間軸/數據用 Geist Mono,中文接 Noto Sans TC(沒裝時退到蘋方/微軟正黑)。織物設計語言與 ledger palette 封存在 `archive/fiber` branch。使用端需安裝字體:
+冷灰桌面上的白紙(#FFFFFF)、墨色文字、墨色 accent(#1B1E24),鳶尾紫 `signal` 只給 agent 正在做事與焦點;層次靠深淺與 rest / float / modal 三階陰影,不靠邊框。標題與內文是 Figtree,時間軸/數據用 Geist Mono,中文接 Noto Sans TC(沒裝時退到蘋方/微軟正黑)。規格在 `docs/plans/02-tactile.md`,色值由 `scripts/palette.mjs` 從 OKLCH 算出。織物設計語言與 ledger palette 封存在 `archive/fiber` branch。使用端需安裝字體:
 
 ```bash
 pnpm add @fontsource-variable/figtree @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
