@@ -105,6 +105,7 @@ export { Badge, Chip, type BadgeProps, type ChipProps } from "./components/badge
 export { Kbd, KbdGroup, KbdToneContext, type KbdProps, type KbdGroupProps } from "./components/kbd/Kbd"
 export { Skeleton, SkeletonGroup, ThreadSkeleton } from "./components/skeleton/Skeleton"
 export type { SkeletonProps, SkeletonGroupProps, ThreadSkeletonProps } from "./components/skeleton/Skeleton"
+export type { ThreadSkeletonLabels } from "./components/skeleton/Skeleton"
 export { Spinner, Progress, ProgressBall, ProgressRing } from "./components/progress/Progress"
 export type {
 	SpinnerProps,
@@ -112,6 +113,7 @@ export type {
 	ProgressBallProps,
 	ProgressRingProps,
 } from "./components/progress/Progress"
+export type { SpinnerLabels, ProgressLabels } from "./components/progress/Progress"
 export { EmptyState, type EmptyStateProps } from "./components/empty-state/EmptyState"
 
 export { Thread, UserMessage, AssistantMessage, TextPart, useMessageBody } from "./components/message/Message"
@@ -121,6 +123,7 @@ export type {
 	AssistantMessageProps,
 	TextPartProps,
 } from "./components/message/Message"
+export type { MessageLabels } from "./components/message/Message"
 export { Bubble, type BubbleProps } from "./components/bubble/Bubble"
 export {
 	AttachmentGrid,
@@ -150,7 +153,9 @@ export type {
 	SubagentThreadProps,
 	SubagentTextProps,
 } from "./components/tool-card/ToolCard"
+export type { ToolCardLabels } from "./components/tool-card/ToolCard"
 export { ReasoningFold, type ReasoningFoldProps } from "./components/reasoning-fold/ReasoningFold"
+export type { ReasoningFoldLabels } from "./components/reasoning-fold/ReasoningFold"
 export { ActionBar } from "./components/action-bar/ActionBar"
 export type {
 	ActionBarProps,
@@ -158,13 +163,16 @@ export type {
 	CopyActionProps,
 	RegenerateActionProps,
 } from "./components/action-bar/ActionBar"
+export type { ActionBarLabels } from "./components/action-bar/ActionBar"
 export {
 	CodeBlock,
 	InlineCode,
 	type CodeBlockProps,
 	type InlineCodeProps,
 } from "./components/code-block/CodeBlock"
+export type { CodeBlockLabels } from "./components/code-block/CodeBlock"
 export { PayloadBlock, type PayloadBlockProps } from "./components/payload-block/PayloadBlock"
+export type { PayloadBlockLabels } from "./components/payload-block/PayloadBlock"
 export { PermissionCard, DecisionCard } from "./components/interaction-card/InteractionCard"
 export type {
 	PermissionCardProps,
@@ -175,17 +183,23 @@ export type {
 	DecisionOption,
 	DecisionAnswer,
 } from "./components/interaction-card/InteractionCard"
+export type { InteractionCardLabels } from "./components/interaction-card/InteractionCard"
 export { HandoffReceipt } from "./components/handoff-receipt/HandoffReceipt"
 export type { HandoffReceiptProps, HandoffReason } from "./components/handoff-receipt/HandoffReceipt"
+export type { HandoffReceiptLabels } from "./components/handoff-receipt/HandoffReceipt"
 export { Composer } from "./components/composer/Composer"
 export { AttachButton, type AttachButtonProps } from "./components/attach-button/AttachButton"
+export type { AttachButtonLabels } from "./components/attach-button/AttachButton"
 export {
 	PendingFiles,
 	type PendingFile,
 	type PendingFilesProps,
 } from "./components/pending-files/PendingFiles"
+export type { PendingFilesLabels } from "./components/pending-files/PendingFiles"
 export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
+export type { ComposerLabels } from "./components/composer/Composer"
 export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
+export type { VoiceIndicatorLabels } from "./components/voice-indicator/VoiceIndicator"
 export {
 	CallBar,
 	type CallBarLabels,
@@ -221,15 +235,19 @@ export {
 
 export { PasswordInput, defaultScorer } from "./components/password-input/PasswordInput"
 export type { PasswordInputProps } from "./components/password-input/PasswordInput"
+export type { PasswordInputLabels } from "./components/password-input/PasswordInput"
 export { RecoveryKey, type RecoveryKeyProps } from "./components/recovery-key/RecoveryKey"
+export type { RecoveryKeyLabels } from "./components/recovery-key/RecoveryKey"
 export { Dropzone, UploadList } from "./components/dropzone/Dropzone"
 export type { DropzoneProps, UploadListProps, UploadJob, Rejection } from "./components/dropzone/Dropzone"
 export { FileRow, FileList } from "./components/file-row/FileRow"
 export type { FileRowProps, FileListProps, FileItem, FileRowAction } from "./components/file-row/FileRow"
 export { DiffViewer, type DiffViewerProps, type DiffFile } from "./components/diff-viewer/DiffViewer"
+export type { DiffViewerLabels } from "./components/diff-viewer/DiffViewer"
 export { DataTable } from "./components/data-table/DataTable"
 export type { DataTableProps, DataTableColumn, SortState } from "./components/data-table/DataTable"
 export { Markdown, type MarkdownProps, type MarkdownBlock } from "./components/markdown/Markdown"
+export type { MarkdownLabels } from "./components/markdown/Markdown"
 export { Formula, type FormulaProps } from "./components/markdown/Formula"
 export { Ghost, GhostLink, type GhostProps, type GhostLinkProps } from "./components/ghost/Ghost"
 export { IconButton, type IconButtonProps } from "./components/icon-button/IconButton"
