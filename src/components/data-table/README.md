@@ -1,0 +1,86 @@
+# DataTable
+
+A real `<table>` with header sorting, a filter box, row selection and inline cell editing; its first consumer is the i18n dictionary editor.
+
+## When to use
+
+- Records you sort, filter, select or edit in place, such as translation keys and their strings.
+- Many rows in a capped scroll area (`maxHeight`, 20rem by default), with a `footer` like "Load more" that scrolls with the rows.
+- A table that sits full width in its own section, not in a card.
+
+## When not to use
+
+- For a read-only mono ledger that wraps to two lines on a phone, use [Table](../table/README.md).
+- For a list of things you click to open, use [List](../list/README.md).
+- For files with icons, sizes and hover actions, use [FileRow](../file-row/README.md).
+
+## Usage
+
+The table does not filter or sort by itself: it reports `filter` and `sort` through `onFilterChange` and `onSortChange`, and you pass in the rows to show. Pass `total` so the count reads "shown / total".
+
+```tsx
+import { DataTable, type DataTableColumn, type SortState } from "@anyknown/ui"
+
+type Entry = { key: string; en: string }
+
+const columns: DataTableColumn<Entry>[] = [
+  { id: "key", header: "key", mono: true, sortable: true, value: (row) => row.key },
+  {
+    id: "en",
+    header: "en",
+    sortable: true,
+    editable: true,
+    value: (row) => row.en,
+    onCommit: (row, next) => saveString(row.key, next),
+  },
+]
+
+<DataTable
+  label="Dictionary"
+  rows={visibleRows}
+  total={entries.length}
+  rowKey={(row) => row.key}
+  columns={columns}
+  filter={filter}
+  onFilterChange={setFilter}
+  filterPlaceholder="Filter keys or strings"
+  sort={sort}
+  onSortChange={setSort}
+  selected={selected}
+  onSelectedChange={setSelected}
+  onClearFilter={() => setFilter("")}
+/>
+```
+
+A column's `cell` renders custom content (such as a Badge); `value` is still what gets edited and compared. An empty value shows a muted `—`.
+
+## Accessibility
+
+- Renders a native `<table>` named by `label` (required), inside a scroll container with `role="region"`, the same name, and `tabIndex={0}`, so keyboard users can scroll it.
+- Column headers are `<th scope="col">`. The sorted column has `aria-sort` (`ascending` / `descending`), and only one column has it at a time. A sortable header is a native button. The arrow is `aria-hidden`.
+- The filter is an `<input type="search">` named by `filterPlaceholder`. The "shown / total" count is an `aria-live="polite"` region.
+- Row checkboxes are native and named by `selectLabel(key)`. The header checkbox is named by `selectAllLabel` and becomes `indeterminate` when only some rows are selected.
+- Editable cells are focusable (`tabIndex={0}`). The editor input is named by `editLabel(column, key)`. It takes focus when it opens, and focus goes back to the cell after Enter or Escape.
+- Focus rings are 2px `focusRing` outlines. With `prefers-reduced-motion: reduce`, transitions are instant.
+- Built-in words are fixed Chinese defaults and do not follow `<LocaleProvider>`. Change them with `filterPlaceholder`, `selectLabel`, `selectAllLabel`, `editLabel`, `clearLabel`, `countLabel` and `emptyState`.
+- Known gaps (A11Y-DEBT): the filter placeholder is 3.75:1 in light mode, and the row checkbox hit area is 13.6px.
+
+## Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Moves through the filter, the scroll region, sort buttons, checkboxes and editable cells. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | On a sort header: cycles ascending → descending → unsorted. |
+| <kbd>Space</kbd> | On a checkbox: toggles the row, or all rows from the header. |
+| <kbd>Enter</kbd> / <kbd>F2</kbd> | On an editable cell: opens the editor. |
+| <kbd>Enter</kbd> | In the editor: commits and returns focus to the cell. |
+| <kbd>Escape</kbd> | In the editor: cancels and returns focus to the cell. |
+| <kbd>Tab</kbd> (in the editor) | Moving focus away commits, like Enter. |
+| Arrow keys | On the focused scroll region: scroll it (native). |
+
+## Related
+
+- [Table](../table/README.md) — the low-level ledger parts, with no sorting or editing.
+- [List](../list/README.md) — rows that open something.
+- [Badge](../badge/README.md) — a status in a custom `cell`.
+- [EmptyState](../empty-state/README.md) — a whole-page empty state; the table has its own empty row.
