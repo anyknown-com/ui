@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { useRef } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { IconButton } from "../icon-button/IconButton"
 import { PlusGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
@@ -13,10 +14,20 @@ const styles = stylex.create({
 	icon: { flexShrink: 0, height: 18, pointerEvents: "none", width: 18 },
 })
 
+const strings = defineStrings({
+	"zh-TW": { attach: "附加檔案" },
+	en: { attach: "Attach files" },
+})
+
+/** The AttachButton's built-in words (follow `<LocaleProvider>`); override any with `labels`. */
+export type AttachButtonLabels = StringsOf<typeof strings>
+
 export type AttachButtonProps = {
 	onFiles: (files: File[]) => void
-	/** The button's name and tooltip. @default "附加檔案" */
+	/** The button's name and tooltip. Wins over `labels.attach`. */
 	label?: string
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<AttachButtonLabels>
 	/** Which files the picker offers, as `<input accept>` reads it. */
 	accept?: string
 	/** @default true */
@@ -27,17 +38,24 @@ export type AttachButtonProps = {
 
 export function AttachButton({
 	onFiles,
-	label = "附加檔案",
+	label,
+	labels,
 	accept,
 	multiple = true,
 	disabled = false,
 	sx,
 }: AttachButtonProps) {
+	const t = useStrings(strings, labels)
 	const input = useRef<HTMLInputElement>(null)
 
 	return (
 		<>
-			<IconButton label={label} disabled={disabled} onClick={() => input.current?.click()} sx={sx}>
+			<IconButton
+				label={label ?? t.attach}
+				disabled={disabled}
+				onClick={() => input.current?.click()}
+				sx={sx}
+			>
 				<PlusGlyph {...stylex.props(styles.icon)} strokeWidth={ICON_STROKE} />
 			</IconButton>
 			<input

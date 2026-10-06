@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { AttachButton } from "./AttachButton"
 
 function picker(container: HTMLElement) {
@@ -44,5 +45,16 @@ describe("AttachButton", () => {
 		const { container } = render(<AttachButton onFiles={() => {}} disabled />)
 		expect(screen.getByRole("button", { name: "附加檔案" })).toBeDisabled()
 		expect(picker(container)).toBeDisabled()
+	})
+
+	test("reads English under an en LocaleProvider; label wins over labels", () => {
+		render(
+			<LocaleProvider locale="en">
+				<AttachButton onFiles={() => {}} />
+				<AttachButton onFiles={() => {}} label="Prop" labels={{ attach: "Labels" }} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Attach files" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Prop" })).toBeInTheDocument()
 	})
 })
