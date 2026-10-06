@@ -497,9 +497,9 @@ These do not need code changes, but they can change screenshots, tests or how a 
   them down anyway. Toasts over `limit` are dropped.
 - **F8** moves focus to the toast region and Escape gives it back.
 - **ActionBar** is one tab stop; use ← / → between its buttons.
-- **Placeholders** in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter
-  use `color.textMuted` (darker than before). The `Select` and `DecisionCard` placeholders are
-  unchanged.
+- **Placeholders** in `Input`, `Textarea`, `PasswordInput`, `Composer`, the `DataTable` filter,
+  the `Select` trigger and search box and the `DecisionCard` free-text box use `color.textMuted`
+  (darker than before).
 - **Spin** turns a little slower (0.8s, was 0.7s), and the **Dropzone** drag-over outline cycles
   in 0.8s (was 0.5s).
 - **Fields use 16px text on phones** (below 45rem) to stop iOS zooming on focus.
@@ -513,9 +513,10 @@ These do not need code changes, but they can change screenshots, tests or how a 
 - **Hover-only controls** (FileRow checkbox and actions, the message ActionBar) stay visible on
   touch devices.
 - **Right-to-left** needs `<DirectionProvider direction="rtl">` (new) at the root as well as
-  `dir="rtl"` on `<html>`. With it, `Tabs` and `DropdownMenu` submenus swap ← / →, and `Slider`
-  mirrors its keys and drag (it also follows a computed `direction: rtl` on its own, so an RTL
-  page without the provider now gets ← raising a Slider). See
+  `dir="rtl"` on `<html>`. With it, `Tabs` and `DropdownMenu` submenus swap ← / →, `Slider`
+  mirrors its keys and drag, and `Segmented` and `ActionBar` mirror their keys. `Slider`,
+  `Segmented` and `ActionBar` also follow a computed `direction: rtl` on their own, so an RTL
+  page without the provider now gets ← raising a Slider. See
   [Right-to-left](docs/guides/i18n.md#right-to-left).
 
 ## Checklist

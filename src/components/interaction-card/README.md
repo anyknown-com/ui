@@ -51,7 +51,7 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 - A rejected receipt swaps the check for a cross as well as turning red, so it is not color alone.
 - `prefers-reduced-motion: reduce` removes the ring and border transitions.
 - Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `cardName`, the badges (`blocking`, `waiting`, `replied`, `decided`), the reply buttons (`allowOnce`, `allowAlways`, `reject`), `scope`, `decide`, `submit`, `acceptRecommended`, `recommended`. Override any with `labels`; `scope`, `blockingLabel`, `deadlineLabel`, `submitLabel` and `recommendedLabel` win over `labels`.
-- Known gap: free-text placeholders use `textFaint` (3.75:1 in light), below 4.5:1 (see `A11Y-DEBT.md`).
+- Free-text placeholders use `textMuted` (6.35:1 light on `surface`), above 4.5:1.
 
 ## Keyboard
 

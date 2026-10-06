@@ -57,7 +57,7 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`,
 | <kbd>Home</kbd> / <kbd>End</kbd> | Moves focus to the first / last enabled option and checks it. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Checks the focused option (native `<button>`). |
 
-In a right-to-left context (computed `direction: rtl`), <kbd>←</kbd> and <kbd>→</kbd> swap so they follow the visual order; <kbd>↑</kbd> and <kbd>↓</kbd> do not change.
+In a right-to-left context (`<DirectionProvider direction="rtl">`, even inside `dir="ltr"`, or a computed `direction: rtl`), <kbd>←</kbd> and <kbd>→</kbd> swap so they follow the visual order; <kbd>↑</kbd> and <kbd>↓</kbd> do not change.
 
 ## Related
 

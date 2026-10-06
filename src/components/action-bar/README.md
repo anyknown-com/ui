@@ -49,7 +49,7 @@ import { ActionBar, AssistantMessage, TextPart } from "@anyknown/ui"
 | Key | Action |
 | --- | --- |
 | <kbd>Tab</kbd> | Moves into the bar (one stop, on the last-focused button) and out again; focus reveals the bar. |
-| <kbd>→</kbd> / <kbd>←</kbd> | Next / previous button, wrapping at the ends. Mirrored when the nearest `dir` is `rtl` (<kbd>←</kbd> is next). |
+| <kbd>→</kbd> / <kbd>←</kbd> | Next / previous button, wrapping at the ends. Mirrored under `<DirectionProvider direction="rtl">` (even inside `dir="ltr"`) or a computed `direction: rtl` (<kbd>←</kbd> is next). |
 | <kbd>Home</kbd> / <kbd>End</kbd> | First / last button. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused button (native `<button>`). |
 

@@ -13,18 +13,16 @@ Numbers are WCAG 2 contrast ratios computed from the hex values in `src/tokens.s
 
 `textFaint` is a 3:1 color, so the rule is: no text that has to be read. Icons, chevrons,
 separators, the `—` in an empty cell, and disabled states may use it; all other text uses
-`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). These text uses are left:
+`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). This text use is left:
 
 | Where | Pair | Measured | Threshold |
 | --- | --- | --- | --- |
-| `Select` trigger placeholder ("Select…") | `textFaint` on `surface` | 3.75 / 4.88 | 4.5:1 |
-| `Select` search box placeholder ("Search…") | `textFaint` on `surfaceRaised` (the popup) | 3.95 / 4.53 | 4.5:1 |
-| `DecisionCard` free-text box placeholder | `textFaint` on `surface` | 3.75 / 4.88 | 4.5:1 |
 | `KbdGroup` separator in a sequence (the caller's "then") | `textFaint` on `bg` / `surface` / `surfaceRaised` | 3.75–3.95 / 4.53–5.15 | 4.5:1 |
 
-All four pass in dark mode on these backgrounds and fail in light mode. The fix is the one
-`Input`, `Composer` and `DataTable` already took: switch these to `textMuted`. Do not retune
-`textFaint`.
+It passes in dark mode on these backgrounds and fails in light mode. A glyph separator ("+",
+"→") counts as a separator and may stay; a word such as "then" is text. The fix, if the
+separator stays a word, is the one the placeholders took: switch it to `textMuted`. Do not
+retune `textFaint`.
 
 ## Intentional
 
@@ -37,6 +35,8 @@ All four pass in dark mode on these backgrounds and fail in light mode. The fix 
 | Item | Before | Now |
 | --- | --- | --- |
 | Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter | `textFaint`: 3.75 / 4.88 | `textMuted`: 6.35 / 9.15 on `surface` |
+| `Select` trigger placeholder, `DecisionCard` free-text placeholder | `textFaint` on `surface`: 3.75 / 4.88 | `textMuted`: 6.35 / 9.15 |
+| `Select` search box placeholder | `textFaint` on `surfaceRaised`: 3.95 / 4.53 | `textMuted` |
 | `DiffViewer` changed words: the only signal was `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` (1.15–1.23:1) | color only | Added words are `<ins>` with an underline, removed words `<del>` with a strike-through, and `Mark` / `MarkText` under forced colors. Each line has a `+` / `−` sign in `text` and a visually hidden "Added line" / "Removed line" prefix. The fill difference is still 1.15–1.23:1, but it is no longer the only signal. |
 | `Checkbox` / `Radio` without a `label` | 16.8px target | a 24px native input over the 16.8px box |
 | `Switch` | 22.4px tall | a 24px tall native input over the 22.4px track |

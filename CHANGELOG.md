@@ -124,7 +124,7 @@ accessibility pass over every component. See [MIGRATION.md](MIGRATION.md) for up
 - Toasts with an `action` or of type `danger` no longer time out unless you pass `timeout`.
 - Toast timers pause on hover, on focus inside the viewport and while the document is hidden.
 - Escape closes only the top dialog of a stack.
-- Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter use `color.textMuted`. The `Select` trigger and search placeholders and the `DecisionCard` free-text placeholder still use `color.textFaint` (see `src/components/A11Y-DEBT.md`).
+- Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer`, the `DataTable` filter, the `Select` trigger and search box and the `DecisionCard` free-text box use `color.textMuted`.
 - Spinning and looping animations take their period from the `motion` loop tokens: `Spin` turns in 0.8s (`loopFast`, was 0.7s), the `Dropzone` drag-over outline cycles in 0.8s (`loopFast`, was 0.5s), the `FileRow` spinner stays at 1.2s (`loop`).
 - Fields use 16px text below the phone breakpoint, so iOS does not zoom on focus.
 - Hover-only affordances (FileRow checkbox and actions, the assistant message's ActionBar) stay visible on touch devices.
@@ -163,6 +163,10 @@ All deprecated names still work and will be removed in a future major release.
 - `tokens.css` loads before the StyleX rules; Geist Mono is named the way Google Fonts registers it.
 - `brand.css` keeps wrapped declarations in the manual themes.
 - PasswordInput hints state the 12-character target.
+- PasswordInput keeps a caller's own `aria-describedby` outside a `Field`, joined with its meter, Caps Lock and mismatch ids.
+- CallBar's mute button keeps its tooltip while muted.
+- A pressable `Chip` forwards `ref` to its `<button>`.
+- `Segmented` and `ActionBar` read `DirectionProvider`, like `Slider`: the provider wins, else the computed CSS `direction`.
 
 ### Accessibility
 
@@ -170,7 +174,7 @@ All deprecated names still work and will be removed in a future major release.
 - Control boundaries reach 3:1 contrast (`color.borderControl`); selected tab pills are ringed at 3:1.
 - Small checkboxes, radios, switches, ActionBar and CodeBlock buttons have 24px hit areas.
 - Controls, overlays, ToolCard, LiveDot, Skeleton, Progress, CallBar, Bubble and Message stay distinguishable in forced-colors mode.
-- Readable text moved from `textFaint` to `textMuted`, except the `Select` trigger and search placeholders, the `DecisionCard` free-text placeholder and the `KbdGroup` sequence separator (listed in A11Y-DEBT).
+- Readable text moved from `textFaint` to `textMuted`, including the `Select` trigger and search placeholders and the `DecisionCard` free-text placeholder; only the `KbdGroup` sequence separator is left (listed in A11Y-DEBT).
 - F8 moves focus to the toast region and Escape returns it; every toast has a named close button; the viewport is a polite live region and `danger` toasts are alerts.
 - Dialog, ConfirmDialog, Select, Dropdown and Popover return focus to the trigger as the exit starts.
 - Segmented follows the WAI-ARIA radio group pattern; ActionBar follows the toolbar pattern.
@@ -179,7 +183,7 @@ All deprecated names still work and will be removed in a future major release.
 - RecoveryKey's reveal button drops `aria-pressed`: its text already names the next action (reveal / hide).
 - `Field` gives its label an id; a `multiple` Select inside a `Field` (a `div` trigger that `<label for>` cannot name) points `aria-labelledby` at it from the trigger, the list and the search box.
 - Forced-colors mode: an invalid `Input`, `Textarea`, `PasswordInput` or `Select` draws a 2px dashed frame, and an invalid `Checkbox` a 2px dashed `ButtonText` frame, so the error does not rely on colour. `Ghost` and `IconButton` draw a 1px `ButtonText` outline on hover and a `Highlight` focus ring.
-- Right-to-left: under `DirectionProvider` the arrow keys of `Tabs`, `DropdownMenu` submenus and `Slider` follow the reading direction, and a `Slider` drag measures from the right edge.
+- Right-to-left: under `DirectionProvider` the arrow keys of `Tabs`, `DropdownMenu` submenus, `Slider`, `Segmented` and `ActionBar` follow the reading direction, and a `Slider` drag measures from the right edge.
 - ListSort's arrow is hidden and an active column is named "X, sorted" (`X，排序中` in zh-TW).
 - DiffViewer no longer relies on colour: `<ins>` / `<del>`, ± signs and visually hidden prefixes.
 - RecoveryKey announces a copy politely; its key box is a focusable, named region that selects the key on focus.

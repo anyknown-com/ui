@@ -102,4 +102,4 @@ The components cannot invent these for you:
 
 ## Known debt
 
-Gaps that are waiting on a design decision are tracked in [A11Y-DEBT.md](../../src/components/A11Y-DEBT.md). Today that is placeholder and hint text that still uses `textFaint` (the `Select` trigger and search box, the free-text box of `DecisionCard`, the separator of a `KbdGroup` sequence).
+Gaps that are waiting on a design decision are tracked in [A11Y-DEBT.md](../../src/components/A11Y-DEBT.md). Today that is the separator of a `KbdGroup` sequence, which still uses `textFaint`.

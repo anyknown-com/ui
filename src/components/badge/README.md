@@ -43,7 +43,7 @@ Badge variants: `neutral` (default), `accent`, `success`, `danger`, `outline`, `
 - The remove control is a native `<button>` whose `aria-label` is `removeLabel`. `removeLabel` is required by the type whenever `onRemove` is given. Its hit area is 24 px through an invisible `::after`, though it looks 16 px.
 - Do not give one `Chip` both `onClick` and `onRemove`: that renders a button inside a button.
 - Focus ring: a 2 px `focusRing` outline on `:focus-visible` for both the chip button and the remove button.
-- A pressable `Chip` does not forward `ref`.
+- `ref` reaches the chip's element: the `<span>` of a label chip, or the `<button>` of a pressable one.
 
 ## Keyboard
 

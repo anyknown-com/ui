@@ -57,7 +57,7 @@ The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`valu
 - The popup sits above dialogs, so a Select inside a Dialog opens on top.
 - The popup grow-in and fade-out are off under `prefers-reduced-motion: reduce`.
 - Built-in words follow `<LocaleProvider>` (zh-TW by default, or en): `placeholder`, `searchPlaceholder`, `searchLabel`, `remove(item)`, `empty(query)`. Override them per instance with `labels`.
-- Known gap (A11Y-DEBT): the trigger placeholder and the search placeholder use `textFaint`, below 4.5:1.
+- The trigger placeholder and the search placeholder use `textMuted` (6.35:1 light on `surface`), above 4.5:1.
 
 ## Keyboard
 

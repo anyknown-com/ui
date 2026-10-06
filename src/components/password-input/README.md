@@ -31,7 +31,7 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`)
 ## Accessibility
 
 - Renders a native `<input>` (`type="password"`, or `"text"` while revealed) with the Input styling, and a native toggle `<button>`.
-- The accessible name comes from the caller: a [Field](../label/README.md) `label` or `aria-label`. Inside a Field, the Field's id, help and error are wired in.
+- The accessible name comes from the caller: a [Field](../label/README.md) `label` or `aria-label`. Inside a Field, the Field's id, help and error are wired in. A caller's own `aria-describedby` is kept and joined with the meter, Caps Lock and mismatch ids, inside a Field or not.
 - Toggle button: one name in both states, `labels.show` ("顯示 passphrase" / "Show passphrase"), with `aria-pressed="true"` while the text is revealed. The name does not switch to "hide", so a screen reader never hears "hide, pressed". It is 28px across, above the 24px minimum target. After toggling, focus goes back to the field. A visually hidden `role="status"` says `labels.shown` when the text is revealed.
 - Meter: the bars are `aria-hidden`; the level text is `aria-live="polite"` and is in the field's `aria-describedby`.
 - Caps Lock: a `role="status"` region, mounted from the start, shows `labels.capsLock` while Caps Lock is on; it clears on blur. Set `capsLockWarning={false}` to turn it off.

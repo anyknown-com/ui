@@ -32,7 +32,7 @@ It is fully controlled and keeps no state: the call session owns `status`, `seco
 ## Accessibility
 
 - The bar is a `role="group"` named "通話" ("Call" in `en`). The dot is decorative (`aria-hidden`).
-- Mute and hang up are [IconButton](../icon-button/README.md)s (native `<button>`) with `aria-label` and tooltip from `labels`. The mute button keeps one name, "靜音" (`labels.mute`), and reports its state with `aria-pressed`; it shows the crossed-out mic and has no tooltip while muted. In forced-colors mode the pressed mute button gets a ring and the bar an outline.
+- Mute and hang up are [IconButton](../icon-button/README.md)s (native `<button>`) with `aria-label` and tooltip from `labels`. The mute button keeps one name, "靜音" (`labels.mute`), and reports its state with `aria-pressed`; while muted it shows the crossed-out mic on a pressed wash and keeps its tooltip. In forced-colors mode the pressed mute button gets a ring and the bar an outline.
 - Status changes are deliberately not a live region: a screen reader talking during a call would cover the other voice.
 - `prefers-reduced-motion: reduce` stops the dot breathing (it stays visible).
 - Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): one word per `CallStatus`, plus `muted`, `call`, `mute` and `hangUp`. Override any with `labels`. There is no `unmute` word.
