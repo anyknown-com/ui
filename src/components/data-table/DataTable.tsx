@@ -8,7 +8,8 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
 	toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: space.md },
-	filter: { position: "relative", width: "min(18rem, 100%)" },
+	// 窄的時候是過濾框讓位,不是計數折行
+	filter: { position: "relative", flex: "0 1 18rem", minWidth: 0 },
 	filterIcon: {
 		position: "absolute",
 		insetInlineStart: space.xs,
@@ -39,7 +40,14 @@ const styles = stylex.create({
 		outlineOffset: -1,
 		"::placeholder": { color: color.textFaint },
 	},
-	count: { fontFamily: font.mono, fontSize: type.t1, lineHeight: 1, color: color.textMuted },
+	count: {
+		color: color.textMuted,
+		flex: "none",
+		fontFamily: font.mono,
+		fontSize: type.t1,
+		lineHeight: 1,
+		whiteSpace: "nowrap",
+	},
 	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
 	wrap: {
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
