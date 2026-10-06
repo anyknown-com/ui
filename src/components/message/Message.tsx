@@ -8,6 +8,8 @@ import { color, corner, space, type } from "../../tokens.stylex"
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // 觸控裝置沒有 hover:只在 hover 才出現的東西要一直顯示
 const NO_HOVER = "@media (hover: none)"
+// forced colors 會換掉底色:泡泡改用框,游標和等待點改塗 CanvasText 才看得見
+const FORCED = "@media (forced-colors: active)"
 // 使用者泡泡的大角。軟材規格是 18 18 6 18,圓角 token 沒有 18 這一階
 const BUBBLE_CORNER = 18
 
@@ -36,6 +38,7 @@ const styles = stylex.create({
 		lineHeight: type.body,
 		color: color.text,
 		overflowWrap: "anywhere",
+		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	assistant: {
 		position: "relative",
@@ -50,7 +53,8 @@ const styles = stylex.create({
 		display: "inline-block",
 		width: 1,
 		height: "1.05em",
-		backgroundColor: color.text,
+		backgroundColor: { default: color.text, [FORCED]: "CanvasText" },
+		forcedColorAdjust: "none",
 		verticalAlign: "text-bottom",
 		marginInlineStart: 1,
 		animationName: { default: blink, [REDUCED]: "none" },
@@ -74,7 +78,8 @@ const styles = stylex.create({
 		width: "0.5rem",
 		height: "0.5rem",
 		borderRadius: corner.pill,
-		backgroundColor: color.signal,
+		backgroundColor: { default: color.signal, [FORCED]: "CanvasText" },
+		forcedColorAdjust: "none",
 		animationName: { default: pulse, [REDUCED]: "none" },
 		animationDuration: "1.2s",
 		animationTimingFunction: "ease-in-out",
