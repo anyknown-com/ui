@@ -27,6 +27,10 @@ const styles = stylex.create({
 		insetBlock: 0,
 		borderRadius: corner.pill,
 		backgroundColor: color.accent,
+		// 跟鈕同一個時長與曲線:只有鈕在動的話,點一下軌道時填充先跳到位、鈕才慢慢跟上
+		transitionProperty: "width",
+		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
 	},
 	// 鈕是 accentText 的圓,外圈一環墨色把它跟軌道隔開(跟 switch 開的鈕同色)
 	thumb: {
@@ -181,7 +185,10 @@ export function Slider({
 				}}
 				{...stylex.props(styles.control, disabled && styles.disabled)}
 			>
-				<span aria-hidden="true" {...stylex.props(styles.fill, styles.grown(ratio))} />
+				<span
+					aria-hidden="true"
+					{...stylex.props(styles.fill, dragging && styles.still, styles.grown(ratio))}
+				/>
 				<span
 					ref={thumb}
 					aria-hidden="true"

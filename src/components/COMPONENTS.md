@@ -96,7 +96,8 @@ API 看 `dist/index.d.ts`,實際長相看 [playground](https://ui.anyknown.com)�
   keydown;一顆單向的 `role="slider"` 自己寫比較誠實
 - 方向鍵 ±5%(range 的,不是 step 的)、Home / End 到底,值一律 clamp 再 snap 回 step
 - 軌道 `layer4`、填滿 `borderStrong`、握把是膠囊形的 `surfaceRaised` + `shadow.rest`
-- 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)
+- 握把 200ms `easeOut`,**拖曳中把 transition 關掉**(不然手指在前、握把在後)。填滿的寬度
+  用同一個時長與曲線一起動、拖曳時一起關;只有握把在動的話,點軌道時填滿先跳到位,兩個對不上
 - `valueText` 唸的是標籤不是數字:0.62 要唸成「多」
 - 存檔接 `onValueCommit` 不接 `onChange`:拖曳放開(含 pointercancel)給一次、方向鍵 / Home / End
   每動一次給一次;值沒變就不給。拖一下 PATCH 一次就是接錯了事件
