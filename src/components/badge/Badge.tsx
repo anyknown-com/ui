@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
-import { color, font, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -14,27 +14,27 @@ const styles = stylex.create({
 		lineHeight: 1,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: "transparent",
 	},
-	neutral: { backgroundColor: color.surface, borderColor: color.border, color: color.textMuted },
+	// 凹下去的一塊,不加框;框只留給 outline 這一種。accentSubtle 在白紙與 surface 上都看得到
+	neutral: { backgroundColor: color.accentSubtle, color: color.textMuted },
 	accent: { backgroundColor: color.accentSubtle, color: color.accent },
 	success: { backgroundColor: color.success, color: color.bg },
 	danger: { backgroundColor: color.dangerSubtle, color: color.danger },
 	outline: { borderColor: color.borderStrong, color: color.text },
 	mono: {
 		fontFamily: font.mono,
-		backgroundColor: color.surface,
-		borderColor: color.border,
+		backgroundColor: color.accentSubtle,
 		color: color.textMuted,
 		letterSpacing: "0.02em",
 	},
 	dot: {
 		width: "0.4rem",
 		height: "0.4rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		backgroundColor: "currentColor",
 		flex: "none",
 	},
@@ -66,7 +66,7 @@ const styles = stylex.create({
 		// 圓鈕比字高:負的 block margin 讓它不撐高 chip(跟其他 badge 等高)
 		marginBlock: "-0.2rem",
 		marginInlineEnd: "-0.2rem",
-		borderRadius: radius.full,
+		borderRadius: corner.pill,
 		cursor: "pointer",
 		color: "inherit",
 		opacity: { default: 0.7, ":hover": 1, ":focus-visible": 1 },

@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, radius, space } from "../../tokens.stylex"
+import { color, corner, radius, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -13,7 +13,7 @@ const shimmer = stylex.keyframes({
 const styles = stylex.create({
 	bone: {
 		backgroundColor: color.bone,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		backgroundImage: {
 			default: `linear-gradient(100deg, transparent 30%, ${color.sheen} 50%, transparent 70%)`,
 			[REDUCED]: "none",
@@ -25,7 +25,7 @@ const styles = stylex.create({
 		animationIterationCount: "infinite",
 	},
 	line: { height: "0.8rem" },
-	circle: { borderRadius: radius.full },
+	circle: { borderRadius: corner.pill },
 	size: (width: string | number, height: string | number | null) => ({ width, height }),
 	group: { display: "grid", gap: space.xxs },
 	srOnly: {

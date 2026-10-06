@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, Fragment, type ReactNode, createContext, useContext } from "react"
 import { styled } from "../../lib/styled"
-import { color, font, radius, space } from "../../tokens.stylex"
+import { color, corner, font, space } from "../../tokens.stylex"
 
 export const KbdToneContext = createContext<"default" | "inverted">("default")
 
@@ -17,7 +17,7 @@ const styles = stylex.create({
 		borderStyle: "solid",
 		borderColor: color.border,
 		borderBottomColor: color.borderStrong,
-		borderRadius: radius.sm,
+		borderRadius: corner.small,
 		boxShadow: `0 1px 0 ${color.borderStrong}`,
 		fontFamily: font.mono,
 		fontSize: "0.72rem",
