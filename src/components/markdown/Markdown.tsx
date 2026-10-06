@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Marked, type Token, type Tokens } from "marked"
 import type { ComponentProps, ReactNode } from "react"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, radius, space, text, type } from "../../tokens.stylex"
+import { color, corner, space, text, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { CodeBlock, InlineCode } from "../code-block/CodeBlock"
 import { Formula } from "./Formula"
@@ -23,14 +23,14 @@ const styles = stylex.create({
 		// size for the same reason: a host whose text colour is wrong (or missing, as when a page
 		// forgets tokens.css) would otherwise paint this black on a dark ground.
 		color: color.text,
-		fontSize: text.sm,
-		lineHeight: text.leadingRelaxed,
+		fontSize: type.t3,
+		lineHeight: type.body,
 		// Model output is full of things with no spaces in them — URLs, file paths, hashes. On a
 		// 390px screen any one of them would otherwise push the whole conversation sideways.
 		overflowWrap: "anywhere",
 		minWidth: 0,
 	},
-	p: { margin: 0, lineHeight: text.leadingNormal },
+	p: { margin: 0, lineHeight: type.body },
 	heading: { margin: 0, lineHeight: text.leadingSnug, fontWeight: 600 },
 	h1: { fontSize: text.lg },
 	// h2 and below are body-sized and carry their weight instead: these are headings inside one
@@ -38,7 +38,7 @@ const styles = stylex.create({
 	h2: { fontSize: text.base },
 	h3: { fontSize: text.base },
 	list: { margin: 0, paddingInlineStart: "1.5em", display: "grid", gap: space.xxs },
-	item: { lineHeight: text.leadingNormal },
+	item: { lineHeight: type.body },
 	// The item's own text follows it on the same line, so the box must not take the whole row.
 	task: { display: "inline-flex", marginInlineEnd: space.xxs, verticalAlign: "middle" },
 	quote: {
@@ -59,7 +59,7 @@ const styles = stylex.create({
 		margin: 0,
 	},
 	link: { color: color.accent, textUnderlineOffset: "0.15em" },
-	image: { maxWidth: "100%", height: "auto", borderRadius: radius.md },
+	image: { maxWidth: "100%", height: "auto", borderRadius: corner.card },
 	// The table itself must not shrink to fit; the wrapper scrolls instead. A squashed table on a
 	// phone is unreadable, a scrolling one is merely narrow.
 	tableWrap: { overflowX: "auto", maxWidth: "100%" },

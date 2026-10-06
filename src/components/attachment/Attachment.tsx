@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, radius, type } from "../../tokens.stylex"
+import { color, corner, shadow, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { FileGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
@@ -18,9 +18,11 @@ const styles = stylex.create({
 		gap: 16,
 		lineHeight: type.tight,
 	},
+	// rest 卡片:紙上的一張紙
 	tile: {
-		backgroundColor: color.layer3,
-		borderRadius: radius.xl,
+		backgroundColor: color.surfaceRaised,
+		borderRadius: corner.card,
+		boxShadow: shadow.rest,
 		color: color.text,
 		flexShrink: 0,
 		fontSize: type.t2,

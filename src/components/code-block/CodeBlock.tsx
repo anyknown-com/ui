@@ -2,18 +2,16 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const blink = stylex.keyframes({ "50%": { opacity: 0 } })
 
 const styles = stylex.create({
+	// 凹下去的 surface,無框;標頭跟本體同一塊底,不畫分隔線
 	block: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		borderRadius: corner.card,
 		backgroundColor: color.surface,
 		overflow: "hidden",
 	},
@@ -22,34 +20,27 @@ const styles = stylex.create({
 		alignItems: "center",
 		justifyContent: "space-between",
 		gap: space.xs,
-		paddingBlock: space.xxs,
-		paddingInlineStart: space.sm,
+		paddingBlockStart: space.xxs,
+		paddingInlineStart: space.md,
 		paddingInlineEnd: space.xxs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 	},
 	lang: {
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		lineHeight: text.leadingSnug,
-		letterSpacing: "0.04em",
-		color: color.textFaint,
+		color: color.textMuted,
 	},
 	copy: {
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
 		fontFamily: font.body,
-		fontSize: text.xs,
+		fontSize: type.t2,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: {
-			default: "transparent",
-			":hover": `color-mix(in srgb, ${color.border} 40%, ${color.surface})`,
-		},
+		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		paddingBlock: space.xxs,
-		paddingInline: space.xxs,
-		borderRadius: radius.sm,
+		paddingInline: space.xs,
+		borderRadius: corner.pill,
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -59,8 +50,9 @@ const styles = stylex.create({
 	copied: { color: color.accent },
 	pre: {
 		margin: 0,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		paddingBlockStart: space.xxs,
+		paddingBlockEnd: space.sm,
+		paddingInline: space.md,
 		overflowX: "auto",
 		fontFamily: font.mono,
 		fontSize: text.code,
@@ -86,11 +78,8 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: text.code,
 		lineHeight: text.leadingNormal,
-		backgroundColor: `color-mix(in srgb, ${color.border} 40%, ${color.surface})`,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.sm,
+		backgroundColor: color.surface,
+		borderRadius: corner.small,
 		paddingInline: "0.3em",
 	},
 })

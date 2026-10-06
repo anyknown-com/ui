@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
-import { color, font, motion, radius, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -12,32 +12,27 @@ const unfold = stylex.keyframes({
 })
 
 const styles = stylex.create({
+	// 凹下去的 surface,無框;標頭跟行之間不畫線
 	diff: {
 		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
+		borderRadius: corner.card,
 		overflow: "hidden",
 	},
 	head: {
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		paddingBlock: space.sm,
+		paddingInline: space.md,
 		fontFamily: font.mono,
-		fontSize: "0.8rem",
+		fontSize: text.code,
 		fontWeight: 500,
 		lineHeight: 1,
 		color: color.text,
 	},
-	dot: { width: "0.5rem", height: "0.5rem", borderRadius: radius.full, flex: "none" },
+	dot: { width: "0.5rem", height: "0.5rem", borderRadius: corner.pill, flex: "none" },
 	dotModified: { backgroundColor: color.warning },
-	dotAdded: { backgroundColor: color.accent },
+	dotAdded: { backgroundColor: color.success },
 	dotDeleted: { backgroundColor: color.danger },
 	stat: { marginInlineStart: "auto", fontSize: "0.72rem", color: color.textMuted },
 	plus: { color: color.success, fontWeight: 600 },
@@ -77,10 +72,7 @@ const styles = stylex.create({
 		width: "100%",
 		boxSizing: "border-box",
 		cursor: "pointer",
-		backgroundColor: { default: color.bg, ":hover": color.accentSubtle },
-		borderBlockWidth: 1,
-		borderBlockStyle: "solid",
-		borderBlockColor: color.border,
+		backgroundColor: { default: color.layer4, ":hover": color.layer5 },
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		fontFamily: font.mono,

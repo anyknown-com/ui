@@ -7,7 +7,7 @@ import { CheckGlyph, CopyGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
 
 /**
- * What a tool was called with, or what it gave back: mono in a framed block that scrolls sideways,
+ * What a tool was called with, or what it gave back: mono in a sunken block that scrolls sideways,
  * a copy button in its corner. No language header, unlike `CodeBlock`.
  *
  * This package ships no highlighter. A shell that has one (shiki, say) passes `highlight` and
@@ -18,10 +18,8 @@ const COPIED_MS = 1500
 
 const styles = stylex.create({
 	block: {
-		borderColor: color.border,
+		backgroundColor: color.surface,
 		borderRadius: corner.card,
-		borderStyle: "solid",
-		borderWidth: 1,
 		color: color.text,
 		fontFamily: font.mono,
 		fontSize: type.t2,
