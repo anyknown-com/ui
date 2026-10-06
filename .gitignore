@@ -8,3 +8,4 @@ site/dist
 .turbo
 .env
 site/eval/out
+site/generated

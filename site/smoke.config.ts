@@ -25,7 +25,7 @@ export default defineConfig({
 		// vitest 預設的 5s。這裡等的是「整站渲染」不是單一互動,放寬到 30s。
 		testTimeout: 30_000,
 		setupFiles: ["../src/test/setup.ts"],
-		include: ["smoke.test.tsx"],
+		include: ["smoke.test.tsx", "api-docs.test.ts"],
 		root: fileURLToPath(new URL(".", import.meta.url)),
 	},
 })
