@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url"
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 
 const FONTS =
-	'@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap");'
+	'@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap");'
 
 /** tokens.css 裡 `selector {` 到對應 `}` 之間的宣告行。 */
 function block(css, selector) {

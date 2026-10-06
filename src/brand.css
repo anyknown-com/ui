@@ -14,11 +14,11 @@
 :root {
 	/* Google Fonts 的家族名沒有 Variable 後綴;兩個名字都列,fontsource 或 Google Fonts 都能接上 */
 	--ak-font-display:
-		"Geist Variable", "Geist", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei",
-		system-ui, sans-serif;
+		"Figtree Variable", "Figtree", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC",
+		"Microsoft JhengHei", system-ui, sans-serif;
 	--ak-font-body:
-		"Geist Variable", "Geist", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei",
-		system-ui, sans-serif;
+		"Figtree Variable", "Figtree", "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC",
+		"Microsoft JhengHei", system-ui, sans-serif;
 	--ak-font-mono:
 		"Geist Mono Variable", "Geist Mono", "Noto Sans TC Variable", "Noto Sans TC", ui-monospace, monospace;
 }

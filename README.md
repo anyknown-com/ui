@@ -121,6 +121,6 @@ app 自己的樣式一律引用 tokens,不寫死色值。`playground/` 就是照
 白紙(#FFFFFF)、墨色文字、墨色 accent(#1D1D1F);標題與內文都是 Geist,時間軸/數據用 Geist Mono,中文接 Noto Sans TC(沒裝時退到蘋方/微軟正黑)。織物設計語言與 ledger palette 封存在 `archive/fiber` branch。使用端需安裝字體:
 
 ```bash
-pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
+pnpm add @fontsource-variable/figtree @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
 ```
 

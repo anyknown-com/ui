@@ -90,8 +90,8 @@ export const shadow = stylex.defineVars({
 
 export const font = stylex.defineVars({
 	display:
-		"'Geist Variable', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
-	body: "'Geist Variable', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+		"'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+	body: "'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
 	mono: "'Geist Mono Variable', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
