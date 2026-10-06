@@ -1,8 +1,54 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Input } from "../input/Input"
 import { Field } from "./Field"
 import { Label } from "./Label"
+
+describe("Label words", () => {
+	test("optional follows the LocaleProvider; labels and optionalLabel override", () => {
+		render(
+			<LocaleProvider locale="en">
+				<Label optional>Nickname</Label>
+				<Label optional labels={{ optional: "if you like" }}>
+					Bio
+				</Label>
+				<Label optional optionalLabel="可不填">
+					Phone
+				</Label>
+			</LocaleProvider>,
+		)
+		expect(screen.getByText("optional")).toBeInTheDocument()
+		expect(screen.getByText("if you like")).toBeInTheDocument()
+		expect(screen.getByText("可不填")).toBeInTheDocument()
+	})
+
+	test("zh-TW stays the default", () => {
+		render(<Label optional>暱稱</Label>)
+		expect(screen.getByText("選填")).toBeInTheDocument()
+	})
+
+	test("axe: required, optional, invalid and disabled fields", async () => {
+		const { container } = render(
+			<>
+				<Field label="Email" required help="我們不會寄廣告。">
+					<Input type="email" />
+				</Field>
+				<Field label="暱稱" optional>
+					<Input />
+				</Field>
+				<Field label="網址" error="格式不完整。">
+					<Input defaultValue="http" />
+				</Field>
+				<Field label="帳號" disabled>
+					<Input defaultValue="solemnis" />
+				</Field>
+			</>,
+		)
+		await expectNoAxeViolations(container)
+	})
+})
 
 describe("Label", () => {
 	test("associates with a control and marks required visually only", () => {
