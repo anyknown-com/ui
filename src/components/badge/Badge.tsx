@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, space, type } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 
@@ -109,22 +110,35 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 /** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
 export type ChipProps = BadgeProps &
 	({ onRemove: () => void; removeLabel: string } | { onRemove?: undefined; removeLabel?: string }) & {
-		/** 給了就是可按的一枚(真的 `<button aria-pressed>`),沒給就是一枚標籤。 */
+		/** Makes the chip a real `<button>`; without it (or a pressed state) the chip is a label. */
 		onClick?: () => void
+		/** On or off, for a controlled toggle chip (`aria-pressed`). Pair it with `onPressedChange`. */
 		pressed?: boolean
+		/** Whether a toggle chip starts on, for an uncontrolled one. */
+		defaultPressed?: boolean
+		/** Called with the next state when a toggle chip is pressed. Giving it makes the chip a toggle. */
+		onPressedChange?: (pressed: boolean) => void
 	}
 
+/**
+ * A badge you can act on: a filter with a × to remove it (`onRemove`), a button (`onClick`), or
+ * a toggle (`pressed` / `defaultPressed` / `onPressedChange`, read out with `aria-pressed`).
+ */
 export function Chip({
 	onRemove,
 	removeLabel,
 	onClick,
 	pressed,
+	defaultPressed,
+	onPressedChange,
 	variant = "outline",
 	children,
 	sx,
 	ref,
 	...props
 }: ChipProps) {
+	const toggle = pressed !== undefined || defaultPressed !== undefined || onPressedChange != null
+	const [isPressed, setPressed] = useControllableState(pressed, defaultPressed ?? false, onPressedChange)
 	const body = (
 		<>
 			{children}
@@ -141,7 +155,7 @@ export function Chip({
 		</>
 	)
 
-	if (onClick == null) {
+	if (onClick == null && !toggle) {
 		return (
 			<Badge variant={variant} sx={sx} ref={ref} {...props}>
 				{body}
@@ -151,8 +165,11 @@ export function Chip({
 	return (
 		<button
 			type="button"
-			aria-pressed={pressed}
-			onClick={onClick}
+			aria-pressed={toggle ? isPressed : undefined}
+			onClick={() => {
+				if (toggle) setPressed(!isPressed)
+				onClick?.()
+			}}
 			{...props}
 			{...styled(
 				props,
@@ -160,7 +177,7 @@ export function Chip({
 				styles.base,
 				styles.pressable,
 				styles[variant],
-				pressed === true && styles.pressed,
+				toggle && isPressed && styles.pressed,
 				sx,
 			)}
 		>

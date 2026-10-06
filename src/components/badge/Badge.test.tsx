@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { expectNoAxeViolations } from "../../test/axe"
 import { Badge, Chip } from "./Badge"
 
 describe("Badge", () => {
@@ -72,4 +73,60 @@ describe("Chip", () => {
 		await userEvent.keyboard("{Enter}")
 		expect(onRemove).toHaveBeenCalledTimes(1)
 	})
+
+	test("uncontrolled toggle: defaultPressed starts it, presses flip it", async () => {
+		const onPressedChange = vi.fn()
+		render(
+			<Chip defaultPressed onPressedChange={onPressedChange}>
+				本週
+			</Chip>,
+		)
+		const chip = screen.getByRole("button", { name: "本週" })
+		expect(chip).toHaveAttribute("aria-pressed", "true")
+		await userEvent.click(chip)
+		expect(chip).toHaveAttribute("aria-pressed", "false")
+		expect(onPressedChange).toHaveBeenCalledExactlyOnceWith(false)
+	})
+
+	test("controlled toggle: aria-pressed follows pressed only", async () => {
+		const onPressedChange = vi.fn()
+		render(
+			<Chip pressed={false} onPressedChange={onPressedChange}>
+				本週
+			</Chip>,
+		)
+		await userEvent.click(screen.getByRole("button"))
+		expect(onPressedChange).toHaveBeenCalledWith(true)
+		expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "false")
+	})
+
+	test("onClick alone is a plain button, no aria-pressed", () => {
+		render(<Chip onClick={() => {}}>篩選</Chip>)
+		expect(screen.getByRole("button", { name: "篩選" })).not.toHaveAttribute("aria-pressed")
+	})
+})
+
+test("axe: every badge variant, a dot, a count, removable, pressable and pressed chips", async () => {
+	const { container } = render(
+		<>
+			<Badge>neutral</Badge>
+			<Badge variant="accent" dot="accent">
+				accent
+			</Badge>
+			<Badge variant="success">success</Badge>
+			<Badge variant="danger" dot="danger">
+				danger
+			</Badge>
+			<Badge variant="outline" count={3}>
+				outline
+			</Badge>
+			<Badge variant="mono">mono</Badge>
+			<Chip onRemove={() => {}} removeLabel="移除">
+				可移除
+			</Chip>
+			<Chip onClick={() => {}}>可按</Chip>
+			<Chip defaultPressed>按下</Chip>
+		</>,
+	)
+	await expectNoAxeViolations(container)
 })
