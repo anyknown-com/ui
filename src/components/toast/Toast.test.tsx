@@ -298,6 +298,51 @@ describe("toast manager", () => {
 		expect(screen.getByRole("alert")).toHaveTextContent("失敗:離線")
 	})
 
+	test("promise states take a description, as an object or from a function", async () => {
+		const manager = setup({ timeout: 3000 })
+		const ok = deferred<number>()
+		const fail = deferred<number>()
+		fail.promise.catch(() => {})
+		act(() => {
+			void manager.promise(ok.promise, {
+				loading: { title: "上傳中", description: "3 個檔案" },
+				success: (n) => ({ title: "已上傳", description: `${n} 個檔案` }),
+				error: "失敗",
+			})
+		})
+		expect(screen.getByText("3 個檔案")).toBeInTheDocument()
+		await act(async () => ok.resolve(3))
+		expect(screen.getByText("已上傳")).toBeInTheDocument()
+		expect(screen.getByText("3 個檔案")).toBeInTheDocument()
+
+		act(() => {
+			void manager.promise(fail.promise, {
+				loading: { title: "同步中", description: "vault" },
+				success: "已同步",
+				error: { title: "同步失敗", description: "稍後重試" },
+			})
+		})
+		await act(async () => fail.reject(new Error("離線")))
+		const alert = screen.getByRole("alert")
+		expect(alert).toHaveTextContent("同步失敗")
+		expect(alert).toHaveTextContent("稍後重試")
+	})
+
+	test("a string state clears the loading description", async () => {
+		const manager = setup({ timeout: 3000 })
+		const { promise, resolve } = deferred<void>()
+		act(() => {
+			void manager.promise(promise, {
+				loading: { title: "儲存中", description: "草稿" },
+				success: "已儲存",
+				error: "失敗",
+			})
+		})
+		await act(async () => resolve())
+		expect(screen.getByRole("status")).toHaveTextContent("已儲存")
+		expect(screen.queryByText("草稿")).not.toBeInTheDocument()
+	})
+
 	test("the same key updates in place, restarts the timer, and counts ×N", () => {
 		const manager = setup({ timeout: 3000 })
 		let first = ""

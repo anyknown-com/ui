@@ -255,10 +255,17 @@ export type ToastUpdate = {
 	timeout?: number
 }
 
+/** One state of `toast.promise`: a title, or a title with a description. */
+export type ToastMessage = string | { title: string; description?: string }
+
+/** What `toast.promise` shows while the promise is pending, and after it settles. */
 export type ToastPromiseMessages<T> = {
-	loading: string
-	success: string | ((value: T) => string)
-	error: string | ((error: unknown) => string)
+	/** Shown while the promise is pending; it does not time out. */
+	loading: ToastMessage
+	/** Shown when the promise resolves, as a `success` toast; a function gets the value. */
+	success: ToastMessage | ((value: T) => ToastMessage)
+	/** Shown when the promise rejects, as a `danger` toast; a function gets the reason. */
+	error: ToastMessage | ((error: unknown) => ToastMessage)
 }
 
 export type ToastRecord = {
@@ -305,8 +312,15 @@ export type ToastManager = {
 	resume: (reason: PauseReason) => void
 }
 
-const pick = <V,>(message: string | ((value: V) => string), value: V) =>
-	typeof message === "function" ? message(value) : message
+/** 字串或 `{ title, description }` 攤成 title / description;沒給 description 就清掉上一個狀態的。 */
+function toFields(message: ToastMessage) {
+	return typeof message === "string"
+		? { title: message, description: undefined }
+		: { title: message.title, description: message.description }
+}
+
+const pick = <V,>(message: ToastMessage | ((value: V) => ToastMessage), value: V) =>
+	toFields(typeof message === "function" ? message(value) : message)
 
 type Timer = { handle?: ReturnType<typeof setTimeout>; remaining: number; startedAt: number }
 
@@ -424,10 +438,10 @@ export function createToastManager(): ToastManager {
 			for (const record of store.getSnapshot().toasts) close(record.id)
 		},
 		promise(promise, messages) {
-			const id = insert({ title: messages.loading }, true)
+			const id = insert(toFields(messages.loading), true)
 			promise.then(
-				(value) => patch(id, { title: pick(messages.success, value), type: "success", loading: false }),
-				(error: unknown) => patch(id, { title: pick(messages.error, error), type: "danger", loading: false }),
+				(value) => patch(id, { ...pick(messages.success, value), type: "success", loading: false }),
+				(error: unknown) => patch(id, { ...pick(messages.error, error), type: "danger", loading: false }),
 			)
 			return promise
 		},

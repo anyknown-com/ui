@@ -75,6 +75,7 @@ export type {
 	ToastUpdate,
 	ToastType,
 	ToastPromiseMessages,
+	ToastMessage,
 	ToastRecord,
 	ToastState,
 	ToastManager,
