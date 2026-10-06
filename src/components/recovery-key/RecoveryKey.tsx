@@ -4,7 +4,7 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
-import { Glyph } from "../icon/glyphs"
+import { CheckGlyph, Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -142,7 +142,7 @@ const strings = defineStrings({
 		hide: "隱藏復原金鑰",
 		veil: "hover 或點一下顯示",
 		copy: "複製",
-		copied: "✓ 已複製",
+		copied: "已複製",
 		download: "下載 .txt",
 	},
 	en: {
@@ -155,7 +155,7 @@ const strings = defineStrings({
 		hide: "Hide recovery key",
 		veil: "Hover or tap to show",
 		copy: "Copy",
-		copied: "✓ Copied",
+		copied: "Copied",
 		download: "Download .txt",
 	},
 })
@@ -217,6 +217,7 @@ export function RecoveryKey({
 	const t = useStrings(strings, labels)
 	const [revealed, setRevealed] = useState(false)
 	const { copied, copy } = useCopy()
+	const copiedWord = copiedLabel ?? t.copied
 
 	function download() {
 		const url = URL.createObjectURL(new Blob([`${value}\n`], { type: "text/plain" }))
@@ -257,14 +258,18 @@ export function RecoveryKey({
 					onClick={() => copy(value)}
 					{...stylex.props(styles.button, copied && styles.copied)}
 				>
-					{!copied && <CopyIcon />}
-					{copied ? (copiedLabel ?? t.copied) : (copyLabel ?? t.copy)}
+					{copied ? <CheckGlyph width={13} height={13} /> : <CopyIcon />}
+					{copied ? copiedWord : (copyLabel ?? t.copy)}
 				</button>
 				<button type="button" onClick={download} {...stylex.props(styles.button)}>
 					<DownloadIcon />
 					{downloadLabel ?? t.download}
 				</button>
 			</div>
+			{/* 按鈕自己的字換掉不一定會被唸;另放一個一直掛著的 status,複製成功時唸一次 */}
+			<span role="status" {...stylex.props(styles.separator)}>
+				{copied ? copiedWord : ""}
+			</span>
 			<div role="note" {...stylex.props(styles.warning)}>
 				<WarningIcon />
 				<p {...stylex.props(styles.warningText)}>{warning ?? t.warning}</p>

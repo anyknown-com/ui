@@ -38,7 +38,17 @@ describe("RecoveryKey", () => {
 		render(<RecoveryKey value={KEY} />)
 		await userEvent.click(screen.getByRole("button", { name: "複製" }))
 		expect(spy).toHaveBeenCalledWith(KEY)
-		expect(await screen.findByRole("button", { name: "✓ 已複製" })).toBeInTheDocument()
+		expect(await screen.findByRole("button", { name: "已複製" })).toBeInTheDocument()
+	})
+
+	test("a copy is announced once through a status region that is mounted beforehand", async () => {
+		Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+		render(<RecoveryKey value={KEY} />)
+		const status = screen.getByRole("status")
+		expect(status).toBeEmptyDOMElement()
+		await userEvent.click(screen.getByRole("button", { name: "複製" }))
+		expect(await screen.findByRole("status")).toHaveTextContent("已複製")
+		expect(screen.getByRole("status")).toBe(status)
 	})
 
 	test("download builds a text blob with the given filename", async () => {
