@@ -40,7 +40,7 @@ const styles = stylex.create({
 		width: "calc(1.4rem - 4px)",
 		height: "calc(1.4rem - 4px)",
 		borderRadius: corner.pill,
-		backgroundColor: "#FFFFFF",
+		backgroundColor: "#FFFFFF", // literal-ok: the thumb stays white on both track colours, in both themes
 		boxShadow: shadow.rest,
 		// 用邏輯方向的 inset 移動,不用 translate:translate 是物理的 x,RTL 時鈕會往軌道外跑
 		transitionProperty: "inset-inline-start, background-color",

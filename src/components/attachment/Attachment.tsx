@@ -52,6 +52,7 @@ const styles = stylex.create({
 		paddingInline: 16,
 		position: "absolute",
 	},
+	// literal-ok: caption sits on a photo, not on a themed surface
 	onImage: { color: "#FFFFFF", textShadow: "0 1px 2px rgba(0, 0, 0, 0.35)" },
 	name: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	meta: { color: color.textMuted, fontSize: type.t1 },
