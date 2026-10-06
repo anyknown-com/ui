@@ -175,22 +175,32 @@ export function Break({ order }: BreakProps) {
 }
 
 export type ToggleProps = {
+	/** Whether the row's `Detail` is open; the chevron turns and `aria-expanded` follows. */
 	open: boolean
-	onPress: () => void
+	/** Called with the next state (`!open`) when pressed. */
+	onOpenChange?: (open: boolean) => void
+	/** Called when pressed; use it or `onOpenChange`. */
+	onPress?: () => void
+	/** The button's accessible name ("Show details for …"). */
 	label: string
+	/** The `id` of the `Detail` it opens, for `aria-controls`. */
 	controls?: string
+	/** Where it lands once the row wraps on a phone. */
 	order?: number
 } & Sx
 
 /** `.rowtog`: the chevron at the end of a row that has a detail under it. */
-export function Toggle({ open, onPress, label, controls, order, sx }: ToggleProps) {
+export function Toggle({ open, onOpenChange, onPress, label, controls, order, sx }: ToggleProps) {
 	return (
 		<button
 			type="button"
 			aria-expanded={open}
 			aria-label={label}
 			{...(controls ? { "aria-controls": controls } : {})}
-			onClick={onPress}
+			onClick={() => {
+				onOpenChange?.(!open)
+				onPress?.()
+			}}
 			{...stylex.props(styles.toggle, order !== undefined && styles.order(order), sx)}
 		>
 			<Chevron
