@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
-import { color, corner, font, space, text } from "../../tokens.stylex"
+import { color, corner, font, space, text, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -42,7 +42,7 @@ const styles = stylex.create({
 	dotFaint: { color: color.textFaint },
 	dotDanger: { color: color.danger },
 	dotWarning: { color: color.warning },
-	count: { fontFamily: font.mono, fontSize: "0.7rem", fontWeight: 600, lineHeight: 1 },
+	count: { fontFamily: font.mono, fontSize: type.t1, fontWeight: 600, lineHeight: 1 },
 	pressable: {
 		cursor: "pointer",
 		backgroundColor: {

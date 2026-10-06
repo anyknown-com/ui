@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { useCallback, useState } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, motion, space } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const STAGES = ["掃描對話", "挑出耐久事實", "合併重複", "落盤固定"]
@@ -56,7 +56,7 @@ const styles = stylex.create({
 	tidy: { display: "grid", gap: space.xs },
 	stage: {
 		fontFamily: font.mono,
-		fontSize: "0.72rem",
+		fontSize: type.t1,
 		fontWeight: 500,
 		lineHeight: 1,
 		letterSpacing: "0.04em",
@@ -102,7 +102,7 @@ const styles = stylex.create({
 	value: {
 		position: "absolute",
 		fontFamily: font.mono,
-		fontSize: "0.75rem",
+		fontSize: text.xs,
 		fontWeight: 500,
 		lineHeight: 1,
 		color: color.text,

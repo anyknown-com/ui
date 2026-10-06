@@ -32,7 +32,7 @@ const styles = stylex.create({
 	state: {
 		marginInlineStart: "auto",
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		letterSpacing: "0.06em",
@@ -45,7 +45,7 @@ const styles = stylex.create({
 	body: { display: "grid", gap: space.xs },
 	mono: {
 		fontFamily: font.mono,
-		fontSize: "0.82rem",
+		fontSize: type.t2,
 		lineHeight: text.leadingNormal,
 		backgroundColor: color.surface,
 		borderRadius: corner.small,
@@ -61,7 +61,7 @@ const styles = stylex.create({
 	actions: { display: "flex", gap: space.xs, flexWrap: "wrap" },
 	shortcut: {
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		fontWeight: 500,
 		opacity: 0.65,
 		marginInlineStart: space.xxs,
@@ -76,7 +76,7 @@ const styles = stylex.create({
 	},
 	policyIcon: { flex: "none", color: color.textFaint },
 	question: {
-		fontSize: "0.95rem",
+		fontSize: type.t3,
 		fontWeight: 500,
 		lineHeight: text.leadingSnug,
 		margin: 0,
@@ -104,7 +104,7 @@ const styles = stylex.create({
 	},
 	recommended: {
 		fontFamily: font.mono,
-		fontSize: "0.62rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		letterSpacing: "0.05em",

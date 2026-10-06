@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, font, motion, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -79,7 +79,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		color: color.text,
 		fontFamily: font.body,
-		fontSize: "0.82rem",
+		fontSize: type.t2,
 		fontWeight: 500,
 		lineHeight: 1,
 		height: "2rem",
@@ -99,7 +99,7 @@ const styles = stylex.create({
 		borderRadius: corner.control,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
-		fontSize: "0.82rem",
+		fontSize: type.t2,
 	},
 	warningIcon: { color: color.warning, flex: "none", marginTop: "0.1rem" },
 	warningText: { margin: 0 },

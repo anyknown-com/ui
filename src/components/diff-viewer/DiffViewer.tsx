@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, useId, useMemo, useState } from "react"
 import { reset } from "../../lib/styled"
 import { type DiffRow, buildDiffRows, collapseRows, countChanges, diffKind } from "../../lib/diff"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -34,7 +34,7 @@ const styles = stylex.create({
 	dotModified: { backgroundColor: color.warning },
 	dotAdded: { backgroundColor: color.success },
 	dotDeleted: { backgroundColor: color.danger },
-	stat: { marginInlineStart: "auto", fontSize: "0.72rem", color: color.textMuted },
+	stat: { marginInlineStart: "auto", fontSize: type.t1, color: color.textMuted },
 	plus: { color: color.success, fontWeight: 600 },
 	minus: { color: color.danger, fontWeight: 600 },
 	body: { overflowX: "auto", outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` } },
@@ -55,7 +55,7 @@ const styles = stylex.create({
 		paddingInlineEnd: space.xs,
 		color: color.textMuted,
 		userSelect: "none",
-		fontSize: "11px",
+		fontSize: type.t1,
 		lineHeight: 1.85,
 	},
 	sign: { flex: "none", width: "1.1rem", textAlign: "center", userSelect: "none", color: color.textFaint },
@@ -76,7 +76,7 @@ const styles = stylex.create({
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		fontFamily: font.mono,
-		fontSize: "0.74rem",
+		fontSize: text.xs,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },

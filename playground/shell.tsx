@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
-import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { color, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
 
 const styles = stylex.create({
 	section: {
@@ -12,14 +12,14 @@ const styles = stylex.create({
 	},
 	heading: {
 		fontFamily: font.mono,
-		fontSize: "0.72rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
 		color: color.textMuted,
 		margin: 0,
 	},
-	sub: { fontFamily: font.mono, fontSize: "0.68rem", color: color.textMuted, margin: 0 },
+	sub: { fontFamily: font.mono, fontSize: type.t1, color: color.textMuted, margin: 0 },
 	body: { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm },
 	panel: {
 		borderWidth: 1,

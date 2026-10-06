@@ -1,6 +1,6 @@
 import { Dialogs, Toaster } from "@anyknown/ui"
 import { dark, light } from "@anyknown/ui/themes.stylex"
-import { color, corner, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { marked } from "marked"
 import { useEffect, useState } from "react"
@@ -157,7 +157,7 @@ const styles = stylex.create({
 	},
 	themeBtn: {
 		fontFamily: font.mono,
-		fontSize: "0.62rem",
+		fontSize: type.t1,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: "transparent",
 		borderWidth: 0,
@@ -177,7 +177,7 @@ const styles = stylex.create({
 	groupName: {
 		display: "block",
 		fontFamily: font.mono,
-		fontSize: "0.62rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",

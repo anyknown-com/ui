@@ -71,7 +71,7 @@ const styles = stylex.create({
 	},
 	size: {
 		fontFamily: font.mono,
-		fontSize: "0.78rem",
+		fontSize: text.xs,
 		lineHeight: 1,
 		fontVariantNumeric: "tabular-nums",
 		color: color.textMuted,
@@ -80,7 +80,7 @@ const styles = stylex.create({
 		gridRow: { default: "auto", [NARROW]: "2" },
 	},
 	mtime: {
-		fontSize: "0.78rem",
+		fontSize: text.xs,
 		color: color.textMuted,
 		gridColumn: { default: "auto", [NARROW]: "4" },
 		gridRow: { default: "auto", [NARROW]: "2" },
@@ -106,7 +106,7 @@ const styles = stylex.create({
 	},
 	count: {
 		fontFamily: font.body,
-		fontSize: "0.78rem",
+		fontSize: text.xs,
 		color: color.textMuted,
 		margin: 0,
 		marginTop: space.xxs,
@@ -117,7 +117,7 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		fontSize: "0.75rem",
+		fontSize: text.xs,
 	},
 	track: {
 		flex: 1,

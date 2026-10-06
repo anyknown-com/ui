@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { type StyleArg, reset } from "../../lib/styled"
-import { color, corner, font, motion, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
@@ -38,7 +38,7 @@ const styles = stylex.create({
 		outlineOffset: -1,
 		"::placeholder": { color: color.textFaint },
 	},
-	count: { fontFamily: font.mono, fontSize: "0.72rem", lineHeight: 1, color: color.textMuted },
+	count: { fontFamily: font.mono, fontSize: type.t1, lineHeight: 1, color: color.textMuted },
 	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
 	wrap: {
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -79,7 +79,7 @@ const styles = stylex.create({
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -92,12 +92,12 @@ const styles = stylex.create({
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
 		fontFamily: font.mono,
-		fontSize: "0.68rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		lineHeight: 1,
 		color: color.textMuted,
 	},
-	arrow: { color: color.accent, fontSize: "0.6rem" },
+	arrow: { color: color.accent, fontSize: type.t1 },
 	row: {
 		backgroundColor: { default: "transparent", ":hover": color.layer3 },
 	},
@@ -112,7 +112,7 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	tdCheck: { width: "2rem" },
-	mono: { fontFamily: font.mono, fontSize: "0.78rem", color: color.textMuted, whiteSpace: "nowrap" },
+	mono: { fontFamily: font.mono, fontSize: text.xs, color: color.textMuted, whiteSpace: "nowrap" },
 	editable: { cursor: "text" },
 	empty: { color: color.textFaint },
 	cellInput: {

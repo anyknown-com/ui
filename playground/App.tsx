@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
+import { color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
 import { Dialogs, Toaster } from "@anyknown/ui"
 import { BasicsDemos } from "./demos/basics"
 import { DesktopDemos } from "./demos/desktop"
@@ -53,7 +53,7 @@ const styles = stylex.create({
 	groupName: {
 		display: "block",
 		fontFamily: font.mono,
-		fontSize: "0.62rem",
+		fontSize: type.t1,
 		fontWeight: 600,
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
