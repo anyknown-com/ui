@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, useId, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, font, space, type } from "../../tokens.stylex"
@@ -69,7 +70,39 @@ const styles = stylex.create({
 	},
 })
 
-const LEVEL_LABELS = ["至少 12 個字元。", "弱，至少要 12 個字元。", "可 — 建議混入更多種字元。", "強", "很強"]
+const strings = defineStrings({
+	"zh-TW": {
+		show: "顯示 passphrase",
+		hide: "隱藏 passphrase",
+		shown: "passphrase 已顯示",
+		capsLock: "Caps Lock 開著。",
+		mismatch: "再輸入一次同樣的 passphrase。",
+		levelEmpty: "至少 12 個字元。",
+		levelWeak: "弱，至少要 12 個字元。",
+		levelFair: "可 — 建議混入更多種字元。",
+		levelStrong: "強",
+		levelVeryStrong: "很強",
+	},
+	en: {
+		show: "Show passphrase",
+		hide: "Hide passphrase",
+		shown: "Passphrase shown",
+		capsLock: "Caps Lock is on.",
+		mismatch: "Enter the same passphrase again.",
+		levelEmpty: "At least 12 characters.",
+		levelWeak: "Weak — use at least 12 characters.",
+		levelFair: "Fair — mix in more kinds of characters.",
+		levelStrong: "Strong",
+		levelVeryStrong: "Very strong",
+	},
+})
+
+/**
+ * PasswordInput's built-in words (follow `<LocaleProvider>`): the reveal toggle, the strength
+ * word for each level 0–4 (`levelEmpty` doubles as the length requirement hint), the Caps Lock
+ * warning and the confirm mismatch. Override any with `labels`.
+ */
+export type PasswordInputLabels = StringsOf<typeof strings>
 
 /** Length thresholds (8 / 12 / 20) × character classes. 12 matches storage's MIN_LENGTH. */
 export function defaultScorer(value: string): number {
@@ -131,40 +164,60 @@ function WarningIcon() {
 }
 
 export type PasswordInputProps = Omit<ComponentProps<"input">, "type" | "size" | "value"> & {
+	/** The passphrase (controlled). */
 	value?: string
+	/** The starting passphrase when uncontrolled. */
 	defaultValue?: string
+	/** Called with the new passphrase on every edit. */
 	onValueChange?: (value: string) => void
+	/** Shows a four-segment strength meter and its word under the field. */
 	meter?: boolean
+	/** Maps the passphrase to a strength level 0–4; the meter fills that many segments. */
 	scorer?: (value: string) => number
+	/** One word per level 0–4, indexed by `scorer`'s result. Wins over the `level*` labels. */
 	levelLabels?: string[]
+	/** Warns while Caps Lock is on. */
 	capsLockWarning?: boolean
+	/** The Caps Lock warning. Wins over `labels.capsLock`. */
 	capsLockLabel?: string
+	/** The passphrase this field must repeat; a difference marks the field invalid. */
 	confirmOf?: string
+	/** The message when the field does not match `confirmOf`. Wins over `labels.mismatch`. */
 	mismatchLabel?: string
+	/** The reveal toggle's name while masked. Wins over `labels.show`. */
 	showLabel?: string
+	/** The reveal toggle's name while shown. Wins over `labels.hide`. */
 	hideLabel?: string
+	/** Announced when the passphrase is revealed. Wins over `labels.shown`. */
 	shownStatus?: string
+	/** Forces the invalid state; otherwise it follows the mismatch and the enclosing field. */
 	invalid?: boolean
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<PasswordInputLabels>
 }
 
+/** A passphrase field with a reveal toggle, an optional strength meter, a Caps Lock warning and a confirm check. */
 export function PasswordInput({
 	value,
 	defaultValue = "",
 	onValueChange,
 	meter = false,
 	scorer = defaultScorer,
-	levelLabels = LEVEL_LABELS,
+	levelLabels,
 	capsLockWarning = true,
-	capsLockLabel = "Caps Lock 開著。",
+	capsLockLabel,
 	confirmOf,
-	mismatchLabel = "再輸入一次同樣的 passphrase。",
-	showLabel = "顯示 passphrase",
-	hideLabel = "隱藏 passphrase",
-	shownStatus = "passphrase 已顯示",
+	mismatchLabel,
+	showLabel,
+	hideLabel,
+	shownStatus,
 	invalid,
+	labels,
 	autoComplete = "new-password",
 	...props
 }: PasswordInputProps) {
+	const t = useStrings(strings, labels)
+	const levelWords = levelLabels ?? [t.levelEmpty, t.levelWeak, t.levelFair, t.levelStrong, t.levelVeryStrong]
 	const base = useId()
 	const meterId = `${base}meter`
 	const capsId = `${base}caps`
@@ -230,7 +283,7 @@ export function PasswordInput({
 				/>
 				<button
 					type="button"
-					aria-label={revealed ? hideLabel : showLabel}
+					aria-label={revealed ? (hideLabel ?? t.hide) : (showLabel ?? t.show)}
 					aria-pressed={revealed}
 					onClick={(event) => {
 						setRevealed((shown) => !shown)
@@ -249,7 +302,7 @@ export function PasswordInput({
 						))}
 					</div>
 					<p aria-live="polite" {...stylex.props(styles.label, level === 1 && styles.labelWeak)}>
-						{levelLabels[level] ?? ""}
+						{levelWords[level] ?? ""}
 					</p>
 				</div>
 			)}
@@ -258,16 +311,16 @@ export function PasswordInput({
 					{capsOn && (
 						<>
 							<WarningIcon />
-							{capsLockLabel}
+							{capsLockLabel ?? t.capsLock}
 						</>
 					)}
 				</p>
 			)}
 			<p id={errorId} {...stylex.props(mismatched ? styles.error : styles.srOnly)}>
-				{mismatched ? mismatchLabel : ""}
+				{mismatched ? (mismatchLabel ?? t.mismatch) : ""}
 			</p>
 			<span role="status" {...stylex.props(styles.srOnly)}>
-				{revealed ? shownStatus : ""}
+				{revealed ? (shownStatus ?? t.shown) : ""}
 			</span>
 		</div>
 	)

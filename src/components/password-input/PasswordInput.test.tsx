@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { PasswordInput, defaultScorer } from "./PasswordInput"
 
 function Pair() {
@@ -103,5 +104,24 @@ describe("PasswordInput", () => {
 		await userEvent.tab()
 		expect(screen.queryByText("Caps Lock 開著。")).not.toBeInTheDocument()
 		await userEvent.keyboard("{CapsLock}")
+	})
+
+	test("built-in words follow the locale; labels and single-word props win", async () => {
+		render(
+			<LocaleProvider locale="en">
+				<PasswordInput aria-label="Vault passphrase" meter labels={{ levelStrong: "Solid" }} />
+				<PasswordInput aria-label="Other" showLabel="Peek" />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: "Show passphrase" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Peek" })).toBeInTheDocument()
+		expect(screen.getByText("At least 12 characters.")).toBeInTheDocument()
+		await userEvent.type(screen.getByLabelText("Vault passphrase"), "Abcdefghijkl1!")
+		expect(screen.getByText("Solid")).toBeInTheDocument()
+	})
+
+	test("levelLabels still wins over the table", () => {
+		render(<PasswordInput aria-label="Vault passphrase" meter levelLabels={["empty"]} />)
+		expect(screen.getByText("empty")).toBeInTheDocument()
 	})
 })
