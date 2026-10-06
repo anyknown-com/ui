@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
+import { expectNoAxeViolations } from "../../test/axe"
 import { AssistantMessage, TextPart, Thread } from "../message/Message"
 import { ActionBar } from "./ActionBar"
 
@@ -74,6 +75,33 @@ describe("ActionBar", () => {
 		await waitFor(() => expect(screen.getByRole("button", { name: "複製" })).toHaveFocus())
 	})
 })
+
+describe("ActionBar axe", () => {
+	test("has no axe violations, hidden and shown, before and after a copy", async () => {
+		writeText(vi.fn().mockResolvedValue(undefined))
+		const { container, rerender } = render(<Bar visible={false} />)
+		await expectNoAxeViolations(container)
+		rerender(<Bar visible />)
+		await userEvent.click(screen.getByRole("button", { name: "複製" }))
+		await screen.findByRole("button", { name: "已複製 ✓" })
+		await expectNoAxeViolations(container)
+	})
+})
+
+function Bar({ visible }: { visible: boolean }) {
+	return (
+		<Thread>
+			<AssistantMessage>
+				<TextPart>內容</TextPart>
+				<ActionBar visible={visible}>
+					<ActionBar.Copy />
+					<ActionBar.Regenerate onRegenerate={() => {}} />
+					<ActionBar.Button aria-label="讚" icon={<svg aria-hidden="true" />} />
+				</ActionBar>
+			</AssistantMessage>
+		</Thread>
+	)
+}
 
 describe("ActionBar targets", () => {
 	test("every button, icon-only included, is at least 24×24", () => {
