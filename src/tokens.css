@@ -3,7 +3,7 @@
  * Generated from tokens.stylex.ts by scripts/tokens-css.mjs — do not edit by hand.
  * Regenerate: pnpm gen:tokens-css (src/tokens-css.test.ts fails when out of sync). */
 
-/* 展開/收合讓頁面長高時捲軸出現 → 置中內容左移;永遠留捲軸的位置。 */
+/* Expanding content can add a scrollbar and shift centred layouts; always reserve its space. */
 html {
 	scrollbar-gutter: stable;
 }
