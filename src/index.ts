@@ -171,6 +171,21 @@ export type { VoiceState } from "./lib/voice"
 export { layerUp, type LayerName } from "./lib/layers"
 export { createStore, useStore, type Store } from "./lib/store"
 export {
+	LocaleProvider,
+	useLocale,
+	defineStrings,
+	useStrings,
+	resolveStrings,
+	DEFAULT_LOCALE,
+	FALLBACK_LOCALE,
+	type Locale,
+	type LocaleProviderProps,
+	type LocaleStrings,
+	type StringsOf,
+	type StringTable,
+	type Word,
+} from "./lib/i18n"
+export {
 	setTextLayoutEngine,
 	measureTextHeight,
 	type TextLayoutEngine,
