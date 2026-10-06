@@ -3,6 +3,7 @@ import type { ComponentProps } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { press, type StyleArg, styled } from "../../lib/styled"
 import { color, corner, font, space, type } from "../../tokens.stylex"
+import { Spin } from "../spin/Spin"
 
 const styles = stylex.create({
 	base: {
@@ -84,24 +85,49 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.dangerSubtle },
 	},
 	label: { position: "relative", display: "inline-flex", alignItems: "center", gap: space.xs },
+	// 等待中:字還在(撐住寬度、也還是按鈕的名字),只是看不見;轉圈疊在正中間
+	loading: { cursor: "progress" },
+	hidden: { opacity: 0 },
+	spin: {
+		position: "absolute",
+		insetBlockStart: "50%",
+		insetInlineStart: "50%",
+		translate: "-50% -50%",
+	},
 })
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
 
 export type ButtonProps = ComponentProps<"button"> & {
+	/**
+	 * `primary` ink for the one main action, `secondary` sunken, `ghost` quiet, `danger` solid red
+	 * for what cannot be undone, `dangerGhost` red words for a lighter destructive action.
+	 * @default "primary"
+	 */
 	variant?: Variant
+	/** Pill height: `lg` 48px, `md` 40px (touch), `sm` 32px, `xs` 28px for crowded toolbars. @default "md" */
 	size?: "xs" | "sm" | "md" | "lg"
 	/** Square, no side padding — for a button whose whole label is one icon. */
 	icon?: boolean
+	/**
+	 * Waiting on the action it started: a spinner replaces the label (the width stays), the
+	 * button is `aria-busy` and `aria-disabled`, and clicks do nothing. It is not `disabled`,
+	 * so it keeps focus and stays in the tab order.
+	 */
+	loading?: boolean
 	sx?: StyleArg
 }
 
 const ICON_SIZE = { xs: "iconXs", sm: "iconSm", md: "iconMd", lg: "iconLg" } as const
+
+/** A pill button. Native `<button>` props pass through; `type` defaults to `"button"`. */
 export function Button({
 	variant = "primary",
 	size = "md",
 	icon = false,
+	loading = false,
 	children,
+	onClick,
 	ref,
 	sx,
 	...props
@@ -110,6 +136,15 @@ export function Button({
 		<button
 			type="button"
 			{...props}
+			{...(loading ? { "aria-busy": true, "aria-disabled": true } : {})}
+			onClick={(event) => {
+				// 等待中不送第二次:連 submit 的預設動作一起擋掉,但不設 disabled,焦點才不會掉
+				if (loading) {
+					event.preventDefault()
+					return
+				}
+				onClick?.(event)
+			}}
 			ref={(element) => assignRef(ref, element)}
 			{...styled(
 				props,
@@ -118,10 +153,12 @@ export function Button({
 				icon && styles[ICON_SIZE[size]],
 				styles[variant],
 				press.button,
+				loading && styles.loading,
 				sx,
 			)}
 		>
-			<span {...stylex.props(styles.label)}>{children}</span>
+			<span {...stylex.props(styles.label, loading && styles.hidden)}>{children}</span>
+			{loading && <Spin sx={styles.spin} />}
 		</button>
 	)
 }
