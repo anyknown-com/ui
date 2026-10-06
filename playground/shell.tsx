@@ -3,7 +3,13 @@ import type { ReactNode } from "react"
 import { color, font, radius, space, text } from "@anyknown/ui/tokens.stylex"
 
 const styles = stylex.create({
-	section: { display: "grid", gap: space.xs, marginBottom: space.xl, scrollMarginTop: space.md },
+	section: {
+		display: "grid",
+		gridTemplateColumns: "minmax(0, 1fr)",
+		gap: space.xs,
+		marginBottom: space.xl,
+		scrollMarginTop: space.md,
+	},
 	heading: {
 		fontFamily: font.mono,
 		fontSize: "0.72rem",
@@ -14,7 +20,7 @@ const styles = stylex.create({
 		margin: 0,
 	},
 	sub: { fontFamily: font.mono, fontSize: "0.68rem", color: color.textFaint, margin: 0 },
-	body: { display: "grid", gap: space.sm },
+	body: { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm },
 	panel: {
 		borderWidth: 1,
 		borderStyle: "dashed",
