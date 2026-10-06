@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { useState } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { Composer, type SourceRef } from "./Composer"
+import { Composer, type ComposerProps, type SourceRef } from "./Composer"
 
 const SOURCES: SourceRef[] = [
 	{ id: "f1", label: "config-store.ts", kind: "檔案" },
@@ -205,6 +206,73 @@ describe("Composer regressions", () => {
 	})
 })
 
+/** An app that owns the draft and can put a saved one back. */
+function DraftHost({
+	restore,
+	...props
+}: { restore: string } & Omit<ComposerProps, "value" | "onValueChange">) {
+	const [draft, setDraft] = useState("")
+	return (
+		<>
+			<button type="button" onClick={() => setDraft(restore)}>
+				還原
+			</button>
+			<Composer value={draft} onValueChange={setDraft} {...props} />
+		</>
+	)
+}
+
+describe("Composer value", () => {
+	test("defaultValue prefills the box and still clears after sending", async () => {
+		const onSubmit = vi.fn()
+		render(<Composer onSubmit={onSubmit} defaultValue="草稿" />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		expect(box).toHaveValue("草稿")
+		expect(screen.getByRole("button", { name: "送出" })).toBeEnabled()
+		await userEvent.type(box, "{Enter}")
+		expect(onSubmit).toHaveBeenCalledWith("草稿", [])
+		expect(box).toHaveValue("")
+	})
+
+	test("onValueChange reports every edit", async () => {
+		const onValueChange = vi.fn()
+		render(<Composer onSubmit={() => {}} onValueChange={onValueChange} />)
+		await userEvent.type(screen.getByRole("textbox", { name: "訊息" }), "嗨")
+		expect(onValueChange).toHaveBeenLastCalledWith("嗨")
+	})
+
+	test("a controlled value follows the parent, and send asks the parent to clear it", async () => {
+		const onSubmit = vi.fn()
+		render(<DraftHost restore="還原的草稿" onSubmit={onSubmit} />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		await userEvent.click(screen.getByRole("button", { name: "還原" }))
+		expect(box).toHaveValue("還原的草稿")
+		await userEvent.type(box, "!{Enter}")
+		expect(onSubmit).toHaveBeenCalledWith("還原的草稿!", [])
+		expect(box).toHaveValue("")
+	})
+
+	test("a controlled value the parent does not clear stays", async () => {
+		const onValueChange = vi.fn()
+		render(<Composer value="固定" onValueChange={onValueChange} onSubmit={() => {}} />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		await userEvent.type(box, "{Enter}")
+		expect(onValueChange).toHaveBeenLastCalledWith("")
+		expect(box).toHaveValue("固定")
+	})
+
+	test("a value set from outside opens no popup until the user types", async () => {
+		render(<DraftHost restore="/" onSubmit={() => {}} commands={[{ id: "c1", label: "handoff" }]} />)
+		const box = screen.getByRole("combobox", { name: "訊息" })
+		await userEvent.type(box, "hi")
+		fireEvent.click(screen.getByRole("button", { name: "還原" }))
+		expect(box).toHaveValue("/")
+		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+		await userEvent.type(box, "h")
+		expect(await screen.findByRole("listbox", { name: "/ 指令" })).toHaveTextContent("handoff")
+	})
+})
+
 describe("Composer autoGrow", () => {
 	afterEach(() => vi.restoreAllMocks())
 
@@ -220,6 +288,21 @@ describe("Composer autoGrow", () => {
 		expect(box.style.height).toBe("72px")
 		scrollHeight = 24
 		await userEvent.type(box, "{Enter}")
+		expect(box.style.height).toBe("24px")
+	})
+
+	test("a controlled value set from outside re-measures the height", () => {
+		let scrollHeight = 24
+		vi.spyOn(CSS, "supports").mockReturnValue(false)
+		vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(() => scrollHeight)
+		const { rerender } = render(<Composer value="" onSubmit={() => {}} />)
+		const box = screen.getByRole("textbox", { name: "訊息" })
+		expect(box.style.height).toBe("24px")
+		scrollHeight = 72
+		rerender(<Composer value={"一\n二\n三"} onSubmit={() => {}} />)
+		expect(box.style.height).toBe("72px")
+		scrollHeight = 24
+		rerender(<Composer value="" onSubmit={() => {}} />)
 		expect(box.style.height).toBe("24px")
 	})
 })

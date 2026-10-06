@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { flushSync } from "react-dom"
 import { press, reset } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { popupStyles } from "../../lib/popup"
 import { breakpoint, color, corner, font, motion, space, type } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
@@ -219,6 +220,15 @@ function SendIcon() {
 }
 
 export type ComposerProps = {
+	/** The text in the box, for a controlled composer. Pair with `onValueChange`. */
+	value?: string
+	/** The starting text for an uncontrolled composer, e.g. a restored draft. Defaults to `""`. */
+	defaultValue?: string
+	/**
+	 * Called with the new text on every edit, and with `""` after a send, so a controlled
+	 * composer clears when its owner applies the value.
+	 */
+	onValueChange?: (value: string) => void
 	placeholder?: string
 	hint?: ReactNode
 	models?: string[]
@@ -235,6 +245,9 @@ export type ComposerProps = {
 }
 
 export function Composer({
+	value: valueProp,
+	defaultValue = "",
+	onValueChange,
 	placeholder = "跟 agent 說話",
 	hint,
 	models,
@@ -252,8 +265,16 @@ export function Composer({
 	const listId = useId()
 	const suggestible = sources != null || commands != null
 	const textarea = useRef<HTMLTextAreaElement>(null)
-	const [value, setValue] = useState("")
+	const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange)
 	const [caret, setCaret] = useState(0)
+	// The value this component last wrote. A different value came from the owner (prefill,
+	// restored draft, clear): the caret state is stale then, so it goes back to 0 and the
+	// next key or click reads the real caret again; no popup opens on a value nobody typed.
+	const [written, setWritten] = useState(value)
+	if (value !== written) {
+		setWritten(value)
+		setCaret(0)
+	}
 	const [items, setItems] = useState<SourceRef[]>([])
 	const [rawActive, setActive] = useState(0)
 	const [picked, setPicked] = useState<SourceRef[]>([])
@@ -262,7 +283,8 @@ export function Composer({
 	const lookup = useRef<{ query: string | null; id: number }>({ query: null, id: 0 })
 
 	// Same growth as Textarea autoGrow: field-sizing, else Pretext, else scrollHeight.
-	// Clearing the value on submit fires no input event, so a new value re-attaches.
+	// Clearing the value on submit, or a value the owner sets, fires no input event, so a new
+	// value re-attaches.
 	const attach = useCallback(
 		(area: HTMLTextAreaElement | null) => {
 			textarea.current = area
@@ -278,7 +300,8 @@ export function Composer({
 
 	/** Moves text and caret together, and asks `sources` when the @ query changed. */
 	function track(next: string, position: number) {
-		setValue(next)
+		if (next !== value) setValue(next)
+		setWritten(next)
 		setCaret(position)
 		const query = AT_PATTERN.exec(next.slice(0, position))?.[2] ?? null
 		if (query === lookup.current.query) return
