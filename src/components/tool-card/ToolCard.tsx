@@ -34,7 +34,7 @@ const styles = stylex.create({
 	},
 	cardError: {
 		boxShadow: `0 0 0 1px color-mix(in srgb, ${color.danger} 45%, ${color.border}), ${shadow.rest}`,
-		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
 	},
 	row: {
 		display: "flex",
@@ -74,7 +74,7 @@ const styles = stylex.create({
 	tileBad: {
 		backgroundColor: color.dangerSubtle,
 		color: color.danger,
-		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
 	},
 	glyph: { width: 18, height: 18, pointerEvents: "none" },
 	main: { flex: 1, minWidth: 0, display: "grid", gap: 6 },

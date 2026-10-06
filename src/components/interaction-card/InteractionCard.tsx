@@ -29,11 +29,11 @@ const styles = stylex.create({
 	// forced colors 下陰影和環都會消失:等你回覆的卡片改畫一圈 CanvasText
 	permissionPending: {
 		boxShadow: `0 0 0 1px ${color.warning}, ${shadow.rest}`,
-		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
 	},
 	decisionPending: {
 		boxShadow: `0 0 0 1px ${color.accent}, ${shadow.rest}`,
-		outline: { default: null, [FORCED]: "2px solid CanvasText" },
+		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
 	},
 	head: { display: "flex", alignItems: "center", gap: space.xs },
 	headIconWarning: { flex: "none", color: color.warning },
