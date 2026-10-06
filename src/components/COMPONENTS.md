@@ -297,11 +297,16 @@ icon 是跟文字同色的線條,不墊圓底。
 
 ### message
 過去區的訊息節奏:user 右對齊氣泡、assistant 全寬純文字。turn 24px / part 8px,
-字級只走三個 token。
+內文 `t3` / `body`(15 / 1.6)。
+
+- user 泡泡是凹下去的 `surface`、無框,圓角 18 18 6 18(右下是說話的人那一角)。18 沒有
+  圓角 token,寫在元件裡的常數;agent 不加泡泡,直接排在紙上
+- 回覆中的點是 `signal`:agent 正在做事
 
 ### bubble
-product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3` / `body`。人說的是
-`successHl` 底、照打的字顯示;回覆是 `layer3` 底、`Markdown tables="ruled"`。
+product 殼的訊息泡泡(0.9):整寬、上下 12、`t3` / `body`。人說的是凹下去的 `surface`、
+左右 16、圓角 18 18 6 18,照打的字顯示;回覆不加泡泡(沒有底、左右不留白),
+`Markdown tables="ruled"`。
 
 - 跟 `UserMessage` / `AssistantMessage` 不是同一個版面:那組是 desktop 的 turn(靠右 85%
   的泡泡、全寬的回覆、串流游標、action bar),這個是殼的一列一泡泡。位置與寬度交給 thread
@@ -309,7 +314,7 @@ product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3
 
 ### attachment
 訊息帶的檔案(0.9,product 殼搬來):`AttachmentGrid` 一排會折行、間距 16 的 150px
-方塊;`AttachmentTile` 是 `layer3`、`radius.xl` 的方塊,上面一段名字 + 一個字的種類
+方塊;`AttachmentTile` 是 rest 卡片(`surfaceRaised` 底、`shadow.rest`、`corner.card`),上面一段名字 + 一個字的種類
 (`PDF`)。有 `preview` 就是圖,`object-fit: cover` 鋪滿,說明變白字加陰影;沒有就在左下角
 畫 28px 的檔案 glyph。
 
@@ -320,9 +325,23 @@ product 殼的訊息泡泡(0.9):整寬、`radius.xl`、上下 12 左右 16、`t3
 工具呼叫的收據:單列 icon + title(動詞)+ subtitle(主要參數)+ 耗時 + chevron,
 展開看輸入/輸出。**subagent 是它的變體,不是新元件家族**。
 
+- rest 卡片:`surfaceRaised` 底、`shadow.rest`、`corner.card`,不畫框。失敗時 rest 的環上
+  再疊一圈偏紅的 1px 環
+- 左邊 36px 圖示底。執行中是 `signalSubtle` 底、`signal` 色的工具圖示(read / edit / write /
+  shell / search / fetch / subagent 各一個 lucide 路徑,其他用 wrench),標題下一條膠囊進度條;
+  沒有進度值,所以是一段 40% 的 `signal` 用 transform 等速滑過,reduced-motion 停住。
+  完成是 `surface` 底的綠勾、失敗是 `dangerSubtle` 底的紅叉 —— 形狀不同,不只靠顏色
+- 為什麼完成就換成勾:`signal` 只代表 agent 正在做事,做完了圖示底就退回中性;工具是什麼
+  標題的動詞已經說了
+- 輸入 / 輸出 / 錯誤是凹下去的 `surface`(錯誤是 `dangerSubtle`),無框,`corner.small`
+  (卡片圓角減 padding 已經 ≤ 0,取最小階)
+
 ### reasoning-fold
 思考過程的摺疊列:預設收合只留「思考了 N 秒」,串流中撐開、標籤 shimmer「思考中…」。
 內容永遠是 muted 斜體的配角。
+
+- 觸發鈕是膠囊:32px 高、`surface` 底、無框,hover 深一階(`accentSubtle`)
+- 展開的內容左邊一條 2px 線,對齊膠囊裡 chevron 的中線
 
 ### action-bar
 assistant 訊息底部的 hover 動作列。**高度永遠保留**(pb + 負 mb 技法),hover 只切
@@ -331,6 +350,9 @@ opacity —— turn 節奏零跳動。每顆是 ghost 膠囊,hover 才有 `accen
 ### code-block
 header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
 超寬**只在 block 內橫向捲動**,不讓頁面橫捲。
+
+- 凹下去的 `surface`、`corner.card`,無框;標頭與本體同一塊底,中間不畫線。複製鈕是膠囊
+- `InlineCode` 同樣是 `surface` 底、`corner.small`、無框
 
 ### markdown
 一則訊息裡的 markdown:GFM 表格、fenced code、TeX 數學、任務清單。
@@ -350,6 +372,7 @@ header(語言小寫標籤 + 複製鈕)+ `text-code`(13/1.5 mono)本體。
   (記憶的附件內文還在用)。以前 product 靠 `[data-bubble] th/td { … !important }` 蓋掉,
   現在不用了
 - `breaks: true`。這是訊息不是文件 —— 單獨一個換行是寫的人真的想換行
+- 內文 `t3` / `body`(15 / 1.6),段落與清單項同一個行高;圖片 `corner.card`
 - 圖表不做:mermaid 光 unpack 就 84MB,設計系統不該讓每個裝它的 app 背。
   留 `renderBlock({lang, code})` 這個口子給 shell 自己接,沒接就退回 code block
 - 自己的 `Marked` 實例,不用 module-level 的 `marked`:`marked.use()` 是全域的,
@@ -371,7 +394,7 @@ TeX → MathML,交給瀏覽器排版。**選 Temml 不選 KaTeX**:輸出 MathML 
   之下前半的尾隨空白還會變成 `<br>`)。所以 block 與 inline 各有各的 hint
 
 ### payload-block
-工具被呼叫時帶的參數、回來的結果(0.9,product 殼搬來):1px `border` 的框、`corner.card`、
+工具被呼叫時帶的參數、回來的結果(0.9,product 殼搬來):凹下去的 `surface`、無框、`corner.card`、
 mono `t2` / `snug`,內容左 16 右 48 上下 12、橫向捲動,右上角一顆 32px 的複製鈕
 (`IconButton`,1.5 秒後從勾變回複製)。沒有語言標頭,這是它跟 `CodeBlock` 的差別。
 
@@ -385,10 +408,12 @@ mono `t2` / `snug`,內容左 16 右 48 上下 12、橫向捲動,右上角一顆 
 agent 在等你的兩種卡:Permission(權限請求)與 Decision(要你決定)。
 pending 是可操作物,回覆後收成過去區的不可改收據。
 
-- Permission:warning 邊框、mono 顯示指令 / 對象、允許一次(⏎)/ 總是允許(⌘⏎)/
+- 卡面是 rest 卡片(`surfaceRaised`、`shadow.rest`、`corner.card`)。「邊框」是疊在 rest 上的
+  1px box-shadow 環,不是 border;指令框與補充欄是凹下去的 `surface`
+- Permission:warning 環、mono 顯示指令 / 對象、允許一次(⏎)/ 總是允許(⌘⏎)/
   拒絕(Esc)、底部 policy 說明列(解釋為何問、規則活過 rotation)
-- Decision:同一種卡分 blocking(邊框 accent、「等你才能繼續」)與 non-blocking
-  (安靜邊框、「等你 · deadlineAt 倒數」);內容走 block DSL(markdown / options /
+- Decision:同一種卡分 blocking(墨色 `accent` 環、「等你才能繼續」)與 non-blocking
+  (只有 rest、「等你 · deadlineAt 倒數」);內容走 block DSL(markdown / options /
   text / table / image / diff);必填未選時送出 disabled,有 recommended 時多一顆「照建議」
 - 三顆回覆鈕:允許一次 `primary`、總是允許 `secondary`、拒絕 `dangerGhost`。
   拒絕不給整塊實心 danger(一整塊紅會蓋過 primary),但語意要看得出來 ——
@@ -408,7 +433,8 @@ session」,可展開看交接摘要。用戶不管理 session,**這是他唯一�
 - collapsed 為預設,左右虛線把它嵌進時間軸;展開(同列 toggle,不開 dialog)看三項
   核對:記憶落盤幾筆 / 摘要已交給下一輪(讀後銷毀)/ 本輪收據數
 - **是收據不是控制**:不可改、無任何動作按鈕
-- 卡面是平的 `surfaceRaised` + 1px `border`;展開時虛線變實線、連結 icon 轉 `accent`
+- 沒有卡面,直接畫在紙上:左右虛線中間一顆 `surface` 膠囊(窄螢幕時字折行、膠囊變高);
+  展開的摘要是凹下去的 `surface`、`corner.card`。展開時虛線變實線、連結 icon 轉 `accent`
 - 收合狀態用 `inert` 不能用 `hidden` —— 一樣離開 a11y tree 與 tab 序,但留在版面上
   讓 0fr→1fr 跑得動
 - 走過的彎路:`display: none` 硬切 + 單向 fade 被打回「死板」;展開讓頁面長高 →
@@ -419,9 +445,14 @@ session」,可展開看交接摘要。用戶不管理 session,**這是他唯一�
 當場重排。永遠可用,不被 pending 卡阻塞。
 
 - 多行 textarea 自動長高(max-height 後內捲);⏎ 送出、⇧⏎ 換行
-- 左側 @ 來源鈕與 / 指令鈕;右側 model picker、麥克風、送出(空值 disabled)
-- 打 `@` 時浮層列出來源建議(檔案 / ledger 收據 / 記憶,各帶種類標),點選補全
-- focus 時整條 border 轉 accent(`:focus-within`)
+- **長高跟 `Textarea autoGrow` 是同一套**(field-sizing → Pretext → scrollHeight):Composer
+  用 ref callback 掛 `textarea/Textarea` 輸出的 `autoGrow`,不自己量。送出清空不會觸發
+  input 事件,所以 ref callback 依 `value` 換一個,重掛時重量
+- 沒有 `useEffect`:移游標在 handler 裡 `flushSync` 先 commit 再 `setSelectionRange`;
+  `sources` 查詢在改字 / 移游標的 handler 裡發,用遞增 id 丟掉過期的回應
+- 外觀:凹下去的 `surface` 紙、無框、`corner.sheet`(20)、`t3` / `body`;送出是 40px 的
+  墨色圓鈕(空值退成 `accentSubtle`),圖示鈕與 model picker 是膠囊
+- focus 時整張紙外圈 2px `focusRing`(`:focus-within`)
 
 ### attach-button / pending-files
 chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `IconButton`(18px 的
@@ -434,7 +465,7 @@ chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `Ic
   chatbox 只要一顆鈕跟一排 chip
 
 ### call-bar
-通話時 chatbox 換成的那一條(0.9,product 殼搬來):`layer4` 底、`corner.card`、左 16 其他 8;
+通話時 chatbox 換成的那一條(0.9,product 殼搬來):跟 Composer 同一張凹下的 `surface`、`corner.sheet`、左 16 其他 8;
 呼吸的點、狀態字、mono 的 `mm:ss`、靜音、紅色的掛斷。
 
 - **受控,自己不存任何狀態**:`status` / `seconds` / `muted` 都從通話 session 來,
@@ -451,6 +482,7 @@ chatbox 的附件(0.9,product 殼搬來)。`AttachButton` 是一顆 36px 的 `Ic
 - 四態:`idle`(靜態灰 bar)/ `listening`(5 條音量 bar 起伏)/ `thinking`(單點脈動)
   / `speaking`(波形依序起伏)
 - 視覺化區**固定寬高**,換態不跳版;文案標明可插話(「說話中…插話會打斷」= barge-in)
+- 外框是 `surface` 膠囊、無框;動起來的纖維是 `signal`(聽、想、說都是 agent 在做事)
 - reduced-motion:全部動畫關閉,bar 停在中段靜態高度,改顯示 mono uppercase 靜態文字標
 
 ### live-dot
@@ -499,7 +531,8 @@ dragover 時虛線與圖示換 `signal`、底換 `signalSubtle`、
 - 行級增刪用 success / danger 的 **subtle 底**(不是飽和色),sign 與 stat 用對應 text 色
 - 行內 highlight 只標變動的字(`<mark>`,比行底再深一階的 hl 色)
 - mono 13px、雙欄行號(before / after),行號 faint、不可選取
-- 收合未變動區段:「⋯ N 行未變動」列可展開收合
+- 凹下去的 `surface`、`corner.card`,無框;標題列與行之間不畫線
+- 收合未變動區段:「⋯ N 行未變動」列可展開收合,`layer4` 底(hover `layer5`)不畫上下線
 - 檔案標題列:kind 色點(modified 黃 / added 綠 / deleted 紅)+ path + `+N −N` 統計;
   added = 只有 after,deleted = 只有 before
 
