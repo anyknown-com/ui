@@ -4,14 +4,14 @@ import type { ReactNode } from "react"
 
 /**
  * `.srows` / `.srow`: a setting per line, 44px — its name and one line of help on the left, the
- * control on the right. The rows sit on one surface with hairlines between them.
+ * control on the right. The rows sit on one sunken `surface` region of the sheet, no ring around
+ * it, hairlines between them.
  */
 
 const styles = stylex.create({
 	rows: {
 		backgroundColor: color.surface,
 		borderRadius: corner.card,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
 		color: color.text,
 		fontSize: type.t2,
 		lineHeight: type.body,

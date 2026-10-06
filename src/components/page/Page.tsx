@@ -53,7 +53,7 @@ const styles = stylex.create({
 	},
 	code: {
 		backgroundColor: color.layer3,
-		borderRadius: corner.sm,
+		borderRadius: corner.small,
 		color: color.textMuted,
 		fontFamily: font.mono,
 		fontSize: type.t1,
@@ -69,7 +69,6 @@ const styles = stylex.create({
 	panel: {
 		backgroundColor: color.surface,
 		borderRadius: corner.card,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
 		color: color.text,
 		fontSize: type.t2,
 		lineHeight: type.body,
@@ -86,7 +85,7 @@ const styles = stylex.create({
 	},
 	sbar: {
 		backgroundColor: color.layer4,
-		borderRadius: 2,
+		borderRadius: corner.pill,
 		flex: "none",
 		height: 4,
 		overflow: "hidden",
@@ -176,7 +175,7 @@ export function Snippet({ children, sx }: { children: ReactNode } & Sx) {
 	return <pre {...stylex.props(styles.code, sx)}>{children}</pre>
 }
 
-/** `.dpanel`: the bordered surface a section's rows sit on; `padded` when it holds prose. */
+/** `.dpanel`: the sunken surface a section's rows sit on, no ring; `padded` when it holds prose. */
 export function Panel({ children, padded = false, sx }: { children: ReactNode; padded?: boolean } & Sx) {
 	return <div {...stylex.props(styles.panel, padded && styles.padded, sx)}>{children}</div>
 }
