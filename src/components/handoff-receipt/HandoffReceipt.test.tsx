@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { HandoffReceipt } from "./HandoffReceipt"
 
 const props = {
@@ -123,5 +124,36 @@ describe("HandoffReceipt open state", () => {
 		expect(row).toHaveAttribute("aria-expanded", "false")
 		rerender(<HandoffReceipt {...props} open onOpenChange={onOpenChange} />)
 		expect(row).toHaveAttribute("aria-expanded", "true")
+	})
+})
+
+describe("HandoffReceipt locale", () => {
+	test("reads English words under an en LocaleProvider", () => {
+		render(
+			<LocaleProvider locale="en">
+				<HandoffReceipt {...props} reason="hard-limit" defaultOpen />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button")).toHaveTextContent(
+			"Handed off · 14:32 · ctx 50% (hard limit) → new session",
+		)
+		expect(screen.getByText("Memory")).toBeInTheDocument()
+		expect(screen.getByText("3 memories saved (偏好 pnpm, 部署走 Cloudflare).")).toBeInTheDocument()
+		expect(
+			screen.getByText("This round's 42 records stay searchable but not carried into the new session."),
+		).toBeInTheDocument()
+	})
+
+	test("labels override single words; per-word props win over labels", () => {
+		render(
+			<HandoffReceipt
+				{...props}
+				defaultOpen
+				labels={{ rotated: "Rotated", memoryTitle: "From labels" }}
+				memoryTitle="From prop"
+			/>,
+		)
+		expect(screen.getByRole("button")).toHaveTextContent("Rotated · 14:32")
+		expect(screen.getByText("From prop")).toBeInTheDocument()
 	})
 })
