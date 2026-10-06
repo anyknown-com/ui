@@ -546,6 +546,41 @@ describe("toast manager", () => {
 	})
 })
 
+function Send({ title }: { title: string }) {
+	const { toast } = useToast()
+	return <Button onClick={() => toast(title)}>{title}</Button>
+}
+
+describe("useToast", () => {
+	test("useToast() under a <Toaster manager> reaches that manager; the nearest one wins", () => {
+		const outer = createToastManager()
+		const inner = createToastManager()
+		render(
+			<Toaster manager={outer}>
+				<Send title="outer" />
+				<Toaster manager={inner}>
+					<Send title="inner" />
+				</Toaster>
+			</Toaster>,
+		)
+		fireEvent.click(screen.getByRole("button", { name: "outer" }))
+		fireEvent.click(screen.getByRole("button", { name: "inner" }))
+		expect(outer.getSnapshot().toasts.map((t) => t.title)).toEqual(["outer"])
+		expect(inner.getSnapshot().toasts.map((t) => t.title)).toEqual(["inner"])
+		expect(toastManager.getSnapshot().toasts).toHaveLength(0)
+		act(() => {
+			outer.closeAll()
+			inner.closeAll()
+		})
+	})
+
+	test("useToast() outside any <Toaster> still reaches the default manager", () => {
+		render(<Harness />)
+		fireEvent.click(screen.getByRole("button", { name: "default" }))
+		expect(toastManager.getSnapshot().toasts.map((t) => t.title)).toEqual(["交接摘要已複製"])
+	})
+})
+
 describe("Toast accessibility", () => {
 	test("a toaster with one toast of each type, a description, an action and a count has no axe violations", async () => {
 		const manager = createToastManager()

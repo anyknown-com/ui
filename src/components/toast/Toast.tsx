@@ -1,5 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
-import { createContext, useCallback, useContext, useRef, useState, useSyncExternalStore } from "react"
+import {
+	type ReactNode,
+	createContext,
+	useCallback,
+	useContext,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react"
 import { createPortal } from "react-dom"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { usePrefersReducedMotion } from "../../lib/motion"
@@ -578,7 +586,10 @@ const ToastApiContext = createContext<ReturnType<typeof makeApi> | null>(null)
  */
 export const toast = makeApi(() => toastManager)
 
-/** `{ toast }` for the nearest `<Toaster manager>`, or the default `toast` outside one. */
+/**
+ * `{ toast }` for the manager of the nearest `<Toaster>` wrapping the caller (its `children`), or
+ * the default `toast` outside one.
+ */
 export function useToast() {
 	const scoped = useContext(ToastApiContext)
 	return { toast: scoped ?? toast }
@@ -600,6 +611,8 @@ export type ToasterProps = {
 	limit?: number
 	/** Pass a manager from `createToastManager()` to scope this viewport. */
 	manager?: ToastManager
+	/** `useToast()` inside reaches this viewport's manager. */
+	children?: ReactNode
 	/** Override built-in words for this viewport; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<ToastLabels>
 }
@@ -609,13 +622,15 @@ const noSubscribe = () => () => {}
 /**
  * The notification region: a polite live region in a corner, portalled to `<body>`. F8 moves
  * focus into it and Escape hands it back; hover, focus inside or a hidden tab pause every
- * countdown. Mount one per manager, near the app root.
+ * countdown. Mount one per manager, near the app root; wrap the app in it so `useToast()` reaches
+ * a scoped manager.
  */
 export function Toaster({
 	position = "bottom-right",
 	timeout = DEFAULT_TIMEOUT,
 	limit = DEFAULT_LIMIT,
 	manager,
+	children,
 	labels,
 }: ToasterProps) {
 	const t = useStrings(strings, labels)
@@ -697,31 +712,31 @@ export function Toaster({
 		}
 	}
 
-	if (!client) return null
-
 	return (
 		<ToastApiContext value={api}>
-			{createPortal(
-				<div
-					ref={connect}
-					role="region"
-					aria-label={t.region}
-					aria-keyshortcuts={HOTKEY}
-					aria-live="polite"
-					tabIndex={-1}
-					{...stylex.props(
-						layerStyles.toast,
-						styles.viewport,
-						fromBottom ? styles.fromBottom : styles.fromTop,
-						POSITIONS[position],
-					)}
-				>
-					{toasts.map((record) => (
-						<ToastItem key={record.id} record={record} paused={paused} onClose={dismiss} t={t} />
-					))}
-				</div>,
-				document.body,
-			)}
+			{children}
+			{client &&
+				createPortal(
+					<div
+						ref={connect}
+						role="region"
+						aria-label={t.region}
+						aria-keyshortcuts={HOTKEY}
+						aria-live="polite"
+						tabIndex={-1}
+						{...stylex.props(
+							layerStyles.toast,
+							styles.viewport,
+							fromBottom ? styles.fromBottom : styles.fromTop,
+							POSITIONS[position],
+						)}
+					>
+						{toasts.map((record) => (
+							<ToastItem key={record.id} record={record} paused={paused} onClose={dismiss} t={t} />
+						))}
+					</div>,
+					document.body,
+				)}
 		</ToastApiContext>
 	)
 }

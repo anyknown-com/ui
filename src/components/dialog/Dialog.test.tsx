@@ -399,6 +399,23 @@ describe("dialog store", () => {
 		expect(screen.getAllByRole("dialog")).toHaveLength(1)
 		act(() => scoped.closeAll())
 	})
+
+	test("useDialog() reaches the nearest <Dialogs manager>", async () => {
+		const outer = createDialogManager()
+		const inner = createDialogManager()
+		render(
+			<Dialogs manager={outer}>
+				<Dialogs manager={inner}>
+					<Opener onOpen={(dialog) => dialog.open(() => <DialogContent title="內層" />)} />
+				</Dialogs>
+			</Dialogs>,
+		)
+		await userEvent.click(screen.getByRole("button", { name: "開啟" }))
+		expect(await screen.findByRole("dialog", { name: "內層" })).toBeInTheDocument()
+		expect(inner.getSnapshot()).toHaveLength(1)
+		expect(outer.getSnapshot()).toHaveLength(0)
+		act(() => inner.closeAll())
+	})
 })
 
 /**
