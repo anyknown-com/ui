@@ -1,179 +1,116 @@
-import { Dialogs, Toaster } from "@anyknown/ui"
-import { dark, light } from "@anyknown/ui/themes.stylex"
-import { color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
+import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
+import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
-import { marked } from "marked"
-import { useEffect, useState } from "react"
-import { BasicsDemos } from "../playground/demos/basics"
-import { DesktopDemos } from "../playground/demos/desktop"
-import { FormsDemos } from "../playground/demos/forms"
-import { StorageDemos } from "../playground/demos/storage"
-import { WebDemos } from "../playground/demos/web"
-import componentsReadme from "../src/components/README.md?raw"
-import componentsDoc from "../src/components/COMPONENTS.md?raw"
-import a11yDebt from "../src/components/A11Y-DEBT.md?raw"
-import readme from "../README.md?raw"
+import { createContext, use, useState } from "react"
+import { ComponentPage, NotFound } from "./ComponentPage"
+import { COMPONENT_DOCS, COMPONENT_GROUPS, GUIDES } from "./content"
+import { DemosPage, GuidePage, HomePage } from "./pages"
+import { LOCALES, type ThemeMode, setLocale, setTheme, useHash, useSiteLocale, useTheme } from "./prefs"
+import { TokensPage } from "./TokensPage"
 
-const GROUPS: Record<string, string[]> = {
-	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "slider", "select", "dropdown"],
-	基礎: [
-		"button",
-		"dialog",
-		"toast",
-		"tooltip",
-		"popover",
-		"tabs",
-		"badge",
-		"kbd",
-		"skeleton",
-		"progress",
-		"empty-state",
-		"scrollbar",
-	],
-	"Desktop AI": [
-		"message",
-		"tool-card",
-		"reasoning-fold",
-		"action-bar",
-		"code-block",
-		"interaction-card",
-		"handoff-receipt",
-		"composer",
-		"voice-indicator",
-		"live-dot",
-	],
-	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
-	"Web 殼": ["group", "status", "list", "bubble", "attachment", "payload-block", "chatbox", "call-bar"],
-}
+export type Route =
+	| { page: "home" }
+	| { page: "guide"; key: string }
+	| { page: "component"; name: string }
+	| { page: "tokens"; anchor?: string }
+	| { page: "demo"; anchor?: string }
 
-// Repo 內的相對連結改指到站內對應頁。
-const GUIDES: Record<string, { title: string; body: string }> = {
-	readme: {
-		title: "開始使用",
-		body: readme.replace("(./src/components/README.md)", "(#/guide/components)"),
-	},
-	components: {
-		title: "元件總覽",
-		body: componentsReadme.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
-	},
-	decisions: {
-		title: "元件決定紀錄",
-		body: componentsDoc.replace("(./A11Y-DEBT.md)", "(#/guide/a11y)"),
-	},
-	a11y: { title: "a11y 偏差", body: a11yDebt },
-}
-
-type Route = { page: "demo"; anchor?: string } | { page: "guide"; key: string }
-
-function parseRoute(hash: string): Route {
-	const parts = hash.replace(/^#\/?/, "").split("/")
-	// 舊的 #/docs/<name> 連結直接落到該元件的示範
-	if (parts[0] === "docs" && parts[1] != null) return { page: "demo", anchor: parts[1] }
-	if (parts[0] === "guide" && GUIDES[parts[1]] != null) return { page: "guide", key: parts[1] }
-	return { page: "demo", anchor: parts[0] === "demo" ? parts[1] : undefined }
-}
-
-function useRoute(): Route {
-	const [route, setRoute] = useState<Route>(() => parseRoute(location.hash))
-	useEffect(() => {
-		const onChange = () => setRoute(parseRoute(location.hash))
-		window.addEventListener("hashchange", onChange)
-		return () => window.removeEventListener("hashchange", onChange)
-	}, [])
-	return route
-}
-
-type ThemeMode = "system" | "light" | "dark"
-const THEME_KEY = "ak-site-theme"
-const THEMES = { light, dark }
-const MODES: { mode: ThemeMode; label: string }[] = [
-	{ mode: "system", label: "系統" },
-	{ mode: "light", label: "亮" },
-	{ mode: "dark", label: "暗" },
-]
-
-function loadTheme(): ThemeMode {
-	try {
-		const saved = localStorage.getItem(THEME_KEY)
-		if (saved === "light" || saved === "dark") return saved
-	} catch {
-		/* private mode 等情況拿不到就用系統 */
+export function parseRoute(hash: string): Route {
+	const [head, rest] = hash.replace(/^#\/?/, "").split("/")
+	switch (head) {
+		case "":
+		case undefined:
+			return { page: "home" }
+		case "guide":
+			return { page: "guide", key: rest ?? "" }
+		case "components":
+		// Old #/docs/<name> links from before the component pages existed.
+		case "docs":
+			return { page: "component", name: rest ?? "" }
+		case "tokens":
+			return { page: "tokens", anchor: rest }
+		case "demo":
+			return { page: "demo", anchor: rest }
+		default:
+			return { page: "home" }
 	}
-	return "system"
 }
 
-// Dialog/toast 會 portal 到 body,theme class 要掛在 <html> 才蓋得到全部;
-// data-theme 給 tokens.css 的 CSS-var 消費端(body、.prose、scrollbar)。
-function useTheme() {
-	const [mode, setMode] = useState<ThemeMode>(loadTheme)
-	useEffect(() => {
-		const root = document.documentElement
-		if (mode === "system") delete root.dataset.theme
-		else root.dataset.theme = mode
-		const cls = mode === "system" ? [] : (stylex.props(...THEMES[mode]).className?.split(" ") ?? [])
-		root.classList.add(...cls)
-		try {
-			if (mode === "system") localStorage.removeItem(THEME_KEY)
-			else localStorage.setItem(THEME_KEY, mode)
-		} catch {
-			/* 存不進去就只在這次生效 */
-		}
-		return () => root.classList.remove(...cls)
-	}, [mode])
-	return { mode, setMode }
-}
-
-const MOBILE = "@media (max-width: 880px)"
+const MOBILE = breakpoint.tablet
 
 const styles = stylex.create({
 	page: {
 		display: "grid",
-		gridTemplateColumns: { default: "14rem minmax(0, 1fr)", [MOBILE]: "minmax(0, 1fr)" },
+		gridTemplateColumns: { default: "15rem minmax(0, 1fr)", [MOBILE]: "minmax(0, 1fr)" },
+		gridTemplateRows: "auto 1fr",
 		minHeight: "100vh",
 	},
-	nav: {
-		position: { default: "sticky", [MOBILE]: "static" },
-		top: 0,
-		height: { default: "100vh", [MOBILE]: "auto" },
-		overflowY: { default: "auto", [MOBILE]: "visible" },
-		padding: space.md,
-	},
-	navHead: {
+	header: {
+		gridColumn: "1 / -1",
 		display: "flex",
+		flexWrap: "wrap",
 		alignItems: "center",
 		justifyContent: "space-between",
 		gap: space.sm,
-		marginBottom: space.md,
+		paddingBlock: space.sm,
+		paddingInline: space.md,
 	},
-	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 600, margin: 0 },
-	themeGroup: {
+	brand: {
+		fontFamily: font.display,
+		fontSize: type.t4,
+		fontWeight: 600,
+		color: color.text,
+		textDecoration: "none",
+		marginInlineEnd: "auto",
+		borderRadius: corner.small,
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: 2,
+	},
+	controls: {
+		display: "flex",
+		flexWrap: "wrap",
+		alignItems: "center",
+		gap: space.xs,
+		flexBasis: { default: "auto", [MOBILE]: "100%" },
+	},
+	toggleGroup: {
 		display: "flex",
 		gap: 2,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.md,
+		backgroundColor: color.accentSubtle,
+		borderRadius: corner.pill,
 		padding: 2,
 	},
-	themeBtn: {
-		fontFamily: font.mono,
+	toggle: {
+		fontFamily: font.body,
 		fontSize: type.t1,
+		lineHeight: type.dense,
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: "transparent",
 		borderWidth: 0,
-		borderRadius: radius.sm,
-		paddingBlock: "0.15rem",
-		paddingInline: "0.4rem",
+		borderRadius: corner.pill,
+		minHeight: "1.75rem",
+		paddingInline: space.sm,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 	},
-	themeBtnActive: { color: color.text, backgroundColor: color.accentSubtle },
-	group: {
-		display: { default: "block", [MOBILE]: "flex" },
-		flexWrap: "wrap",
-		alignItems: "baseline",
-		columnGap: space.xs,
+	toggleActive: {
+		color: color.text,
+		backgroundColor: color.layer2,
+		boxShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
 	},
+	menuButton: { display: { default: "none", [MOBILE]: "inline-flex" }, alignItems: "center" },
+	nav: {
+		position: { default: "sticky", [MOBILE]: "static" },
+		top: 0,
+		maxHeight: { default: "100vh", [MOBILE]: "none" },
+		overflowY: { default: "auto", [MOBILE]: "visible" },
+		paddingBlock: { default: space.xs, [MOBILE]: 0 },
+		paddingInline: space.md,
+		paddingBottom: { default: space.xl, [MOBILE]: space.md },
+		alignSelf: "start",
+	},
+	navClosed: { display: { default: "block", [MOBILE]: "none" } },
+	group: { marginBottom: space.sm },
 	groupName: {
 		display: "block",
 		fontFamily: font.mono,
@@ -182,123 +119,258 @@ const styles = stylex.create({
 		letterSpacing: "0.08em",
 		textTransform: "uppercase",
 		color: color.textMuted,
-		marginBlock: space.sm,
-		flexBasis: { default: "auto", [MOBILE]: "100%" },
+		marginBlock: space.xs,
+	},
+	list: {
+		listStyle: "none",
+		margin: 0,
+		padding: 0,
+		display: { default: "block", [MOBILE]: "flex" },
+		flexWrap: "wrap",
+		gap: space.xxs,
 	},
 	link: {
-		display: { default: "block", [MOBILE]: "inline-block" },
+		display: "block",
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		textDecoration: "none",
-		fontSize: text.xs,
-		paddingBlock: "0.18rem",
-		paddingInline: space.xxs,
-		borderRadius: radius.sm,
+		fontSize: type.t2,
+		lineHeight: type.tight,
+		paddingBlock: space.xxs,
+		paddingInline: space.xs,
+		borderRadius: corner.pill,
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outlineOffset: -2,
 	},
-	active: { color: color.text, backgroundColor: color.accentSubtle },
-	// 殼是桌面(body 的 layer1),內容是放在上面的主紙;窄螢幕時主紙貼齊兩側與底
+	active: { color: color.text, backgroundColor: color.accentSubtle, fontWeight: 500 },
+	// The desk is body (layer1); the content is the white sheet on it. On a phone the sheet
+	// runs to both edges and the bottom.
 	main: {
-		padding: { default: space.lg, [MOBILE]: space.md },
 		minWidth: 0,
-		marginBlock: { default: space.xs, [MOBILE]: 0 },
+		paddingBlock: { default: space.xl, [MOBILE]: space.lg },
+		paddingInline: { default: space.xl, [MOBILE]: space.md },
+		marginBottom: { default: space.xs, [MOBILE]: 0 },
 		marginInlineEnd: { default: space.xs, [MOBILE]: 0 },
 		backgroundColor: color.layer2,
 		borderRadius: { default: corner.sheet, [MOBILE]: `${corner.sheet} ${corner.sheet} 0 0` },
 	},
 	content: { maxWidth: "56rem", marginInline: "auto" },
+	skip: {
+		position: "absolute",
+		insetInlineStart: space.sm,
+		top: { default: "-10rem", ":focus": space.sm },
+		zIndex: 1,
+		backgroundColor: color.layer2,
+		color: color.text,
+		borderRadius: corner.pill,
+		paddingBlock: space.xxs,
+		paddingInline: space.sm,
+		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+	},
 })
 
-function NavLink({ href, current, children }: { href: string; current: boolean; children: string }) {
+const THEME_MODES: { mode: ThemeMode; label: string }[] = [
+	{ mode: "system", label: "System" },
+	{ mode: "light", label: "Light" },
+	{ mode: "dark", label: "Dark" },
+]
+
+function Toggle({
+	label,
+	options,
+	value,
+	onChange,
+}: {
+	label: string
+	options: { value: string; label: string; lang?: string }[]
+	value: string
+	onChange: (value: string) => void
+}) {
 	return (
-		<a
-			href={href}
-			aria-current={current ? "page" : undefined}
-			{...stylex.props(styles.link, current && styles.active)}
-		>
-			{children}
-		</a>
+		<div role="group" aria-label={label} {...stylex.props(styles.toggleGroup)}>
+			{options.map((option) => (
+				<button
+					key={option.value}
+					type="button"
+					lang={option.lang}
+					aria-pressed={value === option.value}
+					onClick={() => onChange(option.value)}
+					{...stylex.props(styles.toggle, value === option.value && styles.toggleActive)}
+				>
+					{option.label}
+				</button>
+			))}
+		</div>
 	)
 }
 
-function Markdown({ body }: { body: string }) {
-	return <div className="prose" dangerouslySetInnerHTML={{ __html: marked.parse(body, { async: false }) }} />
+// Picking a page closes the phone menu.
+const NavigateContext = createContext<() => void>(() => {})
+
+function NavLink({ href, current, children }: { href: string; current: boolean; children: string }) {
+	const onNavigate = use(NavigateContext)
+	return (
+		<li>
+			<a
+				href={href}
+				onClick={() => onNavigate()}
+				aria-current={current ? "page" : undefined}
+				{...stylex.props(styles.link, current && styles.active)}
+			>
+				{children}
+			</a>
+		</li>
+	)
 }
 
-function DemoPage({ anchor }: { anchor?: string }) {
-	useEffect(() => {
-		if (anchor != null) document.getElementById(anchor)?.scrollIntoView()
-	}, [anchor])
+function NavGroup({ title, children }: { title: string; children: React.ReactNode }) {
+	return (
+		<div {...stylex.props(styles.group)}>
+			<b {...stylex.props(styles.groupName)}>{title}</b>
+			<ul {...stylex.props(styles.list)}>{children}</ul>
+		</div>
+	)
+}
+
+const REFERENCE = new Set(["readme", "components", "decisions", "a11y", "contributing"])
+
+function Nav({ route }: { route: Route }) {
+	const isGuide = (key: string) => route.page === "guide" && route.key === key
 	return (
 		<>
-			<FormsDemos />
-			<BasicsDemos />
-			<DesktopDemos />
-			<StorageDemos />
-			<WebDemos />
+			<NavGroup title="Guides">
+				<NavLink href="#/" current={route.page === "home"}>
+					Overview
+				</NavLink>
+				{GUIDES.filter((g) => !REFERENCE.has(g.key)).map((g) => (
+					<NavLink key={g.key} href={`#/guide/${g.key}`} current={isGuide(g.key)}>
+						{g.title}
+					</NavLink>
+				))}
+			</NavGroup>
+			<NavGroup title="Foundations">
+				<NavLink href="#/tokens" current={route.page === "tokens"}>
+					Tokens
+				</NavLink>
+				<NavLink href="#/demo" current={route.page === "demo"}>
+					All demos
+				</NavLink>
+			</NavGroup>
+			{COMPONENT_GROUPS.map((group) => (
+				<NavGroup key={group.title} title={group.title}>
+					{group.names.map((name) => (
+						<NavLink
+							key={name}
+							href={`#/components/${name}`}
+							current={route.page === "component" && route.name === name}
+						>
+							{COMPONENT_DOCS.get(name)?.title ?? name}
+						</NavLink>
+					))}
+				</NavGroup>
+			))}
+			<NavGroup title="Reference">
+				{GUIDES.filter((g) => REFERENCE.has(g.key)).map((g) => (
+					<NavLink key={g.key} href={`#/guide/${g.key}`} current={isGuide(g.key)}>
+						{g.title}
+					</NavLink>
+				))}
+			</NavGroup>
 		</>
 	)
 }
 
-function GuidePage({ guide }: { guide: string }) {
-	useEffect(() => window.scrollTo(0, 0), [guide])
-	return <Markdown body={GUIDES[guide].body} />
+function Page({ route }: { route: Route }) {
+	switch (route.page) {
+		case "home":
+			return <HomePage />
+		case "guide":
+			return <GuidePage guideKey={route.key} />
+		case "component":
+			return <ComponentPage name={route.name} />
+		case "tokens":
+			return <TokensPage />
+		case "demo":
+			return <DemosPage />
+		default:
+			return <NotFound what="such page" />
+	}
+}
+
+/** A new page starts at the top, or at its anchor (`#/demo/<id>`, `#/tokens/<group>`). */
+function scrollOnMount(anchor: string | undefined) {
+	return (node: HTMLElement | null) => {
+		if (node == null) return
+		const target = anchor != null ? document.getElementById(anchor) : null
+		if (target != null) target.scrollIntoView?.()
+		else window.scrollTo(0, 0)
+	}
 }
 
 export function Site() {
-	const route = useRoute()
-	const { mode, setMode } = useTheme()
+	const hash = useHash()
+	const route = parseRoute(hash)
+	const theme = useTheme()
+	const locale = useSiteLocale()
+	const [menuOpen, setMenuOpen] = useState(false)
+	const anchor = route.page === "demo" || route.page === "tokens" ? route.anchor : undefined
 	return (
-		<div {...stylex.props(styles.page)}>
-			<nav {...stylex.props(styles.nav)}>
-				<div {...stylex.props(styles.navHead)}>
-					<h1 {...stylex.props(styles.title)}>@anyknown/ui</h1>
-					<div role="group" aria-label="主題" {...stylex.props(styles.themeGroup)}>
-						{MODES.map((option) => (
-							<button
-								key={option.mode}
-								type="button"
-								aria-pressed={mode === option.mode}
-								onClick={() => setMode(option.mode)}
-								{...stylex.props(styles.themeBtn, mode === option.mode && styles.themeBtnActive)}
-							>
-								{option.label}
-							</button>
-						))}
+		<LocaleProvider locale={locale}>
+			<div {...stylex.props(styles.page)}>
+				<a href="#main" {...stylex.props(styles.skip)} onClick={skipToMain}>
+					Skip to content
+				</a>
+				<header {...stylex.props(styles.header)}>
+					<a href="#/" {...stylex.props(styles.brand)}>
+						@anyknown/ui
+					</a>
+					<button
+						type="button"
+						aria-expanded={menuOpen}
+						aria-controls="site-nav"
+						onClick={() => setMenuOpen((open) => !open)}
+						{...stylex.props(styles.toggle, styles.toggleActive, styles.menuButton)}
+					>
+						{menuOpen ? "Close menu" : "Menu"}
+					</button>
+					<div {...stylex.props(styles.controls)}>
+						<Toggle
+							label="Language of built-in component text"
+							options={LOCALES.map((l) => ({ value: l.locale, label: l.label, lang: l.lang }))}
+							value={locale}
+							onChange={setLocale}
+						/>
+						<Toggle
+							label="Theme"
+							options={THEME_MODES.map((m) => ({ value: m.mode, label: m.label }))}
+							value={theme}
+							onChange={(mode) => setTheme(mode as ThemeMode)}
+						/>
 					</div>
-				</div>
-				<div {...stylex.props(styles.group)}>
-					<b {...stylex.props(styles.groupName)}>指南</b>
-					{Object.entries(GUIDES).map(([key, guide]) => (
-						<NavLink key={key} href={`#/guide/${key}`} current={route.page === "guide" && route.key === key}>
-							{guide.title}
-						</NavLink>
-					))}
-					<NavLink href="#/demo" current={route.page === "demo"}>
-						全部示範
-					</NavLink>
-				</div>
-				{Object.entries(GROUPS).map(([group, names]) => (
-					<div key={group} {...stylex.props(styles.group)}>
-						<b {...stylex.props(styles.groupName)}>{group}</b>
-						{names.map((name) => (
-							<NavLink
-								key={name}
-								href={`#/demo/${name}`}
-								current={route.page === "demo" && route.anchor === name}
-							>
-								{name}
-							</NavLink>
-						))}
+				</header>
+				<nav
+					id="site-nav"
+					aria-label="Documentation"
+					{...stylex.props(styles.nav, !menuOpen && styles.navClosed)}
+				>
+					<NavigateContext value={() => setMenuOpen(false)}>
+						<Nav route={route} />
+					</NavigateContext>
+				</nav>
+				<main id="main" tabIndex={-1} {...stylex.props(styles.main)}>
+					<div key={hash} ref={scrollOnMount(anchor)} {...stylex.props(styles.content)}>
+						<Page route={route} />
 					</div>
-				))}
-			</nav>
-			<main {...stylex.props(styles.main)}>
-				<div {...stylex.props(styles.content)}>
-					{route.page === "demo" ? <DemoPage anchor={route.anchor} /> : <GuidePage guide={route.key} />}
-				</div>
-			</main>
-			<Toaster />
-			<Dialogs />
-		</div>
+				</main>
+				<Toaster />
+				<Dialogs />
+			</div>
+		</LocaleProvider>
 	)
+}
+
+// The hash is the router, so a plain #main link would navigate; move focus instead.
+function skipToMain(event: React.MouseEvent) {
+	event.preventDefault()
+	document.getElementById("main")?.focus()
 }

@@ -1,7 +1,7 @@
 {
 	"name": "@anyknown/ui",
 	"version": "0.9.0",
-	"description": "AnyKnown design system — StyleX tokens, themes, and 38 components",
+	"description": "AnyKnown design system — StyleX tokens, themes, and React components for AI-agent products",
 	"homepage": "https://ui.anyknown.com",
 	"bugs": {
 		"url": "https://github.com/anyknown-com/ui/issues"
@@ -39,8 +39,10 @@
 	},
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/esm-extensions.mjs && cp src/tokens.css src/scrollbar.css dist/ && node scripts/brand-css.mjs",
-		"typecheck": "tsc --noEmit && tsc -p playground/tsconfig.json",
+		"typecheck": "tsc --noEmit && tsc -p playground/tsconfig.json && pnpm typecheck:site",
 		"typecheck:playground": "tsc -p playground/tsconfig.json",
+		"typecheck:site": "node scripts/api-docs.mjs && tsc -p site/tsconfig.json",
+		"gen:api-docs": "node scripts/api-docs.mjs",
 		"lint": "oxlint src",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",
@@ -51,9 +53,9 @@
 		"design:lint": "node scripts/design-lint.mjs",
 		"test": "vitest run",
 		"playground": "vite --config playground/vite.config.ts",
-		"site": "vite --config site/vite.config.ts",
-		"site:test": "vitest run --config site/smoke.config.ts",
-		"site:build": "pnpm build && vite build --config site/vite.config.ts && node scripts/llms-txt.mjs",
+		"site": "node scripts/api-docs.mjs && vite --config site/vite.config.ts",
+		"site:test": "node scripts/api-docs.mjs && vitest run --config site/smoke.config.ts",
+		"site:build": "pnpm build && node scripts/api-docs.mjs && vite build --config site/vite.config.ts && node scripts/llms-txt.mjs",
 		"site:deploy": "pnpm site:build && npx wrangler deploy --config site/wrangler.jsonc",
 		"prepublishOnly": "pnpm check && pnpm test && pnpm verify:pack",
 		"verify:pack": "pnpm build && node scripts/verify-pack.mjs"

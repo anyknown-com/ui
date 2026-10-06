@@ -28,7 +28,12 @@
 				"vitest.config.ts",
 				"playground/**",
 				"!playground/**/*.html",
-				"!playground/dist/**"
+				"!playground/dist/**",
+				"site/**/*.ts",
+				"site/**/*.tsx",
+				"site/tsconfig.json",
+				"scripts/api-docs.mjs",
+				"scripts/api-docs.d.mts"
 			]
 		},
 		"lint": {

@@ -1,16 +1,22 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>@anyknown/ui</title>
+		<title>@anyknown/ui — AnyKnown design system</title>
+		<meta
+			name="description"
+			content="React 19 components and StyleX tokens for AnyKnown's AI-agent products: chat, tool calls, forms, overlays, light and dark."
+		/>
+		<meta name="color-scheme" content="light dark" />
+		<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 		<link
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Geist+Mono:wght@400..600&family=Noto+Sans+TC:wght@400..700&display=swap"
 		/>
 	</head>
 	<body>
-		<!-- 存過的主題在第一個 frame 就套上,避免閃色 -->
+		<!-- Apply a saved theme before the first frame so the page does not flash. -->
 		<script>
 			try {
 				var t = localStorage.getItem("ak-site-theme")

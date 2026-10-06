@@ -1,0 +1,13 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"types": ["vitest/globals", "node", "vite/client"],
+		"resolveJsonModule": true,
+		"paths": {
+			"@anyknown/ui": ["../src/index.ts"],
+			"@anyknown/ui/tokens.stylex": ["../src/tokens.stylex.ts"],
+			"@anyknown/ui/themes.stylex": ["../src/themes.stylex.ts"]
+		}
+	},
+	"include": ["*.ts", "*.tsx", "../src/test/setup.ts"]
+}

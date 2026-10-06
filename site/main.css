@@ -22,36 +22,48 @@ body {
 	background: var(--ak-layer1);
 	color: var(--ak-text);
 	font-family: var(--ak-font-body);
+	-webkit-text-size-adjust: 100%;
 }
 
-/* NOTES.md / README 渲染出來的 markdown;StyleX 管不到 descendant,所以用一般 CSS。 */
+/* Rendered markdown (guides, component READMEs). StyleX cannot style descendants, so plain CSS. */
 .prose {
 	max-width: 44rem;
-	font-size: 0.9rem;
-	line-height: 1.7;
+	font-size: var(--ak-type-t3);
+	line-height: var(--ak-type-body);
+	overflow-wrap: break-word;
+}
+
+.prose > :first-child {
+	margin-top: 0;
 }
 
 .prose h1 {
 	font-family: var(--ak-font-display);
-	font-size: 1.5rem;
-	font-weight: 500;
-	line-height: 1.3;
-	margin: 0 0 0.75rem;
+	font-size: var(--ak-type-t6);
+	font-weight: 600;
+	line-height: var(--ak-type-dense);
+	margin: 0 0 var(--ak-space-sm);
 }
 
 .prose h2 {
-	font-family: var(--ak-font-mono);
-	font-size: 0.72rem;
+	font-family: var(--ak-font-display);
+	font-size: var(--ak-type-t5);
 	font-weight: 600;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: var(--ak-text-faint);
-	margin: 2rem 0 0.5rem;
+	line-height: var(--ak-type-dense);
+	margin: var(--ak-space-xl) 0 var(--ak-space-xs);
 }
 
 .prose h3 {
-	font-size: 0.95rem;
-	margin: 1.5rem 0 0.5rem;
+	font-size: var(--ak-type-t4);
+	font-weight: 600;
+	line-height: var(--ak-type-snug);
+	margin: var(--ak-space-lg) 0 var(--ak-space-xs);
+}
+
+.prose h4 {
+	font-size: var(--ak-type-t3);
+	font-weight: 600;
+	margin: var(--ak-space-md) 0 var(--ak-space-xxs);
 }
 
 .prose p,
@@ -60,7 +72,12 @@ body {
 }
 
 .prose li {
-	margin-block: 0.2rem;
+	margin-block: var(--ak-space-xxs);
+}
+
+.prose ul,
+.prose ol {
+	padding-inline-start: var(--ak-space-lg);
 }
 
 .prose b,
@@ -69,49 +86,60 @@ body {
 	font-weight: 600;
 }
 
-.prose a {
+.prose a,
+.prose-inline a {
 	color: var(--ak-link);
 	text-decoration: underline;
 	text-underline-offset: 2px;
+	border-radius: var(--ak-corner-small);
 }
 
-.prose code {
+.prose a:focus-visible,
+.prose-inline a:focus-visible {
+	outline: var(--ak-focus-ring-width) solid var(--ak-focus-ring);
+	outline-offset: 2px;
+}
+
+.prose code,
+.prose-inline code {
 	font-family: var(--ak-font-mono);
-	font-size: 0.82em;
-	background: var(--ak-surface);
-	border: 1px solid var(--ak-border);
-	border-radius: var(--ak-radius-sm);
+	font-size: 0.86em;
+	color: var(--ak-text);
+	background: var(--ak-layer4);
+	border-radius: var(--ak-corner-small);
 	padding: 0.1em 0.3em;
+	overflow-wrap: anywhere;
 }
 
 .prose pre {
-	background: var(--ak-surface);
-	border: 1px solid var(--ak-border);
-	border-radius: var(--ak-radius-lg);
-	padding: 0.9rem 1rem;
+	background: var(--ak-layer3);
+	border-radius: var(--ak-corner-card);
+	padding: var(--ak-space-sm) var(--ak-space-md);
 	overflow-x: auto;
 }
 
 .prose pre code {
 	background: none;
-	border: none;
 	padding: 0;
-	font-size: 0.78rem;
-	line-height: 1.6;
+	font-size: var(--ak-type-code);
+	line-height: var(--ak-type-body);
+	overflow-wrap: normal;
 }
 
 .prose table {
 	border-collapse: collapse;
-	font-size: 0.82rem;
+	font-size: var(--ak-type-t2);
 	display: block;
+	max-width: 100%;
 	overflow-x: auto;
 }
 
 .prose th,
 .prose td {
-	border: 1px solid var(--ak-border);
-	padding: 0.35rem 0.6rem;
-	text-align: left;
+	border-bottom: 1px solid var(--ak-border);
+	padding: var(--ak-space-xs) var(--ak-space-sm) var(--ak-space-xs) 0;
+	text-align: start;
+	vertical-align: top;
 	color: var(--ak-text-muted);
 }
 
@@ -120,15 +148,26 @@ body {
 	font-weight: 600;
 }
 
+.prose kbd {
+	font-family: var(--ak-font-mono);
+	font-size: var(--ak-type-t1);
+	color: var(--ak-text);
+	background: var(--ak-layer2);
+	box-shadow: 0 0 0 1px var(--ak-border-strong);
+	border-radius: var(--ak-corner-small);
+	padding: 0.1em 0.4em;
+	white-space: nowrap;
+}
+
 .prose blockquote {
 	margin: 0;
-	padding-left: 0.9rem;
-	border-left: 2px solid var(--ak-border-strong);
-	color: var(--ak-text-faint);
+	padding-inline-start: var(--ak-space-sm);
+	border-inline-start: 2px solid var(--ak-border-strong);
+	color: var(--ak-text-muted);
 }
 
 .prose hr {
 	border: none;
 	border-top: 1px solid var(--ak-border);
-	margin: 1.5rem 0;
+	margin: var(--ak-space-lg) 0;
 }
