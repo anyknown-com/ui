@@ -2,16 +2,10 @@
 	"components/checkbox/Checkbox.tsx": {
 		"duration": 1
 	},
-	"components/composer/Composer.tsx": {
-		"zIndex": 1
-	},
 	"components/data-table/DataTable.tsx": {
 		"zIndex": 1
 	},
 	"components/dialog/Dialog.tsx": {
-		"duration": 1
-	},
-	"components/diff-viewer/DiffViewer.tsx": {
 		"duration": 1
 	},
 	"components/dropdown/DropdownMenu.tsx": {
@@ -21,22 +15,7 @@
 	"components/dropzone/Dropzone.tsx": {
 		"duration": 3
 	},
-	"components/handoff-receipt/HandoffReceipt.tsx": {
-		"duration": 4
-	},
-	"components/interaction-card/InteractionCard.tsx": {
-		"duration": 1
-	},
-	"components/password-input/PasswordInput.tsx": {
-		"duration": 1
-	},
 	"components/radio/Radio.tsx": {
-		"duration": 1
-	},
-	"components/reasoning-fold/ReasoningFold.tsx": {
-		"duration": 1
-	},
-	"components/recovery-key/RecoveryKey.tsx": {
 		"duration": 1
 	},
 	"components/switch/Switch.tsx": {
@@ -52,13 +31,7 @@
 	"components/toast/Toast.tsx": {
 		"duration": 1
 	},
-	"components/tool-card/ToolCard.tsx": {
-		"duration": 1
-	},
 	"components/tooltip/Tooltip.tsx": {
-		"fontSize": 1
-	},
-	"components/voice-indicator/VoiceIndicator.tsx": {
 		"fontSize": 1
 	}
 }
