@@ -1,98 +1,98 @@
 # DESIGN.md
 
-給要做出 AnyKnown 頁面的 agent 看的判斷。這份只寫程式碼與 token 裡看不出來的東西:頁面該怎麼組、什麼不准出現。數值不在這裡手抄,發佈版 `https://ui.anyknown.com/design.md` 後面接的附錄(token 表、`brand.css` 詞彙表)是 build 時從原始碼生成的。
+Judgment for agents that build AnyKnown pages. This file covers only what the code and tokens can't tell you: how to put a page together and what must never appear on one. It copies no values. The published `https://ui.anyknown.com/design.md` ends with an appendix (the token table and the `brand.css` vocabulary) that the build generates from source.
 
-兩種讀者。內部各 app 的 agent,已經用 `@anyknown/ui` + StyleX,元件層的規矩在 `src/components/README.md`,這份管頁面層。外部 agent(v0 / Claude / Codex)產一次性 HTML 頁面(報告、提案、benchmark、活動頁),沒有 bundler、沒有 React,只能 `<link>` 一份 `https://ui.anyknown.com/brand.css` 進來,用裡面的 `ak-*` class 排。詞彙刻意小;不在表上的 class 就是不准用。
+There are two kinds of reader. Agents inside our apps already use `@anyknown/ui` with StyleX; component rules live in `src/components/README.md`, and this file covers the page level. Outside agents (v0, Claude, Codex) produce one-off HTML pages (reports, proposals, benchmarks, event pages) with no bundler and no React. They can only `<link>` `https://ui.anyknown.com/brand.css` and lay out the page with its `ak-*` classes. The vocabulary is small on purpose: a class that isn't in the table is not allowed.
 
-## 1. 這是什麼
+## 1. What this is
 
-軟材。中性灰的桌面上放白紙:內容是紙,浮起來的東西是疊在紙上的紙。越靠近使用者的東西越圓、陰影越深。
+Tactile. White paper on a neutral gray desk: content is paper, and anything that floats is more paper stacked on top. The closer something is to the user, the rounder its corners and the deeper its shadow.
 
-- 層次靠深淺與陰影,不靠邊框。桌面是 `layer1`,主紙是 `layer2`;紙裡要分區就用凹下去的 `surface`,不加框。邊框只留給要 3:1 邊界才看得到的控制項(輸入框、checkbox)。一頁上的框一多,看起來就像表單。
-- 陰影只有三階。rest 給紙上的卡片(tool card、檔案列、附件),float 給 popover、dropdown、tooltip、toast,modal 給 dialog 與 sheet。不屬於這三種的東西沒有陰影;陰影一多,讀者就分不出誰在上面。
-- 圓角跟尺寸走,不是一個值套全部。小東西 6、輸入框 12、卡片 14、浮層 16、主紙 20、dialog 24,按鈕與 badge 是膠囊。巢狀時內層圓角等於外層減 padding,不然轉角看起來會歪。
-- 顏色由五條 12 階色階生成:灰階的 chroma 是 0(純灰,不偏冷也不偏暖),每一階有固定工作(1–2 背景、3–5 填色、6–8 邊框、9–10 實心、11–12 文字)。頁面只用語意變數 `--ak-*`,色階本身不公開。
-- 一個顏色一個意思,讀者才不用猜。藍色(`--ak-signal`、`--ak-focus-ring`、`--ak-info`)只代表 agent 正在做事、焦點、進度;紅色只代表刪除與失敗,琥珀只代表警告,綠色只代表成功。拿顏色來裝飾都是錯的。
-- 主動作是墨色實心的膠囊,一頁一顆。連結也是墨色,靠底線跟內文分開(`ak-prose` 裡的 `a` 已經是這樣),不用藍色。紅色實心(`--ak-danger-solid` 配 `--ak-on-danger-solid` 字)只給不可復原的刪除。
-- `--ak-text-faint` 只有 3:1,不放字,只給 icon、placeholder、分隔符;次要的字用 `ak-muted`。`--ak-border` 是分隔線,控制項的邊界用 `--ak-border-control`。
-- 狀態標籤是淡底加同色字(`--ak-success-subtle` 底配 `--ak-success` 字),不用實心底。`ak-callout` 的三種語意已經照這個做。
-- 標題與內文用 Figtree(標題 600 到 700,內文 400),中文接 Noto Sans TC;數據與代碼用 Geist Mono。Figtree 字形圓,跟膠囊與大圓角是同一個語氣。
+- Depth comes from tone and shadow, not borders. The desk is `layer1` and the main sheet is `layer2`. To divide a sheet, use a recessed `surface` with no frame. Borders are only for controls that need a 3:1 edge to be seen (inputs, checkboxes). A page full of frames looks like a form.
+- There are three shadow levels. Rest is for cards on the paper (tool cards, file rows, attachments), float is for popovers, dropdowns, tooltips and toasts, and modal is for dialogs and sheets. Anything else has no shadow; with more shadows the reader can't tell what sits on top.
+- Corner radius follows size; no single value fits everything. Small parts 6, inputs 12, cards 14, floating layers 16, the main sheet 20, dialogs 24, and buttons and badges are pills. When nesting, the inner radius is the outer radius minus the padding, or the corners look off.
+- Colors come from five 12-step scales. The gray scale has chroma 0 (pure gray, neither cool nor warm), and every step has a fixed job (1–2 backgrounds, 3–5 fills, 6–8 borders, 9–10 solids, 11–12 text). Pages use only the semantic `--ak-*` variables; the scales themselves are not public.
+- One color, one meaning, so the reader never has to guess. Blue (`--ak-signal`, `--ak-focus-ring`, `--ak-info`) means only that the agent is working, focus, or progress. Red means only delete and failure, amber only warning, green only success. Color used as decoration is always wrong.
+- The primary action is a solid ink pill, one per page. Links are ink too and stand apart from body text by their underline (`a` inside `ak-prose` already does this), not by blue. Solid red (`--ak-danger-solid` with `--ak-on-danger-solid` text) is only for deletes that can't be undone.
+- `--ak-text-faint` has only 3:1 contrast, so it never carries text; it is for icons, placeholders and separators. Use `ak-muted` for secondary text. `--ak-border` is a divider; control edges use `--ak-border-control`.
+- Status labels are a tinted background with text in the same hue (`--ak-success-subtle` background with `--ak-success` text), never a solid fill. The three `ak-callout` variants already work this way.
+- Headings and body text use Figtree (headings 600 to 700, body 400), falling back to Noto Sans TC for Chinese. Data and code use Geist Mono. Figtree's round letterforms match the pills and large corners.
 
-氣質還是帳本:安靜、可對照、沒有裝飾。讀者來是為了做一個決定,頁面的工作是把證據擺整齊,不是說服。
+The tone is still a ledger: quiet, comparable, no ornament. Readers come to make a decision, and the page's job is to line up the evidence, not to persuade.
 
-## 2. 先框讀者任務,再選結構
+## 2. Frame the reader's task, then pick a structure
 
-每種一次性頁面先答一句:讀者打開這頁要決定什麼。答不出來就不要開始排。
+Before laying out any one-off page, answer one question: what does the reader need to decide when they open it? If you can't answer, don't start.
 
-答得出來之後從三個骨架挑,不要自創:
+Once you can, pick one of three skeletons. Don't invent your own.
 
-- 單欄長文。報告、事後檢討。`ak-page` 裡一個 `ak-display`,接 `ak-prose`,證據表穿插其中。讀者從頭讀到尾。
-- 結論在前,證據網格在後。提案、benchmark、定價比較。第一屏是結論(一段 `ak-prose` 加一排 `ak-stat`),往下是 `ak-section` 分段的 `ak-table` 與 `ak-grid-2` / `ak-grid-3`。讀者先看答案,再決定要不要看證據。
-- 控制項在前。互動規劃頁、報名頁。`ak-btn` 與表單(每個欄位一個 `ak-field`,label 在上)在第一屏,說明在下面。讀者是來動手的,不是來讀的。報名頁的第一屏是表單,不是一排 stat;名額剩多少寫在按鈕旁邊一句話就夠。
+- Single-column long read. Reports and post-mortems. One `ak-display` inside `ak-page`, then `ak-prose`, with evidence tables in between. The reader goes top to bottom.
+- Conclusion first, evidence grid after. Proposals, benchmarks, pricing comparisons. The first screen is the conclusion (a paragraph of `ak-prose` and a row of `ak-stat`); below it come `ak-table` and `ak-grid-2` / `ak-grid-3`, split into `ak-section` blocks. The reader sees the answer first and then decides whether to check the evidence.
+- Controls first. Interactive planning pages and sign-up pages. `ak-btn` and the form (one `ak-field` per field, label on top) are on the first screen, with the explanation below. The reader came to act, not to read. A sign-up page opens with the form, not a row of stats; one sentence next to the button is enough to say how many seats are left.
 
-三個骨架共用同一套字級與間距。結構跟著讀者目標走,不跟著資料量走:資料多就分段,不要換骨架。
+All three share the same type scale and spacing. Structure follows the reader's goal, not the amount of data: when there is a lot of data, add sections, don't switch skeletons.
 
-## 3. 證據怎麼擺
+## 3. Laying out evidence
 
-- 比較用的數字放同一把尺上:同一欄、同一單位、同一基準。兩個數字放在不同欄或不同單位,讀者就得自己換算,比較就失效了。
-- 證據表滿版,不縮進卡片。`ak-table` 直接放在 `ak-section` 裡,寬度跟正文一樣。卡片是給一個獨立物件的(一個檔案、一張附件、一次 tool 呼叫的結果);表格是正文的一部分,包進卡片就跟正文斷開了。
-- 一頁只有一個主圖,其他都是表。圖用來給一個印象,表用來對照;兩個以上的圖讀者就不知道該看哪個。
-- 大數字用 `ak-stat`(裡面一個 `ak-stat-value` 一個 `ak-stat-label`),一排最多四個,而且只放結論級的數字。結論級的意思是讀者看完這個數字就能做決定,通常是表裡算出來的那個差:倍數、差額、剩餘、超出預算多少。表裡原本就有的格子(總數、成本、某方案的分數)不要再放大一次,lint 會把 stat 的值拿去跟表格逐格比對。一頁沒有結論級數字就不放 stat,三個 stat 不是必填。
-- 同一單位的數字只能有一張表。定價、成本、競品都是每分鐘 USD,就是一張表;分成三張讀者要自己跨表比。多一個維度就多一欄,不要多一張表。
-- 兩欄的表不要做成表。滿版表格只有兩欄時數字會被推到最右邊,眼睛接不上;改成 `ak-prose` 的清單,或併進別的表當一欄。
-- 要讀者注意的一句話用 `ak-callout`,語意加 `ak-callout-info` / `ak-callout-warning` / `ak-callout-danger`。一頁最多兩個;到處都是提示框就沒有提示了。callout 不重複正文已經說過的話,也不獨占一個 `ak-section`;它貼著它要提醒的那張表或那顆按鈕。
-- 數字用 tabular(`ak-table` 與 `ak-stat` 已經開了),欄內小數位對齊,單位放在表頭不放在每格。
+- Put numbers that are compared on the same ruler: same column, same unit, same baseline. When two numbers sit in different columns or units, the reader has to convert them and the comparison fails.
+- Evidence tables run full width, never inset in a card. Put `ak-table` straight into `ak-section`, as wide as the body text. A card is for one standalone object (a file, an attachment, the result of one tool call); a table is part of the text, and wrapping it in a card cuts it off from the text.
+- One main chart per page; everything else is a table. A chart gives an impression and a table allows comparison. With two or more charts the reader doesn't know where to look.
+- Use `ak-stat` for big numbers (one `ak-stat-value` and one `ak-stat-label` inside), at most four in a row, and only for conclusion-level numbers. A conclusion-level number is one the reader can decide on after seeing it, usually a difference computed from the table: a ratio, a delta, what's left, how far over budget. Don't enlarge a cell the table already has (a total, a cost, one option's score); lint checks every stat value against the table cells. If a page has no conclusion-level number, it has no stats. Three stats are not required.
+- Numbers in the same unit get exactly one table. If pricing, cost and competitors are all USD per minute, that is one table; split into three, the reader has to compare across tables. Another dimension means another column, not another table.
+- Don't make a table out of two columns. In a full-width table with only two columns the numbers get pushed to the far right and the eye loses the row. Use a list in `ak-prose` instead, or fold it into another table as a column.
+- For the one sentence the reader must notice, use `ak-callout` with `ak-callout-info` / `ak-callout-warning` / `ak-callout-danger`. At most two per page; when callouts are everywhere, nothing stands out. A callout doesn't repeat the body text and doesn't take up an `ak-section` of its own; it sits right next to the table or button it is about.
+- Numbers are tabular (`ak-table` and `ak-stat` already turn this on), decimals line up within a column, and units go in the header, not in every cell.
 
-## 4. 層級與排版
+## 4. Hierarchy and type
 
-- 一頁一個 display 級標題(`ak-display`)。第二個 display 就是第二頁。
-- `ak-h1` 給 section 的標題,`ak-h2` 給 section 內的分節。`text.xl` 以上的字只准出現在段落起頭,不准出現在段落中間或表格裡。
-- 正文行長 60 到 75 字。`ak-prose` 已經設了最大寬,不要把它撐開;寬螢幕多出來的地方留白,不要拿東西填。
-- 間距只用 `space.*` 階(附錄有表)。13px、18px 這種自創值一律不准;兩個 token 之間選不到就選小的那個。
-- 顏色只用 `--ak-*` 變數。自創 hex 是這份文件最常被違反的一條,所以 lint 會數。色值不手調:要改色是回 `scripts/palette.mjs` 改色階、重跑,不是在頁面上換一個近似的 hex。
-- 次要說明用 `ak-muted`,不用縮小字級來表示次要。字級表達層級,顏色表達重要性,兩個不要疊。
-- 等寬只給數據、代碼、識別碼(`ak-mono`)。用等寬字當裝飾就是在假裝這是終端機。
-- 淺色是預設,暗色跟隨 OS。`ak-theme-light` / `ak-theme-dark` 只給需要手動鎖定的頁面,鎖了就整頁鎖,不要一頁裡兩種。
+- One display heading (`ak-display`) per page. A second display heading means a second page.
+- `ak-h1` is for section titles and `ak-h2` for subsections within a section. Text at `text.xl` or larger may only open a block, never sit mid-paragraph or inside a table.
+- Body lines are 60 to 75 characters long. `ak-prose` already sets a max width; don't stretch it. On wide screens, leave the extra space empty instead of filling it.
+- Spacing uses only the `space.*` steps (table in the appendix). Made-up values such as 13px or 18px are never allowed; if neither neighboring token fits, pick the smaller one.
+- Color uses only the `--ak-*` variables. Made-up hex is the most often broken rule in this file, so lint counts it. Never hand-tune a color: to change one, edit the scale in `scripts/palette.mjs` and rerun it, rather than swapping in a similar hex on the page.
+- Use `ak-muted` for secondary notes; don't shrink the type to signal that something is secondary. Size expresses hierarchy and color expresses importance; don't stack the two.
+- Monospace is only for data, code and identifiers (`ak-mono`). Monospace as decoration pretends the page is a terminal.
+- Light is the default and dark follows the OS. `ak-theme-light` / `ak-theme-dark` are only for pages that must lock a theme; lock the whole page, never mix the two on one page.
 
-## 5. 文案
+## 5. Copy
 
-- 句首大寫,不用 Title Case。標題是句子不是招牌。
-- 按鈕動詞開頭:「送出報名」不是「報名表單」。讀者按下去之前要知道會發生什麼。
-- 錯誤說怎麼修,不說對不起。「金額要大於 0」比「抱歉,發生錯誤」有用。
-- 數字用 tabular,千分位用逗號,單位與數字之間一個空格。
-- 不寫「強大」「無縫」「一站式」。帳本不形容自己。
+- Use sentence case, not Title Case. A heading is a sentence, not a sign.
+- Buttons start with a verb: 「送出報名」 (Submit registration), not 「報名表單」 (Registration form). The reader should know what happens before they press it.
+- Errors say how to fix the problem, not sorry. 「金額要大於 0」 (Amount must be greater than 0) helps more than 「抱歉,發生錯誤」 (Sorry, something went wrong).
+- Numbers are tabular, thousands are separated with commas, and there is one space between a number and its unit.
+- Don't write 「強大」「無縫」「一站式」 (powerful, seamless, all-in-one). A ledger doesn't describe itself.
 
-## 6. 動態
+## 6. Motion
 
-- 只有 ease-out 與 linear。沒有回彈、沒有 overshoot、沒有 spring。`--ak-motion-spring` 留在 token 裡只是相容,不准用。
-- 能不動就不動。一次性頁面通常什麼都不用動;需要的話只動 opacity 與 transform,時長用 `--ak-motion-*`。
-- 尊重 `prefers-reduced-motion`,`brand.css` 已經處理 `ak-btn`,自己加的動畫要自己處理。
+- Only ease-out and linear. No bounce, no overshoot, no spring. `--ak-motion-spring` stays in the tokens only for compatibility; don't use it.
+- If something can stay still, keep it still. One-off pages usually need no motion at all; when they do, animate only opacity and transform, with `--ak-motion-*` durations.
+- Respect `prefers-reduced-motion`. `brand.css` already handles `ak-btn`; any animation you add is yours to handle.
 
-## 7. 反模式
+## 7. Anti-patterns
 
-逐條點名。看到就改,不用問。
+Each one by name. When you see one, fix it without asking.
 
-- 通用 SaaS 三欄 KPI 卡:三個圓角卡片各放一個數字加一個 icon。用 `ak-stat` 一排,不要卡片。
-- 漸層卡片、玻璃霧面、backdrop-filter。紙沒有這些。
-- 彩色圓底 icon。icon 只用線條、單色、跟文字同色。例外只有 tool card 左邊的 `signalSubtle` 圖示底,它說的是 agent 在做事,不是裝飾。
-- 每段一張 hero 圖。一頁最多一張主圖(第 3 節)。
-- 同一頁兩個主色按鈕。`ak-btn` 一頁一顆,其他都是 `ak-btn-secondary`。
-- 把表格塞進卡片再加陰影。表格滿版,沒有陰影。
-- 自創 hex、rgb()、hsl()。只用 `--ak-*`。
-- 自創 class。詞彙外的 class 都不准,要新的排版需求先回來改 `brand.css` 再改這份。
-- 內聯 style。一次性頁面也不例外,inline style 就是自創值的入口。
-- 非 token 字體:Inter、Roboto、system-ui 直接寫在 `font-family` 裡。用 `--ak-font-*`。
-- overshoot bezier、`animation: bounce`。第 6 節。
-- 卡片裡再一層卡片。一層 rest 就夠;卡片裡要分區就用凹下去的 `surface`,巢狀的框與陰影是層級沒想清楚。
-- 每塊東西都框一圈 1px 邊框。分層靠深淺與陰影,框只給要 3:1 邊界的控制項(第 1 節)。
-- 全大寫小標(`text-transform: uppercase` 加 letter-spacing)。這是另一家的語言。
-- `useEffect`(內部 agent)。ref callback 加 cleanup,範例在 `src/components/button`。
+- The generic SaaS row of three KPI cards: three rounded cards, each with a number and an icon. Use a row of `ak-stat`, no cards.
+- Gradient cards, frosted glass, `backdrop-filter`. Paper has none of these.
+- Icons on colored circles. Icons are line, single-color, and the same color as the text. The only exception is the `signalSubtle` icon background on the left of a tool card; it means the agent is working, not decoration.
+- A hero image for every section. At most one main image per page (section 3).
+- Two primary buttons on one page. One `ak-btn` per page; everything else is `ak-btn-secondary`.
+- A table stuffed into a card with a shadow. Tables run full width with no shadow.
+- Made-up hex, `rgb()`, `hsl()`. Use only `--ak-*`.
+- Made-up classes. Nothing outside the vocabulary is allowed. For a new layout need, change `brand.css` first, then this file.
+- Inline styles. One-off pages are no exception; inline style is how made-up values get in.
+- Fonts that aren't tokens: Inter, Roboto or `system-ui` written straight into `font-family`. Use `--ak-font-*`.
+- Overshoot béziers and `animation: bounce`. See section 6.
+- A card inside a card. One rest level is enough; to divide a card, use a recessed `surface`. Nested frames and shadows mean the hierarchy wasn't thought through.
+- A 1px border around every block. Depth comes from tone and shadow; borders are only for controls that need a 3:1 edge (section 1).
+- All-caps eyebrows (`text-transform: uppercase` plus letter-spacing). That is someone else's language.
+- `useEffect` (internal agents). Use a ref callback with cleanup; see `src/components/button` for an example.
 
-## 8. 交付檢查
+## 8. Pre-delivery check
 
-交出去之前自己過一遍:
+Go through this yourself before handing the page over:
 
-- 光暗兩色都要看。暗色不是把顏色反過來,是另一組 token;沒看過暗色就等於沒做。
-- 縮到 375 寬要能讀。`ak-grid-*` 會自己折成單欄,表格要能橫向捲,不能把頁面撐寬。
-- 截圖跟 `https://ui.anyknown.com` 的元件放一起,看不出是兩家。特別是按鈕:`ak-btn` 與 playground 的 Button 應該是同一顆。
-- 跑 `node scripts/design-lint.mjs <html>`,自創 hex、詞彙外 class、內聯 style 都要是 0。
+- Check both light and dark. Dark isn't inverted light; it is a separate set of tokens. If you haven't looked at dark, you haven't finished.
+- It must read at 375px wide. `ak-grid-*` collapses to one column on its own; tables must scroll sideways instead of widening the page.
+- Put a screenshot next to the components on `https://ui.anyknown.com`; no one should be able to tell they come from two places. Buttons especially: `ak-btn` and the playground's Button should look like the same button.
+- Run `node scripts/design-lint.mjs <html>`. Made-up hex, out-of-vocabulary classes and inline styles must all be 0.
