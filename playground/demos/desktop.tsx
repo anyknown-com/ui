@@ -26,11 +26,11 @@ import {
 	type VoiceState,
 } from "@anyknown/ui"
 import { useState } from "react"
-import { Demo, Row } from "../shell"
+import { type DemoEntry, Demo, Row } from "../shell"
 
-const MARKDOWN = `## 這是一則訊息
+const MARKDOWN = `## This is a message
 
-模型會寫 **粗體**、\`inline code\`、[連結](https://anyknown.com),還有一整段程式:
+The model writes **bold**, \`inline code\`, [links](https://anyknown.com), and whole blocks of code:
 
 \`\`\`ts
 export function pickModel(providers: ProviderConfig[]) {
@@ -40,24 +40,26 @@ export function pickModel(providers: ProviderConfig[]) {
 
 | provider | byok | platform |
 | --- | :---: | ---: |
-| anthropic | 是 | 是 |
-| baseten | 否 | 是 |
+| anthropic | yes | yes |
+| baseten | no | yes |
 
-- [x] 表格會自己捲,不會把訊息撐寬
-- [ ] 清單、任務清單
-- 巢狀:
-  1. 第一
-  2. 第二
+- [x] Tables scroll on their own instead of widening the message
+- [ ] Lists and task lists
+- Nested:
+  1. First
+  2. Second
 
-> 引言長這樣。
+> This is a quote.
 
-行內數學 $E = mc^2$ 跟獨立成塊的:
+Inline math $E = mc^2$, and a block of its own:
 
 $$\\int_0^1 x^2\\,dx = \\frac{1}{3}$$
 
-價格不是數學:從 $5 漲到 $10。
+Prices are not math: it went from $5 to $10.
 
-<script>alert("這段只會被當成文字顯示")</script>
+交接時,agent 會把這條 thread 的重點寫成記憶,下一個 session 從這裡接著做,不用從頭再講一次。中文、English 與 \`code\` 混排時,行尾不會切在詞的中間。
+
+<script>alert("This only ever shows up as text")</script>
 `
 
 const CODE = `export function useChildSession(callID: string) {
@@ -68,246 +70,337 @@ const CODE = `export function useChildSession(callID: string) {
 const VOICE_STATES: VoiceState[] = ["idle", "listening", "thinking", "speaking"]
 
 const SOURCES = [
-	{ id: "f1", label: "packages/server/src/config-store.ts", kind: "檔案" },
-	{ id: "l1", label: "昨天的換班摘要", kind: "ledger" },
-	{ id: "m1", label: "部署走 Cloudflare", kind: "記憶" },
+	{ id: "f1", label: "packages/server/src/config-store.ts", kind: "file" },
+	{ id: "l1", label: "Yesterday's handoff summary", kind: "ledger" },
+	{ id: "m1", label: "Deploys to Cloudflare", kind: "memory" },
 ]
 
 const PRICING = [
-	{ value: "three", label: "三檔方案", description: "Free / Pro / Team。", recommended: true },
-	{ value: "single", label: "單一價", description: "先驗證願付,之後再拆檔。" },
-	{ value: "none", label: "先不放定價", description: "只收 waitlist。" },
+	{ value: "three", label: "Three tiers", description: "Free, Pro and Team.", recommended: true },
+	{ value: "single", label: "One price", description: "Test willingness to pay first, split tiers later." },
+	{ value: "none", label: "No pricing yet", description: "Collect a waitlist only." },
 ]
 
-export function DesktopDemos() {
-	const [voice, setVoice] = useState<VoiceState>("listening")
+function MessageDemo() {
+	return (
+		<Demo
+			id="message"
+			title="message"
+			note="Turns sit 24px apart, parts 8px. User messages are bubbles; assistant messages run full width. The second user message is Traditional Chinese to show CJK line breaking."
+		>
+			<Thread>
+				<UserMessage>
+					Can you look at the desktop thread reducer? For the same parentID, only the latest message should
+					show.
+				</UserMessage>
+				<AssistantMessage>
+					<TextPart>
+						Sure. The rule lives in <InlineCode>selectVisibleMessages</InlineCode>: for the same parentID,
+						only the newest assistant message stays.
+					</TextPart>
+					<TextPart>I've updated the selector and added reducer tests.</TextPart>
+				</AssistantMessage>
+				<UserMessage>
+					接著把 session.retrying 折進 footer 狀態,重試中的時候讓使用者看得出來還在等。
+				</UserMessage>
+				<AssistantMessage streaming>
+					<TextPart>
+						Got it. I'll add the event type to the contract first, then fold session.retrying into that
+						assistant message's footer in the reduc
+					</TextPart>
+				</AssistantMessage>
+				<UserMessage>Check lint while you're at it.</UserMessage>
+				<AssistantMessage pending />
+			</Thread>
+		</Demo>
+	)
+}
+
+function ToolCardDemo() {
+	return (
+		<Demo id="tool-card" title="tool-card">
+			<ToolCard tool="search" state="running" subtitle="parentCallID" durationMs={2400}>
+				<ToolInput json={{ pattern: "parentCallID", path: "packages/contract" }} />
+			</ToolCard>
+			<ToolCard
+				tool="read"
+				state="completed"
+				subtitle="apps/desktop/src/thread/tool-part.tsx"
+				durationMs={300}
+			>
+				<ToolInput json={{ filePath: "apps/desktop/src/thread/tool-part.tsx" }} />
+				<ToolOutput text={"export function ToolPart({ part }) {\n  …\n}"} />
+			</ToolCard>
+			<ToolCard tool="shell" state="completed" subtitle="pnpm test --filter desktop" durationMs={8100}>
+				<ToolOutput text={"Test Files  12 passed (12)\n     Tests  84 passed (84)\n  Duration  6.92s"} />
+			</ToolCard>
+			<ToolCard
+				tool="shell"
+				state="error"
+				subtitle="pnpm build"
+				durationMs={12000}
+				retry={{ attempt: 2, max: 3, delayMs: 3000 }}
+			>
+				<ToolError text={"Error: ENOMEM: not enough memory\n    at ChildProcess.spawn"} />
+			</ToolCard>
+			<ToolCard
+				tool="subagent"
+				state="running"
+				subtitle="Investigate missing retry events"
+				durationLabel="01:24"
+				secondLine={<SubagentLine model="sonnet-5" now="Searching for session.retrying" />}
+			>
+				<SubagentThread task="Find out why the runtime's automatic 429/5xx retries never reach the SSE stream.">
+					<SubagentText>Starting with where retry.ts emits events…</SubagentText>
+				</SubagentThread>
+			</ToolCard>
+			<ToolCard
+				tool="subagent"
+				state="completed"
+				subtitle="Investigate missing retry events"
+				durationLabel="03:41"
+				secondLine={<SubagentLine model="sonnet-5" toolCount={7} />}
+				footer={
+					<SubagentSummary>
+						The gap is in turn.ts: the retry loop only logs and never emits an event, and the contract's
+						EVENTS has no session.retrying type.
+					</SubagentSummary>
+				}
+			>
+				<SubagentThread task="Find out why the runtime's automatic 429/5xx retries never reach the SSE stream.">
+					<SubagentText>
+						Conclusion: the session.retrying event and its contract type are missing.
+					</SubagentText>
+				</SubagentThread>
+			</ToolCard>
+		</Demo>
+	)
+}
+
+function ReasoningFoldDemo() {
+	return (
+		<Demo id="reasoning-fold" title="reasoning-fold">
+			<ReasoningFold durationSec={12}>
+				The user wants only the newest assistant message per parentID. The reducer already groups messages by
+				sessionID, so this belongs in the selector layer.
+			</ReasoningFold>
+			<ReasoningFold streaming>
+				First, check whether the contract has a session.retrying type… withRetry in turn.ts only takes an
+				onRetry callback.
+			</ReasoningFold>
+		</Demo>
+	)
+}
+
+function ActionBarDemo() {
+	return (
+		<Demo
+			id="action-bar"
+			title="action-bar"
+			note="Its height is always reserved and hover only changes opacity, so the turn rhythm never jumps."
+		>
+			<Thread>
+				<UserMessage>Are the reducer tests done?</UserMessage>
+				<AssistantMessage>
+					<TextPart>
+						Done. All three cases for replacing older cards with the same parentID pass. This is a middle
+						message, so it only has Copy.
+					</TextPart>
+					<ActionBar>
+						<ActionBar.Copy />
+					</ActionBar>
+				</AssistantMessage>
+				<UserMessage>Good. Now run the full retry chain.</UserMessage>
+				<AssistantMessage>
+					<TextPart>This is the last message, so it also gets Regenerate.</TextPart>
+					<ActionBar>
+						<ActionBar.Copy />
+						<ActionBar.Regenerate onRegenerate={() => {}} />
+					</ActionBar>
+				</AssistantMessage>
+			</Thread>
+		</Demo>
+	)
+}
+
+function MarkdownDemo() {
+	return (
+		<Demo
+			id="markdown"
+			title="markdown"
+			note="Headings, code, tables, task lists, quotes and math. The last paragraph is Traditional Chinese to show CJK line breaking, and the script tag renders as text."
+		>
+			<AssistantMessage>
+				<Markdown>{MARKDOWN}</Markdown>
+			</AssistantMessage>
+		</Demo>
+	)
+}
+
+function CodeBlockDemo() {
+	return (
+		<Demo id="code-block" title="code-block">
+			<CodeBlock lang="ts" code={CODE} />
+			<CodeBlock
+				lang="bash"
+				code="pnpm --filter @anyknown/desktop exec playwright test thread-retry.spec.ts --project=electron --reporter=line"
+			/>
+			<CodeBlock
+				lang="ts"
+				code={'bus.emit("session.retrying", {\n  sessionID, messageID,\n  attempt, delayMs'}
+				streaming
+			/>
+		</Demo>
+	)
+}
+
+function InteractionCardDemo() {
 	const [permission, setPermission] = useState<string | null>(null)
 	const [decision, setDecision] = useState<string | null>(null)
+
+	return (
+		<Demo id="interaction-card" title="interaction-card">
+			<PermissionCard
+				verb="Run command"
+				subject="pnpm publish --access public"
+				policyHint="The agent only stops to ask when something costs money, publishes, or touches security. “Always allow” becomes a rule and still applies after a handoff."
+				onReply={(reply) =>
+					setPermission(
+						reply === "once"
+							? "Allowed once"
+							: "always" in reply
+								? "Always allowed (this command)"
+								: "Denied",
+					)
+				}
+				resolved={permission ? { text: permission, rejected: permission === "Denied" } : undefined}
+			/>
+			<DecisionCard
+				blocking
+				title="Which pricing section should the landing page ship first?"
+				blocks={[
+					{
+						kind: "options",
+						id: "variant",
+						required: true,
+						options: PRICING,
+					},
+					{ kind: "text", id: "note", label: "Notes", placeholder: "Anything to add? (optional)" },
+				]}
+				onAnswer={(answer) =>
+					setDecision(
+						`Decided · you chose “${PRICING.find((option) => option.value === answer.variant)?.label ?? ""}”`,
+					)
+				}
+				resolved={decision ? { text: decision } : undefined}
+			/>
+		</Demo>
+	)
+}
+
+function HandoffReceiptDemo() {
+	return (
+		<Demo
+			id="handoff-receipt"
+			title="handoff-receipt"
+			note="A pill in the middle of a divider; open it to read the handoff summary."
+		>
+			<HandoffReceipt
+				at="14:32"
+				ctxPercent={50}
+				memory={{ count: 3, items: ["Prefers pnpm", "Deploys to Cloudflare", "Desktop ships first"] }}
+				ledgerCount={42}
+				handoffSummary="The landing page's three-tier pricing table is written; the FAQ is next."
+			/>
+			<HandoffReceipt
+				at="09:05"
+				ctxPercent={80}
+				reason="hard-limit"
+				memory={{ count: 1 }}
+				ledgerCount={117}
+				handoffSummary="The large refactor has reached the store layer; 3 tests are failing."
+			/>
+		</Demo>
+	)
+}
+
+function ComposerDemo() {
 	const [model, setModel] = useState("Fable 5")
 	const [sent, setSent] = useState<string | null>(null)
 
 	return (
-		<>
-			<Demo id="message" title="message" note="turn 24px / part 8px,user 氣泡、assistant 全寬。">
-				<Thread>
-					<UserMessage>幫我看一下 desktop 的 thread reducer,同 parentID 只顯示最新一則。</UserMessage>
-					<AssistantMessage>
-						<TextPart>
-							好,規則在 <InlineCode>selectVisibleMessages</InlineCode>:同 parentID 的 assistant 只留最新那則。
-						</TextPart>
-						<TextPart>我已經改好 selector 並補了 reducer 測試。</TextPart>
-					</AssistantMessage>
-					<UserMessage>接著把 session.retrying 折進 footer 狀態。</UserMessage>
-					<AssistantMessage streaming>
-						<TextPart>
-							收到,我先在 contract 補上事件型別,然後在 reducer 把 session.retrying 折進該 assistant 的 footer
-							狀
-						</TextPart>
-					</AssistantMessage>
-					<UserMessage>順便看一下 lint。</UserMessage>
-					<AssistantMessage pending />
-				</Thread>
-			</Demo>
-
-			<Demo id="tool-card" title="tool-card">
-				<ToolCard tool="search" state="running" subtitle="parentCallID" durationMs={2400}>
-					<ToolInput json={{ pattern: "parentCallID", path: "packages/contract" }} />
-				</ToolCard>
-				<ToolCard
-					tool="read"
-					state="completed"
-					subtitle="apps/desktop/src/thread/tool-part.tsx"
-					durationMs={300}
-				>
-					<ToolInput json={{ filePath: "apps/desktop/src/thread/tool-part.tsx" }} />
-					<ToolOutput text={"export function ToolPart({ part }) {\n  …\n}"} />
-				</ToolCard>
-				<ToolCard tool="shell" state="completed" subtitle="pnpm test --filter desktop" durationMs={8100}>
-					<ToolOutput text={"Test Files  12 passed (12)\n     Tests  84 passed (84)\n  Duration  6.92s"} />
-				</ToolCard>
-				<ToolCard
-					tool="shell"
-					state="error"
-					subtitle="pnpm build"
-					durationMs={12000}
-					retry={{ attempt: 2, max: 3, delayMs: 3000 }}
-				>
-					<ToolError text={"Error: ENOMEM: not enough memory\n    at ChildProcess.spawn"} />
-				</ToolCard>
-				<ToolCard
-					tool="subagent"
-					state="running"
-					subtitle="調查 retry 事件缺漏"
-					durationLabel="01:24"
-					secondLine={<SubagentLine model="sonnet-5" now="搜尋 session.retrying" />}
-				>
-					<SubagentThread task="找出 runtime 裡 429/5xx 自動重試的事件為什麼沒進 SSE。">
-						<SubagentText>先看 retry.ts 的事件發送點…</SubagentText>
-					</SubagentThread>
-				</ToolCard>
-				<ToolCard
-					tool="subagent"
-					state="completed"
-					subtitle="調查 retry 事件缺漏"
-					durationLabel="03:41"
-					secondLine={<SubagentLine model="sonnet-5" toolCount={7} />}
-					footer={
-						<SubagentSummary>
-							缺口在 turn.ts:retry 迴圈只 log 不發事件,contract 的 EVENTS 也沒有 session.retrying 型別。
-						</SubagentSummary>
-					}
-				>
-					<SubagentThread task="找出 runtime 裡 429/5xx 自動重試的事件為什麼沒進 SSE。">
-						<SubagentText>結論:缺 session.retrying 事件與 contract 型別。</SubagentText>
-					</SubagentThread>
-				</ToolCard>
-			</Demo>
-
-			<Demo id="reasoning-fold" title="reasoning-fold">
-				<ReasoningFold durationSec={12}>
-					使用者要的是同 parentID 只顯示最新 assistant。reducer 已經按 sessionID 收好 messages,所以這應該做在
-					selector 層。
-				</ReasoningFold>
-				<ReasoningFold streaming>
-					先確認 contract 有沒有 session.retrying 的型別… turn.ts 的 withRetry 只吃 onRetry callback。
-				</ReasoningFold>
-			</Demo>
-
-			<Demo id="action-bar" title="action-bar" note="高度永遠保留,hover 只切 opacity —— turn 節奏零跳動。">
-				<Thread>
-					<UserMessage>reducer 的測試補好了嗎?</UserMessage>
-					<AssistantMessage>
-						<TextPart>補好了,同 parentID 蓋舊卡的三個 case 都綠。這是中間訊息,只有「複製」。</TextPart>
-						<ActionBar>
-							<ActionBar.Copy />
-						</ActionBar>
-					</AssistantMessage>
-					<UserMessage>好,那接著跑 retry 全鏈。</UserMessage>
-					<AssistantMessage>
-						<TextPart>這是最後一則,所以多了「重新生成」。</TextPart>
-						<ActionBar>
-							<ActionBar.Copy />
-							<ActionBar.Regenerate onRegenerate={() => {}} />
-						</ActionBar>
-					</AssistantMessage>
-				</Thread>
-			</Demo>
-
-			<Demo id="markdown" title="markdown">
-				<AssistantMessage>
-					<Markdown>{MARKDOWN}</Markdown>
-				</AssistantMessage>
-			</Demo>
-
-			<Demo id="code-block" title="code-block">
-				<CodeBlock lang="ts" code={CODE} />
-				<CodeBlock
-					lang="bash"
-					code="pnpm --filter @anyknown/desktop exec playwright test thread-retry.spec.ts --project=electron --reporter=line"
-				/>
-				<CodeBlock
-					lang="ts"
-					code={'bus.emit("session.retrying", {\n  sessionID, messageID,\n  attempt, delayMs'}
-					streaming
-				/>
-			</Demo>
-
-			<Demo id="interaction-card" title="interaction-card">
-				<PermissionCard
-					verb="執行指令"
-					subject="pnpm publish --access public"
-					policyHint="只在花錢、發佈、動到安全的時候停下來問你。「總是允許」會寫進規則,換班後仍有效。"
-					onReply={(reply) =>
-						setPermission(
-							reply === "once" ? "已允許一次" : "always" in reply ? "已總是允許(這個指令)" : "已拒絕",
-						)
-					}
-					resolved={permission ? { text: permission, rejected: permission === "已拒絕" } : undefined}
-				/>
-				<DecisionCard
-					blocking
-					title="landing 的定價區塊,先出哪一版?"
-					blocks={[
-						{
-							kind: "options",
-							id: "variant",
-							required: true,
-							options: PRICING,
-						},
-						{ kind: "text", id: "note", label: "補充", placeholder: "想補充什麼,寫在這裡(選填)…" },
-					]}
-					onAnswer={(answer) =>
-						setDecision(
-							`已決定 · 你選了「${PRICING.find((option) => option.value === answer.variant)?.label ?? ""}」`,
-						)
-					}
-					resolved={decision ? { text: decision } : undefined}
-				/>
-			</Demo>
-
-			<Demo id="handoff-receipt" title="handoff-receipt" note="分隔線中間一顆膠囊;點開看交接摘要。">
-				<HandoffReceipt
-					at="14:32"
-					ctxPercent={50}
-					memory={{ count: 3, items: ["偏好 pnpm", "部署走 Cloudflare", "先出 desktop"] }}
-					ledgerCount={42}
-					handoffSummary="landing 定價區塊寫到三檔方案的表格,下一步接 FAQ。"
-				/>
-				<HandoffReceipt
-					at="09:05"
-					ctxPercent={80}
-					reason="hard-limit"
-					memory={{ count: 1 }}
-					ledgerCount={117}
-					handoffSummary="大型 refactor 進行到 store 層,測試 3 紅。"
-				/>
-			</Demo>
-
-			<Demo id="composer" title="composer" note="打「@」看來源建議;⏎ 送出、⇧⏎ 換行。">
-				<Composer
-					placeholder="跟 agent 說話——它只在花錢、發佈、動到安全的時候停下來問你"
-					models={["Fable 5", "Opus 5", "Sonnet 5", "GPT-5.4"]}
-					model={model}
-					onModelChange={setModel}
-					sources={async (query) =>
-						SOURCES.filter((source) => source.label.toLowerCase().includes(query.toLowerCase()))
-					}
-					commands={[
-						{ id: "handoff", label: "handoff" },
-						{ id: "memory", label: "memory" },
-					]}
-					onMicToggle={() => {}}
-					onSubmit={(value) => setSent(value)}
-					hint={sent ? `已送出:${sent}` : "⏎ 送出 · ⇧⏎ 換行"}
-				/>
-			</Demo>
-
-			<Demo
-				id="voice-indicator"
-				title="voice-indicator"
-				note="一條波形的四種狀態:閒置是灰的,聆聽、思考、說話是紫的。"
-			>
-				<VoiceIndicator state={voice} />
-				<Row>
-					{VOICE_STATES.map((state) => (
-						<Button
-							key={state}
-							size="sm"
-							variant={state === voice ? "primary" : "secondary"}
-							onClick={() => setVoice(state)}
-						>
-							{state}
-						</Button>
-					))}
-				</Row>
-			</Demo>
-
-			<Demo id="live-dot" title="live-dot" note="「還在跑」的一顆呼吸點;reduced-motion 下停住不消失。">
-				<Row>
-					<LiveDot label="還在跑" />
-					<span>讀 packages/runtime/src/loop.ts</span>
-				</Row>
-			</Demo>
-		</>
+		<Demo id="composer" title="composer" note="Type @ for source suggestions. ⏎ sends, ⇧⏎ adds a new line.">
+			<Composer
+				placeholder="Message the agent. It only stops to ask when something costs money, publishes, or touches security."
+				models={["Fable 5", "Opus 5", "Sonnet 5", "GPT-5.4"]}
+				model={model}
+				onModelChange={setModel}
+				sources={async (query) =>
+					SOURCES.filter((source) => source.label.toLowerCase().includes(query.toLowerCase()))
+				}
+				commands={[
+					{ id: "handoff", label: "handoff", kind: "command" },
+					{ id: "memory", label: "memory", kind: "command" },
+				]}
+				onMicToggle={() => {}}
+				onSubmit={(value) => setSent(value)}
+				hint={sent ? `Sent: ${sent}` : "⏎ to send · ⇧⏎ for a new line"}
+			/>
+		</Demo>
 	)
 }
+
+function VoiceIndicatorDemo() {
+	const [voice, setVoice] = useState<VoiceState>("listening")
+
+	return (
+		<Demo
+			id="voice-indicator"
+			title="voice-indicator"
+			note="One waveform, four states: idle is grey; listening, thinking and speaking are signal blue."
+		>
+			<VoiceIndicator state={voice} />
+			<Row>
+				{VOICE_STATES.map((state) => (
+					<Button
+						key={state}
+						size="sm"
+						variant={state === voice ? "primary" : "secondary"}
+						onClick={() => setVoice(state)}
+					>
+						{state}
+					</Button>
+				))}
+			</Row>
+		</Demo>
+	)
+}
+
+function LiveDotDemo() {
+	return (
+		<Demo
+			id="live-dot"
+			title="live-dot"
+			note="A breathing dot that says “still running”. Under reduced motion it holds still instead of disappearing."
+		>
+			<Row>
+				<LiveDot label="Still running" />
+				<span>Reading packages/runtime/src/loop.ts</span>
+			</Row>
+		</Demo>
+	)
+}
+
+export const desktopDemos: DemoEntry[] = [
+	{ id: "message", covers: ["message"], Component: MessageDemo },
+	{ id: "tool-card", covers: ["tool-card"], Component: ToolCardDemo },
+	{ id: "reasoning-fold", covers: ["reasoning-fold"], Component: ReasoningFoldDemo },
+	{ id: "action-bar", covers: ["action-bar"], Component: ActionBarDemo },
+	{ id: "markdown", covers: ["markdown"], Component: MarkdownDemo },
+	{ id: "code-block", covers: ["code-block"], Component: CodeBlockDemo },
+	{ id: "interaction-card", covers: ["interaction-card"], Component: InteractionCardDemo },
+	{ id: "handoff-receipt", covers: ["handoff-receipt"], Component: HandoffReceiptDemo },
+	{ id: "composer", covers: ["composer"], Component: ComposerDemo },
+	{ id: "voice-indicator", covers: ["voice-indicator"], Component: VoiceIndicatorDemo },
+	{ id: "live-dot", covers: ["live-dot"], Component: LiveDotDemo },
+]

@@ -22,18 +22,18 @@ import {
 } from "@anyknown/ui"
 import * as pretext from "@chenglou/pretext"
 import { useState } from "react"
-import { Demo, Row } from "../shell"
+import { type DemoEntry, Demo, Row } from "../shell"
 
-// 沒有 field-sizing 的瀏覽器,autoGrow 用 Pretext 量高度
+// Browsers without field-sizing measure autoGrow height with Pretext
 setTextLayoutEngine(pretext)
 
 const growPath =
 	typeof CSS !== "undefined" && CSS.supports("field-sizing", "content")
-		? "這個瀏覽器支援 field-sizing,由 CSS 長高"
-		: "這個瀏覽器不支援 field-sizing,由 Pretext 量高度"
+		? "This browser supports field-sizing, so CSS grows the height."
+		: "This browser has no field-sizing, so Pretext measures the height."
 
 const effortLabel = (f: number) =>
-	f < 0.03 ? "自動" : f < 0.3 ? "少" : f < 0.6 ? "中" : f < 0.85 ? "多" : "最多"
+	f < 0.03 ? "Auto" : f < 0.3 ? "Low" : f < 0.6 ? "Medium" : f < 0.85 ? "High" : "Max"
 
 function SearchIcon() {
 	return (
@@ -44,170 +44,245 @@ function SearchIcon() {
 	)
 }
 
-export function FormsDemos() {
-	const [threshold, setThreshold] = useState("50")
-	const [source, setSource] = useState("claude")
-	const [model, setModel] = useState("")
-	const [memories, setMemories] = useState<string[]>([])
-	const [receipts, setReceipts] = useState(false)
-	const [effort, setEffort] = useState(0)
+function InputDemo() {
+	return (
+		<Demo id="input" title="input">
+			<Field label="Workspace name" help="You can change this later in settings.">
+				<Input placeholder="e.g. anyknown" />
+			</Field>
+			<Input size="sm" aria-label="Search memories" placeholder="Search memories…" />
+			<Input aria-label="Search threads" placeholder="Search threads…" leadingIcon={<SearchIcon />} />
+			<Field label="Email" error="This email is missing a domain.">
+				<Input defaultValue="admin@anyknown" />
+			</Field>
+			<Input aria-label="Disabled" disabled defaultValue="senlima@anyknown.com" />
+		</Demo>
+	)
+}
+
+function TextareaDemo() {
 	const [note, setNote] = useState(
-		"交接時把這段貼給下一個 session。\n\n第二段:受控的值,按「清空」高度會縮回去。",
+		"Paste this into the next session at handoff.\n\nSecond paragraph: a controlled value. Press Clear and the height shrinks back.",
 	)
 
 	return (
-		<>
-			<Demo id="input" title="input">
-				<Field label="工作區名稱" help="之後可以在設定裡改。">
-					<Input placeholder="例如:anyknown" />
-				</Field>
-				<Input size="sm" aria-label="搜尋記憶" placeholder="搜尋記憶…" />
-				<Input aria-label="搜尋 thread" placeholder="搜尋 thread…" leadingIcon={<SearchIcon />} />
-				<Field label="Email" error="Email 格式不完整,少了網域。">
-					<Input defaultValue="admin@anyknown" />
-				</Field>
-				<Input aria-label="停用" disabled defaultValue="senlima@anyknown.com" />
-			</Demo>
-
-			<Demo id="textarea" title="textarea" note={growPath}>
-				<Field label="回報問題">
-					<Textarea placeholder="發生了什麼事?" />
-				</Field>
-				<Textarea
-					aria-label="自動長高"
-					autoGrow
-					maxRows={8}
-					defaultValue="打字時高度會跟著內容長,到上限後出現捲軸。"
-					placeholder="跟同一條 thread 說話…"
-				/>
-				<Textarea
-					aria-label="受控的自動長高"
-					autoGrow
-					maxRows={6}
-					value={note}
-					onChange={(event) => setNote(event.target.value)}
-				/>
-				<Button variant="secondary" size="sm" onClick={() => setNote("")}>
-					清空
-				</Button>
-				<Field label="交接備註" error="最多 200 字,目前 214 字。">
-					<Textarea defaultValue="內容超過 200 字上限。" />
-				</Field>
-			</Demo>
-
-			<Demo id="label" title="label / field">
-				<Label htmlFor="pg-name">顯示名稱</Label>
-				<Input id="pg-name" />
-				<Field label="Email" required>
-					<Input />
-				</Field>
-				<Field label="邀請碼" optional help="有邀請碼可以直接加入既有工作區。">
-					<Input />
-				</Field>
-				<Field label="裝置名稱" disabled help="由系統偵測,無法修改。">
-					<Input defaultValue="Senlima 的 MacBook" />
-				</Field>
-			</Demo>
-
-			<Demo id="checkbox" title="checkbox" note="沒勾是一圈灰框;勾選後填滿墨色,勾一筆畫出來。">
-				<Checkbox defaultChecked label="記住這台裝置" />
-				<Checkbox label="換班時通知我" description="每次 handoff 都會收到桌面通知。" />
-				<Checkbox indeterminate label="全選記憶(3 / 7)" />
-				<Checkbox defaultChecked disabled label="端對端加密" description="永遠開啟。" />
-			</Demo>
-
-			<Demo id="radio" title="radio" note="沒選是一圈灰框;選中填滿墨色,中間一顆反白的點。">
-				<RadioGroup legend="換班門檻" value={threshold} onValueChange={setThreshold}>
-					<Radio value="50" label="50%(建議)" description="context 用到一半就交接,品質最穩。" />
-					<Radio value="75" label="75%" />
-					<Radio value="90" label="90%" description="接近上限才交接,單一 session 最長。" />
-				</RadioGroup>
-				<RadioGroup legend="訂閱來源" variant="card" value={source} onValueChange={setSource}>
-					<Radio value="claude" label="Claude" description="用你現有的 Claude 訂閱。" />
-					<Radio value="chatgpt" label="ChatGPT" description="用你現有的 ChatGPT 訂閱。" />
-				</RadioGroup>
-			</Demo>
-
-			<Demo id="switch" title="switch" note="關是灰色軌道,開是墨色軌道;圓鈕滑到另一端。">
-				<Switch defaultChecked label="語音喚醒" description="說「Anyknown」開始對話。" />
-				<Switch label="開機自動啟動" />
-				<Switch defaultChecked disabled label="本地儲存" description="永遠開啟,資料不離開這台電腦。" />
-			</Demo>
-
-			<Demo id="select" title="select">
-				<Select
-					aria-label="選擇模型"
-					value={model}
-					onValueChange={setModel as never}
-					placeholder="選擇模型…"
-					searchPlaceholder="搜尋模型…"
-				>
-					<SelectGroup label="Anthropic">
-						<SelectItem value="fable-5" hint="最強">
-							Fable 5
-						</SelectItem>
-						<SelectItem value="opus-5">Opus 5</SelectItem>
-						<SelectItem value="sonnet-5" hint="快">
-							Sonnet 5
-						</SelectItem>
-					</SelectGroup>
-					<SelectGroup label="OpenAI">
-						<SelectItem value="gpt-5.4">GPT-5.4</SelectItem>
-						<SelectItem value="gpt-5.4-mini">GPT-5.4 mini</SelectItem>
-					</SelectGroup>
-				</Select>
-				<Select
-					aria-label="選擇記憶"
-					multiple
-					value={memories}
-					onValueChange={setMemories as never}
-					placeholder="選擇要帶進交接的記憶…"
-					searchPlaceholder="搜尋記憶…"
-				>
-					<SelectGroup label="偏好">
-						<SelectItem value="pnpm">偏好 pnpm</SelectItem>
-						<SelectItem value="no-comment">少寫註解</SelectItem>
-					</SelectGroup>
-					<SelectGroup label="專案">
-						<SelectItem value="cf">部署走 Cloudflare</SelectItem>
-						<SelectItem value="desktop-first">先出 desktop</SelectItem>
-					</SelectGroup>
-				</Select>
-			</Demo>
-
-			<Demo id="slider" title="slider" note="連續、沒有節點;方向鍵一次 5%,Home / End 到底">
-				<Slider
-					value={effort}
-					onChange={setEffort}
-					label={`思考 · ${effortLabel(effort)}`}
-					valueText={() => effortLabel(effort)}
-				/>
-				<Slider value={0.4} onChange={() => {}} disabled aria-label="思考多少(停用)" />
-			</Demo>
-
-			<Demo id="dropdown" title="dropdown">
-				<Row>
-					<DropdownMenu trigger={<Button variant="secondary">Thread 動作</Button>}>
-						<DropdownGroup label="這條 thread">
-							<DropdownItem shortcut="⌘N">新增交接備註</DropdownItem>
-							<DropdownItem shortcut="⌘F">搜尋這一天</DropdownItem>
-							<DropdownSub label="匯出">
-								<DropdownItem>Markdown</DropdownItem>
-								<DropdownItem>JSON</DropdownItem>
-								<DropdownSub label="範圍…">
-									<DropdownItem>只有今天</DropdownItem>
-									<DropdownItem>整條 thread</DropdownItem>
-								</DropdownSub>
-							</DropdownSub>
-						</DropdownGroup>
-						<DropdownSeparator />
-						<DropdownCheckboxItem checked={receipts} onCheckedChange={setReceipts}>
-							顯示換班回條
-						</DropdownCheckboxItem>
-						<DropdownItem variant="danger">刪除這一天的紀錄</DropdownItem>
-					</DropdownMenu>
-				</Row>
-			</Demo>
-		</>
+		<Demo id="textarea" title="textarea" note={growPath}>
+			<Field label="Report a problem">
+				<Textarea placeholder="What happened?" />
+			</Field>
+			<Textarea
+				aria-label="Auto-growing"
+				autoGrow
+				maxRows={8}
+				defaultValue="The height follows the text as you type, and a scrollbar appears once it reaches the limit."
+				placeholder="Message this thread…"
+			/>
+			<Textarea
+				aria-label="Controlled auto-growing"
+				autoGrow
+				maxRows={6}
+				value={note}
+				onChange={(event) => setNote(event.target.value)}
+			/>
+			<Button variant="secondary" size="sm" onClick={() => setNote("")}>
+				Clear
+			</Button>
+			<Field label="Handoff note" error="200 characters at most; this one has 214.">
+				<Textarea defaultValue="This note runs past the 200-character limit." />
+			</Field>
+		</Demo>
 	)
 }
+
+function LabelDemo() {
+	return (
+		<Demo id="label" title="label / field">
+			<Label htmlFor="pg-name">Display name</Label>
+			<Input id="pg-name" />
+			<Field label="Email" required>
+				<Input />
+			</Field>
+			<Field label="Invite code" optional help="With an invite code you join an existing workspace.">
+				<Input />
+			</Field>
+			<Field label="Device name" disabled help="Detected by the system; you can't change it.">
+				<Input defaultValue="Senlima's MacBook" />
+			</Field>
+		</Demo>
+	)
+}
+
+function CheckboxDemo() {
+	return (
+		<Demo
+			id="checkbox"
+			title="checkbox"
+			note="Unchecked is a grey ring; checked fills with ink and draws the tick in one stroke."
+		>
+			<Checkbox defaultChecked label="Remember this device" />
+			<Checkbox label="Notify me at handoff" description="Get a desktop notification for every handoff." />
+			<Checkbox indeterminate label="Select all memories (3 of 7)" />
+			<Checkbox defaultChecked disabled label="End-to-end encryption" description="Always on." />
+		</Demo>
+	)
+}
+
+function RadioDemo() {
+	const [threshold, setThreshold] = useState("50")
+	const [source, setSource] = useState("claude")
+
+	return (
+		<Demo
+			id="radio"
+			title="radio"
+			note="Unselected is a grey ring; selected fills with ink around a light centre dot."
+		>
+			<RadioGroup legend="Handoff threshold" value={threshold} onValueChange={setThreshold}>
+				<Radio
+					value="50"
+					label="50% (recommended)"
+					description="Hand off when half the context is used. The most stable quality."
+				/>
+				<Radio value="75" label="75%" />
+				<Radio
+					value="90"
+					label="90%"
+					description="Hand off close to the limit. The longest single session."
+				/>
+			</RadioGroup>
+			<RadioGroup legend="Subscription" variant="card" value={source} onValueChange={setSource}>
+				<Radio value="claude" label="Claude" description="Use your existing Claude subscription." />
+				<Radio value="chatgpt" label="ChatGPT" description="Use your existing ChatGPT subscription." />
+			</RadioGroup>
+		</Demo>
+	)
+}
+
+function SwitchDemo() {
+	return (
+		<Demo
+			id="switch"
+			title="switch"
+			note="Off is a grey track, on is an ink track; the knob slides to the other end."
+		>
+			<Switch defaultChecked label="Voice wake" description="Say “Anyknown” to start talking." />
+			<Switch label="Open at login" />
+			<Switch
+				defaultChecked
+				disabled
+				label="Local storage"
+				description="Always on. Your data never leaves this computer."
+			/>
+		</Demo>
+	)
+}
+
+function SelectDemo() {
+	const [model, setModel] = useState("")
+	const [memories, setMemories] = useState<string[]>([])
+
+	return (
+		<Demo id="select" title="select">
+			<Select
+				aria-label="Choose a model"
+				value={model}
+				onValueChange={setModel as never}
+				placeholder="Choose a model…"
+				searchPlaceholder="Search models…"
+			>
+				<SelectGroup label="Anthropic">
+					<SelectItem value="fable-5" hint="Strongest">
+						Fable 5
+					</SelectItem>
+					<SelectItem value="opus-5">Opus 5</SelectItem>
+					<SelectItem value="sonnet-5" hint="Fast">
+						Sonnet 5
+					</SelectItem>
+				</SelectGroup>
+				<SelectGroup label="OpenAI">
+					<SelectItem value="gpt-5.4">GPT-5.4</SelectItem>
+					<SelectItem value="gpt-5.4-mini">GPT-5.4 mini</SelectItem>
+				</SelectGroup>
+			</Select>
+			<Select
+				aria-label="Choose memories"
+				multiple
+				value={memories}
+				onValueChange={setMemories as never}
+				placeholder="Choose memories to carry into the handoff…"
+				searchPlaceholder="Search memories…"
+			>
+				<SelectGroup label="Preferences">
+					<SelectItem value="pnpm">Prefers pnpm</SelectItem>
+					<SelectItem value="no-comment">Keep comments short</SelectItem>
+				</SelectGroup>
+				<SelectGroup label="Project">
+					<SelectItem value="cf">Deploys to Cloudflare</SelectItem>
+					<SelectItem value="desktop-first">Desktop ships first</SelectItem>
+				</SelectGroup>
+			</Select>
+		</Demo>
+	)
+}
+
+function SliderDemo() {
+	const [effort, setEffort] = useState(0)
+
+	return (
+		<Demo
+			id="slider"
+			title="slider"
+			note="Continuous, with no stops. Arrow keys move 5%; Home and End jump to either end."
+		>
+			<Slider
+				value={effort}
+				onChange={setEffort}
+				label={`Thinking · ${effortLabel(effort)}`}
+				valueText={() => effortLabel(effort)}
+			/>
+			<Slider value={0.4} onChange={() => {}} disabled aria-label="Thinking effort (disabled)" />
+		</Demo>
+	)
+}
+
+function DropdownDemo() {
+	const [receipts, setReceipts] = useState(false)
+
+	return (
+		<Demo id="dropdown" title="dropdown">
+			<Row>
+				<DropdownMenu trigger={<Button variant="secondary">Thread actions</Button>}>
+					<DropdownGroup label="This thread">
+						<DropdownItem shortcut="⌘N">Add a handoff note</DropdownItem>
+						<DropdownItem shortcut="⌘F">Search this day</DropdownItem>
+						<DropdownSub label="Export">
+							<DropdownItem>Markdown</DropdownItem>
+							<DropdownItem>JSON</DropdownItem>
+							<DropdownSub label="Range…">
+								<DropdownItem>Today only</DropdownItem>
+								<DropdownItem>Whole thread</DropdownItem>
+							</DropdownSub>
+						</DropdownSub>
+					</DropdownGroup>
+					<DropdownSeparator />
+					<DropdownCheckboxItem checked={receipts} onCheckedChange={setReceipts}>
+						Show handoff receipts
+					</DropdownCheckboxItem>
+					<DropdownItem variant="danger">Delete this day's history</DropdownItem>
+				</DropdownMenu>
+			</Row>
+		</Demo>
+	)
+}
+
+export const formsDemos: DemoEntry[] = [
+	{ id: "input", covers: ["input"], Component: InputDemo },
+	{ id: "textarea", covers: ["textarea"], Component: TextareaDemo },
+	{ id: "label", covers: ["label"], Component: LabelDemo },
+	{ id: "checkbox", covers: ["checkbox"], Component: CheckboxDemo },
+	{ id: "radio", covers: ["radio"], Component: RadioDemo },
+	{ id: "switch", covers: ["switch"], Component: SwitchDemo },
+	{ id: "select", covers: ["select"], Component: SelectDemo },
+	{ id: "slider", covers: ["slider"], Component: SliderDemo },
+	{ id: "dropdown", covers: ["dropdown"], Component: DropdownDemo },
+]

@@ -10,8 +10,12 @@ import {
 	DialogContent,
 	DialogTrigger,
 	EmptyState,
+	Ghost,
+	GhostLink,
+	IconButton,
 	Kbd,
 	KbdGroup,
+	Pill,
 	Popover,
 	PopoverContent,
 	PopoverDescription,
@@ -20,11 +24,14 @@ import {
 	Progress,
 	ProgressBall,
 	ProgressRing,
+	Segmented,
 	Select,
 	SelectItem,
 	Skeleton,
 	SkeletonGroup,
+	Spin,
 	Spinner,
+	StatusChip,
 	Tabs,
 	TabsList,
 	TabsPanel,
@@ -32,14 +39,15 @@ import {
 	Text,
 	ThreadSkeleton,
 	Tooltip,
+	icon,
 	useDialog,
 	useToast,
 	ICON_STROKE,
 } from "@anyknown/ui"
 import * as stylex from "@stylexjs/stylex"
 import { color, radius, space } from "@anyknown/ui/tokens.stylex"
-import { useEffect, useState } from "react"
-import { Demo, Row } from "../shell"
+import { type ReactNode, useEffect, useState } from "react"
+import { type DemoEntry, Demo, Label, Row } from "../shell"
 
 const styles = stylex.create({
 	pane: {
@@ -65,6 +73,13 @@ const styles = stylex.create({
 	},
 	ringRow: { display: "flex", gap: space.lg, alignItems: "center" },
 	wideDialog: { width: "min(44rem, calc(100vw - 2rem))", height: "calc(100vh - 2rem)" },
+	stack: { display: "grid", gap: space.xs },
+	cards: {
+		display: "grid",
+		gap: space.md,
+		gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 16rem), 1fr))",
+	},
+	iconCell: { display: "grid", justifyItems: "center", gap: space.xxs },
 })
 
 function MemoryIcon() {
@@ -87,9 +102,47 @@ function MemoryIcon() {
 	)
 }
 
+/** A 24-unit glyph drawn the package's way: stroke ICON_STROKE, round caps, currentColor. */
+function Glyph({ size = "md", children }: { size?: keyof typeof icon; children: ReactNode }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth={ICON_STROKE}
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+			{...stylex.props(icon[size])}
+		>
+			{children}
+		</svg>
+	)
+}
+
+const SEARCH = (
+	<>
+		<circle cx="11" cy="11" r="7" />
+		<path d="m20 20-3.5-3.5" />
+	</>
+)
+const BELL = (
+	<>
+		<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+		<path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+	</>
+)
+const PLUS = <path d="M5 12h14M12 5v14" />
+const SETTINGS = (
+	<>
+		<circle cx="12" cy="12" r="3" />
+		<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+	</>
+)
+
 function wait(ms: number, ok: boolean) {
 	return new Promise<void>((resolve, reject) =>
-		setTimeout(() => (ok ? resolve() : reject(new Error("vault 離線"))), ms),
+		setTimeout(() => (ok ? resolve() : reject(new Error("the vault is offline"))), ms),
 	)
 }
 
@@ -111,432 +164,731 @@ function StackedSettings() {
 				variant="dangerGhost"
 				onClick={async () => {
 					const ok = await dialog.confirm({
-						title: "刪除這個工作區?",
-						description: "疊在設定上面;Esc 只關這一層。",
-						confirmLabel: "刪除工作區",
+						title: "Delete this workspace?",
+						description: "This sits on top of settings; Esc closes only this layer.",
+						confirmLabel: "Delete workspace",
 						tone: "danger",
 					})
-					toast(ok ? "已刪除工作區" : "保留工作區")
+					toast(ok ? "Workspace deleted" : "Workspace kept")
 				}}
 			>
-				刪除工作區…
+				Delete workspace…
 			</Button>
 			<DialogClose>
-				<Button variant="ghost">關閉</Button>
+				<Button variant="ghost">Close</Button>
 			</DialogClose>
 		</DialogActions>
 	)
 }
 
-export function BasicsDemos() {
+function ButtonDemo() {
+	return (
+		<Demo
+			id="button"
+			title="button"
+			note="A pill, 40px tall by default. The primary action is solid ink, one per page; secondary is a sunken grey, ghost only shows a fill on hover. Pressing scales it to 0.98, except under reduced motion."
+		>
+			<Row>
+				<Button>New thread</Button>
+				<Button variant="secondary">Rename</Button>
+				<Button variant="ghost">Cancel</Button>
+				<Button variant="dangerGhost">Decline</Button>
+				<Button variant="danger">Delete memory</Button>
+			</Row>
+			<Row>
+				<Button size="sm">New thread</Button>
+				<Button size="sm" variant="secondary">
+					Rename
+				</Button>
+				<Button size="sm" variant="ghost">
+					Cancel
+				</Button>
+				<Button size="sm" variant="danger">
+					Delete memory
+				</Button>
+			</Row>
+			<Row>
+				<Button disabled>Disabled</Button>
+				<Button variant="secondary" disabled>
+					Disabled
+				</Button>
+				<Button>
+					<MemoryIcon />
+					With icon
+				</Button>
+				<Button variant="secondary">A very long button label, to check it never breaks the pill</Button>
+			</Row>
+		</Demo>
+	)
+}
+
+function GhostDemo() {
+	return (
+		<Demo
+			id="ghost"
+			title="ghost"
+			note="A word that is a button: 28px, muted until the pointer is on it. danger is for warnings. GhostLink is the same word as a link."
+		>
+			<Row>
+				<Ghost>Edit</Ghost>
+				<Ghost>Copy link</Ghost>
+				<Ghost danger>Revoke key</Ghost>
+				<Ghost disabled>Archived</Ghost>
+			</Row>
+			<Row>
+				<GhostLink href="#/demo/ghost">View the handoff log</GhostLink>
+				<GhostLink href="https://anyknown.com" external>
+					Open anyknown.com
+				</GhostLink>
+			</Row>
+		</Demo>
+	)
+}
+
+function IconButtonDemo() {
+	return (
+		<Demo
+			id="icon-button"
+			title="icon-button"
+			note="A circle around one glyph. Nothing at rest, an ink wash on hover, the name in a tooltip and as the accessible name. A badge in the corner when it counts something."
+		>
+			<Row>
+				<IconButton label="Search threads">
+					<Glyph>{SEARCH}</Glyph>
+				</IconButton>
+				<IconButton label="Notifications" badge={3}>
+					<Glyph>{BELL}</Glyph>
+				</IconButton>
+				<IconButton label="Settings" current>
+					<Glyph>{SETTINGS}</Glyph>
+				</IconButton>
+				<IconButton label="New thread" open>
+					<Glyph>{PLUS}</Glyph>
+				</IconButton>
+			</Row>
+			<Row>
+				<IconButton label="Search threads (md)" side="bottom">
+					<Glyph>{SEARCH}</Glyph>
+				</IconButton>
+				<IconButton label="Search threads (sm)" size="sm" side="bottom">
+					<Glyph size="sm">{SEARCH}</Glyph>
+				</IconButton>
+				<IconButton label="Search threads (xs)" size="xs" side="bottom">
+					<Glyph size="xs">{SEARCH}</Glyph>
+				</IconButton>
+			</Row>
+			<Label>current marks the page that is open; open is pressed while its popover shows (no tooltip)</Label>
+		</Demo>
+	)
+}
+
+const SCOPES = [
+	{ value: "personal", label: "Personal" },
+	{ value: "workspace", label: "Workspace" },
+	{ value: "all", label: "All" },
+] as const
+
+function SegmentedDemo() {
+	const [scope, setScope] = useState<(typeof SCOPES)[number]["value"]>("workspace")
+
+	return (
+		<Demo
+			id="segmented"
+			title="segmented"
+			note="A few words on a sunken track; the chosen one is a sheet of paper raised on it."
+		>
+			<Segmented label="Memory scope" value={scope} onChange={setScope} options={[...SCOPES]} />
+			<Label>Showing {scope} memories</Label>
+		</Demo>
+	)
+}
+
+function DialogDemo() {
 	const { toast } = useToast()
 	const { dialog } = useDialog()
+
+	return (
+		<Demo
+			id="dialog"
+			title="dialog"
+			note="The second row uses the imperative dialog store, which needs one <Dialogs /> mounted in the app."
+		>
+			<Row>
+				<Dialog>
+					<DialogTrigger>
+						<Button variant="secondary">Rename workspace</Button>
+					</DialogTrigger>
+					<DialogContent
+						title="Rename workspace"
+						description="The new name syncs to every member's sidebar and vault path."
+					>
+						<DialogActions>
+							<DialogClose>
+								<Button variant="ghost">Cancel</Button>
+							</DialogClose>
+							<DialogClose>
+								<Button>Save</Button>
+							</DialogClose>
+						</DialogActions>
+					</DialogContent>
+				</Dialog>
+				<Dialog>
+					<DialogTrigger>
+						<Button variant="secondary">Popup inside a dialog</Button>
+					</DialogTrigger>
+					<DialogContent
+						title="New run"
+						description="The select menu has to stack above the dialog, not under it."
+					>
+						<Select aria-label="Model" placeholder="Choose a model…">
+							<SelectItem value="fable-5">Fable 5</SelectItem>
+							<SelectItem value="opus-5">Opus 5</SelectItem>
+						</Select>
+						<DialogActions>
+							<DialogClose>
+								<Button variant="ghost">Cancel</Button>
+							</DialogClose>
+							<DialogClose>
+								<Button>Start</Button>
+							</DialogClose>
+						</DialogActions>
+					</DialogContent>
+				</Dialog>
+				<Dialog>
+					<DialogTrigger>
+						<Button variant="secondary">Custom size</Button>
+					</DialogTrigger>
+					<DialogContent
+						title="Choose a model"
+						description="sx overrides the popup's default width and maxHeight so a three-column picker fits."
+						sx={styles.wideDialog}
+					>
+						<DialogActions>
+							<DialogClose>
+								<Button variant="ghost">Close</Button>
+							</DialogClose>
+						</DialogActions>
+					</DialogContent>
+				</Dialog>
+				<ConfirmDialog
+					trigger={<Button variant="secondary">Delete memory</Button>}
+					title="Delete this memory?"
+					description="“Deploys to Cloudflare” will be removed from the workspace. You can't undo this."
+					danger
+					confirmLabel="Delete memory"
+					onConfirm={() =>
+						toast("Deleted “Deploys to Cloudflare”", { action: { label: "Undo", onClick: () => {} } })
+					}
+				/>
+			</Row>
+			<Row>
+				<Button
+					variant="secondary"
+					onClick={async () => {
+						const name = await dialog.open<string>(({ close }) => (
+							<DialogContent
+								title="Rename thread"
+								description="The result of dialog.open resolves with the value passed to close."
+							>
+								<DialogActions>
+									<DialogClose>
+										<Button variant="ghost">Cancel</Button>
+									</DialogClose>
+									<Button onClick={() => close("Deploy notes")}>Rename to “Deploy notes”</Button>
+								</DialogActions>
+							</DialogContent>
+						)).result
+						toast(name == null ? "Name unchanged" : `Renamed to “${name}”`)
+					}}
+				>
+					dialog.open
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={async () => {
+						const ok = await dialog.confirm({
+							title: "Archive this thread?",
+							description: "You can still find it in the sidebar.",
+							confirmLabel: "Archive thread",
+						})
+						toast(ok ? "Thread archived" : "Not archived")
+					}}
+				>
+					dialog.confirm
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						dialog.alert({
+							title: "Workspace limit reached",
+							description: "The free plan includes up to 3 workspaces.",
+						})
+					}
+				>
+					dialog.alert
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						dialog.open(() => (
+							<DialogContent
+								title="Workspace settings"
+								description="Open a confirm from here to stack two layers."
+							>
+								<StackedSettings />
+							</DialogContent>
+						))
+					}
+				>
+					Stacked
+				</Button>
+			</Row>
+		</Demo>
+	)
+}
+
+function ToastDemo() {
+	const { toast } = useToast()
+
+	return (
+		<Demo
+			id="toast"
+			title="toast"
+			note="The thin pill along the bottom is the countdown; hover, focus or switching tabs pauses it. Loading toasts don't count down; the same key updates in place and counts repeats."
+		>
+			<Row>
+				<Button variant="secondary" onClick={() => toast("Handoff summary copied")}>
+					default
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						toast.success("Handoff complete", { description: "3 memories carried into the new thread" })
+					}
+				>
+					success
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => toast.danger("Can't reach the vault", { description: "Retrying shortly" })}
+				>
+					danger
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => toast("Deleted “Prefers pnpm”", { action: { label: "Undo", onClick: () => {} } })}
+				>
+					with action
+				</Button>
+			</Row>
+			<Row>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						toast.promise(wait(1600, true), {
+							loading: "Syncing the vault…",
+							success: "Vault synced",
+							error: "Sync failed",
+						})
+					}
+				>
+					promise resolves
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() =>
+						toast
+							.promise(wait(1600, false), {
+								loading: "Uploading 3 files…",
+								success: "Uploaded",
+								error: (error) => `Upload failed: ${(error as Error).message}`,
+							})
+							.catch(() => {})
+					}
+				>
+					promise rejects
+				</Button>
+				<Button variant="secondary" onClick={() => toast("Link copied", { key: "copy-link" })}>
+					same key (×N)
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						const id = toast("Handing off…", { timeout: 0 })
+						setTimeout(
+							() => toast.update(id, { title: "Handoff complete", type: "success", timeout: 4000 }),
+							1200,
+						)
+					}}
+				>
+					update
+				</Button>
+			</Row>
+		</Demo>
+	)
+}
+
+function TooltipDemo() {
+	return (
+		<Demo id="tooltip" title="tooltip" note="Hover or tab to a button; it opens after 400ms.">
+			<Row>
+				<Tooltip content="Pin this memory">
+					<Button variant="secondary">top</Button>
+				</Tooltip>
+				<Tooltip content="Archive thread" side="bottom">
+					<Button variant="secondary">bottom</Button>
+				</Tooltip>
+				<Tooltip content="Back to workspace" side="left">
+					<Button variant="secondary">left</Button>
+				</Tooltip>
+				<Tooltip content="Open the vault" side="right">
+					<Button variant="secondary">right</Button>
+				</Tooltip>
+				<Tooltip content="Write a handoff summary" shortcut={<KbdGroup keys={["⌘", "⇧", "H"]} />}>
+					<Button variant="secondary">Start handoff</Button>
+				</Tooltip>
+			</Row>
+		</Demo>
+	)
+}
+
+function PopoverDemo() {
+	return (
+		<Demo id="popover" title="popover">
+			<Row>
+				<Popover>
+					<PopoverTrigger>
+						<Button variant="secondary">Deploys to Cloudflare</Button>
+					</PopoverTrigger>
+					<PopoverContent side="bottom" titled>
+						<PopoverTitle>Deploys to Cloudflare</PopoverTitle>
+						<PopoverDescription>
+							Saved by a handoff on Aug 12, 2026. New threads pick this up automatically.
+						</PopoverDescription>
+						<Row>
+							<Button size="sm" variant="secondary">
+								Edit
+							</Button>
+							<Button size="sm" variant="ghost">
+								Delete
+							</Button>
+						</Row>
+					</PopoverContent>
+				</Popover>
+			</Row>
+		</Demo>
+	)
+}
+
+function TabsDemo() {
+	return (
+		<Demo id="tabs" title="tabs">
+			<Tabs defaultValue="chat">
+				<TabsList aria-label="Thread view">
+					<TabsTab value="chat">Chat</TabsTab>
+					<TabsTab value="memory">Memories</TabsTab>
+					<TabsTab value="handoff">Handoffs</TabsTab>
+					<TabsTab value="files" disabled>
+						Files
+					</TabsTab>
+				</TabsList>
+				<TabsPanel value="chat">This thread has 12 messages.</TabsPanel>
+				<TabsPanel value="memory">This workspace has kept 7 memories so far.</TabsPanel>
+				<TabsPanel value="handoff">Fable handed off to Opus yesterday at 18:00.</TabsPanel>
+				<TabsPanel value="files">Not available yet.</TabsPanel>
+			</Tabs>
+			<Tabs defaultValue="today" variant="pills">
+				<TabsList aria-label="Time range">
+					<TabsTab value="today">Today</TabsTab>
+					<TabsTab value="week">This week</TabsTab>
+					<TabsTab value="all">All</TabsTab>
+				</TabsList>
+				<TabsPanel value="today">3 threads updated today.</TabsPanel>
+				<TabsPanel value="week">18 threads this week.</TabsPanel>
+				<TabsPanel value="all">142 threads in this workspace.</TabsPanel>
+			</Tabs>
+		</Demo>
+	)
+}
+
+function BadgeDemo() {
+	return (
+		<Demo id="badge" title="badge">
+			<Row>
+				<Badge>Draft</Badge>
+				<Badge variant="accent">In progress</Badge>
+				<Badge variant="success">Handed off</Badge>
+				<Badge variant="danger">Interrupted</Badge>
+				<Badge variant="outline">Read-only</Badge>
+			</Row>
+			<Row>
+				<Badge variant="accent" count={3}>
+					Waiting on you ·{" "}
+				</Badge>
+				<Badge count={12}>Read · </Badge>
+				<Badge variant="mono">128k · 42%</Badge>
+			</Row>
+			<Row>
+				<Badge dot="accent">Fable online</Badge>
+				<Badge dot="faint">Handing off</Badge>
+				<Badge dot="danger">Disconnected</Badge>
+			</Row>
+			<Row>
+				<Chip onRemove={() => {}} removeLabel="Remove filter: workspace anyknown">
+					Workspace: anyknown
+				</Chip>
+				<Chip onRemove={() => {}} removeLabel="Remove filter: this week">
+					This week
+				</Chip>
+			</Row>
+		</Demo>
+	)
+}
+
+function StatusChipDemo() {
+	return (
+		<Demo
+			id="status-chip"
+			title="status-chip"
+			note="StatusChip is a mono word in a 16px pill: r reads, w writes, d destroys, n is unmarked, a is running (signal blue, spinning), f failed, plain is the catalogue's auth chip. Pill is the 22px mono pill a fold's first line is made of."
+		>
+			<Row>
+				<StatusChip variant="r">read</StatusChip>
+				<StatusChip variant="w">write</StatusChip>
+				<StatusChip variant="d">delete</StatusChip>
+				<StatusChip variant="n">fetch</StatusChip>
+				<StatusChip variant="a">running</StatusChip>
+				<StatusChip variant="f">failed</StatusChip>
+				<StatusChip variant="plain">OAuth</StatusChip>
+			</Row>
+			<Row>
+				<Pill status="live">researching</Pill>
+				<Pill status="paused">waiting on you</Pill>
+				<Pill status="done">done</Pill>
+				<Pill>sonnet-5</Pill>
+				<Pill title>Find why retry events never reach the stream</Pill>
+			</Row>
+		</Demo>
+	)
+}
+
+function KbdDemo() {
+	return (
+		<Demo id="kbd" title="kbd">
+			<Row>
+				<Kbd>⌘</Kbd>
+				<Kbd>⇧</Kbd>
+				<Kbd>Esc</Kbd>
+				<Kbd>Enter</Kbd>
+				<KbdGroup keys={["⌘", "N"]} />
+				<KbdGroup keys={["⌘", "⇧", "P"]} />
+				<KbdGroup keys={["g", "t"]} separator="then" />
+			</Row>
+			<Text variant="caption">
+				Press <KbdGroup keys={["⌘", "⇧", "H"]} /> before a handoff to preview the memories it carries.
+			</Text>
+		</Demo>
+	)
+}
+
+function CardDemo() {
+	return (
+		<Demo
+			id="card"
+			title="card"
+			note="A card on the sheet: rest elevation, and its shadow ring is the only edge."
+		>
+			<div {...stylex.props(styles.cards)}>
+				<Card>
+					<div {...stylex.props(styles.stack)}>
+						<Text variant="title">Pricing page</Text>
+						<Text variant="caption">Handed off at 14:32 · 3 memories</Text>
+						<Text>The three-tier table is drafted. Next up: the FAQ under it.</Text>
+					</div>
+				</Card>
+				<Card>
+					<div {...stylex.props(styles.stack)}>
+						<Text variant="title">Store refactor</Text>
+						<Text variant="caption">Handed off at 09:05 · hit the context limit</Text>
+						<Text>Halfway through the store layer; 3 tests are still failing.</Text>
+					</div>
+				</Card>
+			</div>
+		</Demo>
+	)
+}
+
+function TextDemo() {
+	return (
+		<Demo
+			id="text"
+			title="text"
+			note="Five variants. display and title use the display face; body is 15px at line height 1.6; caption is muted; mono is for identifiers."
+		>
+			<Text variant="display">Your agent remembers</Text>
+			<Text variant="title">Handoff summary</Text>
+			<Text variant="body">
+				When a session reaches the handoff threshold, the agent writes down what matters and passes the work
+				to a fresh session, so the thread keeps going without losing its place.
+			</Text>
+			<Text variant="caption">Last handoff 14:32 · context 50%</Text>
+			<Text variant="mono">thread_01JAH6Q3V8 · opus-5</Text>
+			<Text as="span" variant="caption">
+				as=&quot;span&quot; renders the same style on another element.
+			</Text>
+		</Demo>
+	)
+}
+
+function SkeletonDemo() {
+	return (
+		<Demo id="skeleton" title="skeleton">
+			<SkeletonGroup label="Loading">
+				<Skeleton />
+				<Skeleton width="92%" />
+				<Skeleton width="61%" />
+			</SkeletonGroup>
+			<ThreadSkeleton messages={1} />
+		</Demo>
+	)
+}
+
+const TIDY_STAGES = ["Scanning the thread", "Picking what to keep", "Merging duplicates", "Saving memories"]
+
+function ProgressDemo() {
 	const percent = useDemoProgress()
 
 	return (
-		<>
-			<Demo
-				id="button"
-				title="button"
-				note="膠囊,預設高 40。主動作是墨色實心,一頁一顆;secondary 是凹下去的灰底,ghost 只在 hover 有底。按下縮到 0.98,reduced-motion 時不縮。"
-			>
-				<Row>
-					<Button>建立 thread</Button>
-					<Button variant="secondary">重新命名</Button>
-					<Button variant="ghost">取消</Button>
-					<Button variant="dangerGhost">拒絕</Button>
-					<Button variant="danger">刪除記憶</Button>
-				</Row>
-				<Row>
-					<Button size="sm">建立 thread</Button>
-					<Button size="sm" variant="secondary">
-						重新命名
-					</Button>
-					<Button size="sm" variant="ghost">
-						取消
-					</Button>
-					<Button size="sm" variant="danger">
-						刪除記憶
-					</Button>
-				</Row>
-				<Row>
-					<Button disabled>已停用</Button>
-					<Button variant="secondary" disabled>
-						已停用
-					</Button>
-					<Button>
-						<MemoryIcon />
-						帶圖示
-					</Button>
-					<Button variant="secondary">很長的一顆按鈕,看長文字會不會撐破膠囊</Button>
-				</Row>
-			</Demo>
-
-			<Demo id="dialog" title="dialog" note="第二排是命令式的 dialog store:要在 app 裡掛一個 <Dialogs />。">
-				<Row>
-					<Dialog>
-						<DialogTrigger>
-							<Button variant="secondary">重新命名工作區</Button>
-						</DialogTrigger>
-						<DialogContent title="重新命名工作區" description="新名稱會同步到所有成員的側欄與 vault 路徑。">
-							<DialogActions>
-								<DialogClose>
-									<Button variant="ghost">取消</Button>
-								</DialogClose>
-								<DialogClose>
-									<Button>儲存</Button>
-								</DialogClose>
-							</DialogActions>
-						</DialogContent>
-					</Dialog>
-					<Dialog>
-						<DialogTrigger>
-							<Button variant="secondary">dialog 裡的浮層</Button>
-						</DialogTrigger>
-						<DialogContent title="新的執行" description="select 的選單要疊在 dialog 上面,不是被它蓋住。">
-							<Select aria-label="模型" placeholder="選擇模型…">
-								<SelectItem value="fable-5">Fable 5</SelectItem>
-								<SelectItem value="opus-5">Opus 5</SelectItem>
-							</Select>
-							<DialogActions>
-								<DialogClose>
-									<Button variant="ghost">取消</Button>
-								</DialogClose>
-								<DialogClose>
-									<Button>開始</Button>
-								</DialogClose>
-							</DialogActions>
-						</DialogContent>
-					</Dialog>
-					<Dialog>
-						<DialogTrigger>
-							<Button variant="secondary">自己給寬高</Button>
-						</DialogTrigger>
-						<DialogContent
-							title="選擇模型"
-							description="sx 蓋掉 popup 預設的 width / maxHeight,三欄選擇器才放得下。"
-							sx={styles.wideDialog}
-						>
-							<DialogActions>
-								<DialogClose>
-									<Button variant="ghost">關閉</Button>
-								</DialogClose>
-							</DialogActions>
-						</DialogContent>
-					</Dialog>
-					<ConfirmDialog
-						trigger={<Button variant="secondary">刪除記憶</Button>}
-						title="刪除這則記憶?"
-						description="「部署走 Cloudflare」會從工作區移除,此動作無法復原。"
-						danger
-						confirmLabel="刪除記憶"
-						onConfirm={() =>
-							toast("已刪除「部署走 Cloudflare」", { action: { label: "復原", onClick: () => {} } })
-						}
-					/>
-				</Row>
-				<Row>
-					<Button
-						variant="secondary"
-						onClick={async () => {
-							const name = await dialog.open<string>(({ close }) => (
-								<DialogContent
-									title="重新命名 thread"
-									description="dialog.open 回傳的 result 會帶回 close 的值。"
-								>
-									<DialogActions>
-										<DialogClose>
-											<Button variant="ghost">取消</Button>
-										</DialogClose>
-										<Button onClick={() => close("部署筆記")}>改成「部署筆記」</Button>
-									</DialogActions>
-								</DialogContent>
-							)).result
-							toast(name == null ? "沒有改名" : `已改名為「${name}」`)
-						}}
-					>
-						dialog.open
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={async () => {
-							const ok = await dialog.confirm({
-								title: "封存這個 thread?",
-								description: "封存後仍可從側欄找回。",
-								confirmLabel: "封存 thread",
-							})
-							toast(ok ? "已封存" : "沒有封存")
-						}}
-					>
-						dialog.confirm
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => dialog.alert({ title: "已達上限", description: "免費方案最多 3 個工作區。" })}
-					>
-						dialog.alert
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() =>
-							dialog.open(() => (
-								<DialogContent title="工作區設定" description="從這裡再開一個 confirm,兩層疊放。">
-									<StackedSettings />
-								</DialogContent>
-							))
-						}
-					>
-						疊放
-					</Button>
-				</Row>
-			</Demo>
-
-			<Demo
-				id="toast"
-				title="toast"
-				note="底邊的細膠囊是倒數;hover、focus、切走分頁都會停住。loading 不倒數;同 key 原地更新並計數。"
-			>
-				<Row>
-					<Button variant="secondary" onClick={() => toast("交接摘要已複製")}>
-						default
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => toast.success("換班完成", { description: "3 則記憶已帶進新 thread" })}
-					>
-						success
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => toast.danger("無法連到 vault", { description: "稍後會自動重試" })}
-					>
-						danger
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => toast("已刪除「偏好 pnpm」", { action: { label: "復原", onClick: () => {} } })}
-					>
-						with action
-					</Button>
-				</Row>
-				<Row>
-					<Button
-						variant="secondary"
-						onClick={() =>
-							toast.promise(wait(1600, true), {
-								loading: "正在同步 vault…",
-								success: "vault 已同步",
-								error: "同步失敗",
-							})
-						}
-					>
-						promise 成功
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() =>
-							toast
-								.promise(wait(1600, false), {
-									loading: "正在上傳 3 個檔案…",
-									success: "已上傳",
-									error: (error) => `上傳失敗:${(error as Error).message}`,
-								})
-								.catch(() => {})
-						}
-					>
-						promise 失敗
-					</Button>
-					<Button variant="secondary" onClick={() => toast("已複製連結", { key: "copy-link" })}>
-						同 key 連按(×N)
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => {
-							const id = toast("正在換班…", { timeout: 0 })
-							setTimeout(() => toast.update(id, { title: "換班完成", type: "success", timeout: 4000 }), 1200)
-						}}
-					>
-						update
-					</Button>
-				</Row>
-			</Demo>
-
-			<Demo id="tooltip" title="tooltip" note="hover 或 tab 到按鈕,延遲 400ms。">
-				<Row>
-					<Tooltip content="釘選這則記憶">
-						<Button variant="secondary">top</Button>
-					</Tooltip>
-					<Tooltip content="封存 thread" side="bottom">
-						<Button variant="secondary">bottom</Button>
-					</Tooltip>
-					<Tooltip content="回到工作區" side="left">
-						<Button variant="secondary">left</Button>
-					</Tooltip>
-					<Tooltip content="打開 vault" side="right">
-						<Button variant="secondary">right</Button>
-					</Tooltip>
-					<Tooltip content="產生交接摘要" shortcut={<KbdGroup keys={["⌘", "⇧", "H"]} />}>
-						<Button variant="secondary">開始換班</Button>
-					</Tooltip>
-				</Row>
-			</Demo>
-
-			<Demo id="popover" title="popover">
-				<Row>
-					<Popover>
-						<PopoverTrigger>
-							<Button variant="secondary">部署走 Cloudflare</Button>
-						</PopoverTrigger>
-						<PopoverContent side="bottom" titled>
-							<PopoverTitle>部署走 Cloudflare</PopoverTitle>
-							<PopoverDescription>
-								2026/08/12 由換班交接寫入。之後的 thread 會自動帶上這條。
-							</PopoverDescription>
-							<Row>
-								<Button size="sm" variant="secondary">
-									編輯
-								</Button>
-								<Button size="sm" variant="ghost">
-									刪除
-								</Button>
-							</Row>
-						</PopoverContent>
-					</Popover>
-				</Row>
-			</Demo>
-
-			<Demo id="tabs" title="tabs">
-				<Tabs defaultValue="chat">
-					<TabsList aria-label="Thread 檢視">
-						<TabsTab value="chat">對話</TabsTab>
-						<TabsTab value="memory">記憶</TabsTab>
-						<TabsTab value="handoff">換班紀錄</TabsTab>
-						<TabsTab value="files" disabled>
-							檔案
-						</TabsTab>
-					</TabsList>
-					<TabsPanel value="chat">這個 thread 目前有 12 則訊息。</TabsPanel>
-					<TabsPanel value="memory">本次工作區共留下 7 條記憶。</TabsPanel>
-					<TabsPanel value="handoff">昨天 18:00 由 Fable 交接給 Opus。</TabsPanel>
-					<TabsPanel value="files">尚未開放。</TabsPanel>
-				</Tabs>
-				<Tabs defaultValue="today" variant="pills">
-					<TabsList aria-label="時間範圍">
-						<TabsTab value="today">今天</TabsTab>
-						<TabsTab value="week">本週</TabsTab>
-						<TabsTab value="all">全部</TabsTab>
-					</TabsList>
-					<TabsPanel value="today">今天有 3 個 thread 更新。</TabsPanel>
-					<TabsPanel value="week">本週累積 18 個 thread。</TabsPanel>
-					<TabsPanel value="all">工作區共 142 個 thread。</TabsPanel>
-				</Tabs>
-			</Demo>
-
-			<Demo id="badge" title="badge">
-				<Row>
-					<Badge>草稿</Badge>
-					<Badge variant="accent">進行中</Badge>
-					<Badge variant="success">已交接</Badge>
-					<Badge variant="danger">已中斷</Badge>
-					<Badge variant="outline">唯讀</Badge>
-				</Row>
-				<Row>
-					<Badge variant="accent" count={3}>
-						等你 ·{" "}
-					</Badge>
-					<Badge count={12}>已讀 · </Badge>
-					<Badge variant="mono">128k · 42%</Badge>
-				</Row>
-				<Row>
-					<Badge dot="accent">Fable 在線</Badge>
-					<Badge dot="faint">換班中</Badge>
-					<Badge dot="danger">連線中斷</Badge>
-				</Row>
-				<Row>
-					<Chip onRemove={() => {}} removeLabel="移除篩選:工作區 anyknown">
-						工作區:anyknown
-					</Chip>
-					<Chip onRemove={() => {}} removeLabel="移除篩選:本週">
-						本週
-					</Chip>
-				</Row>
-			</Demo>
-
-			<Demo id="kbd" title="kbd">
-				<Row>
-					<Kbd>⌘</Kbd>
-					<Kbd>⇧</Kbd>
-					<Kbd>Esc</Kbd>
-					<Kbd>Enter</Kbd>
-					<KbdGroup keys={["⌘", "N"]} />
-					<KbdGroup keys={["⌘", "⇧", "P"]} />
-					<KbdGroup keys={["g", "t"]} separator="然後" />
-				</Row>
-				<Text variant="caption">
-					換班前按 <KbdGroup keys={["⌘", "⇧", "H"]} /> 可以先預覽要交接的記憶。
-				</Text>
-			</Demo>
-
-			<Demo id="skeleton" title="skeleton">
-				<SkeletonGroup label="載入中">
-					<Skeleton />
-					<Skeleton width="92%" />
-					<Skeleton width="61%" />
-				</SkeletonGroup>
-				<ThreadSkeleton messages={1} />
-			</Demo>
-
-			<Demo
-				id="progress"
-				title="progress"
-				note="凹下去的軌加一段紫色填充,表示 agent 正在做事;不定量時填充在軌上滑過。環形與圓球是讀數,用墨色。"
-			>
-				<Progress value={percent} aria-label="同步 thread" valueText={`${percent}% · 3 則訊息交接中`} />
-				<Row>
-					<Spinner size="sm" />
-					<Spinner size="md" />
-					<Spinner size="lg" />
-				</Row>
-				<Row>
-					<ProgressBall value={percent} aria-label="下載模型" />
-					<Badge variant="mono">{`${percent}%`}</Badge>
-				</Row>
-				<Progress aria-label="整理記憶" />
-				<div {...stylex.props(styles.ringRow)}>
-					<ProgressRing value={42} aria-label="context 用量" valueText="128k context 已用 42%" />
-				</div>
-			</Demo>
-
-			<Demo id="empty-state" title="empty-state">
-				<EmptyState
-					icon={<MemoryIcon />}
-					title="還沒有記憶"
-					description="開始第一個 thread,重要的事會自動留下來,換班時帶得走。"
-					action={<Button>開始第一個 thread</Button>}
-				/>
-				<EmptyState
-					title="找不到符合的 thread"
-					description="「部署流程」沒有結果。換個關鍵字,或把篩選條件清掉再找一次。"
-					action={<Button variant="ghost">清除篩選</Button>}
-				/>
-			</Demo>
-
-			<Demo id="scrollbar" title="scrollbar" note="全域 CSS,不是元件:@anyknown/ui/scrollbar.css。">
-				<div {...stylex.props(styles.pane)} tabIndex={0}>
-					{Array.from({ length: 9 }, (_, i) => (
-						<Text key={i} variant="caption">
-							換班完成 · 14:32 · ctx 50% → 新 session(第 {i + 1} 列)
-						</Text>
-					))}
-				</div>
-				<div {...stylex.props(styles.both)} tabIndex={0}>
-					<Card {...stylex.props(styles.wide)}>
-						<Text variant="caption">
-							這個容器同時有直向與橫向捲動;右下角的 corner 是透明的,不會出現一塊灰色補丁。
-						</Text>
-					</Card>
-				</div>
-			</Demo>
-		</>
+		<Demo
+			id="progress"
+			title="progress"
+			note="A sunken track with a signal-blue fill: the agent is working. Indeterminate, the fill sweeps across the track and the stage under it cycles. The ring and the ball are readings, not work, so they stay ink."
+		>
+			<Progress
+				value={percent}
+				aria-label="Syncing thread"
+				valueText={`${percent}% · handing off 3 messages`}
+			/>
+			<Row>
+				<Spinner size="sm" />
+				<Spinner size="md" />
+				<Spinner size="lg" />
+			</Row>
+			<Row>
+				<ProgressBall value={percent} aria-label="Downloading model" valueText={`${percent}% downloaded`} />
+				<Badge variant="mono">{`${percent}%`}</Badge>
+			</Row>
+			<Progress aria-label="Tidying memories" valueText="Tidying memories" stages={TIDY_STAGES} />
+			<div {...stylex.props(styles.ringRow)}>
+				<ProgressRing value={42} aria-label="Context used" valueText="42% of 128k context used" />
+			</div>
+		</Demo>
 	)
 }
+
+function SpinDemo() {
+	return (
+		<Demo
+			id="spin"
+			title="spin"
+			note="A 12px ring (9px when small): the one thing on a button that moves while it waits. It stops under reduced motion and is hidden from screen readers, so say what is happening in text."
+		>
+			<Row>
+				<Spin />
+				<Spin small />
+				<Button variant="secondary" disabled>
+					<Spin />
+					Syncing…
+				</Button>
+				<Ghost disabled>
+					<Spin small />
+					Saving
+				</Ghost>
+			</Row>
+		</Demo>
+	)
+}
+
+function EmptyStateDemo() {
+	return (
+		<Demo id="empty-state" title="empty-state">
+			<EmptyState
+				icon={<MemoryIcon />}
+				title="No memories yet"
+				description="Start your first thread. What matters gets kept automatically and travels with every handoff."
+				action={<Button>Start your first thread</Button>}
+			/>
+			<EmptyState
+				title="No matching threads"
+				description="Nothing matches “deploy process”. Try another keyword, or clear the filters and search again."
+				action={<Button variant="ghost">Clear filters</Button>}
+			/>
+		</Demo>
+	)
+}
+
+function IconDemo() {
+	const sizes = ["xs", "sm", "md", "base", "lg"] as const
+
+	return (
+		<Demo
+			id="icon"
+			title="icon"
+			note="Not a component: icon is a set of StyleX size styles (xs to lg) for any 24-unit SVG drawn with ICON_STROKE and currentColor."
+		>
+			<Row>
+				{sizes.map((size) => (
+					<span key={size} {...stylex.props(styles.iconCell)}>
+						<Glyph size={size}>{BELL}</Glyph>
+						<Label>{size}</Label>
+					</span>
+				))}
+			</Row>
+		</Demo>
+	)
+}
+
+function ScrollbarDemo() {
+	return (
+		<Demo id="scrollbar" title="scrollbar" note="Global CSS, not a component: @anyknown/ui/scrollbar.css.">
+			<div {...stylex.props(styles.pane)} tabIndex={0}>
+				{Array.from({ length: 9 }, (_, i) => (
+					<Text key={i} variant="caption">
+						Handoff complete · 14:32 · ctx 50% → new session (row {i + 1})
+					</Text>
+				))}
+			</div>
+			<div {...stylex.props(styles.both)} tabIndex={0}>
+				<Card {...stylex.props(styles.wide)}>
+					<Text variant="caption">
+						This box scrolls both ways. The corner at the bottom right is transparent, so no grey patch shows
+						up.
+					</Text>
+				</Card>
+			</div>
+		</Demo>
+	)
+}
+
+export const basicsDemos: DemoEntry[] = [
+	{ id: "button", covers: ["button"], Component: ButtonDemo },
+	{ id: "ghost", covers: ["ghost"], Component: GhostDemo },
+	{ id: "icon-button", covers: ["icon-button"], Component: IconButtonDemo },
+	{ id: "segmented", covers: ["segmented"], Component: SegmentedDemo },
+	{ id: "dialog", covers: ["dialog"], Component: DialogDemo },
+	{ id: "toast", covers: ["toast"], Component: ToastDemo },
+	{ id: "tooltip", covers: ["tooltip"], Component: TooltipDemo },
+	{ id: "popover", covers: ["popover"], Component: PopoverDemo },
+	{ id: "tabs", covers: ["tabs"], Component: TabsDemo },
+	{ id: "badge", covers: ["badge"], Component: BadgeDemo },
+	{ id: "status-chip", covers: ["status-chip"], Component: StatusChipDemo },
+	{ id: "kbd", covers: ["kbd"], Component: KbdDemo },
+	{ id: "card", covers: ["card"], Component: CardDemo },
+	{ id: "text", covers: ["text"], Component: TextDemo },
+	{ id: "skeleton", covers: ["skeleton"], Component: SkeletonDemo },
+	{ id: "progress", covers: ["progress"], Component: ProgressDemo },
+	{ id: "spin", covers: ["spin"], Component: SpinDemo },
+	{ id: "empty-state", covers: ["empty-state"], Component: EmptyStateDemo },
+	{ id: "icon", covers: ["icon"], Component: IconDemo },
+	{ id: "scrollbar", covers: [], Component: ScrollbarDemo },
+]

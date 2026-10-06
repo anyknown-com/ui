@@ -1,57 +1,36 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
-import { Dialogs, Toaster } from "@anyknown/ui"
-import { BasicsDemos } from "./demos/basics"
-import { DesktopDemos } from "./demos/desktop"
-import { StorageDemos } from "./demos/storage"
-import { FormsDemos } from "./demos/forms"
-import { WebDemos } from "./demos/web"
-
-const GROUPS: Record<string, string[]> = {
-	表單: ["input", "textarea", "label", "checkbox", "radio", "switch", "slider", "select", "dropdown"],
-	基礎: [
-		"button",
-		"dialog",
-		"toast",
-		"tooltip",
-		"popover",
-		"tabs",
-		"badge",
-		"kbd",
-		"skeleton",
-		"progress",
-		"empty-state",
-		"scrollbar",
-	],
-	"Desktop AI": [
-		"message",
-		"tool-card",
-		"reasoning-fold",
-		"action-bar",
-		"code-block",
-		"markdown",
-		"interaction-card",
-		"handoff-receipt",
-		"composer",
-		"voice-indicator",
-		"live-dot",
-	],
-	"Storage / 資料": ["password-input", "recovery-key", "dropzone", "file-row", "diff-viewer", "data-table"],
-	"Web 殼": ["group", "status", "list", "bubble", "attachment", "payload-block", "chatbox", "call-bar"],
-}
+import { breakpoint, color, corner, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
+import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
+import { DEMO_GROUPS, DEMOS } from "./demos"
 
 const styles = stylex.create({
-	page: { display: "grid", gridTemplateColumns: "13rem 1fr", minHeight: "100vh" },
-	nav: {
-		position: "sticky",
-		top: 0,
-		height: "100vh",
-		overflowY: "auto",
-		padding: space.md,
+	page: {
+		display: "grid",
+		gridTemplateColumns: { default: "13rem minmax(0, 1fr)", [breakpoint.tablet]: "minmax(0, 1fr)" },
+		minHeight: "100vh",
 	},
-	title: { fontFamily: font.display, fontSize: text.lg, fontWeight: 600, margin: 0, marginBottom: space.md },
+	nav: {
+		position: { default: "sticky", [breakpoint.tablet]: "static" },
+		top: 0,
+		height: { default: "100vh", [breakpoint.tablet]: "auto" },
+		overflowY: { default: "auto", [breakpoint.tablet]: "visible" },
+		padding: space.md,
+		display: { default: "block", [breakpoint.tablet]: "flex" },
+		flexWrap: "wrap",
+		gap: space.xxs,
+	},
+	title: {
+		fontFamily: font.display,
+		fontSize: text.lg,
+		fontWeight: 600,
+		margin: 0,
+		marginBottom: { default: space.md, [breakpoint.tablet]: space.xs },
+		flexBasis: "100%",
+	},
+	// On a narrow window the groups dissolve and every link joins one wrapped row
+	group: { display: { default: "block", [breakpoint.tablet]: "contents" } },
 	groupName: {
-		display: "block",
+		display: { default: "block", [breakpoint.tablet]: "none" },
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		fontWeight: 600,
@@ -66,46 +45,46 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		textDecoration: "none",
 		fontSize: text.xs,
-		paddingBlock: "0.18rem",
+		paddingBlock: space.xxs,
 		paddingInline: space.xxs,
 		borderRadius: radius.sm,
 	},
-	// 殼是桌面(body 的 layer1),內容是放在上面的主紙
+	// The shell is the desk (layer1 on body); the content is the main sheet on top of it
 	main: {
-		padding: space.lg,
+		padding: { default: space.lg, [breakpoint.tablet]: space.md },
 		minWidth: 0,
-		marginBlock: space.xs,
-		marginInlineEnd: space.xs,
+		marginBlock: { default: space.xs, [breakpoint.tablet]: 0 },
+		marginInlineEnd: { default: space.xs, [breakpoint.tablet]: 0 },
 		backgroundColor: color.layer2,
-		borderRadius: corner.sheet,
+		borderRadius: { default: corner.sheet, [breakpoint.tablet]: 0 },
 	},
 })
 
 export function App() {
 	return (
-		<div {...stylex.props(styles.page)}>
-			<nav {...stylex.props(styles.nav)}>
-				<h1 {...stylex.props(styles.title)}>@anyknown/ui</h1>
-				{Object.entries(GROUPS).map(([group, names]) => (
-					<div key={group}>
-						<b {...stylex.props(styles.groupName)}>{group}</b>
-						{names.map((name) => (
-							<a key={name} href={`#${name}`} {...stylex.props(styles.link)}>
-								{name}
-							</a>
-						))}
-					</div>
-				))}
-			</nav>
-			<main {...stylex.props(styles.main)}>
-				<FormsDemos />
-				<BasicsDemos />
-				<DesktopDemos />
-				<StorageDemos />
-				<WebDemos />
-			</main>
-			<Toaster />
-			<Dialogs />
-		</div>
+		<LocaleProvider locale="en">
+			<div {...stylex.props(styles.page)}>
+				<nav aria-label="Components" {...stylex.props(styles.nav)}>
+					<h1 {...stylex.props(styles.title)}>@anyknown/ui</h1>
+					{DEMO_GROUPS.map((group) => (
+						<div key={group.title} {...stylex.props(styles.group)}>
+							<b {...stylex.props(styles.groupName)}>{group.title}</b>
+							{group.demos.map(({ id }) => (
+								<a key={id} href={`#${id}`} {...stylex.props(styles.link)}>
+									{id}
+								</a>
+							))}
+						</div>
+					))}
+				</nav>
+				<main {...stylex.props(styles.main)}>
+					{DEMOS.map(({ id, Component }) => (
+						<Component key={id} />
+					))}
+				</main>
+				<Toaster />
+				<Dialogs />
+			</div>
+		</LocaleProvider>
 	)
 }

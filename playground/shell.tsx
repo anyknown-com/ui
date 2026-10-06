@@ -1,6 +1,15 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ReactNode } from "react"
+import type { ComponentType, ReactNode } from "react"
 import { color, font, radius, space, text, type } from "@anyknown/ui/tokens.stylex"
+
+export interface DemoEntry {
+	/** Section id and `#/demo/<id>` anchor. Keep the existing ids. */
+	id: string
+	/** Component folders (src/components/<folder>) this demo shows, e.g. ["attach-button", "pending-files"]. */
+	covers: string[]
+	/** Renders the full <Demo> section. */
+	Component: ComponentType
+}
 
 const styles = stylex.create({
 	section: {
