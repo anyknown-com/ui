@@ -125,6 +125,11 @@ focus 跟輸入框是同一個),浮層是 float 階(見 popover);選項內角 12
 secondary 深一階(`layer5`),ghost 類是透明 → `accentSubtle` / `dangerSubtle`。
 按下去 `scale: 0.98`,120ms ease-out;reduced motion 不縮。
 
+- **按下去的回饋只有一份**:`lib/styled.ts` 的 `press.button`(`:active:not(:disabled)` 縮
+  0.98,連同 transition 一起接手)。Button、IconButton、Ghost、ActionBar 的鈕、Composer 的
+  送出、Segmented 的格、Toast 的動作與關閉、Dropzone 的選檔都套它,放在元件樣式後面、`sx`
+  前面。新的按鈕照套,不要自己再寫一次 `scale`。例外是滿版的 GroupCell 列:縮了兩邊會離開卡緣,
+  所以蓋回 `scale: 1`
 | variant | 底 | 標籤色 | 用在 |
 | --- | --- | --- | --- |
 | `primary` | `accent`(墨色) | `accentText` | 主要動作,一個畫面一顆 |

@@ -1,10 +1,10 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { press } from "../../lib/styled"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 import type { ButtonHTMLAttributes, Ref } from "react"
 
 /** `.ghost`: a word that is a button. 28px, muted until the pointer is on it; `danger` is warning. */
 
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
@@ -31,9 +31,6 @@ const styles = stylex.create({
 		paddingBlock: 0,
 		paddingInline: space.xs,
 		textDecoration: "none",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionProperty: "background-color, color",
-		transitionTimingFunction: motion.easeOut,
 		whiteSpace: "nowrap",
 	},
 	danger: {
@@ -49,7 +46,13 @@ export type GhostProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> &
 }
 
 export function Ghost({ danger = false, sx, ...props }: GhostProps) {
-	return <button type="button" {...props} {...stylex.props(styles.root, danger && styles.danger, sx)} />
+	return (
+		<button
+			type="button"
+			{...props}
+			{...stylex.props(styles.root, danger && styles.danger, press.button, sx)}
+		/>
+	)
 }
 
 export type GhostLinkProps = {
@@ -65,7 +68,7 @@ export function GhostLink({ href, children, external = false, sx }: GhostLinkPro
 		<a
 			href={href}
 			{...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-			{...stylex.props(styles.root, sx)}
+			{...stylex.props(styles.root, press.button, sx)}
 		>
 			{children}
 		</a>

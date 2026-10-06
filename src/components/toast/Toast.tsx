@@ -4,8 +4,8 @@ import { createPortal } from "react-dom"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
-import { reset } from "../../lib/styled"
-import { color, corner, font, motion, shadow, space, text, type as scale } from "../../tokens.stylex"
+import { press, reset } from "../../lib/styled"
+import { color, corner, font, shadow, space, text, type as scale } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
@@ -138,8 +138,6 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		borderRadius: corner.pill,
 		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
-		transitionProperty: "background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
@@ -153,8 +151,6 @@ const styles = stylex.create({
 		color: { default: color.textFaint, ":hover": color.text },
 		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
-		transitionProperty: "color, background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
@@ -578,7 +574,7 @@ function ToastItem({ record, paused, onClose }: ToastItemProps) {
 						action.onClick()
 						onClose(record.id)
 					}}
-					{...stylex.props(reset.control, styles.action)}
+					{...stylex.props(reset.control, styles.action, press.button)}
 				>
 					{action.label}
 				</button>
@@ -587,7 +583,7 @@ function ToastItem({ record, paused, onClose }: ToastItemProps) {
 				type="button"
 				aria-label="關閉通知"
 				onClick={() => onClose(record.id)}
-				{...stylex.props(reset.control, styles.close, twoLine && styles.closeTwoLine)}
+				{...stylex.props(reset.control, styles.close, twoLine && styles.closeTwoLine, press.button)}
 			>
 				<XGlyph {...stylex.props(styles.closeGlyph)} />
 			</button>

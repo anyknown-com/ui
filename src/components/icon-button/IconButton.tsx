@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, ink, motion, type } from "../../tokens.stylex"
+import { press } from "../../lib/styled"
+import { color, corner, font, ink, type } from "../../tokens.stylex"
 import { Tooltip } from "../tooltip/Tooltip"
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
 
@@ -7,8 +8,6 @@ import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
  * `.ib`: a circle that holds one glyph. Nothing at rest, an ink wash under the pointer, the
  * name in a tooltip; a badge in the corner when it counts something.
  */
-
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
 	root: {
@@ -32,10 +31,6 @@ const styles = stylex.create({
 		padding: 0,
 		placeItems: "center",
 		position: "relative",
-		scale: { default: "1", ":active": { default: "0.98", [REDUCED]: "1" } },
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionProperty: "background-color, color, scale",
-		transitionTimingFunction: motion.easeOut,
 		width: "2.25rem",
 	},
 	current: { color: color.text },
@@ -95,6 +90,7 @@ export function IconButton({
 		open && styles.open,
 		size === "sm" && styles.sm,
 		size === "xs" && styles.xs,
+		press.button,
 		sx,
 	)
 

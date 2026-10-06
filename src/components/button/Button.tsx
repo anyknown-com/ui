@@ -1,10 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps } from "react"
 import { assignRef } from "../../lib/mergeRefs"
-import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
-
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
+import { press, type StyleArg, styled } from "../../lib/styled"
+import { color, corner, font, space, text, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	base: {
@@ -22,11 +20,7 @@ const styles = stylex.create({
 		backgroundColor: "transparent",
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		opacity: { default: 1, ":disabled": 0.5 },
-		// 按下去壓一點點;reduced motion 不縮
-		scale: { default: "1", ":active:not(:disabled)": { default: "0.98", [REDUCED]: "1" } },
-		transitionProperty: "color, background-color, scale",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
+		// 按下去壓一點點與轉場是共用的 press.button
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
@@ -117,7 +111,15 @@ export function Button({
 			type="button"
 			{...props}
 			ref={(element) => assignRef(ref, element)}
-			{...styled(props, styles.base, styles[size], icon && styles[ICON_SIZE[size]], styles[variant], sx)}
+			{...styled(
+				props,
+				styles.base,
+				styles[size],
+				icon && styles[ICON_SIZE[size]],
+				styles[variant],
+				press.button,
+				sx,
+			)}
 		>
 			<span {...stylex.props(styles.label)}>{children}</span>
 		</button>

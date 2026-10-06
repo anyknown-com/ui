@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, motion, radius, shadow, space, type } from "../../tokens.stylex"
+import { press } from "../../lib/styled"
+import { color, corner, font, radius, shadow, space, type } from "../../tokens.stylex"
 
 /** `.seg`: a few words on a sunken track; the chosen one is a sheet of paper raised on it. */
 
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const PHONE = "@media (max-width: 45rem)"
 
 const styles = stylex.create({
@@ -37,8 +37,6 @@ const styles = stylex.create({
 		outlineOffset: -2,
 		paddingBlock: 0,
 		paddingInline: space.sm,
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionProperty: "background-color, color, box-shadow",
 		whiteSpace: "nowrap",
 	},
 	// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊
@@ -66,7 +64,7 @@ export function Segmented<T extends string>({ value, options, onChange, label, s
 					type="button"
 					aria-pressed={one.value === value}
 					onClick={() => onChange(one.value)}
-					{...stylex.props(styles.item, one.value === value && styles.on)}
+					{...stylex.props(styles.item, one.value === value && styles.on, press.button)}
 				>
 					{one.label}
 				</button>

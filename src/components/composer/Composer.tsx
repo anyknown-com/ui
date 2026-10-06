@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { flushSync } from "react-dom"
-import { reset } from "../../lib/styled"
+import { press, reset } from "../../lib/styled"
 import { popupStyles } from "../../lib/popup"
 import { color, corner, font, motion, space, text, type } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
@@ -95,10 +95,6 @@ const styles = stylex.create({
 		backgroundColor: { default: color.accent, ":disabled": color.accentSubtle },
 		color: { default: color.accentText, ":disabled": color.textFaint },
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
-		scale: { default: null, ":active:not(:disabled)": { default: "0.98", [REDUCED]: null } },
-		transitionProperty: "scale, background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
@@ -486,7 +482,7 @@ export function Composer({
 					aria-label="送出"
 					disabled={!canSend}
 					onClick={submit}
-					{...stylex.props(reset.control, styles.send)}
+					{...stylex.props(reset.control, styles.send, press.button)}
 				>
 					<SendIcon />
 				</button>

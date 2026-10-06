@@ -46,6 +46,8 @@ const styles = stylex.create({
 		borderRadius: 0,
 		height: "auto",
 		justifyContent: "flex-start",
+		// 整列滿版的按鈕按下去不縮:縮 0.98 時兩邊會離開卡緣,看起來像列鬆掉了
+		scale: "1",
 	},
 	text: { display: "flex", flex: 1, flexDirection: "column", gap: 2, minWidth: 0 },
 	label: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },

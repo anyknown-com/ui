@@ -1,6 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
 import type { CompiledStyles, InlineStyles, StyleXArray } from "@stylexjs/stylex/lib/types/StyleXTypes"
 import type { CSSProperties } from "react"
+import { motion } from "../tokens.stylex"
+
+const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 export type StyleArg = StyleXArray<
 	(null | undefined | CompiledStyles) | boolean | Readonly<[CompiledStyles, InlineStyles]>
@@ -39,5 +42,17 @@ export const reset = stylex.create({
 		fontWeight: "inherit",
 		lineHeight: "inherit",
 		textAlign: "inherit",
+	},
+})
+
+// 按下去壓到 0.98:每顆按鈕共用這一份,不要各自再寫。transition 一併接手,清單涵蓋按鈕會變的
+// 屬性(字色、底、框、陰影、透明度、縮放),120ms ease-out;reduced motion 時不縮也不轉場。
+// 用法:放在元件自己的樣式後面、呼叫端 sx 前面。
+export const press = stylex.create({
+	button: {
+		scale: { default: "1", ":active:not(:disabled)": { default: "0.98", [REDUCED]: "1" } },
+		transitionProperty: "color, background-color, border-color, box-shadow, opacity, scale",
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
+		transitionTimingFunction: "ease-out",
 	},
 })

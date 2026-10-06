@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, ReactNode } from "react"
-import { reset, styled } from "../../lib/styled"
+import { press, reset, styled } from "../../lib/styled"
 import { useCopy } from "../../lib/useCopy"
 import { color, corner, motion, space, text } from "../../tokens.stylex"
 import { useMessageBody } from "../message/Message"
@@ -97,7 +97,7 @@ export type ActionBarButtonProps = ComponentProps<"button"> & { icon?: ReactNode
 
 function ActionBarButton({ icon, children, ...props }: ActionBarButtonProps) {
 	return (
-		<button type="button" {...props} {...styled(props, reset.control, styles.button)}>
+		<button type="button" {...props} {...styled(props, reset.control, styles.button, press.button)}>
 			{icon}
 			{children}
 		</button>
@@ -125,7 +125,7 @@ function CopyAction({ text: value, label = "複製", copiedLabel = "已複製 �
 		<button
 			type="button"
 			onClick={() => copy(value ?? messageText())}
-			{...stylex.props(reset.control, styles.button, copied && styles.done)}
+			{...stylex.props(reset.control, styles.button, copied && styles.done, press.button)}
 		>
 			{!copied && <CopyIcon />}
 			{copied ? copiedLabel : label}

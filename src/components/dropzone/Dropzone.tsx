@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type DragEvent, type ReactNode, useRef, useState } from "react"
-import { reset } from "../../lib/styled"
+import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
 import { color, corner, font, motion, shadow, space, text, tone } from "../../tokens.stylex"
 
@@ -278,7 +278,7 @@ export function Dropzone({
 				type="button"
 				disabled={disabled}
 				onClick={() => input.current?.click()}
-				{...stylex.props(styles.pick)}
+				{...stylex.props(styles.pick, press.button)}
 			>
 				{pickLabel}
 			</button>
