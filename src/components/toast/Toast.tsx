@@ -5,7 +5,7 @@ import { usePrefersReducedMotion } from "../../lib/motion"
 import { layerStyles } from "../../lib/popup"
 import { createStore, useStore } from "../../lib/store"
 import { reset } from "../../lib/styled"
-import { color, corner, font, motion, radius, shadow, space, text } from "../../tokens.stylex"
+import { color, corner, font, motion, shadow, space, text, type as scale } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 import { Spin } from "../spin/Spin"
 
@@ -36,6 +36,7 @@ const styles = stylex.create({
 	bottomLeft: { bottom: space.md, insetInlineStart: space.md },
 	topRight: { top: space.md, insetInlineEnd: space.md },
 	topLeft: { top: space.md, insetInlineStart: space.md },
+	// float 階的白紙。透明的框只為了 forced-colors(那裡陰影會消失)
 	toast: {
 		position: "relative",
 		overflow: "hidden",
@@ -45,19 +46,30 @@ const styles = stylex.create({
 		backgroundColor: color.surfaceRaised,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: corner.md,
-		boxShadow: shadow.pop,
-		paddingBlock: space.xs,
-		paddingInline: space.xs,
+		borderColor: "transparent",
+		borderRadius: corner.float,
+		boxShadow: shadow.float,
+		paddingBlock: space.sm,
+		paddingInlineStart: space.md,
+		paddingInlineEnd: space.sm,
 		fontFamily: font.body,
 		fontSize: text.sm,
+		lineHeight: text.leadingSnug,
 		color: color.text,
 		animationName: { default: slideIn, [REDUCED]: "none" },
 		animationDuration: "180ms",
 		animationTimingFunction: "ease-out",
 	},
-	countdown: { position: "absolute", top: 0, insetInlineStart: 0, width: "100%", height: 5 },
+	// 有說明的那則:點與按鈕對齊第一行
+	twoLine: { alignItems: "flex-start" },
+	// 退到圓角內側,線頭不會被 16px 的角切掉
+	countdown: {
+		position: "absolute",
+		top: 0,
+		insetInlineStart: corner.float,
+		width: `calc(100% - 2 * ${corner.float})`,
+		height: 5,
+	},
 	countLine: {
 		fill: "none",
 		strokeWidth: 1.5,
@@ -68,56 +80,79 @@ const styles = stylex.create({
 		animationFillMode: "forwards",
 	},
 	lineDefault: { stroke: color.textFaint },
-	lineSuccess: { stroke: color.accent },
+	lineSuccess: { stroke: color.success },
 	lineDanger: { stroke: color.danger },
 	running: (ms: number, paused: boolean) => ({
 		animationDuration: `${ms}ms`,
 		animationPlayState: paused ? "paused" : "running",
 	}),
-	dot: { flex: "none", width: "0.5rem", height: "0.5rem", borderRadius: radius.full },
-	dotDefault: { backgroundColor: color.textFaint },
-	dotSuccess: { backgroundColor: color.accent },
-	dotDanger: { backgroundColor: color.danger },
-	spin: { color: color.textFaint },
-	content: { flex: 1, display: "grid", gap: 0 },
-	title: { margin: 0, fontSize: text.sm, color: color.text },
-	count: {
-		marginInlineStart: space.xxs,
-		fontSize: "0.72rem",
-		fontVariantNumeric: "tabular-nums",
-		color: color.textMuted,
+	// 20px 的槽:點、轉圈都放在裡面置中,換狀態時標題不會跳
+	mark: {
+		flex: "none",
+		display: "grid",
+		placeItems: "center",
+		width: "1.25rem",
+		height: "1.25rem",
 	},
-	description: { margin: 0, fontSize: "0.78rem", color: color.textMuted },
-	action: {
-		fontFamily: font.body,
-		fontSize: "0.8rem",
-		fontWeight: 500,
+	dot: { width: "0.5rem", height: "0.5rem", borderRadius: corner.pill },
+	dotDefault: { backgroundColor: color.text },
+	dotSuccess: { backgroundColor: color.success },
+	dotDanger: { backgroundColor: color.danger },
+	spin: { color: color.signal, width: space.md, height: space.md },
+	content: { flex: 1, minWidth: 0, display: "grid", gap: "0.125rem" },
+	title: { margin: 0, fontSize: text.sm, color: color.text },
+	titleStrong: { fontWeight: 500 },
+	count: {
+		flex: "none",
+		display: "inline-grid",
+		placeItems: "center",
+		boxSizing: "border-box",
+		minWidth: space.lg,
+		height: "1.375rem",
+		paddingInline: "0.375rem",
+		borderRadius: corner.pill,
+		backgroundColor: color.accentSubtle,
+		color: color.text,
+		fontSize: text.xs,
+		fontWeight: 600,
 		lineHeight: 1,
-		color: color.accent,
+		fontVariantNumeric: "tabular-nums",
+	},
+	description: { margin: 0, fontSize: scale.t2, color: color.textMuted },
+	action: {
+		flex: "none",
+		height: "1.75rem",
+		fontFamily: font.body,
+		fontSize: scale.t2,
+		fontWeight: 600,
+		lineHeight: 1,
+		color: color.text,
 		cursor: "pointer",
-		paddingBlock: space.xxs,
-		paddingInline: space.xxs,
-		borderRadius: radius.sm,
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		paddingInline: space.sm,
+		borderRadius: corner.pill,
+		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
 		transitionProperty: "background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
-		outlineOffset: -1,
+		outlineOffset: 2,
 	},
 	close: {
 		flex: "none",
 		display: "inline-grid",
 		placeItems: "center",
-		width: "1.5rem",
-		height: "1.5rem",
-		borderRadius: radius.sm,
+		width: space.lg,
+		height: space.lg,
+		borderRadius: corner.pill,
 		color: { default: color.textFaint, ":hover": color.text },
+		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
 		cursor: "pointer",
-		transitionProperty: "color",
+		transitionProperty: "color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
+	// 對齊第一行(20px 行高)的中線
+	closeTwoLine: { marginBlock: "-0.125rem" },
 	closeGlyph: { width: 14, height: 14 },
 	srOnly: {
 		position: "absolute",
@@ -456,13 +491,14 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 	const reduced = usePrefersReducedMotion()
 	const tone = TONE[record.type in TONE ? record.type : "default"]
 	const action = record.action
+	const twoLine = record.description != null
 
 	return (
 		<div
 			role={record.type === "danger" ? "alert" : "status"}
 			aria-atomic="true"
 			data-type={record.type}
-			{...stylex.props(styles.toast)}
+			{...stylex.props(styles.toast, twoLine && styles.twoLine)}
 		>
 			{!reduced && record.duration > 0 && (
 				<svg
@@ -479,19 +515,20 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 					/>
 				</svg>
 			)}
-			{record.loading ? (
-				<Spin small sx={styles.spin} />
-			) : (
-				<span aria-hidden="true" {...stylex.props(styles.dot, tone.dot)} />
-			)}
+			<span aria-hidden="true" {...stylex.props(styles.mark)}>
+				{record.loading ? <Spin sx={styles.spin} /> : <span {...stylex.props(styles.dot, tone.dot)} />}
+			</span>
 			<div {...stylex.props(styles.content)}>
 				{tone.word !== "" && <span {...stylex.props(styles.srOnly)}>{tone.word}</span>}
-				<p {...stylex.props(styles.title)}>
-					{record.title}
-					{record.count > 1 && <span {...stylex.props(styles.count)}>×{record.count}</span>}
-				</p>
-				{record.description != null && <p {...stylex.props(styles.description)}>{record.description}</p>}
+				<p {...stylex.props(styles.title, twoLine && styles.titleStrong)}>{record.title}</p>
+				{twoLine && <p {...stylex.props(styles.description)}>{record.description}</p>}
 			</div>
+			{record.count > 1 && (
+				<span {...stylex.props(styles.count)}>
+					<span {...stylex.props(styles.srOnly)}>×</span>
+					{record.count}
+				</span>
+			)}
 			{action != null && (
 				<button
 					type="button"
@@ -508,7 +545,7 @@ function ToastItem({ record, paused, manager }: ToastItemProps) {
 				type="button"
 				aria-label="關閉通知"
 				onClick={() => manager.close(record.id)}
-				{...stylex.props(reset.control, styles.close)}
+				{...stylex.props(reset.control, styles.close, twoLine && styles.closeTwoLine)}
 			>
 				<XGlyph {...stylex.props(styles.closeGlyph)} />
 			</button>
