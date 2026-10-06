@@ -5,13 +5,6 @@
 	"components/data-table/DataTable.tsx": {
 		"zIndex": 1
 	},
-	"components/dialog/Dialog.tsx": {
-		"duration": 1
-	},
-	"components/dropdown/DropdownMenu.tsx": {
-		"duration": 1,
-		"fontSize": 1
-	},
 	"components/dropzone/Dropzone.tsx": {
 		"duration": 3
 	},
@@ -27,11 +20,5 @@
 	"components/tabs/Tabs.tsx": {
 		"duration": 2,
 		"zIndex": 1
-	},
-	"components/toast/Toast.tsx": {
-		"duration": 1
-	},
-	"components/tooltip/Tooltip.tsx": {
-		"fontSize": 1
 	}
 }
