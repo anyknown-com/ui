@@ -3,7 +3,7 @@ import { type ReactNode, useCallback, useId, useRef, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, motion, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, motion, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -30,8 +30,8 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-		transitionTimingFunction: "ease-out",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		transitionTimingFunction: motion.easeOut,
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	chevron: {
@@ -39,7 +39,7 @@ const styles = stylex.create({
 		height: 14,
 		flex: "none",
 		transitionProperty: "rotate",
-		transitionDuration: { default: "140ms", [REDUCED]: "0s" },
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	chevronOpen: { rotate: "90deg" },
 	// 左線對齊膠囊裡 chevron 的中線
@@ -65,7 +65,7 @@ const styles = stylex.create({
 		color: { default: "transparent", [REDUCED]: color.textMuted },
 		animationName: { default: shimmer, [REDUCED]: "none" },
 		animationDuration: "1.6s",
-		animationTimingFunction: "linear",
+		animationTimingFunction: motion.linear,
 		animationIterationCount: "infinite",
 	},
 })
