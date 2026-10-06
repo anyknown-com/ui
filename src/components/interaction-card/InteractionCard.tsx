@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react"
+import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { color, corner, font, motion, shadow, space, type } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 import { Checkbox } from "../checkbox/Checkbox"
@@ -191,29 +192,86 @@ function ReceiptIcon({ rejected }: { rejected?: boolean }) {
 	)
 }
 
+const strings = defineStrings({
+	"zh-TW": {
+		cardName: (verb: string, subject: string) => `${verb}:${subject}`,
+		blocking: "等你才能繼續",
+		waiting: "等你",
+		replied: "已回覆",
+		allowOnce: "允許一次",
+		allowAlways: "總是允許",
+		reject: "拒絕",
+		scope: "這個指令",
+		decide: "決定",
+		decided: "已決定",
+		submit: "送出決定",
+		acceptRecommended: "照建議",
+		recommended: "建議",
+	},
+	en: {
+		cardName: (verb: string, subject: string) => `${verb}: ${subject}`,
+		blocking: "Blocked on you",
+		waiting: "Waiting on you",
+		replied: "Replied",
+		allowOnce: "Allow once",
+		allowAlways: "Always allow",
+		reject: "Deny",
+		scope: "this command",
+		decide: "Decision",
+		decided: "Decided",
+		submit: "Submit decision",
+		acceptRecommended: "Use recommendation",
+		recommended: "Recommended",
+	},
+})
+
+/**
+ * PermissionCard's and DecisionCard's built-in words (follow `<LocaleProvider>`): state
+ * badges, reply and submit buttons, the default `scope` and the "recommended" tag.
+ * Override any with `labels`.
+ */
+export type InteractionCardLabels = StringsOf<typeof strings>
+
 export type PermissionReply = "once" | { always: string } | { reject: true; message?: string }
 
 export type PermissionReceipt = { text: string; rejected?: boolean }
 
 export type PermissionCardProps = {
+	/** What the agent wants to do, e.g. "Run command". Heads the card and names it. */
 	verb: string
+	/** The exact thing it wants to do it to, shown verbatim in a scrollable block. */
 	subject: string
+	/** What "Always allow" covers; reported back as `{ always: scope }`. Wins over `labels.scope`. */
 	scope?: string
+	/** A short note under the buttons, e.g. which policy asked. */
 	policyHint?: ReactNode
+	/** The state badge while waiting. Wins over `labels.blocking`. */
 	blockingLabel?: string
+	/** Called with the person's reply. */
 	onReply?: (reply: PermissionReply) => void
+	/** Once answered: the card collapses to this receipt. */
 	resolved?: PermissionReceipt
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<InteractionCardLabels>
 }
 
+/**
+ * Asks the person to allow something the agent wants to do. Enter activates the focused
+ * reply, ⌘/Ctrl+Enter always allows, Escape rejects.
+ */
 export function PermissionCard({
 	verb,
 	subject,
-	scope = "這個指令",
+	scope: scopeProp,
 	policyHint,
-	blockingLabel = "等你才能繼續",
+	blockingLabel,
 	onReply,
 	resolved,
+	labels,
 }: PermissionCardProps) {
+	const t = useStrings(strings, labels)
+	const scope = scopeProp ?? t.scope
+
 	// Plain Enter is left to the focused button's own activation; only the
 	// card-level shortcuts are intercepted.
 	function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
@@ -230,14 +288,14 @@ export function PermissionCard({
 	return (
 		<div
 			role="group"
-			aria-label={`${verb}:${subject}`}
+			aria-label={t.cardName(verb, subject)}
 			{...stylex.props(styles.card, !resolved && styles.permissionPending)}
 		>
 			<div {...stylex.props(styles.head)}>
 				<LockIcon />
 				<span {...stylex.props(styles.verb)}>{verb}</span>
 				<span {...stylex.props(styles.state, resolved ? styles.stateQuiet : styles.stateWarning)}>
-					{resolved ? "已回覆" : blockingLabel}
+					{resolved ? t.replied : (blockingLabel ?? t.blocking)}
 				</span>
 			</div>
 			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
@@ -257,7 +315,7 @@ export function PermissionCard({
 					</pre>
 					<div {...stylex.props(styles.actions)}>
 						<Button onKeyDown={onKeyDown} onClick={() => onReply?.("once")}>
-							允許一次
+							{t.allowOnce}
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								⏎
 							</kbd>
@@ -268,7 +326,7 @@ export function PermissionCard({
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ always: scope })}
 						>
-							總是允許
+							{t.allowAlways}
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								⌘⏎
 							</kbd>
@@ -279,7 +337,7 @@ export function PermissionCard({
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ reject: true })}
 						>
-							拒絕
+							{t.reject}
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								Esc
 							</kbd>
@@ -297,12 +355,12 @@ export function PermissionCard({
 	)
 }
 
-function optionLabel(option: DecisionOption) {
+function optionLabel(option: DecisionOption, recommendedWord: string) {
 	if (!option.recommended) return option.label
 	return (
 		<>
 			{option.label}
-			<span {...stylex.props(styles.recommended)}>建議</span>
+			<span {...stylex.props(styles.recommended)}>{recommendedWord}</span>
 		</>
 	)
 }
@@ -329,26 +387,39 @@ export type DecisionBlock =
 export type DecisionAnswer = Record<string, string | string[]>
 
 export type DecisionCardProps = {
+	/** The question. Also names unlabelled option groups and text boxes. */
 	title: string
+	/** The card's contents in order: markdown notes, option groups and free-text boxes. */
 	blocks: DecisionBlock[]
+	/** The agent cannot continue until this is answered: the card gets a ring and a blocking badge. */
 	blocking?: boolean
+	/** The badge when not blocking, e.g. when the agent will go ahead on its own. Defaults to `labels.waiting`. */
 	deadlineLabel?: string
+	/** The submit button. Wins over `labels.submit`. */
 	submitLabel?: string
+	/** The button that submits the recommended options. Wins over `labels.acceptRecommended`. */
 	recommendedLabel?: string
+	/** Called with the answer, keyed by block id. */
 	onAnswer?: (answer: DecisionAnswer) => void
+	/** Once answered: the card collapses to this receipt. */
 	resolved?: { text: string }
+	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
+	labels?: Partial<InteractionCardLabels>
 }
 
+/** Asks the person to decide: options, free text, and a one-click "use the recommendation". */
 export function DecisionCard({
 	title,
 	blocks,
 	blocking = false,
 	deadlineLabel,
-	submitLabel = "送出決定",
-	recommendedLabel = "照建議",
+	submitLabel,
+	recommendedLabel,
 	onAnswer,
 	resolved,
+	labels,
 }: DecisionCardProps) {
+	const t = useStrings(strings, labels)
 	const base = useId()
 	const [answer, setAnswer] = useState<DecisionAnswer>({})
 
@@ -381,14 +452,14 @@ export function DecisionCard({
 		<div {...stylex.props(styles.card, !resolved && blocking && styles.decisionPending)}>
 			<div {...stylex.props(styles.head)}>
 				<DecideIcon />
-				<span {...stylex.props(styles.verb)}>決定</span>
+				<span {...stylex.props(styles.verb)}>{t.decide}</span>
 				<span
 					{...stylex.props(
 						styles.state,
 						resolved ? styles.stateQuiet : blocking ? styles.stateAccent : styles.stateQuiet,
 					)}
 				>
-					{resolved ? "已決定" : blocking ? "等你才能繼續" : (deadlineLabel ?? "等你")}
+					{resolved ? t.decided : blocking ? t.blocking : (deadlineLabel ?? t.waiting)}
 				</span>
 			</div>
 			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
@@ -446,7 +517,7 @@ export function DecisionCard({
 											onCheckedChange={(on) =>
 												set(block.id, on ? [...picks, option.value] : picks.filter((v) => v !== option.value))
 											}
-											label={optionLabel(option)}
+											label={optionLabel(option, t.recommended)}
 											description={option.description}
 										/>
 									))}
@@ -468,7 +539,7 @@ export function DecisionCard({
 									<Radio
 										key={option.value}
 										value={option.value}
-										label={optionLabel(option)}
+										label={optionLabel(option, t.recommended)}
 										description={option.description}
 									/>
 								))}
@@ -477,11 +548,11 @@ export function DecisionCard({
 					})}
 					<div {...stylex.props(styles.actions)}>
 						<Button disabled={missing} onClick={() => onAnswer?.(answer)}>
-							{submitLabel}
+							{submitLabel ?? t.submit}
 						</Button>
 						{hasRecommendation && (
 							<Button variant="secondary" disabled={recommendationMissing} onClick={() => onAnswer?.(merged)}>
-								{recommendedLabel}
+								{recommendedLabel ?? t.acceptRecommended}
 							</Button>
 						)}
 					</div>

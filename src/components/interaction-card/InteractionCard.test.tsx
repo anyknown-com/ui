@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test, vi } from "vitest"
+import { LocaleProvider } from "../../lib/i18n"
 import { type DecisionBlock, DecisionCard, PermissionCard } from "./InteractionCard"
 
 const BLOCKS: DecisionBlock[] = [
@@ -123,6 +124,36 @@ describe("DecisionCard", () => {
 		)
 		expect(screen.getByText("已決定 · 你選了三檔方案")).toBeInTheDocument()
 		expect(screen.queryByRole("radio")).not.toBeInTheDocument()
+	})
+})
+
+describe("InteractionCard locale", () => {
+	test("PermissionCard words follow the locale; labels and single-word props win", async () => {
+		const onReply = vi.fn()
+		render(
+			<LocaleProvider locale="en">
+				<PermissionCard verb="Run" subject="pnpm publish" onReply={onReply} labels={{ reject: "No" }} />
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("group", { name: "Run: pnpm publish" })).toBeInTheDocument()
+		expect(screen.getByText("Blocked on you")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Allow once" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "No" })).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Always allow" }))
+		expect(onReply).toHaveBeenLastCalledWith({ always: "this command" })
+	})
+
+	test("DecisionCard words follow the locale; single-word props win", () => {
+		render(
+			<LocaleProvider locale="en">
+				<DecisionCard title="Which first?" blocks={BLOCKS} submitLabel="Go" />
+			</LocaleProvider>,
+		)
+		expect(screen.getByText("Decision")).toBeInTheDocument()
+		expect(screen.getByText("Waiting on you")).toBeInTheDocument()
+		expect(screen.getByText("Recommended")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Go" })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Use recommendation" })).toBeInTheDocument()
 	})
 })
 
