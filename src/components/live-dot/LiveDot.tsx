@@ -3,6 +3,7 @@ import type { StyleArg } from "../../lib/styled"
 import { color, corner, space } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+const FORCED = "@media (forced-colors: active)"
 
 // 呼吸只到 0.35 就回來:淡出到底會變成閃爍,那是警報不是「還在跑」。
 const breathe = stylex.keyframes({ "50%": { opacity: 0.35 } })
@@ -15,7 +16,9 @@ const styles = stylex.create({
 		height: "0.375rem",
 		borderRadius: corner.pill,
 		// 「agent 正在做事」是 signal 的意思
-		backgroundColor: color.signal,
+		// Forced colors wipe backgrounds and the dot would vanish: paint Highlight and keep it.
+		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
+		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		animationName: { default: breathe, [REDUCED]: "none" },
 		animationDuration: "1.6s",
 		animationIterationCount: "infinite",
