@@ -4,7 +4,7 @@ import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { useCopy } from "../../lib/useCopy"
 import { formatDuration } from "../../lib/format"
-import { color, corner, font, ink, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, font, ink, motion, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -96,6 +96,18 @@ const styles = stylex.create({
 		animationTimingFunction: "linear",
 		animationIterationCount: "infinite",
 	},
+	// 定量:寬度跟著 progress 走,不掃
+	fill: {
+		position: "absolute",
+		insetBlock: 0,
+		insetInlineStart: 0,
+		borderRadius: corner.pill,
+		backgroundColor: color.signal,
+		transitionProperty: "width",
+		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
+		transitionTimingFunction: motion.easeOut,
+	},
+	fillWidth: (percent: number) => ({ width: `${percent}%` }),
 	time: {
 		flex: "none",
 		fontSize: type.t2,
@@ -361,6 +373,12 @@ export type ToolCardProps = {
 	defaultOpen?: boolean
 	/** Called with the new state when the user opens or closes the card. Opening on error is not reported. */
 	onOpenChange?: (open: boolean) => void
+	/**
+	 * How far the running call is, as a fraction from 0 to 1 (values outside are clamped).
+	 * Fills the bar and is exposed as a progressbar (0–100) while `state` is `running`.
+	 * Leave it undefined for the indeterminate sweep, the default.
+	 */
+	progress?: number
 	retry?: ToolRetry
 	/** The retry line, shown and announced: when the next try starts and which try of how many it is. */
 	retryLabel?: (attempt: number, max: number, seconds: number) => string
@@ -382,6 +400,7 @@ export function ToolCard({
 	open: openProp,
 	defaultOpen,
 	onOpenChange,
+	progress,
 	retry,
 	retryLabel = (attempt, max, seconds) => `${seconds} 秒後重試(第 ${attempt} / ${max} 次)`,
 	runningLabel = "執行中",
@@ -409,6 +428,10 @@ export function ToolCard({
 	const retryText =
 		retry != null ? retryLabel(retry.attempt, retry.max, Math.round(retry.delayMs / 1000)) : ""
 	const time = durationLabel ?? (durationMs != null ? formatDuration(durationMs) : "")
+	const fraction =
+		state === "running" && progress != null && Number.isFinite(progress)
+			? Math.min(1, Math.max(0, progress))
+			: undefined
 
 	return (
 		<div {...stylex.props(styles.card, state === "error" && styles.cardError)}>
@@ -437,22 +460,45 @@ export function ToolCard({
 				</span>
 				<span {...stylex.props(styles.main)}>
 					<span {...stylex.props(styles.line)}>
-						<span {...stylex.props(styles.title)}>{title ?? VERBS[tool] ?? tool}</span>
+						<span id={`${detailId}-title`} {...stylex.props(styles.title)}>
+							{title ?? VERBS[tool] ?? tool}
+						</span>
 						{subtitle != null && (
-							<span title={subtitle} {...stylex.props(styles.subtitle, open && styles.subtitleOpen)}>
+							<span
+								id={`${detailId}-subtitle`}
+								title={subtitle}
+								{...stylex.props(styles.subtitle, open && styles.subtitleOpen)}
+							>
 								{subtitle}
 							</span>
 						)}
 					</span>
 					{state === "running" && (
 						<span aria-hidden="true" {...stylex.props(styles.track)}>
-							<span {...stylex.props(styles.bar)} />
+							<span
+								{...stylex.props(
+									fraction != null ? styles.fill : styles.bar,
+									fraction != null && styles.fillWidth(fraction * 100),
+								)}
+							/>
 						</span>
 					)}
 				</span>
 				{time !== "" && <span {...stylex.props(styles.time)}>{time}</span>}
 				<Chevron open={open} />
 			</button>
+			{/* A button's children are presentational, so the progressbar sits beside it, visually hidden;
+			    the bar inside the row is its picture. */}
+			{fraction != null && (
+				<span
+					role="progressbar"
+					aria-labelledby={subtitle != null ? `${detailId}-title ${detailId}-subtitle` : `${detailId}-title`}
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-valuenow={Math.round(fraction * 100)}
+					{...stylex.props(styles.srOnly)}
+				/>
+			)}
 			{secondLine}
 			{footer}
 			<div id={detailId} hidden={!open} {...stylex.props(styles.detail)}>

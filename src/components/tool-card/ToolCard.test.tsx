@@ -175,6 +175,33 @@ describe("ToolCard open state", () => {
 	})
 })
 
+describe("ToolCard progress", () => {
+	test("indeterminate by default: no progressbar is exposed", () => {
+		render(<ToolCard tool="fetch" state="running" subtitle="example.com" />)
+		expect(screen.queryByRole("progressbar")).toBeNull()
+	})
+
+	test("a fraction becomes a named 0–100 progressbar while running", () => {
+		render(<ToolCard tool="fetch" state="running" subtitle="example.com" progress={0.426} />)
+		const bar = screen.getByRole("progressbar", { name: "取得 example.com" })
+		expect(bar).toHaveAttribute("aria-valuenow", "43")
+		expect(bar).toHaveAttribute("aria-valuemin", "0")
+		expect(bar).toHaveAttribute("aria-valuemax", "100")
+	})
+
+	test("values outside 0–1 are clamped", () => {
+		const { rerender } = render(<ToolCard tool="fetch" state="running" progress={1.7} />)
+		expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100")
+		rerender(<ToolCard tool="fetch" state="running" progress={-0.2} />)
+		expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0")
+	})
+
+	test("only while running", () => {
+		render(<ToolCard tool="fetch" state="completed" progress={1} />)
+		expect(screen.queryByRole("progressbar")).toBeNull()
+	})
+})
+
 describe("ToolCard state transitions", () => {
 	test("a card that starts running and later errors opens itself", () => {
 		const { rerender } = render(<ToolCard tool="read" state="running" subtitle="a.ts" />)
