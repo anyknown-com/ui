@@ -78,6 +78,26 @@ describe("FileRow", () => {
 		expect(onSelectChange).not.toHaveBeenCalled()
 	})
 
+	test("uncontrolled: defaultSelected starts it and clicks toggle it", async () => {
+		const onSelectedChange = vi.fn()
+		render(<FileRow item={FILE} defaultSelected onSelectedChange={onSelectedChange} />)
+		const row = screen.getByRole("row")
+		expect(row).toHaveAttribute("aria-selected", "true")
+		await userEvent.click(row)
+		expect(row).toHaveAttribute("aria-selected", "false")
+		expect(onSelectedChange).toHaveBeenCalledExactlyOnceWith(false)
+		await userEvent.click(screen.getByRole("checkbox"))
+		expect(row).toHaveAttribute("aria-selected", "true")
+	})
+
+	test("controlled: onSelectedChange asks, the parent decides", async () => {
+		const onSelectedChange = vi.fn()
+		render(<FileRow item={FILE} selected={false} onSelectedChange={onSelectedChange} />)
+		await userEvent.click(screen.getByRole("row"))
+		expect(onSelectedChange).toHaveBeenCalledWith(true)
+		expect(screen.getByRole("row")).toHaveAttribute("aria-selected", "false")
+	})
+
 	test("folders show a dash instead of a size", () => {
 		render(<FileRow item={FOLDER} />)
 		expect(screen.getByText("—")).toBeInTheDocument()

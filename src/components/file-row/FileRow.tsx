@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent, ReactNode } from "react"
 import { reset } from "../../lib/styled"
+import { useControllableState } from "../../lib/useControllableState"
 import { formatBytes } from "../../lib/format"
 import { color, corner, font, shadow, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
@@ -165,34 +166,61 @@ function FileIcon() {
 }
 
 export type FileItem = {
+	/** A folder gets the folder glyph and no size. */
 	kind: "file" | "folder"
+	/** The file's name, truncated in the row with the full name on hover. */
 	name: string
+	/** Bytes; shown formatted (`1.2 MB`). */
 	size?: number
+	/** When it last changed, already formatted for reading. */
 	mtime?: string
+	/** The MIME type, for the caller's own use (icons, previews). */
 	mime?: string
 }
 
 export type FileRowAction = {
+	/** The glyph on the button. */
 	icon: ReactNode
+	/** The button's accessible name. */
 	label: string
+	/** Pressed; the row's own selection does not change. */
 	onAction: () => void
 }
 
 export type FileRowProps = {
+	/** The file or folder this row stands for. */
 	item: FileItem
+	/** Whether the row is selected, for a controlled row. Pair it with `onSelectedChange`. */
 	selected?: boolean
+	/** Whether the row starts selected, for an uncontrolled row. @default false */
+	defaultSelected?: boolean
+	/** Called with the next selection: a click on the row, its checkbox, or Space. */
+	onSelectedChange?: (selected: boolean) => void
+	/** @deprecated Use `onSelectedChange`; it is called with the same value. */
 	onSelectChange?: (selected: boolean) => void
+	/** Double-click or Enter: open the file or go into the folder. */
 	onOpen?: () => void
+	/** Buttons at the end of the row, shown on hover and focus (always on touch). */
 	actions?: FileRowAction[]
+	/** `encrypting` and `uploading` replace size, time and actions with progress. @default "idle" */
 	state?: "idle" | "encrypting" | "uploading"
+	/** Upload progress, 0–100, while `state` is `uploading`. @default 0 */
 	progress?: number
+	/** Replaces the file or folder glyph. */
 	icon?: ReactNode
+	/** @deprecated Use `labels={{ select }}`. */
 	selectLabel?: (name: string) => string
 }
 
+/**
+ * One file or folder in a `FileList` grid: a click (or Space) toggles selection, a
+ * double-click (or Enter) opens it, its actions appear on hover and focus.
+ */
 export function FileRow({
 	item,
-	selected = false,
+	selected: selectedProp,
+	defaultSelected = false,
+	onSelectedChange,
 	onSelectChange,
 	onOpen,
 	actions = [],
@@ -202,6 +230,10 @@ export function FileRow({
 	selectLabel = (name) => `選取 ${name}`,
 }: FileRowProps) {
 	const busy = state !== "idle"
+	const [selected, setSelected] = useControllableState(selectedProp, defaultSelected, (next: boolean) => {
+		onSelectedChange?.(next)
+		onSelectChange?.(next)
+	})
 
 	function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
 		// Only the row's own keys; anything bubbling from the checkbox or an
@@ -209,7 +241,7 @@ export function FileRow({
 		if (busy || event.target !== event.currentTarget) return
 		if (event.key === " ") {
 			event.preventDefault()
-			onSelectChange?.(!selected)
+			setSelected(!selected)
 		} else if (event.key === "Enter") {
 			event.preventDefault()
 			onOpen?.()
@@ -266,7 +298,7 @@ export function FileRow({
 			onClick={(event) => {
 				// The second click of a double-click must not undo the first's toggle.
 				if (event.detail > 1) return
-				onSelectChange?.(!selected)
+				setSelected(!selected)
 			}}
 			onDoubleClick={() => onOpen?.()}
 			onKeyDown={onKeyDown}
@@ -278,7 +310,7 @@ export function FileRow({
 					checked={selected}
 					aria-label={selectLabel(item.name)}
 					onClick={(event) => event.stopPropagation()}
-					onChange={(event) => onSelectChange?.(event.currentTarget.checked)}
+					onChange={(event) => setSelected(event.currentTarget.checked)}
 					{...stylex.props(styles.check)}
 				/>
 			</span>
