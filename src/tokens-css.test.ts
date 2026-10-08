@@ -17,6 +17,11 @@ describe("tokens.css", () => {
 		expect(Object.fromEntries(declarations(css, selector))).toEqual(Object.fromEntries(want.dark))
 	})
 
+	test('[data-theme="light"] 有每個會變色的變數的淺色值', () => {
+		const expected = Object.fromEntries([...want.dark.keys()].map((k) => [k, want.light.get(k)]))
+		expect(Object.fromEntries(declarations(css, '[data-theme="light"]'))).toEqual(expected)
+	})
+
 	test("不只顏色:space、type、motion、zIndex、corner、shadow 都有", () => {
 		for (const name of [
 			"--ak-space-md",

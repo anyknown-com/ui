@@ -38,11 +38,13 @@ export function DarkSection({ children }: { children: ReactNode }) {
 }
 
 [data-theme="dark"] { /* dark values */ }
+
+[data-theme="light"] { /* light values of the variables that change */ }
 ```
 
 So:
 
-- `data-theme="light"` on `<html>` keeps light on a dark OS. It only works on the root element.
+- `data-theme="light"` turns any element and its subtree light, also on a dark OS or inside `data-theme="dark"`.
 - `data-theme="dark"` turns any element and its subtree dark.
 - No attribute follows the OS.
 
@@ -109,8 +111,12 @@ The tokens do not set `color-scheme`. Set it yourself so native controls, form a
   }
 }
 
-:root[data-theme="dark"] {
+[data-theme="dark"] {
   color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
 }
 ```
 

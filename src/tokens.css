@@ -242,3 +242,54 @@ html {
 	--ak-tone-rail-layer2: #1f1f1f;
 	--ak-tone-rail-layer3: #242424;
 }
+
+/* data-theme="light" locks light on any element and its subtree, even on a dark OS or inside data-theme="dark". */
+[data-theme="light"] {
+	--ak-bg: #ffffff;
+	--ak-surface: #f9f9f9;
+	--ak-surface-raised: #ffffff;
+	--ak-border: #dfdfdf;
+	--ak-border-strong: #d3d3d3;
+	--ak-border-control: #808080;
+	--ak-text: #171717;
+	--ak-text-muted: #5c5c5c;
+	--ak-text-faint: #808080;
+	--ak-accent: #171717;
+	--ak-accent-text: #ffffff;
+	--ak-accent-subtle: #ededed;
+	--ak-link: #171717;
+	--ak-signal: #0169da;
+	--ak-signal-subtle: #e9f2ff;
+	--ak-danger: #ca322e;
+	--ak-danger-subtle: #feecea;
+	--ak-danger-solid: #ca322e;
+	--ak-on-danger-solid: #ffffff;
+	--ak-success: #246e3a;
+	--ak-success-subtle: #e4f7e7;
+	--ak-warning: #955e02;
+	--ak-warning-subtle: #ffeedc;
+	--ak-info: #0169da;
+	--ak-info-subtle: #e9f2ff;
+	--ak-focus-ring: #0169da;
+	--ak-scrim: rgba(0, 0, 0, 0.32);
+	--ak-bone: #ededed;
+	--ak-sheen: #f9f9f9;
+	--ak-success-hl: #c5edcc;
+	--ak-danger-hl: #ffd6d0;
+	--ak-layer1: #f2f2f2;
+	--ak-layer2: #ffffff;
+	--ak-layer3: #f9f9f9;
+	--ak-layer4: #ededed;
+	--ak-layer5: #e6e6e6;
+
+	--ak-shadow-rest: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
+	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
+	--ak-shadow-modal: 0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16);
+	--ak-shadow-raised: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
+	--ak-shadow-popover: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
+
+	--ak-tone-layer6: #d3d3d3;
+	--ak-tone-faint: #808080;
+	--ak-tone-rail-layer2: #ffffff;
+	--ak-tone-rail-layer3: #ededed;
+}

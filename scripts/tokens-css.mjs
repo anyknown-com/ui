@@ -84,6 +84,14 @@ export function generate(groups = readGroups()) {
 					.join("\n"),
 			)
 			.join("\n\n")
+	const locked = themed
+		.map((g) =>
+			g.vars
+				.filter((v) => v.dark !== undefined)
+				.map((v) => `\t${varName(g.name, v.key)}: ${cssValue(v.light)};`)
+				.join("\n"),
+		)
+		.join("\n\n")
 	return `/* Tokens as plain CSS variables — for non-StyleX consumers
  * (desktop uses Tailwind v4 @theme; reference these vars there).
  * Generated from tokens.stylex.ts by scripts/tokens-css.mjs — do not edit by hand.
@@ -106,6 +114,11 @@ ${block("dark", "\t\t")}
 
 [data-theme="dark"] {
 ${block("dark", "\t")}
+}
+
+/* data-theme="light" locks light on any element and its subtree, even on a dark OS or inside data-theme="dark". */
+[data-theme="light"] {
+${locked}
 }
 `
 }
