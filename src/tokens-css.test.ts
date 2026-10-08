@@ -18,8 +18,8 @@ describe("tokens.css", () => {
 	})
 
 	test('[data-theme="light"] 有每個會變色的變數的淺色值', () => {
-		const expected = Object.fromEntries([...want.dark.keys()].map((k) => [k, want.light.get(k)]))
-		expect(Object.fromEntries(declarations(css, '[data-theme="light"]'))).toEqual(expected)
+		const lightOfThemed = Object.fromEntries([...want.dark.keys()].map((k) => [k, want.light.get(k)]))
+		expect(Object.fromEntries(declarations(css, '[data-theme="light"]'))).toEqual(lightOfThemed)
 	})
 
 	test("不只顏色:space、type、motion、zIndex、corner、shadow 都有", () => {
