@@ -7,6 +7,10 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.11.0 — 2026-10-08
+
 ### Added
 
 - **tokens.css:** `data-theme="light"` now locks light on any element and its subtree, also on a dark OS or inside `data-theme="dark"`. Before, it only worked on `<html>`.
