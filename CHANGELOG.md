@@ -9,6 +9,14 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 Nothing yet.
 
+## 0.11.1 — 2026-10-09
+
+### Fixed
+
+- **Table:** `Tr` rows have `space.xs` (8px) padding above and below instead of a fixed 34px height, so a cell that wraps no longer touches the hairlines. Cells line up on their first line (`align-items: start`), so a chip, switch or number beside a wrapped cell stays level with its first line. `Toggle` overhangs into the padding, so rows with and without a chevron are the same height.
+- **Table:** `TableHead` labels are small muted sans (`font.body`, `type.t1`, weight 500) on the same sunken strip, instead of mono. A `TableCell num` label stays right-aligned and takes the sans face. Write head labels in sentence case.
+- **Tabs:** the gap between `TabsList` and the panel is `space.md` (16px), up from `space.xs`, so the panel sits clearly below the list's rule.
+
 ## 0.11.0 — 2026-10-08
 
 ### Added
