@@ -7,7 +7,10 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ## Unreleased
 
-Nothing yet.
+### Added
+
+- **DataTable:** `onOpen(row)` opens a row on click or on <kbd>Enter</kbd>. With it, the rows are one tab stop with a roving tabindex, and <kbd>↑</kbd> / <kbd>↓</kbd> move focus between them. Clicks and keys on a checkbox, link, button or editable cell stay that control's. Without `onOpen` the rows behave as before.
+- **DataTable:** above 1,000 rows, only the rows in and near the scroll area are mounted (TanStack Virtual, row heights measured as they mount), with `aria-rowcount` / `aria-rowindex` so screen readers report a row's place in the whole list. No new prop; 1,000 rows or fewer render as before. Adds the `@tanstack/react-virtual` dependency.
 
 ## 0.11.1 — 2026-10-09
 

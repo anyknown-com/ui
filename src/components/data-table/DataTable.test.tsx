@@ -1,7 +1,7 @@
-import { render, screen, within } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useMemo, useState } from "react"
-import { describe, expect, test, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { LocaleProvider } from "../../lib/i18n"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Badge } from "../badge/Badge"
@@ -391,5 +391,185 @@ describe("DataTable regressions", () => {
 		expect(region).toContainElement(more)
 		expect(region.compareDocumentPosition(more) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 		expect(region.style.getPropertyValue("max-height") || region.getAttribute("style")).toContain("40rem")
+	})
+})
+
+describe("DataTable keyboard rows", () => {
+	const columns: DataTableColumn<Entry>[] = [
+		{ id: "key", header: "key", value: (row) => row.key },
+		{ id: "zh", header: "zh-TW", editable: true, value: (row) => row.zh },
+	]
+	const openable = (onOpen?: (row: Entry) => void, defaultSelected?: Set<string>) => (
+		<DataTable
+			label="字典"
+			rows={ENTRIES}
+			rowKey={(row) => row.key}
+			columns={columns}
+			onOpen={onOpen}
+			defaultSelected={defaultSelected}
+		/>
+	)
+	const bodyRows = () => screen.getAllByRole("row").slice(1)
+
+	test("the rows are one tab stop; ↑ / ↓ move focus and the tab stop with it", async () => {
+		render(openable(vi.fn()))
+		const [first, second] = bodyRows() as [HTMLElement, HTMLElement]
+		expect(bodyRows().map((row) => row.getAttribute("tabindex"))).toEqual(["0", "-1", "-1"])
+		await userEvent.tab() // the scroll region
+		await userEvent.tab()
+		expect(first).toHaveFocus()
+		await userEvent.keyboard("{ArrowDown}")
+		expect(second).toHaveFocus()
+		expect(bodyRows().map((row) => row.getAttribute("tabindex"))).toEqual(["-1", "0", "-1"])
+		await userEvent.keyboard("{ArrowUp}{ArrowUp}")
+		expect(first).toHaveFocus()
+	})
+
+	test("Enter opens the focused row", async () => {
+		const onOpen = vi.fn()
+		render(openable(onOpen))
+		;(bodyRows()[0] as HTMLElement).focus()
+		await userEvent.keyboard("{ArrowDown}{Enter}")
+		expect(onOpen).toHaveBeenCalledTimes(1)
+		expect(onOpen).toHaveBeenCalledWith(ENTRIES[1])
+	})
+
+	test("a click opens the row, but not a click on its checkbox or editable cell", async () => {
+		const onOpen = vi.fn()
+		render(openable(onOpen, new Set()))
+		await userEvent.click(screen.getByText("nav.projects"))
+		expect(onOpen).toHaveBeenCalledWith(ENTRIES[0])
+		await userEvent.click(screen.getByRole("checkbox", { name: "選取 nav.settings" }))
+		await userEvent.click(screen.getByText("換班"))
+		expect(onOpen).toHaveBeenCalledTimes(1)
+	})
+
+	test("keys in an editable cell stay the cell's", async () => {
+		const onOpen = vi.fn()
+		render(openable(onOpen))
+		const cell = screen.getByText("專案").closest("td") as HTMLElement
+		cell.focus()
+		await userEvent.keyboard("{Enter}")
+		expect(screen.getByRole("textbox", { name: /編輯 nav.projects/ })).toHaveFocus()
+		await userEvent.keyboard("{ArrowDown}{Enter}")
+		expect(onOpen).not.toHaveBeenCalled()
+		expect(cell).toHaveFocus()
+	})
+
+	test("without onOpen the rows are not focusable", () => {
+		render(openable())
+		for (const row of bodyRows()) expect(row).not.toHaveAttribute("tabindex")
+	})
+
+	test("axe: focusable rows", async () => {
+		const { container } = render(openable(vi.fn(), new Set()))
+		;(bodyRows()[1] as HTMLElement).focus()
+		await expectNoAxeViolations(container)
+	})
+})
+
+describe("DataTable virtual rows", () => {
+	type Line = { id: string }
+	const many = (count: number): Line[] => Array.from({ length: count }, (_, i) => ({ id: `row-${i}` }))
+	const lines = (rows: Line[], onOpen?: (row: Line) => void) => (
+		<DataTable
+			label="紀錄"
+			rows={rows}
+			rowKey={(row) => row.id}
+			columns={[{ id: "id", header: "id", value: (row) => row.id }]}
+			onOpen={onOpen}
+		/>
+	)
+	// Plain selectors: role queries over 1000 mounted rows are slow enough to time out.
+	const bodyRows = () => Array.from(document.querySelectorAll<HTMLElement>("tbody tr:not([aria-hidden])"))
+
+	// jsdom lays nothing out: give the scroll region a 320px viewport and let scrollTo move it.
+	let restore: () => void
+	beforeEach(() => {
+		const props = ["offsetHeight", "clientHeight", "scrollHeight"] as const
+		const saved = props.map((prop) => Object.getOwnPropertyDescriptor(Element.prototype, prop))
+		const savedOffset = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetHeight")
+		const scrollTo = Object.getOwnPropertyDescriptor(Element.prototype, "scrollTo")
+		const region = (element: Element) => element.getAttribute("role") === "region"
+		const size = (element: Element) => (region(element) ? 320 : 0)
+		Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+			configurable: true,
+			get: function (this: Element) {
+				return size(this)
+			},
+		})
+		Object.defineProperty(Element.prototype, "clientHeight", {
+			configurable: true,
+			get: function (this: Element) {
+				return size(this)
+			},
+		})
+		// Rows draw nothing in jsdom, so the content is as tall as the virtual list says.
+		Object.defineProperty(Element.prototype, "scrollHeight", {
+			configurable: true,
+			get: function (this: Element) {
+				return region(this) ? Number(this.querySelector("table")?.getAttribute("aria-rowcount") ?? 0) * 33 : 0
+			},
+		})
+		Element.prototype.scrollTo = function (this: Element, options?: ScrollToOptions | number) {
+			if (typeof options === "object" && options.top != null) scrollRegion(this as HTMLElement, options.top)
+		} as Element["scrollTo"]
+		restore = () => {
+			props.forEach((prop, i) => {
+				const descriptor = saved[i]
+				if (descriptor) Object.defineProperty(Element.prototype, prop, descriptor)
+				else delete (Element.prototype as unknown as Record<string, unknown>)[prop]
+			})
+			if (savedOffset) Object.defineProperty(HTMLElement.prototype, "offsetHeight", savedOffset)
+			if (scrollTo) Object.defineProperty(Element.prototype, "scrollTo", scrollTo)
+			else delete (Element.prototype as Partial<Element>).scrollTo
+		}
+	})
+	afterEach(() => restore())
+
+	function scrollRegion(region: HTMLElement, top: number) {
+		Object.defineProperty(region, "scrollTop", { configurable: true, value: top })
+		fireEvent.scroll(region)
+	}
+
+	test("5000 rows mount only a window, and scrolling brings later rows in", async () => {
+		render(lines(many(5000)))
+		const table = screen.getByRole("table", { name: "紀錄" })
+		expect(table).toHaveAttribute("aria-rowcount", "5001")
+		const mounted = bodyRows()
+		expect(mounted.length).toBeGreaterThan(0)
+		expect(mounted.length).toBeLessThan(60)
+		expect(screen.getByText("row-0")).toBeInTheDocument()
+		expect(screen.queryByText("row-4000")).not.toBeInTheDocument()
+		expect(mounted[0]).toHaveAttribute("aria-rowindex", "2")
+
+		act(() => scrollRegion(screen.getByRole("region", { name: "紀錄" }), 4000 * 33))
+		expect(await screen.findByText("row-4000")).toBeInTheDocument()
+		expect(screen.queryByText("row-0")).not.toBeInTheDocument()
+		expect(screen.getByText("row-4000").closest("tr")).toHaveAttribute("aria-rowindex", "4002")
+		expect(bodyRows().length).toBeLessThan(60)
+	})
+
+	test("the row count follows a filter, and 1000 rows or fewer are all mounted", () => {
+		const { rerender } = render(lines(many(5000)))
+		rerender(lines(many(1500)))
+		expect(document.querySelector("table")).toHaveAttribute("aria-rowcount", "1501")
+		expect(bodyRows().length).toBeLessThan(60)
+		rerender(lines(many(1000)))
+		expect(document.querySelector("table")).not.toHaveAttribute("aria-rowcount")
+		expect(bodyRows()).toHaveLength(1000)
+	})
+
+	test("↓ past the mounted window scrolls the next row in and focuses it", async () => {
+		const onOpen = vi.fn()
+		render(lines(many(5000), onOpen))
+		const mounted = bodyRows()
+		const last = mounted[mounted.length - 1] as HTMLElement
+		const lastIndex = Number(last.dataset.index)
+		last.focus()
+		await userEvent.keyboard("{ArrowDown}")
+		await waitFor(() => expect(screen.getByText(`row-${lastIndex + 1}`).closest("tr")).toHaveFocus())
+		await userEvent.keyboard("{Enter}")
+		expect(onOpen).toHaveBeenCalledWith({ id: `row-${lastIndex + 1}` })
 	})
 })

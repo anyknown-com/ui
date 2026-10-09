@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useCallback, useRef, useState } from "react"
+import { measureElement, useVirtualizer } from "@tanstack/react-virtual"
+import { type KeyboardEvent, type MouseEvent, type ReactNode, useCallback, useRef, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
@@ -7,6 +8,11 @@ import { color, corner, focusRing, font, motion, space, type } from "../../token
 import { Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
+
+// 超過這麼多列才只掛看得到的那一段;以下照舊全部畫出來
+const VIRTUAL_THRESHOLD = 1000
+// 一列沒折行時的高度,還沒量到(或量不到)時先用它
+const ROW_ESTIMATE = 33
 
 const styles = stylex.create({
 	toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: space.md },
@@ -113,6 +119,12 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.layer3 },
 	},
 	rowSelected: { backgroundColor: color.accentSubtle },
+	rowOpenable: {
+		cursor: "pointer",
+		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
+		outlineOffset: -2,
+	},
+	spacer: (height: number) => ({ height }),
 	td: {
 		borderBottomWidth: 1,
 		borderBottomStyle: "solid",
@@ -265,6 +277,11 @@ export type DataTableProps<Row> = {
 	onSelectedChange?: (selected: Set<string>) => void
 	/** What to say when there are no rows, given the filter text. */
 	emptyState?: (query: string) => ReactNode
+	/**
+	 * Opens a row: on click, or on Enter when the row has focus. Giving it makes the rows one
+	 * tab stop that ↑ / ↓ move between.
+	 */
+	onOpen?: (row: Row) => void
 	/** Shows a "clear filter" link in the empty row; it empties the filter, then calls this. */
 	onClearFilter?: () => void
 	/** Override built-in words for this table; the rest follow `<LocaleProvider>`. */
@@ -320,6 +337,7 @@ export function DataTable<Row>({
 	defaultSelected,
 	onSelectedChange,
 	emptyState,
+	onOpen,
 	onClearFilter,
 	labels,
 	countLabel,
@@ -359,6 +377,74 @@ export function DataTable<Row>({
 	const selectedCount = selected ? keys.filter((key) => selected.has(key)).length : 0
 	const allSelected = keys.length > 0 && selectedCount === keys.length
 	const someSelected = selectedCount > 0 && !allSelected
+	const colCount = columns.length + (selected != null ? 1 : 0)
+
+	// 1000 列以上只畫捲到的那一段,上下用撐高的空列補齊捲軸長度
+	const wrapRef = useRef<HTMLDivElement>(null)
+	const virtual = visible.length > VIRTUAL_THRESHOLD
+	// oxlint-disable-next-line react/incompatible-library -- no React Compiler here; the virtualizer is read fresh each render
+	const virtualizer = useVirtualizer({
+		enabled: virtual,
+		count: visible.length,
+		getScrollElement: () => wrapRef.current,
+		estimateSize: () => ROW_ESTIMATE,
+		getItemKey: (index) => keys[index] ?? index,
+		measureElement: (element, entry, instance) => measureElement(element, entry, instance) || ROW_ESTIMATE,
+		overscan: 10,
+	})
+	const items = virtual ? virtualizer.getVirtualItems() : null
+	const windowed = items
+		? items.map((item) => ({ row: visible[item.index] as Row, index: item.index }))
+		: visible.map((row, index) => ({ row, index }))
+	const padTop = items?.[0]?.start ?? 0
+	const padBottom = items?.length ? virtualizer.getTotalSize() - (items[items.length - 1]?.end ?? 0) : 0
+
+	// Roving tabindex: with onOpen the rows are one tab stop, ↑ / ↓ move it.
+	const [activeKey, setActiveKey] = useState<string | null>(null)
+	const tabStop = activeKey != null && keys.includes(activeKey) ? activeKey : keys[0]
+	// A row ↑ / ↓ moved to that was not mounted yet (virtual) takes focus when it mounts.
+	const pendingFocus = useRef<number | null>(null)
+	const rowRef = useCallback(
+		(node: HTMLTableRowElement | null) => {
+			if (!node) return
+			if (virtual) virtualizer.measureElement(node)
+			if (pendingFocus.current === Number(node.dataset.index)) {
+				pendingFocus.current = null
+				node.focus()
+			}
+		},
+		[virtual, virtualizer],
+	)
+
+	function moveTo(index: number) {
+		const key = keys[index]
+		if (key === undefined) return
+		setActiveKey(key)
+		const node = wrapRef.current?.querySelector<HTMLElement>(`tbody tr[data-index="${index}"]`)
+		if (node) node.focus()
+		else {
+			pendingFocus.current = index
+			virtualizer.scrollToIndex(index)
+		}
+	}
+
+	function rowKeyDown(event: KeyboardEvent<HTMLTableRowElement>, index: number, row: Row) {
+		// Keys inside a cell (an editor, a checkbox) are the cell's own.
+		if (event.target !== event.currentTarget) return
+		if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+			event.preventDefault()
+			moveTo(index + (event.key === "ArrowDown" ? 1 : -1))
+		} else if (event.key === "Enter") {
+			event.preventDefault()
+			onOpen?.(row)
+		}
+	}
+
+	function rowClick(event: MouseEvent<HTMLTableRowElement>, row: Row) {
+		// A click on a checkbox, a link or an editable cell is that control's, not the row's.
+		const hit = (event.target as Element).closest("a, button, input, label, select, textarea, [tabindex]")
+		if (hit === event.currentTarget) onOpen?.(row)
+	}
 
 	// indeterminate 只能從 DOM 設:ref callback 跟著 someSelected 換 identity,React 重跑它就寫回去
 	const selectAll = useCallback(
@@ -437,14 +523,19 @@ export function DataTable<Row>({
 				</div>
 			)}
 			<div
+				ref={wrapRef}
 				tabIndex={0}
 				role="region"
 				aria-label={label}
 				{...stylex.props(styles.wrap, styles.capped(maxHeight))}
 			>
-				<table aria-label={label} {...stylex.props(styles.table)}>
+				<table
+					aria-label={label}
+					aria-rowcount={virtual ? visible.length + 1 : undefined}
+					{...stylex.props(styles.table)}
+				>
 					<thead>
-						<tr>
+						<tr aria-rowindex={virtual ? 1 : undefined}>
 							{selected != null && (
 								<th scope="col" {...stylex.props(styles.th, styles.thCheck)}>
 									<label {...stylex.props(styles.hit)}>
@@ -491,7 +582,7 @@ export function DataTable<Row>({
 					<tbody>
 						{visible.length === 0 ? (
 							<tr>
-								<td colSpan={columns.length + (selected != null ? 1 : 0)} {...stylex.props(styles.emptyRow)}>
+								<td colSpan={colCount} {...stylex.props(styles.emptyRow)}>
 									{emptyState?.(filter) ?? t.noMatch(filter)}
 									{onClearFilter != null && (
 										<>
@@ -511,83 +602,117 @@ export function DataTable<Row>({
 								</td>
 							</tr>
 						) : (
-							visible.map((row) => {
-								const key = rowKey(row)
-								const isSelected = selected?.has(key) ?? false
-								return (
-									<tr key={key} {...stylex.props(styles.row, isSelected && styles.rowSelected)}>
-										{selected != null && (
-											<td {...stylex.props(styles.td, styles.tdCheck)}>
-												<label {...stylex.props(styles.hit)}>
-													<input
-														type="checkbox"
-														checked={isSelected}
-														aria-label={t.select(key)}
-														onChange={(event) => {
-															const next = new Set(selected)
-															if (event.currentTarget.checked) next.add(key)
-															else next.delete(key)
-															setSelected(next)
-														}}
-														{...stylex.props(styles.checkbox)}
-													/>
-												</label>
-											</td>
-										)}
-										{columns.map((column) => {
-											const isEditing = editing?.key === key && editing.col === column.id
-											const value = cellValue(column, row)
-											return (
-												<td
-													key={column.id}
-													tabIndex={column.editable ? 0 : undefined}
-													onDoubleClick={column.editable ? () => startEdit(key, column.id, value) : undefined}
-													onKeyDown={
-														column.editable && !isEditing
-															? (event) => {
-																	if (event.key !== "Enter" && event.key !== "F2") return
-																	event.preventDefault()
-																	startEdit(key, column.id, value)
-																}
-															: undefined
-													}
-													{...stylex.props(
-														styles.td,
-														column.mono && styles.mono,
-														column.editable && styles.editable,
-													)}
-												>
-													{isEditing ? (
-														<input
-															ref={focusOnMount}
-															aria-label={t.edit(column.header, key)}
-															value={draft}
-															onChange={(event) => setDraft(event.currentTarget.value)}
-															onBlur={(event) =>
-																commit(column, row, draft, event.currentTarget.closest("td"))
-															}
-															onKeyDown={(event) => {
-																const cell = event.currentTarget.closest("td") as HTMLElement | null
-																if (event.key === "Enter") {
-																	event.preventDefault()
-																	commit(column, row, draft, cell)
-																} else if (event.key === "Escape") {
-																	event.preventDefault()
-																	leaveEdit(cell)
-																}
-															}}
-															{...stylex.props(reset.control, styles.cellInput)}
-														/>
-													) : (
-														(column.cell?.(row) ??
-														(value === "" ? <span {...stylex.props(styles.empty)}>—</span> : value))
-													)}
-												</td>
-											)
-										})}
+							<>
+								{padTop > 0 && (
+									<tr aria-hidden="true" {...stylex.props(styles.spacer(padTop))}>
+										{/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- an aria-hidden spacer, no content */}
+										<td colSpan={colCount} />
 									</tr>
-								)
-							})
+								)}
+								{windowed.map(({ row, index }) => {
+									const key = rowKey(row)
+									const isSelected = selected?.has(key) ?? false
+									return (
+										<tr
+											key={key}
+											ref={rowRef}
+											data-index={index}
+											aria-rowindex={virtual ? index + 2 : undefined}
+											tabIndex={onOpen ? (key === tabStop ? 0 : -1) : undefined}
+											onFocus={
+												onOpen
+													? (event) => event.target === event.currentTarget && setActiveKey(key)
+													: undefined
+											}
+											onKeyDown={onOpen ? (event) => rowKeyDown(event, index, row) : undefined}
+											onClick={onOpen ? (event) => rowClick(event, row) : undefined}
+											{...stylex.props(
+												styles.row,
+												onOpen && styles.rowOpenable,
+												isSelected && styles.rowSelected,
+											)}
+										>
+											{selected != null && (
+												<td {...stylex.props(styles.td, styles.tdCheck)}>
+													<label {...stylex.props(styles.hit)}>
+														<input
+															type="checkbox"
+															checked={isSelected}
+															aria-label={t.select(key)}
+															onChange={(event) => {
+																const next = new Set(selected)
+																if (event.currentTarget.checked) next.add(key)
+																else next.delete(key)
+																setSelected(next)
+															}}
+															{...stylex.props(styles.checkbox)}
+														/>
+													</label>
+												</td>
+											)}
+											{columns.map((column) => {
+												const isEditing = editing?.key === key && editing.col === column.id
+												const value = cellValue(column, row)
+												return (
+													<td
+														key={column.id}
+														tabIndex={column.editable ? 0 : undefined}
+														onDoubleClick={
+															column.editable ? () => startEdit(key, column.id, value) : undefined
+														}
+														onKeyDown={
+															column.editable && !isEditing
+																? (event) => {
+																		if (event.key !== "Enter" && event.key !== "F2") return
+																		event.preventDefault()
+																		startEdit(key, column.id, value)
+																	}
+																: undefined
+														}
+														{...stylex.props(
+															styles.td,
+															column.mono && styles.mono,
+															column.editable && styles.editable,
+														)}
+													>
+														{isEditing ? (
+															<input
+																ref={focusOnMount}
+																aria-label={t.edit(column.header, key)}
+																value={draft}
+																onChange={(event) => setDraft(event.currentTarget.value)}
+																onBlur={(event) =>
+																	commit(column, row, draft, event.currentTarget.closest("td"))
+																}
+																onKeyDown={(event) => {
+																	const cell = event.currentTarget.closest("td") as HTMLElement | null
+																	if (event.key === "Enter") {
+																		event.preventDefault()
+																		commit(column, row, draft, cell)
+																	} else if (event.key === "Escape") {
+																		event.preventDefault()
+																		leaveEdit(cell)
+																	}
+																}}
+																{...stylex.props(reset.control, styles.cellInput)}
+															/>
+														) : (
+															(column.cell?.(row) ??
+															(value === "" ? <span {...stylex.props(styles.empty)}>—</span> : value))
+														)}
+													</td>
+												)
+											})}
+										</tr>
+									)
+								})}
+								{padBottom > 0 && (
+									<tr aria-hidden="true" {...stylex.props(styles.spacer(padBottom))}>
+										{/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- an aria-hidden spacer, no content */}
+										<td colSpan={colCount} />
+									</tr>
+								)}
+							</>
 						)}
 					</tbody>
 				</table>
