@@ -368,7 +368,7 @@ function TableDemo() {
 		<Demo
 			id="table"
 			title="table"
-			note="A ledger: a mono head on a sunken strip, 34px rows with hairlines, numbers on the right. On a phone the head goes and each row wraps to two lines in the order its cells give. Click a tool name to filter by it."
+			note="A ledger: muted labels on a sunken strip, padded rows with hairlines, cells aligned to their first line, numbers on the right. On a phone the head goes and each row wraps to two lines in the order its cells give. Click a tool name to filter by it."
 		>
 			{tool !== null && (
 				<Row>

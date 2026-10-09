@@ -1,6 +1,6 @@
 # Table
 
-Low-level parts for a mono ledger: a full-width grid with one mono head line on a sunken strip, 34px rows with a hairline under each, and rows that wrap to two lines on a phone.
+Low-level parts for a mono ledger: a full-width grid with one line of small muted labels on a sunken strip, padded rows with a hairline under each, and rows that wrap to two lines on a phone.
 
 ## When to use
 
@@ -19,8 +19,8 @@ Low-level parts for a mono ledger: a full-width grid with one mono head line on 
 The family:
 
 - `Table` — the wrapper. It is full width and never in a card.
-- `TableHead` — the mono head line. `columns` is the grid template that every row shares. `sticky` keeps it at the top of a `ListScroll`. It is hidden on a phone.
-- `Tr` — a 34px row on the same `columns`. `hover` lifts it to `layer3`.
+- `TableHead` — the head line: small muted sans labels on a sunken `surface` strip. Write the labels in sentence case ("Calls · 7d", not "calls · 7d"). `columns` is the grid template that every row shares; a `TableCell num` label stays right-aligned. `sticky` keeps it at the top of a `ListScroll`. It is hidden on a phone.
+- `Tr` — a row on the same `columns`, with `space.xs` (8px) above and below its cells. Cells line up on their first line, so a chip, switch or number beside a cell that wraps stays level with that cell's first line. `hover` lifts it to `layer3`.
 - `TableCell` — a cell: `mono`, `num` (right-aligned), `faint`. For the phone layout: `order`, `prefixed` (`· ` before it), `pushed` (to the line end), `grow` and `hidden`.
 - `StatusCell` — the state column: nothing when fine, a warning dot and a code when `warn`.
 - `Subject` — a mono identifier that is also a button (for example, filter by it).
@@ -39,9 +39,9 @@ const COLS = "minmax(0, 1fr) 6rem 5rem 24px"
 
 <Table>
   <TableHead columns={COLS}>
-    <span>key</span>
-    <span>state</span>
-    <span>size</span>
+    <span>Key</span>
+    <span>State</span>
+    <TableCell num>Size</TableCell>
     <span />
   </TableHead>
   {keys.map((key) => (

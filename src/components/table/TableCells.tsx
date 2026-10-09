@@ -29,7 +29,7 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	num: {
-		fontFamily: font.mono,
+		fontFamily: `var(--ak-table-num-font, ${font.mono})`,
 		textAlign: { default: "end", [breakpoint.phone]: "start" },
 		whiteSpace: "nowrap",
 	},
@@ -60,7 +60,10 @@ const styles = stylex.create({
 		display: "inline-grid",
 		height: 24,
 		justifySelf: "end",
-		margin: 0,
+		// 24px button on a ~21px first line: it overhangs into the row padding, so a row with a
+		// chevron is as tall as one without
+		marginBlock: -2,
+		marginInline: 0,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		padding: 0,
 		placeItems: "center",

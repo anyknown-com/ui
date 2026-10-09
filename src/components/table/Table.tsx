@@ -3,10 +3,12 @@ import { breakpoint, color, corner, focusRing, font, motion, space, type } from 
 import type { ReactNode } from "react"
 
 /**
- * `.tbl`: a ledger, full width in its section and never in a card. The head is one mono line on a
- * sunken `surface` strip, every row is 34px with a hairline under it, identifiers and numbers are
- * mono and numbers sit on the right. On a phone the head goes and each row wraps to two lines,
- * in the order the caller gives each cell.
+ * `.tbl`: a ledger, full width in its section and never in a card. The head is one line of small
+ * muted sans labels on a sunken `surface` strip. Every row has `space.xs` above and below its
+ * cells and a hairline under it; cells line up on their first line, so a chip or switch beside a
+ * cell that wraps stays level with its first line. Identifiers and numbers are mono and numbers
+ * sit on the right. On a phone the head goes and each row wraps to two lines, in the order the
+ * caller gives each cell.
  */
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -25,24 +27,28 @@ const styles = stylex.create({
 		borderRadius: corner.small,
 		color: color.textMuted,
 		display: { default: "grid", [breakpoint.phone]: "none" },
-		fontFamily: font.mono,
+		fontFamily: font.body,
 		fontSize: type.t1,
+		fontWeight: 500,
 		gap: space.sm,
 		height: 28,
+		lineHeight: type.tight,
 		paddingInline: space.sm,
+		// a `TableCell num` in the head keeps its end alignment but takes the head's sans
+		"--ak-table-num-font": font.body,
 	},
 	sticky: { position: "sticky", top: 0, zIndex: 1 }, // literal-ok: local stacking, the head over its own rows
 	row: {
-		alignItems: "center",
+		// first-line alignment: a chip or switch beside a cell that wraps stays on its first line
+		alignItems: "start",
 		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
 		columnGap: { default: space.sm, [breakpoint.phone]: space.xs },
 		display: { default: "grid", [breakpoint.phone]: "flex" },
 		flexWrap: "wrap",
 		fontSize: type.t2,
-		height: { default: 34, [breakpoint.phone]: "auto" },
 		lineHeight: { default: type.body, [breakpoint.phone]: "1.4" },
-		minHeight: { default: 34, [breakpoint.phone]: 52 },
-		paddingBlock: { default: 0, [breakpoint.phone]: space.xs },
+		minHeight: { default: null, [breakpoint.phone]: 52 },
+		paddingBlock: space.xs,
 		paddingInline: space.sm,
 		rowGap: 0,
 	},
@@ -96,7 +102,7 @@ export type TableProps = {
 	children: ReactNode
 } & Sx
 
-/** A full-width ledger of rows: a mono head, 34px rows with hairlines, numbers on the right. */
+/** A full-width ledger of rows: a muted sans head, padded rows with hairlines, numbers on the right. */
 export function Table({ children, sx }: TableProps) {
 	return <div {...stylex.props(styles.table, sx)}>{children}</div>
 }
@@ -113,7 +119,7 @@ export type TableHeadProps = {
 /** @deprecated Use `TableHeadProps`. */
 export type HeadProps = TableHeadProps
 
-/** The one mono line above the rows; `columns` is the grid template every row shares. */
+/** The line of muted labels above the rows; `columns` is the grid template every row shares. */
 export function TableHead({ columns, children, sticky = false, sx }: TableHeadProps) {
 	return (
 		<div {...stylex.props(styles.head, styles.cols(columns), sticky && styles.sticky, sx)}>{children}</div>
