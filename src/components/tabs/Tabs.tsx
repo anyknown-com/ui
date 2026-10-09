@@ -10,7 +10,7 @@ const FORCED = "@media (forced-colors: active)"
 const VariantContext = createContext<"underline" | "pills">("underline")
 
 const styles = stylex.create({
-	root: { display: "grid", gap: space.xs },
+	root: { display: "grid", gap: space.md },
 	list: { display: "flex", gap: space.xxs, position: "relative" },
 	underlineList: {
 		borderBottomWidth: 1,
