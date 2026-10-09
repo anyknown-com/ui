@@ -7,6 +7,10 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.12.0 — 2026-10-09
+
 ### Added
 
 - **DataTable:** `onOpen(row)` opens a row on click or on <kbd>Enter</kbd>. With it, the rows are one tab stop with a roving tabindex, and <kbd>↑</kbd> / <kbd>↓</kbd> move focus between them. Clicks and keys on a checkbox, link, button or editable cell stay that control's. Without `onOpen` the rows behave as before.
