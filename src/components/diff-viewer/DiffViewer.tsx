@@ -37,7 +37,21 @@ const styles = stylex.create({
 	dotModified: { backgroundColor: color.warning },
 	dotAdded: { backgroundColor: color.success },
 	dotDeleted: { backgroundColor: color.danger },
-	stat: { marginInlineStart: "auto", fontSize: type.t1, color: color.textMuted },
+	// 長路徑在窄螢幕截斷，+/− 數字永遠看得到
+	path: {
+		minWidth: 0,
+		overflow: "hidden",
+		textOverflow: "ellipsis",
+		whiteSpace: "nowrap",
+		lineHeight: type.tight,
+	},
+	stat: {
+		flex: "none",
+		marginInlineStart: "auto",
+		fontSize: type.t1,
+		color: color.textMuted,
+		whiteSpace: "nowrap",
+	},
 	plus: { color: color.success, fontWeight: 600 },
 	minus: { color: color.danger, fontWeight: 600 },
 	body: {
@@ -268,7 +282,9 @@ export function DiffViewer({
 					)}
 				/>
 				<span {...stylex.props(styles.srOnly)}>{t[kind]}</span>
-				{file.path}
+				<span title={file.path} {...stylex.props(styles.path)}>
+					{file.path}
+				</span>
 				<span {...stylex.props(styles.stat)}>
 					<b {...stylex.props(styles.plus)}>{`+${added}`}</b>{" "}
 					<b {...stylex.props(styles.minus)}>{`−${removed}`}</b>
