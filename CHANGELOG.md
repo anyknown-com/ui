@@ -7,7 +7,14 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ## Unreleased
 
-Nothing yet.
+### Breaking
+
+- **ToolCard:** removed, with `ToolInput`, `ToolOutput`, `ToolError`, `SubagentLine`, `SubagentSummary`, `SubagentThread`, `SubagentText` and their prop types, `ToolState`, `ToolRetry` and `ToolCardLabels`. No product drew tool calls with it. Use `ToolGroup` for tool calls and `SubThreadRow` for a sub agent; see [MIGRATION.md](MIGRATION.md).
+
+### Added
+
+- **ToolGroup:** tool calls as Anyknown Desktop draws them. A header counts the calls and names each tool once ("用了 3 次工具：read ×2、shell"); a framed list has one row per call (`{ id, tool, summary, input?, output?, risk? }`), and a row opens to the input in a `PayloadBlock` and the output. `open` / `defaultOpen` / `onOpenChange`, `highlight`, `labels`.
+- **SubThreadRow:** a sub agent's run as a filled pill with its title, a status (`SubThreadStatus`: `queued`, `running`, `waiting`, `blocked`, `done`, `failed`, `cancelled`) and a chevron; the pill calls `onOpenRun`. `children` shows under the pill until the run is over.
 
 ## 0.12.2 — 2026-10-15
 

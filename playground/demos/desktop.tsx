@@ -11,16 +11,11 @@ import {
 	Markdown,
 	PermissionCard,
 	ReasoningFold,
-	SubagentLine,
-	SubagentSummary,
-	SubagentText,
-	SubagentThread,
+	SubThreadRow,
 	TextPart,
 	Thread,
-	ToolCard,
-	ToolError,
-	ToolInput,
-	ToolOutput,
+	ToolGroup,
+	type ToolGroupCall,
 	UserMessage,
 	VoiceIndicator,
 	type VoiceState,
@@ -116,87 +111,75 @@ function MessageDemo() {
 	)
 }
 
-function ToolCardDemo() {
+const CALLS: ToolGroupCall[] = [
+	{
+		id: "c1",
+		tool: "read",
+		summary: "packages/runtime/src/turn.ts",
+		input: { path: "packages/runtime/src/turn.ts" },
+		output: "export async function runTurn(session, input) {\n  …\n}",
+	},
+	{
+		id: "c2",
+		tool: "read",
+		summary: "packages/contract/src/events.ts",
+		input: { path: "packages/contract/src/events.ts" },
+	},
+	{
+		id: "c3",
+		tool: "shell",
+		summary: "pnpm test --filter runtime",
+		input: { command: "pnpm test --filter runtime" },
+		output: "Test Files  12 passed (12)\n     Tests  84 passed (84)",
+	},
+	{
+		id: "c4",
+		tool: "mcp_call",
+		summary: "stripe/charges_create",
+		input: { tool: "stripe/charges_create", amount: 2500, currency: "usd" },
+		risk: ["Spends money", "Deletes"],
+	},
+]
+
+function ToolGroupDemo() {
 	const [open, setOpen] = useState(false)
 
 	return (
 		<Demo
-			id="tool-card"
-			title="tool-card"
-			note="The row is a button: Enter or Space folds the detail open. shell, edit and write start open, a failed call opens itself, and a running call sweeps its bar until progress (0 to 1) fills it instead. The last card is controlled: open and onOpenChange belong to the page."
+			id="tool-group"
+			title="tool-group"
+			note="The header counts the calls and names each tool once; Enter or Space hides or shows the list. Each row is a button that opens the call's input and output. The last row declares risks, drawn muted after the summary. The second group is controlled: open and onOpenChange belong to the page."
 		>
-			<ToolCard tool="search" state="running" subtitle="parentCallID" durationMs={2400}>
-				<ToolInput json={{ pattern: "parentCallID", path: "packages/contract" }} />
-			</ToolCard>
-			<ToolCard tool="fetch" state="running" subtitle="rent.example.com/list?max=25000" progress={0.62}>
-				<ToolInput json={{ url: "https://rent.example.com/list?max=25000", pages: 2 }} />
-			</ToolCard>
-			<ToolCard
-				tool="read"
-				state="completed"
-				subtitle="apps/desktop/src/thread/tool-part.tsx"
-				durationMs={300}
-			>
-				<ToolInput json={{ filePath: "apps/desktop/src/thread/tool-part.tsx" }} />
-				<ToolOutput text={"export function ToolPart({ part }) {\n  …\n}"} />
-			</ToolCard>
-			<ToolCard tool="shell" state="completed" subtitle="pnpm test --filter desktop" durationMs={8100}>
-				<ToolOutput text={"Test Files  12 passed (12)\n     Tests  84 passed (84)\n  Duration  6.92s"} />
-			</ToolCard>
-			<ToolCard
-				tool="shell"
-				state="error"
-				subtitle="pnpm build"
-				durationMs={12000}
-				retry={{ attempt: 2, max: 3, delayMs: 3000 }}
-			>
-				<ToolError text={"Error: ENOMEM: not enough memory\n    at ChildProcess.spawn"} />
-			</ToolCard>
-			<ToolCard
-				tool="subagent"
-				state="running"
-				subtitle="Investigate missing retry events"
-				durationLabel="01:24"
-				secondLine={<SubagentLine model="sonnet-5" now="Searching for session.retrying" />}
-			>
-				<SubagentThread task="Find out why the runtime's automatic 429/5xx retries never reach the SSE stream.">
-					<SubagentText>Starting with where retry.ts emits events…</SubagentText>
-				</SubagentThread>
-			</ToolCard>
-			<ToolCard
-				tool="subagent"
-				state="completed"
-				subtitle="Investigate missing retry events"
-				durationLabel="03:41"
-				secondLine={<SubagentLine model="sonnet-5" toolCount={7} />}
-				footer={
-					<SubagentSummary>
-						The gap is in turn.ts: the retry loop only logs and never emits an event, and the contract's
-						EVENTS has no session.retrying type.
-					</SubagentSummary>
-				}
-			>
-				<SubagentThread task="Find out why the runtime's automatic 429/5xx retries never reach the SSE stream.">
-					<SubagentText>
-						Conclusion: the session.retrying event and its contract type are missing.
-					</SubagentText>
-				</SubagentThread>
-			</ToolCard>
+			<ToolGroup calls={CALLS} />
 			<Row>
 				<Button size="sm" variant="secondary" onClick={() => setOpen(!open)}>
-					{open ? "Fold the lint output" : "Show the lint output"}
+					{open ? "Hide the lint call" : "Show the lint call"}
 				</Button>
 			</Row>
-			<ToolCard
-				tool="shell"
-				state="completed"
-				subtitle="pnpm lint"
-				durationMs={2100}
+			<ToolGroup
+				calls={[{ id: "l1", tool: "shell", summary: "pnpm lint", output: "Found 0 warnings and 0 errors." }]}
 				open={open}
 				onOpenChange={setOpen}
-			>
-				<ToolOutput text={"Found 0 warnings and 0 errors.\nFinished in 412ms on 186 files."} />
-			</ToolCard>
+			/>
+		</Demo>
+	)
+}
+
+function SubThreadDemo() {
+	return (
+		<Demo
+			id="sub-thread"
+			title="sub-thread"
+			note="A sub agent's run is its own pill, not a call in a group. The whole pill opens the run. While the run is not over, what it is doing shows indented under it; once done, failed or cancelled, only the pill stays."
+		>
+			<SubThreadRow title="Investigate missing retry events" status="running" onOpenRun={() => {}}>
+				Reading packages/runtime/src/retry.ts for where retries emit events…
+			</SubThreadRow>
+			<SubThreadRow title="Wait for the deploy approval" status="waiting" onOpenRun={() => {}} />
+			<SubThreadRow title="Push the release tag" status="blocked" onOpenRun={() => {}} />
+			<SubThreadRow title="Summarise yesterday's handoffs" status="done" onOpenRun={() => {}} />
+			<SubThreadRow title="Rebuild the search index" status="failed" onOpenRun={() => {}} />
+			<SubThreadRow title="Draft the changelog" status="cancelled" onOpenRun={() => {}} />
 		</Demo>
 	)
 }
@@ -437,7 +420,8 @@ function LiveDotDemo() {
 
 export const desktopDemos: DemoEntry[] = [
 	{ id: "message", covers: ["message"], Component: MessageDemo },
-	{ id: "tool-card", covers: ["tool-card"], Component: ToolCardDemo },
+	{ id: "tool-group", covers: ["tool-group"], Component: ToolGroupDemo },
+	{ id: "sub-thread", covers: ["sub-thread"], Component: SubThreadDemo },
 	{ id: "reasoning-fold", covers: ["reasoning-fold"], Component: ReasoningFoldDemo },
 	{ id: "action-bar", covers: ["action-bar"], Component: ActionBarDemo },
 	{ id: "markdown", covers: ["markdown"], Component: MarkdownDemo },

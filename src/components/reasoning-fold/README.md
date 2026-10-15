@@ -9,7 +9,7 @@ A pill that folds away the agent's thinking: collapsed it says "思考了 N 秒"
 
 ## When not to use
 
-- For a tool call and its input and output, use [ToolCard](../tool-card/README.md).
+- For tool calls and their input and output, use [ToolGroup](../tool-group/README.md); for a sub agent, [SubThreadRow](../sub-thread/README.md).
 - For the reply itself, use [Message](../message/README.md) or [Markdown](../markdown/README.md).
 
 ## Usage
@@ -44,5 +44,5 @@ Without `durationSec` the collapsed label is "思考過程". Once the person tog
 
 ## Related
 
-- [ToolCard](../tool-card/README.md) — the other collapsible row in a turn.
+- [ToolGroup](../tool-group/README.md) — the other fold in a turn.
 - [Message](../message/README.md) — the turn that holds the fold.

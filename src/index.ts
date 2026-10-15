@@ -136,28 +136,17 @@ export {
 	type AttachmentTileProps,
 } from "./components/attachment/Attachment"
 export {
-	ToolCard,
-	ToolInput,
-	ToolOutput,
-	ToolError,
-	SubagentLine,
-	SubagentSummary,
-	SubagentThread,
-	SubagentText,
-} from "./components/tool-card/ToolCard"
-export type {
-	ToolCardProps,
-	ToolState,
-	ToolRetry,
-	ToolInputProps,
-	ToolOutputProps,
-	ToolErrorProps,
-	SubagentLineProps,
-	SubagentSummaryProps,
-	SubagentThreadProps,
-	SubagentTextProps,
-} from "./components/tool-card/ToolCard"
-export type { ToolCardLabels } from "./components/tool-card/ToolCard"
+	ToolGroup,
+	type ToolGroupProps,
+	type ToolGroupCall,
+	type ToolGroupLabels,
+} from "./components/tool-group/ToolGroup"
+export {
+	SubThreadRow,
+	type SubThreadRowProps,
+	type SubThreadStatus,
+	type SubThreadRowLabels,
+} from "./components/sub-thread/SubThreadRow"
 export { ReasoningFold, type ReasoningFoldProps } from "./components/reasoning-fold/ReasoningFold"
 export type { ReasoningFoldLabels } from "./components/reasoning-fold/ReasoningFold"
 export { ActionBar } from "./components/action-bar/ActionBar"

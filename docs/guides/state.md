@@ -423,7 +423,7 @@ Hand-written components use `useControllableState(controlled, defaultValue, onCh
 | --- | --- |
 | `value` / `defaultValue` / `onValueChange` | `Tabs`, `RadioGroup`, `Select`, `PasswordInput`, `Slider`, `SliderCell`, `Segmented`, `Composer` |
 | `checked` / `defaultChecked` / `onCheckedChange` | `Checkbox`, `Switch`, `DropdownCheckboxItem` |
-| `open` / `defaultOpen` / `onOpenChange` | `Dialog`, `ConfirmDialog`, `Popover`, `DropdownMenu`, `GroupItem`, `ToolCard`, `HandoffReceipt`, `ReasoningFold` |
+| `open` / `defaultOpen` / `onOpenChange` | `Dialog`, `ConfirmDialog`, `Popover`, `DropdownMenu`, `GroupItem`, `ToolGroup`, `HandoffReceipt`, `ReasoningFold` |
 | `pressed` / `defaultPressed` / `onPressedChange` | `Chip` (a toggle chip) |
 | `selected` / `defaultSelected` / `onSelectedChange` | `FileRow` (a boolean), `DataTable` (a `Set<string>` of row keys) |
 | `filter` / `defaultFilter` / `onFilterChange`, `sort` / `defaultSort` / `onSortChange` | `DataTable` |
@@ -464,7 +464,7 @@ Details worth knowing:
 - `Input` and `Textarea` are native elements, so `value` and `defaultValue` work as in plain React. They add `onValueChange(text)` next to the native `onChange(event)`; both fire.
 - `Slider` and `SliderCell` also have `onValueCommit`: once when a drag ends, once per key that moved the value. Save there, not in `onValueChange`.
 - A controlled `Composer` gets `onValueChange("")` after a send, so it clears when you apply the value.
-- `ReasoningFold` does not report its automatic open while `streaming` or the collapse after it. `ToolCard` does not report opening itself on error.
+- `ReasoningFold` does not report its automatic open while `streaming` or the collapse after it.
 - `Expand` takes an optional `open`. Without it, it follows its `GroupItem`.
 
 ### Exceptions

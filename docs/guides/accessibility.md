@@ -29,13 +29,13 @@ outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.
 outlineOffset: 2,
 ```
 
-Controls that sit inside a frame use an offset of `-1` or `-2` so the ring is not clipped. Under `@media (forced-colors: active)` the ring uses the system `Highlight` color in `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Select`, `DropdownMenu`, `Ghost`, `IconButton`, `Composer`, `ToolCard`, toasts and dialogs.
+Controls that sit inside a frame use an offset of `-1` or `-2` so the ring is not clipped. Under `@media (forced-colors: active)` the ring uses the system `Highlight` color in `Checkbox`, `Radio`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Select`, `DropdownMenu`, `Ghost`, `IconButton`, `Composer`, toasts and dialogs.
 
 ### Reduced motion everywhere
 
 Every animation and transition is wrapped in `@media (prefers-reduced-motion: reduce)`, which turns it off or sets its duration to `0s`. Repeating animations (spinners, a blinking caret, pulses, shimmers) take their period from the `motion` loop tokens (`loopFast`, `blink`, `loop`, `loopSlow`) and stop under reduced motion.
 
-Where an element should not render at all under reduced motion (the toast countdown line, `requestAnimationFrame` loops), the code uses `usePrefersReducedMotion()` from `src/lib/motion.ts`, a `useSyncExternalStore` hook on `matchMedia`. Toasts and imperative dialogs also skip their exit fade. One animation slows down instead of stopping: the `ToolCard` spinner, because the motion is the information. Reduced means reduced, not always eliminated.
+Where an element should not render at all under reduced motion (the toast countdown line, `requestAnimationFrame` loops), the code uses `usePrefersReducedMotion()` from `src/lib/motion.ts`, a `useSyncExternalStore` hook on `matchMedia`. Toasts and imperative dialogs also skip their exit fade.
 
 ### Forced colors
 

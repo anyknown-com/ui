@@ -1,3 +1,60 @@
+# Migrating to the next release (unreleased)
+
+## `ToolCard` → `ToolGroup` / `SubThreadRow`
+
+**What changed:** `ToolCard` and its parts (`ToolInput`, `ToolOutput`, `ToolError`, `SubagentLine`,
+`SubagentSummary`, `SubagentThread`, `SubagentText`) are removed. Tool calls are a `ToolGroup`: one
+header for a run of calls and one row per call. A sub agent is a `SubThreadRow`, not a kind of
+tool card.
+
+**Why:** the design system documents what ships. Anyknown Desktop draws tool calls and sub agents
+this way; no product used `ToolCard`.
+
+The data moves from children into props. A call's progress, duration and retry have no place in
+the new row; its summary line is the one thing shown closed.
+
+Before:
+
+```tsx
+import { SubagentLine, ToolCard, ToolInput, ToolOutput } from "@anyknown/ui"
+
+<ToolCard tool="read" state="completed" subtitle="src/thread/rows.ts" durationMs={300}>
+	<ToolInput json={{ path: "src/thread/rows.ts" }} />
+	<ToolOutput text={source} />
+</ToolCard>
+<ToolCard tool="shell" state="completed" subtitle="pnpm test">
+	<ToolOutput text={log} />
+</ToolCard>
+<ToolCard
+	tool="subagent"
+	state="running"
+	subtitle="Investigate missing retry events"
+	secondLine={<SubagentLine model="sonnet-5" now="Searching" />}
+/>
+```
+
+After:
+
+```tsx
+import { SubThreadRow, ToolGroup } from "@anyknown/ui"
+
+<ToolGroup
+	calls={[
+		{ id: "c1", tool: "read", summary: "src/thread/rows.ts", input: { path: "src/thread/rows.ts" }, output: source },
+		{ id: "c2", tool: "shell", summary: "pnpm test", output: log },
+	]}
+/>
+<SubThreadRow title="Investigate missing retry events" status="running" onOpenRun={() => openRun(runId)}>
+	{runPreview}
+</SubThreadRow>
+```
+
+- `state="running" | "completed" | "error"` on a sub agent becomes `status` (`"running"`, `"done"`,
+  `"failed"`, and also `"queued"`, `"waiting"`, `"blocked"`, `"cancelled"`).
+- `ToolCardLabels` becomes `ToolGroupLabels` (`title(count, tools)`) and `SubThreadRowLabels`
+  (the status words).
+- Risk words (`risk: ["花錢"]`) are passed already in the reader's language.
+
 # Migrating from 0.9 to 0.10
 
 0.10 has five breaking changes. Most apps only need to touch the first two. Everything else

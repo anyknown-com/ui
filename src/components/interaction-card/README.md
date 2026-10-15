@@ -66,5 +66,5 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 ## Related
 
 - [HandoffReceipt](../handoff-receipt/README.md) — another read-only receipt in the thread.
-- [ToolCard](../tool-card/README.md) — what the agent did, as opposed to what it asks.
+- [ToolGroup](../tool-group/README.md) and [SubThreadRow](../sub-thread/README.md) — what the agent did, as opposed to what it asks.
 - [Dialog](../dialog/README.md) — confirmations that are not part of the conversation.

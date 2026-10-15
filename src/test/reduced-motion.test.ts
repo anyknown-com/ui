@@ -15,7 +15,7 @@ const JS_GATED = new Set(["toast/Toast.tsx:countLine"])
  * moving but slower, because the motion is the information — see the component's
  * NOTES.md for the reasoning.
  */
-const SLOWED = new Set(["tool-card/ToolCard.tsx:spinner"])
+const SLOWED = new Set<string>()
 
 const ANIMATED = new Set(["animationName", "transitionDuration"])
 
@@ -121,10 +121,7 @@ test("the documented exceptions still exist and are still exceptional", async ()
 	expect(toast).toContain("usePrefersReducedMotion")
 	expect(toast).toContain("{!reduced && record.duration > 0 && (")
 
-	const toolCard = await readFile(join(SRC, "components/tool-card/ToolCard.tsx"), "utf8")
-	expect(toolCard).toContain("animationDuration: { default: motion.loopFast, [REDUCED]: motion.loopSlow }")
-
-	expect(JS_GATED.size + SLOWED.size).toBe(2)
+	expect(JS_GATED.size + SLOWED.size).toBe(1)
 })
 
 test("rAF-driven animation is gated on the media query", async () => {

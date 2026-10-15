@@ -464,35 +464,33 @@ it is the image, `object-fit: cover`, and the caption turns white with a shadow;
 - The image has `alt=""`: the name is already in the `figcaption`, and reading it twice is
   redundant
 
-### tool-card
-The receipt of a tool call: one row of icon + title (verb) + subtitle (main argument) +
-duration + chevron; expand to see input / output. **A subagent is a variant of it, not a new
-component family**.
+### tool-group
+Tool calls as Anyknown Desktop ships them, copied from shell-ui's `thread/tool-group`. It
+replaced `ToolCard` (icon tile, verb + target, progress bar, duration), which no product used.
 
-- Rest card: `surfaceRaised` background, `shadow.rest`, `corner.card`, no frame. On failure a
-  reddish 1px ring is layered over the rest ring
-- A 36px icon tile on the left. While running: `signalSubtle` background with the tool icon in
-  `signal` (one lucide path each for read / edit / write / shell / search / fetch / subagent,
-  a wrench for others), and a pill progress bar under the title; there is no progress value, so
-  a 40% `signal` segment slides at constant speed via transform, stopping under reduced motion.
-  Done is a green check on `surface`, failed a red cross on `dangerSubtle`: different shapes,
-  not color alone
-- Why it switches to a check when done: `signal` means only "the agent is working", so when
-  the work is done the tile goes back to neutral; the title's verb already says what the tool
-  was
-- Input / output / error are a sunken `surface` (error is `dangerSubtle`), no frame,
-  `corner.small` (card corner minus padding is already ≤ 0, so the smallest step)
-- Expanded content (io labels and input / output), the retry row and the subagent's second line
-  all start from the title's edge (card padding + 36px tile + gap), not each from the card's
-  left edge
-- A subtitle that doesn't fit is cut with `…`, with the full text in `title`; expanded, it wraps
-  in full, uncut
-- The retry row says "when, which attempt, how many max" in one sentence: "Retrying in 3 s
-  (attempt 2 / 3)" (「3 秒後重試(第 2 / 3 次)」), the same sentence on screen and in the live
-  region. The sentence is `retryLabel(attempt, max, seconds)`; never the self-contradicting
-  "Retrying… in 3 s"
-- Opens by default for `shell` / `edit` / `write` and for any error, including a later change
-  from running to error
+- A Ghost header, 28px, transparent even on hover: "用了 N 次工具：read ×2、shell", counting
+  calls and naming each tool once in first-use order. A 16px chevron turns −90° when closed
+  (`motion.fast`, ease-out)
+- The list is a 1px `color.border` frame, `corner.card`, `overflow: hidden`; rows are split by
+  a 1px top border, none on the first
+- A row is one 44px-minimum line: summary cut with `…`, then the risk words in muted, then a
+  right / down chevron. Muted until hovered. Its focus ring is drawn inside (offset −2) because
+  the frame clips it; that is the one change from desktop
+- Open, a row shows the input in a PayloadBlock and the output as plain `t2` text, 12px apart,
+  16px in from the frame
+- Risk comes in as words, not keys: the package does not know the product's risk names
+
+### sub-thread
+A sub agent's run, copied from shell-ui's `thread/sub-thread`. **A sub agent is its own row,
+not a tool call in a group.**
+
+- A filled pill: `layer3`, hover `layer4`, `corner.float` (16px), 44px minimum, 16px in from
+  the thread's edge. Title, then the status, then a faint 16px chevron. The whole pill opens the
+  run
+- Status: `queued` / `running` read 進行中 with a LiveDot; `waiting` 暫停 and `blocked` 卡住了
+  are warning, `done` success, `failed` danger, `cancelled` muted, each with its own circle
+  glyph (14px). Stuck, failed and cancelled differ in colour and shape
+- The run's content (`children`) shows indented under the pill until the run is over
 
 ### reasoning-fold
 The fold row for the reasoning process: collapsed by default to just "Thought for N s"

@@ -113,3 +113,56 @@ export function PhoneOffGlyph(props: GlyphProps) {
 		</Glyph>
 	)
 }
+
+/** A circle with two bars, for paused. */
+export function CirclePauseGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<circle cx="12" cy="12" r="10" />
+			<line x1="10" x2="10" y1="15" y2="9" />
+			<line x1="14" x2="14" y1="15" y2="9" />
+		</Glyph>
+	)
+}
+
+/** A circle with an exclamation mark, for stuck. */
+export function CircleAlertGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<circle cx="12" cy="12" r="10" />
+			<line x1="12" x2="12" y1="8" y2="12" />
+			<line x1="12" x2="12.01" y1="16" y2="16" />
+		</Glyph>
+	)
+}
+
+/** A circle with a check mark, for done. */
+export function CircleCheckGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<circle cx="12" cy="12" r="10" />
+			<path d="m9 12 2 2 4-4" />
+		</Glyph>
+	)
+}
+
+/** A circle with an X, for failed. */
+export function CircleXGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<circle cx="12" cy="12" r="10" />
+			<path d="m15 9-6 6" />
+			<path d="m9 9 6 6" />
+		</Glyph>
+	)
+}
+
+/** A struck-through circle, for cancelled. */
+export function CircleSlashGlyph(props: GlyphProps) {
+	return (
+		<Glyph {...props}>
+			<circle cx="12" cy="12" r="10" />
+			<line x1="9" x2="15" y1="15" y2="9" />
+		</Glyph>
+	)
+}

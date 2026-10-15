@@ -11,7 +11,7 @@ A sunken monospace block for what a tool was called with or gave back, with a co
 ## When not to use
 
 - For a code snippet with a language label, use [CodeBlock](../code-block/README.md).
-- For a full tool call receipt with title, state and duration, use [ToolCard](../tool-card/README.md).
+- For a run of tool calls with a header and one row per call, use [ToolGroup](../tool-group/README.md); it draws this block inside an open row.
 
 ## Usage
 
@@ -43,5 +43,5 @@ The tooltip opens on keyboard focus; <kbd>Esc</kbd> hides it.
 ## Related
 
 - [CodeBlock](../code-block/README.md) — code with a language header.
-- [ToolCard](../tool-card/README.md) — the receipt a payload usually sits under.
+- [ToolGroup](../tool-group/README.md) — the tool call row a payload usually sits in.
 - [IconButton](../icon-button/README.md) — the copy button.

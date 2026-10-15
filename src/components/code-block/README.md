@@ -46,4 +46,4 @@ Long lines scroll sideways inside the block; the page never scrolls horizontally
 
 - [PayloadBlock](../payload-block/README.md) — tool arguments and results.
 - [Markdown](../markdown/README.md) — renders fenced code with this.
-- [ToolCard](../tool-card/README.md) — tool input and output panes.
+- [ToolGroup](../tool-group/README.md) — tool calls, whose input sits in a [PayloadBlock](../payload-block/README.md).

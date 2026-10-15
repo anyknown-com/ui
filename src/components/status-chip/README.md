@@ -46,4 +46,4 @@ No keyboard interaction of its own.
 - [Spin](../spin/README.md) — the ring inside an active chip.
 - [StatusBadge](../status-badge/README.md) — the larger live state pill.
 - [Badge](../badge/README.md) — general labels and filter chips.
-- [ToolCard](../tool-card/README.md) — the library's own tool call display.
+- [ToolGroup](../tool-group/README.md) and [SubThreadRow](../sub-thread/README.md) — the library's own tool call and sub agent display.

@@ -48,7 +48,7 @@ import { AssistantMessage, TextPart, Thread, UserMessage } from "@anyknown/ui"
 
 ## Keyboard
 
-No keyboard interaction of its own. Focusable children are whatever the turn holds, such as [ActionBar](../action-bar/README.md) buttons or [ToolCard](../tool-card/README.md) rows.
+No keyboard interaction of its own. Focusable children are whatever the turn holds, such as [ActionBar](../action-bar/README.md) buttons or [ToolGroup](../tool-group/README.md) rows.
 
 ## Related
 

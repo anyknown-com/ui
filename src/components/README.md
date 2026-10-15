@@ -25,9 +25,9 @@ The playground and the docs site use the same section ids.
   `select` `dropdown` `password-input` `segmented`
 - **Basics** — `button` `icon-button` `ghost` `card` `text` `icon` `dialog` `toast` `tooltip`
   `popover` `tabs` `badge` `kbd` `skeleton` `progress` `spin` `empty-state` (`scrollbar` is CSS)
-- **Agent & chat (desktop AI-native)** — `message` `markdown` (with `Formula`) `tool-card`
-  `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt` `composer`
-  `voice-indicator` `live-dot`
+- **Agent & chat (desktop AI-native)** — `message` `markdown` (with `Formula`) `tool-group`
+  `sub-thread` `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt`
+  `composer` `voice-indicator` `live-dot`
 - **Storage & data** — `recovery-key` `dropzone` `file-row` `diff-viewer` `data-table`
 - **Web shell** — `group` (grouped lists and cells) `page` `settings-rows` `table` `list`
   `status-badge` `status-chip` `bubble` `attachment` `payload-block` `attach-button`
