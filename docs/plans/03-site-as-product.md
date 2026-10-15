@@ -1,6 +1,6 @@
 # ui.anyknown.com as a product
 
-Status: in progress (2026-10-15).
+Status: built and deployed (2026-10-15).
 
 CEO feedback: the site reads like a bare index. It is a product too, so it must show use cases and situations, not a wall of text cards.
 
