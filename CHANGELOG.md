@@ -9,6 +9,12 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 Nothing yet.
 
+## 0.12.2 — 2026-10-15
+
+### Fixed
+
+- **DiffViewer:** a long file path in the header is cut with an ellipsis (full path in its tooltip), so the `+N −N` count stays inside the card on a phone. Before, the count was pushed past the right edge.
+
 ## 0.12.1 — 2026-10-15
 
 ### Changed
