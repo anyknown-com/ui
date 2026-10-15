@@ -1,14 +1,23 @@
 import { DEMO_GROUPS } from "../playground/demos"
-import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
+import { Button, CodeBlock, ToolCard } from "@anyknown/ui"
+import { breakpoint, color, corner, font, shadow, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
-import { API, COMPONENT_DOCS, COMPONENT_GROUPS, GUIDES, REPO, guideByKey } from "./content"
+import { COMPONENT_DOCS, COMPONENT_GROUPS, REPO, guideByKey } from "./content"
 import { Markdown, renderMarkdown } from "./Markdown"
 import { NotFound } from "./ComponentPage"
+import { sceneById } from "./scenes"
+import { SceneTiles } from "./situations"
 
 const MOBILE = breakpoint.tablet
 
 const styles = stylex.create({
-	hero: { display: "grid", gap: space.sm, maxWidth: "44rem" },
+	hero: {
+		display: "grid",
+		gridTemplateColumns: { default: "minmax(0, 5fr) minmax(0, 7fr)", [MOBILE]: "minmax(0, 1fr)" },
+		alignItems: "center",
+		gap: { default: space.xl, [MOBILE]: space.lg },
+	},
+	heroText: { display: "grid", gap: space.sm, alignContent: "center" },
 	heroTitle: {
 		fontFamily: font.display,
 		fontSize: type.t7,
@@ -17,8 +26,17 @@ const styles = stylex.create({
 		letterSpacing: "-0.01em",
 		color: color.text,
 		margin: 0,
+		textWrap: "balance",
 	},
-	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, margin: 0 },
+	pageTitle: {
+		fontFamily: font.display,
+		fontSize: type.t6,
+		lineHeight: type.dense,
+		fontWeight: 600,
+		color: color.text,
+		marginBlock: `0 ${space.sm}`,
+	},
+	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, maxWidth: "44rem", margin: 0 },
 	actions: { display: "flex", flexWrap: "wrap", gap: space.xs, marginTop: space.xs },
 	primary: {
 		display: "inline-flex",
@@ -35,28 +53,76 @@ const styles = stylex.create({
 		outlineOffset: 3,
 	},
 	secondary: { color: color.text, backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 } },
-	install: {
-		fontFamily: font.mono,
-		fontSize: type.code,
-		color: color.text,
-		backgroundColor: color.layer3,
-		borderRadius: corner.control,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
-		marginTop: space.sm,
-		overflowX: "auto",
-		whiteSpace: "pre",
+	heroScene: {
+		height: { default: "34rem", [MOBILE]: "30rem" },
+		minWidth: 0,
+		padding: { default: space.sm, [MOBILE]: space.xs },
+		boxSizing: "border-box",
+		backgroundColor: color.layer1,
+		borderRadius: corner.sheet,
 	},
-	stats: {
-		display: "flex",
-		flexWrap: "wrap",
+	section: { marginTop: space.xxl, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.md },
+	sectionHead: { display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: space.sm },
+	h3: { fontWeight: 600, fontSize: type.t3, lineHeight: type.tight, color: color.text, margin: 0 },
+	muted: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0 },
+	body: { fontSize: type.t3, lineHeight: type.body, color: color.text, margin: 0, maxWidth: "44rem" },
+	ways: {
+		display: "grid",
+		gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [MOBILE]: "minmax(0, 1fr)" },
+		gap: { default: space.lg, [MOBILE]: space.xl },
+	},
+	way: { display: "grid", alignContent: "start", gap: space.xs, minWidth: 0 },
+	products: {
+		listStyle: "none",
+		margin: 0,
+		padding: 0,
+		display: "grid",
+		gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [MOBILE]: "minmax(0, 1fr)" },
 		gap: space.lg,
-		marginTop: space.lg,
-		fontSize: type.t2,
-		color: color.textMuted,
 	},
-	stat: { display: "grid" },
-	statNum: { fontFamily: font.display, fontSize: type.t5, fontWeight: 600, color: color.text },
+	product: { display: "grid", alignContent: "start", gap: space.xxs },
+	rules: {
+		display: "grid",
+		gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [MOBILE]: "minmax(0, 1fr)" },
+		gap: { default: space.lg, [MOBILE]: space.xl },
+	},
+	rule: { margin: 0, display: "grid", alignContent: "start", gap: space.sm, minWidth: 0 },
+	specimen: {
+		minHeight: "12rem",
+		boxSizing: "border-box",
+		padding: space.md,
+		backgroundColor: color.layer3,
+		borderRadius: corner.card,
+	},
+	center: { display: "flex", alignItems: "center", justifyContent: "center", gap: space.xs },
+	stack: { display: "grid", alignContent: "center", gap: space.xs },
+	deskSpecimen: { backgroundColor: color.layer1, display: "grid" },
+	paper: {
+		display: "grid",
+		alignContent: "start",
+		gap: space.xs,
+		padding: space.md,
+		backgroundColor: color.layer2,
+		borderRadius: corner.card,
+	},
+	bar: { display: "block", height: space.xs, width: "60%", borderRadius: corner.pill, backgroundColor: color.bone },
+	barLong: { width: "85%" },
+	barShort: { width: "45%" },
+	restCard: {
+		marginTop: space.xs,
+		padding: space.sm,
+		backgroundColor: color.layer2,
+		borderRadius: corner.control,
+		boxShadow: shadow.rest,
+	},
+	caption: { display: "grid", gap: space.xxs },
+	agentFile: {
+		marginTop: space.xl,
+		display: "grid",
+		gridTemplateColumns: "minmax(0, 1fr)",
+		gap: space.xs,
+		maxWidth: "44rem",
+	},
 	group: { marginTop: space.xxl, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm },
 	h2: { fontFamily: font.display, fontSize: type.t5, lineHeight: type.dense, fontWeight: 600, margin: 0 },
 	cards: {
@@ -99,41 +165,187 @@ function plain(markdown: string) {
 	return text.replace(/\s*[^.]*:$/, "")
 }
 
+const AGENT_SCENE = sceneById("agent-working")
+
+const WAYS = [
+	{
+		who: "Building an agent app",
+		step: "Install the package, then follow Getting started to set up StyleX and the theme.",
+		lang: "bash",
+		code: "pnpm add @anyknown/ui @stylexjs/stylex",
+		href: "#/guide/getting-started",
+		link: "Getting started",
+	},
+	{
+		who: "Making a one-off page",
+		step: "Link the stylesheet and lay the page out with its ak-* classes. No bundler, no React.",
+		lang: "html",
+		code: '<link rel="stylesheet" href="https://ui.anyknown.com/brand.css">',
+		href: "#/agents",
+		link: "For agents",
+	},
+	{
+		who: "Coding in our repos",
+		step: "Load the index; it links every guide and component page as plain markdown.",
+		lang: "url",
+		code: "https://ui.anyknown.com/llms.txt",
+		href: "#/components",
+		link: "Components",
+	},
+]
+
+// What each product imports from @anyknown/ui today, read from its source.
+const PRODUCTS = [
+	{
+		name: "Anyknown Desktop",
+		uses: "Groups and settings cells, segmented controls and switches, live dots and status badges, bubbles, markdown, attachments and dialogs, across the whole shell.",
+	},
+	{
+		name: "Anyknown Storage",
+		uses: "List rows with letter and icon tiles, the password input that unlocks the vault, fields and spinners.",
+	},
+	{
+		name: "Anyknown Call",
+		uses: "The call bar and live dot in the web dock, with empty states and toasts around them.",
+	},
+]
+
 export function HomePage() {
-	const exports = API.filter((c) => c.aliasOf == null).length
 	return (
 		<article>
 			<div {...stylex.props(styles.hero)}>
-				<h1 {...stylex.props(styles.heroTitle)}>@anyknown/ui</h1>
-				<p {...stylex.props(styles.lead)}>
-					The design system behind AnyKnown's AI-agent products: React 19 components on StyleX tokens, with a
-					chat and agent vocabulary built in. Gray paper on a desk, ink for the one action that matters, and
-					blue only when the agent is working.
-				</p>
-				<div {...stylex.props(styles.actions)}>
-					<a href="#/guide/getting-started" {...stylex.props(styles.primary)}>
-						Get started
-					</a>
-					<a href="#/tokens" {...stylex.props(styles.primary, styles.secondary)}>
-						Foundations
-					</a>
-					<a href="#/demo" {...stylex.props(styles.primary, styles.secondary)}>
-						All demos
-					</a>
+				<div {...stylex.props(styles.heroText)}>
+					<h1 {...stylex.props(styles.heroTitle)}>Components for products where an agent does the work</h1>
+					<p {...stylex.props(styles.lead)}>
+						@anyknown/ui is the React and StyleX system behind Anyknown. Threads, tool calls, questions for
+						the person, files, voice and settings are built in, and they all look like one product.
+					</p>
+					<div {...stylex.props(styles.actions)}>
+						<a href="#/situations" {...stylex.props(styles.primary)}>
+							See the situations
+						</a>
+						<a href="#/guide/getting-started" {...stylex.props(styles.primary, styles.secondary)}>
+							Get started
+						</a>
+					</div>
 				</div>
-				<pre {...stylex.props(styles.install)}>pnpm add @anyknown/ui @stylexjs/stylex</pre>
+				{AGENT_SCENE != null && (
+					<div {...stylex.props(styles.heroScene)}>
+						<AGENT_SCENE.Scene compact />
+					</div>
+				)}
 			</div>
-			<div {...stylex.props(styles.stats)}>
-				<div {...stylex.props(styles.stat)}>
-					<span {...stylex.props(styles.statNum)}>{COMPONENT_DOCS.size}</span>component families
+
+			<section {...stylex.props(styles.section)}>
+				<div {...stylex.props(styles.sectionHead)}>
+					<h2 {...stylex.props(styles.h2)}>Situations</h2>
+					<a href="#/situations" {...stylex.props(styles.link)}>
+						All situations
+					</a>
 				</div>
-				<div {...stylex.props(styles.stat)}>
-					<span {...stylex.props(styles.statNum)}>{exports}</span>exported components
+				<SceneTiles short />
+			</section>
+
+			<section {...stylex.props(styles.section)}>
+				<h2 {...stylex.props(styles.h2)}>Three ways in</h2>
+				<div {...stylex.props(styles.ways)}>
+					{WAYS.map((way) => (
+						<div key={way.who} {...stylex.props(styles.way)}>
+							<h3 {...stylex.props(styles.h3)}>{way.who}</h3>
+							<p {...stylex.props(styles.muted)}>{way.step}</p>
+							<CodeBlock lang={way.lang} code={way.code} />
+							<a href={way.href} {...stylex.props(styles.link)}>
+								{way.link}
+							</a>
+						</div>
+					))}
 				</div>
-				<div {...stylex.props(styles.stat)}>
-					<span {...stylex.props(styles.statNum)}>{GUIDES.length}</span>guides
+			</section>
+
+			<section {...stylex.props(styles.section)}>
+				<h2 {...stylex.props(styles.h2)}>Shipping in</h2>
+				<ul {...stylex.props(styles.products)}>
+					{PRODUCTS.map((product) => (
+						<li key={product.name} {...stylex.props(styles.product)}>
+							<span {...stylex.props(styles.h3)}>{product.name}</span>
+							<span {...stylex.props(styles.muted)}>{product.uses}</span>
+						</li>
+					))}
+				</ul>
+			</section>
+
+			<section {...stylex.props(styles.section)}>
+				<h2 {...stylex.props(styles.h2)}>The rules in one look</h2>
+				<div {...stylex.props(styles.rules)}>
+					<figure {...stylex.props(styles.rule)}>
+						<div aria-hidden="true" {...stylex.props(styles.specimen, styles.deskSpecimen)}>
+							<div {...stylex.props(styles.paper)}>
+								<span {...stylex.props(styles.bar, styles.barLong)} />
+								<span {...stylex.props(styles.bar)} />
+								<div {...stylex.props(styles.restCard)}>
+									<span {...stylex.props(styles.bar, styles.barShort)} />
+								</div>
+							</div>
+						</div>
+						<figcaption {...stylex.props(styles.caption)}>
+							<b {...stylex.props(styles.h3)}>Gray desk, white paper</b>
+							<span {...stylex.props(styles.muted)}>
+								Depth comes from tone and shadow. Cards are paper on paper, not boxes with borders.
+							</span>
+						</figcaption>
+					</figure>
+					<figure {...stylex.props(styles.rule)}>
+						<div aria-hidden="true" inert {...stylex.props(styles.specimen, styles.center)}>
+							<Button variant="secondary" size="sm">
+								Save draft
+							</Button>
+							<Button size="sm">Publish</Button>
+						</div>
+						<figcaption {...stylex.props(styles.caption)}>
+							<b {...stylex.props(styles.h3)}>Ink for the one action</b>
+							<span {...stylex.props(styles.muted)}>
+								One solid ink pill per view. Everything else is sunken or quiet, and links are ink too.
+							</span>
+						</figcaption>
+					</figure>
+					<figure {...stylex.props(styles.rule)}>
+						<div aria-hidden="true" inert {...stylex.props(styles.specimen, styles.stack)}>
+							<ToolCard tool="shell" state="running" subtitle="pnpm test" />
+							<ToolCard tool="read" state="completed" subtitle="turn.ts" durationMs={300} />
+						</div>
+						<figcaption {...stylex.props(styles.caption)}>
+							<b {...stylex.props(styles.h3)}>Blue only while the agent works</b>
+							<span {...stylex.props(styles.muted)}>
+								Blue means running, focus or progress. When the work is done, it goes back to gray.
+							</span>
+						</figcaption>
+					</figure>
 				</div>
-			</div>
+			</section>
+
+			<p {...stylex.props(styles.foot)}>
+				MIT licensed ·{" "}
+				<a href={REPO} {...stylex.props(styles.link)}>
+					Source on GitHub
+				</a>{" "}
+				·{" "}
+				<a href="/llms.txt" {...stylex.props(styles.link)}>
+					llms.txt
+				</a>
+			</p>
+		</article>
+	)
+}
+
+/** The catalog index: every family by group. Step 3 of plan 03 turns the cards into live thumbnails. */
+export function ComponentsPage() {
+	return (
+		<article>
+			<h1 {...stylex.props(styles.pageTitle)}>Components</h1>
+			<p {...stylex.props(styles.lead)}>
+				{COMPONENT_DOCS.size} component families, grouped by the job they do. Each page has demos, the rules
+				for when to use it, and its full API.
+			</p>
 			{COMPONENT_GROUPS.map((group) => (
 				<section key={group.title} {...stylex.props(styles.group)}>
 					<h2 {...stylex.props(styles.h2)}>{group.title}</h2>
@@ -150,16 +362,48 @@ export function HomePage() {
 					</div>
 				</section>
 			))}
-			<p {...stylex.props(styles.foot)}>
-				MIT licensed ·{" "}
-				<a href={REPO} {...stylex.props(styles.link)}>
-					Source on GitHub
-				</a>{" "}
-				·{" "}
-				<a href="/llms.txt" {...stylex.props(styles.link)}>
-					llms.txt
-				</a>
+		</article>
+	)
+}
+
+const AGENT_FILES = [
+	{
+		name: "design.md",
+		what: "Judgment for laying out a page: which of three skeletons to pick, how to lay out evidence, and what must never appear. It ends with the token table and the brand.css vocabulary.",
+		when: "Load it before you lay out any page.",
+		urls: ["https://ui.anyknown.com/design.md"],
+	},
+	{
+		name: "brand.css",
+		what: "The whole look for a one-off HTML page: the --ak-* variables and the ak-* classes, light and dark. A class that is not in it is not allowed.",
+		when: "Link it from the page’s <head>; no bundler or React needed.",
+		urls: ["https://ui.anyknown.com/brand.css"],
+	},
+	{
+		name: "llms.txt and llms-full.txt",
+		what: "The index of this site as plain markdown links, and the same content inlined into one file.",
+		when: "Use llms.txt to find one page; use llms-full.txt when you want everything in one read.",
+		urls: ["https://ui.anyknown.com/llms.txt", "https://ui.anyknown.com/llms-full.txt"],
+	},
+]
+
+export function AgentsPage() {
+	return (
+		<article>
+			<h1 {...stylex.props(styles.pageTitle)}>For agents</h1>
+			<p {...stylex.props(styles.lead)}>
+				Three plain-text files at fixed URLs. An agent loads one of these instead of reading this site.
 			</p>
+			{AGENT_FILES.map((file) => (
+				<section key={file.name} {...stylex.props(styles.agentFile)}>
+					<h2 {...stylex.props(styles.h2)}>{file.name}</h2>
+					<p {...stylex.props(styles.body)}>{file.what}</p>
+					<p {...stylex.props(styles.muted)}>{file.when}</p>
+					{file.urls.map((url) => (
+						<CodeBlock key={url} lang="url" code={url} />
+					))}
+				</section>
+			))}
 		</article>
 	)
 }

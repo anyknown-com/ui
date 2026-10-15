@@ -5,6 +5,8 @@ import { join } from "node:path"
 import { describe, expect, test, vi } from "vitest"
 import { DEMOS } from "../playground/demos"
 import { COMPONENT_DOCS, COMPONENT_GROUPS, GUIDES } from "./content"
+import { SCENES } from "./scenes"
+import { InspectContext } from "./scenes/Inspect"
 import { Site } from "./Site"
 
 // Node's own experimental localStorage shadows jsdom's and has no methods; give the site a
@@ -47,15 +49,99 @@ describe("site content", () => {
 	test("demo covers name real folders", () => {
 		for (const demo of DEMOS) for (const name of demo.covers) expect(folders, demo.id).toContain(name)
 	})
+
+	test("every scene's uses are real component folders, and ids are unique", () => {
+		const ids = SCENES.map((scene) => scene.meta.id)
+		expect(new Set(ids).size).toBe(ids.length)
+		for (const { meta } of SCENES) {
+			expect(meta.uses.length, meta.id).toBeGreaterThan(0)
+			expect(meta.decisions.length, meta.id).toBeGreaterThanOrEqual(3)
+			for (const name of meta.uses) expect(folders, meta.id).toContain(name)
+		}
+	})
+})
+
+describe("scenes", () => {
+	test("every scene renders full, compact and with inspect on", () => {
+		for (const { meta, Scene } of SCENES) {
+			const full = render(<Scene />)
+			expect(full.container.textContent, meta.id).not.toBe("")
+			full.unmount()
+			render(<Scene compact />).unmount()
+			const inspected = render(
+				<InspectContext value={true}>
+					<Scene />
+				</InspectContext>,
+			)
+			inspected.unmount()
+		}
+	})
+
+	test("inspect labels link to real component pages", () => {
+		const First = SCENES[0]!.Scene
+		const { container } = render(
+			<InspectContext value={true}>
+				<First />
+			</InspectContext>,
+		)
+		const labels = [...container.querySelectorAll<HTMLAnchorElement>("[data-part] > a[href^='#/components/']")]
+		expect(labels.length).toBeGreaterThan(0)
+		for (const label of labels) expect(folders).toContain(label.getAttribute("href")!.split("/").at(-1))
+	})
+
+	test("the agent-working run reaches its reply and loops", () => {
+		vi.useFakeTimers()
+		try {
+			const { Scene } = SCENES.find((scene) => scene.meta.id === "agent-working")!
+			render(<Scene compact />)
+			expect(screen.getAllByText("Agent working").length).toBeGreaterThan(0)
+			act(() => vi.advanceTimersByTime(21_000))
+			expect(screen.queryAllByText("Agent working")).toHaveLength(0)
+			expect(screen.getByText(/Runtime tests pass\./)).toBeInTheDocument()
+			act(() => vi.advanceTimersByTime(6_000))
+			expect(screen.getAllByText("Agent working").length).toBeGreaterThan(0)
+		} finally {
+			vi.useRealTimers()
+		}
+	})
 })
 
 describe("site smoke", () => {
-	test("home, guides, tokens and demo pages render", () => {
+	test("home, situations, components, agents, guides, tokens and demo pages render", () => {
 		location.hash = ""
 		render(<Site />)
-		expect(screen.getByRole("heading", { level: 1, name: "@anyknown/ui" })).toBeInTheDocument()
-		// the count is derived from the folders, not typed in
-		expect(screen.getByText(String(folders.length))).toBeInTheDocument()
+		expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument()
+		for (const { meta } of SCENES)
+			expect(document.querySelector(`main a[href="#/situations/${meta.id}"]`), meta.id).not.toBeNull()
+		const sections = screen.getByRole("navigation", { name: "Sections" })
+		for (const name of ["Situations", "Components", "Foundations", "Guides", "For agents"])
+			expect(within(sections).getByRole("link", { name })).toBeInTheDocument()
+
+		goto("#/situations")
+		expect(screen.getByRole("heading", { level: 1, name: "Situations" })).toBeInTheDocument()
+		for (const { meta } of SCENES) {
+			goto(`#/situations/${meta.id}`)
+			const main = screen.getByRole("main")
+			expect(within(main).getByRole("heading", { level: 1, name: meta.title })).toBeInTheDocument()
+			for (const name of meta.uses)
+				expect(main.querySelector(`a[href="#/components/${name}"]`), `${meta.id} → ${name}`).not.toBeNull()
+		}
+
+		goto("#/components")
+		// one card per folder, counted from the folders, not typed in
+		const catalog = screen.getByRole("main")
+		expect(within(catalog).getByRole("heading", { level: 1, name: "Components" })).toBeInTheDocument()
+		expect(catalog.querySelectorAll("a[href^='#/components/']").length).toBe(folders.length)
+		expect(within(catalog).getByText(new RegExp(`^${folders.length} component families`))).toBeInTheDocument()
+
+		goto("#/agents")
+		for (const url of [
+			"https://ui.anyknown.com/design.md",
+			"https://ui.anyknown.com/brand.css",
+			"https://ui.anyknown.com/llms.txt",
+			"https://ui.anyknown.com/llms-full.txt",
+		])
+			expect(screen.getByText(url)).toBeInTheDocument()
 
 		for (const guide of GUIDES) {
 			goto(`#/guide/${guide.key}`)

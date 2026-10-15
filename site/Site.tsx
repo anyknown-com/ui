@@ -4,16 +4,21 @@ import * as stylex from "@stylexjs/stylex"
 import { createContext, use, useState } from "react"
 import { ComponentPage, NotFound } from "./ComponentPage"
 import { COMPONENT_DOCS, COMPONENT_GROUPS, GUIDES } from "./content"
-import { DemosPage, GuidePage, HomePage } from "./pages"
+import { AgentsPage, ComponentsPage, DemosPage, GuidePage, HomePage } from "./pages"
 import { LOCALES, type ThemeMode, setLocale, setTheme, useHash, useSiteLocale, useTheme } from "./prefs"
+import { SituationPage, SituationsPage } from "./situations"
 import { TokensPage } from "./TokensPage"
 
 export type Route =
 	| { page: "home" }
-	| { page: "guide"; key: string }
+	| { page: "situations" }
+	| { page: "situation"; id: string }
+	| { page: "components" }
 	| { page: "component"; name: string }
+	| { page: "guide"; key: string }
 	| { page: "tokens"; anchor?: string }
 	| { page: "demo"; anchor?: string }
+	| { page: "agents" }
 
 export function parseRoute(hash: string): Route {
 	const [head, rest] = hash.replace(/^#\/?/, "").split("/")
@@ -21,36 +26,75 @@ export function parseRoute(hash: string): Route {
 		case "":
 		case undefined:
 			return { page: "home" }
+		case "situations":
+			return rest ? { page: "situation", id: rest } : { page: "situations" }
 		case "guide":
 			return { page: "guide", key: rest ?? "" }
 		case "components":
 		// Old #/docs/<name> links from before the component pages existed.
 		case "docs":
-			return { page: "component", name: rest ?? "" }
+			return rest ? { page: "component", name: rest } : { page: "components" }
 		case "tokens":
 			return { page: "tokens", anchor: rest }
 		case "demo":
 			return { page: "demo", anchor: rest }
+		case "agents":
+			return { page: "agents" }
 		default:
 			return { page: "home" }
 	}
 }
 
+type Section = "situations" | "components" | "foundations" | "guides" | "agents"
+
+const SECTIONS: { section: Section; label: string; href: string }[] = [
+	{ section: "situations", label: "Situations", href: "#/situations" },
+	{ section: "components", label: "Components", href: "#/components" },
+	{ section: "foundations", label: "Foundations", href: "#/tokens" },
+	{ section: "guides", label: "Guides", href: "#/guide/getting-started" },
+	{ section: "agents", label: "For agents", href: "#/agents" },
+]
+
+function sectionOf(route: Route): Section | null {
+	switch (route.page) {
+		case "situations":
+		case "situation":
+			return "situations"
+		case "components":
+		case "component":
+		case "demo":
+			return "components"
+		case "tokens":
+			return "foundations"
+		case "guide":
+			return "guides"
+		case "agents":
+			return "agents"
+		default:
+			return null
+	}
+}
+
+/** Pages that show a live scene or a grid get the wider column; reading pages stay narrow. */
+const WIDE = new Set<Route["page"]>(["home", "situations", "situation", "components"])
+
 const MOBILE = breakpoint.tablet
+
+const focus = { default: "none", ":focus-visible": `2px solid ${color.focusRing}` }
 
 const styles = stylex.create({
 	page: {
 		display: "grid",
-		gridTemplateColumns: { default: "15rem minmax(0, 1fr)", [MOBILE]: "minmax(0, 1fr)" },
+		gridTemplateColumns: "minmax(0, 1fr)",
 		gridTemplateRows: "auto 1fr",
 		minHeight: "100vh",
 	},
+	withRail: { gridTemplateColumns: { default: "15rem minmax(0, 1fr)", [MOBILE]: "minmax(0, 1fr)" } },
 	header: {
 		gridColumn: "1 / -1",
 		display: "flex",
 		flexWrap: "wrap",
 		alignItems: "center",
-		justifyContent: "space-between",
 		gap: space.sm,
 		paddingBlock: space.sm,
 		paddingInline: space.md,
@@ -61,11 +105,36 @@ const styles = stylex.create({
 		fontWeight: 600,
 		color: color.text,
 		textDecoration: "none",
-		marginInlineEnd: "auto",
+		marginInlineEnd: { default: space.sm, [MOBILE]: "auto" },
 		borderRadius: corner.small,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: focus,
 		outlineOffset: 2,
 	},
+	sections: {
+		display: "flex",
+		alignItems: { default: "center", [MOBILE]: "stretch" },
+		gap: space.xxs,
+		marginInlineEnd: "auto",
+		flexDirection: { default: "row", [MOBILE]: "column" },
+		alignSelf: { default: "auto", [MOBILE]: "stretch" },
+		flexBasis: { default: "auto", [MOBILE]: "100%" },
+	},
+	sectionLink: {
+		display: "flex",
+		alignItems: "center",
+		minHeight: "2.25rem",
+		paddingInline: space.sm,
+		borderRadius: corner.control,
+		fontSize: type.t2,
+		fontWeight: 500,
+		whiteSpace: "nowrap",
+		textDecoration: "none",
+		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		outline: focus,
+		outlineOffset: -2,
+	},
+	sectionActive: { color: color.text, backgroundColor: color.accentSubtle },
 	controls: {
 		display: "flex",
 		flexWrap: "wrap",
@@ -73,6 +142,8 @@ const styles = stylex.create({
 		gap: space.xs,
 		flexBasis: { default: "auto", [MOBILE]: "100%" },
 	},
+	// On a phone the section links and the toggles live behind the menu button.
+	closed: { display: { default: "flex", [MOBILE]: "none" } },
 	toggleGroup: {
 		display: "flex",
 		gap: 2,
@@ -91,7 +162,7 @@ const styles = stylex.create({
 		minHeight: "1.75rem",
 		paddingInline: space.sm,
 		cursor: "pointer",
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: focus,
 	},
 	toggleActive: {
 		color: color.text,
@@ -99,7 +170,7 @@ const styles = stylex.create({
 		boxShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
 	},
 	menuButton: { display: { default: "none", [MOBILE]: "inline-flex" }, alignItems: "center" },
-	nav: {
+	rail: {
 		position: { default: "sticky", [MOBILE]: "static" },
 		top: 0,
 		maxHeight: { default: "100vh", [MOBILE]: "none" },
@@ -109,16 +180,14 @@ const styles = stylex.create({
 		paddingBottom: { default: space.xl, [MOBILE]: space.md },
 		alignSelf: "start",
 	},
-	navClosed: { display: { default: "block", [MOBILE]: "none" } },
+	railClosed: { display: { default: "block", [MOBILE]: "none" } },
 	group: { marginBottom: space.sm },
 	groupName: {
 		display: "block",
-		fontFamily: font.mono,
-		fontSize: type.t1,
+		fontSize: type.t2,
 		fontWeight: 600,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
-		color: color.textMuted,
+		color: color.text,
+		paddingInline: space.xs,
 		marginBlock: space.xs,
 	},
 	list: {
@@ -138,8 +207,8 @@ const styles = stylex.create({
 		lineHeight: type.tight,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
-		borderRadius: corner.pill,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		borderRadius: corner.control,
+		outline: focus,
 		outlineOffset: -2,
 	},
 	active: { color: color.text, backgroundColor: color.accentSubtle, fontWeight: 500 },
@@ -150,11 +219,13 @@ const styles = stylex.create({
 		paddingBlock: { default: space.xl, [MOBILE]: space.lg },
 		paddingInline: { default: space.xl, [MOBILE]: space.md },
 		marginBottom: { default: space.xs, [MOBILE]: 0 },
-		marginInlineEnd: { default: space.xs, [MOBILE]: 0 },
+		marginInline: { default: space.xs, [MOBILE]: 0 },
 		backgroundColor: color.layer2,
 		borderRadius: { default: corner.sheet, [MOBILE]: `${corner.sheet} ${corner.sheet} 0 0` },
 	},
+	mainWithRail: { marginInlineStart: 0 },
 	content: { maxWidth: "56rem", marginInline: "auto" },
+	contentWide: { maxWidth: "72rem" },
 	skip: {
 		position: "absolute",
 		insetInlineStart: space.sm,
@@ -165,7 +236,7 @@ const styles = stylex.create({
 		borderRadius: corner.pill,
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
-		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
+		outline: focus,
 	},
 })
 
@@ -234,23 +305,34 @@ function NavGroup({ title, children }: { title: string; children: React.ReactNod
 
 const REFERENCE = new Set(["readme", "components", "decisions", "a11y", "contributing"])
 
-function Nav({ route }: { route: Route }) {
+function GuidesRail({ route }: { route: Route }) {
 	const isGuide = (key: string) => route.page === "guide" && route.key === key
 	return (
 		<>
 			<NavGroup title="Guides">
-				<NavLink href="#/" current={route.page === "home"}>
-					Overview
-				</NavLink>
 				{GUIDES.filter((g) => !REFERENCE.has(g.key)).map((g) => (
 					<NavLink key={g.key} href={`#/guide/${g.key}`} current={isGuide(g.key)}>
 						{g.title}
 					</NavLink>
 				))}
 			</NavGroup>
-			<NavGroup title="Foundations">
-				<NavLink href="#/tokens" current={route.page === "tokens"}>
-					Tokens
+			<NavGroup title="Reference">
+				{GUIDES.filter((g) => REFERENCE.has(g.key)).map((g) => (
+					<NavLink key={g.key} href={`#/guide/${g.key}`} current={isGuide(g.key)}>
+						{g.title}
+					</NavLink>
+				))}
+			</NavGroup>
+		</>
+	)
+}
+
+function ComponentsRail({ route }: { route: Route }) {
+	return (
+		<>
+			<NavGroup title="Catalog">
+				<NavLink href="#/components" current={route.page === "components"}>
+					All components
 				</NavLink>
 				<NavLink href="#/demo" current={route.page === "demo"}>
 					All demos
@@ -269,13 +351,6 @@ function Nav({ route }: { route: Route }) {
 					))}
 				</NavGroup>
 			))}
-			<NavGroup title="Reference">
-				{GUIDES.filter((g) => REFERENCE.has(g.key)).map((g) => (
-					<NavLink key={g.key} href={`#/guide/${g.key}`} current={isGuide(g.key)}>
-						{g.title}
-					</NavLink>
-				))}
-			</NavGroup>
 		</>
 	)
 }
@@ -284,14 +359,22 @@ function Page({ route }: { route: Route }) {
 	switch (route.page) {
 		case "home":
 			return <HomePage />
-		case "guide":
-			return <GuidePage guideKey={route.key} />
+		case "situations":
+			return <SituationsPage />
+		case "situation":
+			return <SituationPage id={route.id} />
+		case "components":
+			return <ComponentsPage />
 		case "component":
 			return <ComponentPage name={route.name} />
+		case "guide":
+			return <GuidePage guideKey={route.key} />
 		case "tokens":
 			return <TokensPage />
 		case "demo":
 			return <DemosPage />
+		case "agents":
+			return <AgentsPage />
 		default:
 			return <NotFound what="such page" />
 	}
@@ -314,26 +397,46 @@ export function Site() {
 	const locale = useSiteLocale()
 	const [menuOpen, setMenuOpen] = useState(false)
 	const anchor = route.page === "demo" || route.page === "tokens" ? route.anchor : undefined
+	const section = sectionOf(route)
+	const rail = section === "components" || section === "guides" ? section : null
+	const closeMenu = () => setMenuOpen(false)
 	return (
 		<LocaleProvider locale={locale}>
-			<div {...stylex.props(styles.page)}>
+			<div {...stylex.props(styles.page, rail != null && styles.withRail)}>
 				<a href="#main" {...stylex.props(styles.skip)} onClick={skipToMain}>
 					Skip to content
 				</a>
 				<header {...stylex.props(styles.header)}>
-					<a href="#/" {...stylex.props(styles.brand)}>
+					<a href="#/" onClick={closeMenu} {...stylex.props(styles.brand)}>
 						@anyknown/ui
 					</a>
 					<button
 						type="button"
 						aria-expanded={menuOpen}
-						aria-controls="site-nav"
+						aria-controls="site-sections"
 						onClick={() => setMenuOpen((open) => !open)}
 						{...stylex.props(styles.toggle, styles.toggleActive, styles.menuButton)}
 					>
 						{menuOpen ? "Close menu" : "Menu"}
 					</button>
-					<div {...stylex.props(styles.controls)}>
+					<nav
+						id="site-sections"
+						aria-label="Sections"
+						{...stylex.props(styles.sections, !menuOpen && styles.closed)}
+					>
+						{SECTIONS.map((item) => (
+							<a
+								key={item.section}
+								href={item.href}
+								onClick={closeMenu}
+								aria-current={section === item.section ? "page" : undefined}
+								{...stylex.props(styles.sectionLink, section === item.section && styles.sectionActive)}
+							>
+								{item.label}
+							</a>
+						))}
+					</nav>
+					<div {...stylex.props(styles.controls, !menuOpen && styles.closed)}>
 						<Toggle
 							label="Language of built-in component text"
 							options={LOCALES.map((l) => ({ value: l.locale, label: l.label, lang: l.lang }))}
@@ -348,17 +451,22 @@ export function Site() {
 						/>
 					</div>
 				</header>
-				<nav
-					id="site-nav"
-					aria-label="Documentation"
-					{...stylex.props(styles.nav, !menuOpen && styles.navClosed)}
-				>
-					<NavigateContext value={() => setMenuOpen(false)}>
-						<Nav route={route} />
-					</NavigateContext>
-				</nav>
-				<main id="main" tabIndex={-1} {...stylex.props(styles.main)}>
-					<div key={hash} ref={scrollOnMount(anchor)} {...stylex.props(styles.content)}>
+				{rail != null && (
+					<nav
+						aria-label={rail === "components" ? "Components" : "Guides"}
+						{...stylex.props(styles.rail, !menuOpen && styles.railClosed)}
+					>
+						<NavigateContext value={closeMenu}>
+							{rail === "components" ? <ComponentsRail route={route} /> : <GuidesRail route={route} />}
+						</NavigateContext>
+					</nav>
+				)}
+				<main id="main" tabIndex={-1} {...stylex.props(styles.main, rail != null && styles.mainWithRail)}>
+					<div
+						key={hash}
+						ref={scrollOnMount(anchor)}
+						{...stylex.props(styles.content, WIDE.has(route.page) && styles.contentWide)}
+					>
 						<Page route={route} />
 					</div>
 				</main>
