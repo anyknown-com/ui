@@ -44,7 +44,7 @@ const styles = stylex.create({
 })
 
 export type PartProps = {
-	/** The component folder under src/components, e.g. "tool-card". Also the label and link. */
+	/** The component folder under src/components, e.g. "tool-group". Also the label and link. */
 	name: string
 	/** For a component that sits in a line of text (a badge, a dot): the outline hugs it. */
 	inline?: boolean

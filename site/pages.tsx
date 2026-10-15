@@ -1,5 +1,5 @@
 import { DEMO_GROUPS } from "../playground/demos"
-import { Button, CodeBlock, ToolCard } from "@anyknown/ui"
+import { Button, CodeBlock, StatusBadge, SubThreadRow } from "@anyknown/ui"
 import { breakpoint, color, corner, font, shadow, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { COMPONENT_DOCS, COMPONENT_GROUPS, REPO, guideByKey } from "./content"
@@ -97,6 +97,8 @@ const styles = stylex.create({
 	},
 	center: { display: "flex", alignItems: "center", justifyContent: "center", gap: space.xs },
 	stack: { display: "grid", alignContent: "center", gap: space.xs },
+	flush: { marginInlineStart: 0 },
+	badges: { display: "flex", flexWrap: "wrap", gap: space.xs },
 	deskSpecimen: { backgroundColor: color.layer1, display: "grid" },
 	paper: {
 		display: "grid",
@@ -326,8 +328,18 @@ export function HomePage() {
 					</figure>
 					<figure {...stylex.props(styles.rule)}>
 						<div aria-hidden="true" inert {...stylex.props(styles.specimen, styles.stack)}>
-							<ToolCard tool="shell" state="running" subtitle="pnpm test" />
-							<ToolCard tool="read" state="completed" subtitle="turn.ts" durationMs={300} />
+							<div {...stylex.props(styles.paper)}>
+								<div {...stylex.props(styles.badges)}>
+									<StatusBadge tone="live">Agent working</StatusBadge>
+									<StatusBadge tone="plain">Done</StatusBadge>
+								</div>
+								<SubThreadRow
+									title="Trace retry events"
+									status="running"
+									onOpenRun={() => {}}
+									sx={styles.flush}
+								/>
+							</div>
 						</div>
 						<figcaption {...stylex.props(styles.caption)}>
 							<b {...stylex.props(styles.h3)}>Blue only while the agent works</b>

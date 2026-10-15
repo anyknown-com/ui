@@ -9,8 +9,7 @@ import {
 	StatusBadge,
 	TextPart,
 	Thread,
-	ToolCard,
-	ToolOutput,
+	ToolGroup,
 	UserMessage,
 	toast,
 	type DiffFile,
@@ -34,7 +33,7 @@ export const meta: SceneMeta = {
 		"The action bar keeps its row reserved, so the thread never jumps when you hover a reply.",
 		"The handoff receipt marks where the work moved to a fresh context, and opens to show what was kept.",
 	],
-	uses: ["diff-viewer", "button", "message", "action-bar", "handoff-receipt", "tool-card", "status-badge"],
+	uses: ["diff-viewer", "button", "message", "action-bar", "handoff-receipt", "tool-group", "status-badge"],
 }
 
 const MOBILE = breakpoint.phone
@@ -366,18 +365,30 @@ export function Scene({ compact }: SceneProps) {
 									/>
 								</Part>
 								<AssistantMessage>
-									<Part name="tool-card">
-										<ToolCard
-											tool="shell"
-											state="completed"
-											subtitle="pnpm test --filter api"
-											durationMs={3800}
-											defaultOpen={false}
-										>
-											<ToolOutput
-												text={"Test Files  12 passed (12)\n     Tests  87 passed (87)\n  Duration  3.71s"}
-											/>
-										</ToolCard>
+									<Part name="tool-group">
+										<ToolGroup
+											calls={[
+												{
+													id: "route",
+													tool: "edit",
+													summary: "apps/api/src/routes/share.ts",
+													input: { filePath: "apps/api/src/routes/share.ts" },
+												},
+												{
+													id: "dialog",
+													tool: "edit",
+													summary: "apps/web/src/share/ShareDialog.tsx",
+													input: { filePath: "apps/web/src/share/ShareDialog.tsx" },
+												},
+												{
+													id: "test",
+													tool: "shell",
+													summary: "pnpm test --filter api",
+													input: { command: "pnpm test --filter api" },
+													output: "Test Files  12 passed (12)\n     Tests  87 passed (87)\n  Duration  3.71s",
+												},
+											]}
+										/>
 									</Part>
 									<TextPart>{REPLY}</TextPart>
 									<Part name="action-bar">

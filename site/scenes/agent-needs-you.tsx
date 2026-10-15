@@ -10,8 +10,7 @@ import {
 	StatusBadge,
 	TextPart,
 	Thread,
-	ToolCard,
-	ToolOutput,
+	ToolGroup,
 	UserMessage,
 	toast,
 	type DecisionAnswer,
@@ -37,7 +36,7 @@ export const meta: SceneMeta = {
 		"The waiting badge is amber, not blue, because the agent is not working; blue comes back only when it picks the run up again.",
 		"An answered card collapses to a one-line receipt, so the thread reads as a record of what you decided.",
 	],
-	uses: ["interaction-card", "message", "tool-card", "status-badge", "live-dot", "action-bar", "composer"],
+	uses: ["interaction-card", "message", "tool-group", "status-badge", "live-dot", "action-bar", "composer"],
 }
 
 const MOBILE = breakpoint.phone
@@ -204,28 +203,26 @@ export function Scene({ compact }: SceneProps) {
 							{!compact && <UserMessage>{REQUEST}</UserMessage>}
 							<AssistantMessage>
 								{!compact && (
-									<Part name="tool-card">
-										<ToolCard
-											tool="shell"
-											state="completed"
-											subtitle="pnpm build && pnpm test"
-											durationMs={6100}
-											defaultOpen={false}
-										>
-											<ToolOutput
-												text={"Test Files  14 passed (14)\n     Tests  128 passed (128)\n  Duration  5.92s"}
-											/>
-										</ToolCard>
+									<Part name="tool-group">
+										<ToolGroup
+											calls={[
+												{
+													id: "build",
+													tool: "shell",
+													summary: "pnpm build && pnpm test",
+													input: { command: "pnpm build && pnpm test" },
+													output:
+														"Test Files  14 passed (14)\n     Tests  128 passed (128)\n  Duration  5.92s",
+												},
+												{
+													id: "changelog",
+													tool: "edit",
+													summary: "packages/axis/CHANGELOG.md",
+													input: { filePath: "packages/axis/CHANGELOG.md" },
+												},
+											]}
+										/>
 									</Part>
-								)}
-								{!compact && (
-									<ToolCard
-										tool="edit"
-										state="completed"
-										subtitle="packages/axis/CHANGELOG.md"
-										durationMs={300}
-										defaultOpen={false}
-									/>
 								)}
 								<TextPart>{ASK}</TextPart>
 								<Part name="interaction-card">

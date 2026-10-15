@@ -7,15 +7,11 @@ import {
 	LiveDot,
 	ReasoningFold,
 	StatusBadge,
-	SubagentLine,
-	SubagentSummary,
-	SubagentText,
-	SubagentThread,
+	SubThreadRow,
 	TextPart,
 	Thread,
-	ToolCard,
-	ToolInput,
-	ToolOutput,
+	ToolGroup,
+	type ToolGroupCall,
 	UserMessage,
 	toast,
 } from "@anyknown/ui"
@@ -32,13 +28,22 @@ export const meta: SceneMeta = {
 	moment:
 		"You asked the agent to fix a bug and went back to your own work. It reads code, runs tools and sends a helper off to dig, and a glance tells you how far it got.",
 	decisions: [
-		"Blue marks only what is running right now: the live tool card, the dot and the badge. A finished card goes back to gray.",
+		"Blue marks only what is running right now: the status dot, the badge and a running subagent. Tool calls carry no live state; the status line says what is happening.",
 		"Reasoning streams open, then folds itself a second after it ends, so thinking never pushes the answer down.",
-		"A subagent runs inside its parent's tool card, so you follow one thread, not two.",
+		"Calls in a row share one group that counts them, and each call opens to its input and output. A subagent is its own row; it shows its work while it runs and folds to one line when it is done.",
 		"The agent's reply runs full width with no bubble; only your own messages are bubbles.",
 		"The composer stays usable the whole time; an agent at work never locks you out.",
 	],
-	uses: ["message", "reasoning-fold", "tool-card", "live-dot", "status-badge", "action-bar", "composer"],
+	uses: [
+		"message",
+		"reasoning-fold",
+		"tool-group",
+		"sub-thread",
+		"live-dot",
+		"status-badge",
+		"action-bar",
+		"composer",
+	],
 }
 
 const MOBILE = breakpoint.phone
@@ -48,8 +53,9 @@ const REQUEST = "The desktop never shows when the runtime retries after a 429. F
 const REASONING =
 	"The desktop only hears about retries through the SSE stream. Either the runtime never emits a retry event, or the contract drops it before the reducer sees it. Search for the event name first, then read the retry loop."
 
-const SUBAGENT_TASK =
-	"Follow one 429 from withRetry in turn.ts to the desktop reducer and report where the event is lost."
+const SUBAGENT_TASK = "Trace retry events end to end"
+
+const SUBAGENT_TEXT = "Starting where withRetry is called, then following one 429 out to the desktop reducer."
 
 const REPLY =
 	"Found it. The retry loop in turn.ts only logged each attempt, and the contract had no session.retrying type, so nothing reached the stream. I added the type to the contract and emit it from withRetry with the attempt and the delay. The desktop reducer already handled it, so the footer now shows “Retrying (2 of 3)” while it waits. Runtime tests pass."
@@ -70,28 +76,34 @@ const REPLY_PER_TICK = 6
 const END = T.reply + Math.ceil(REPLY.length / REPLY_PER_TICK)
 const PAUSE = { full: 90, compact: 50 }
 
-const SUBAGENT_STEPS = [
+// The subagent's own calls, one every 1.6 s while it runs.
+const SUBAGENT_CALLS: (ToolGroupCall & { at: number })[] = [
 	{
 		at: T.subagent,
-		now: "Reading packages/runtime/src/retry.ts",
-		text: "Starting where withRetry is called…",
+		id: "sub-retry",
+		tool: "read",
+		summary: "packages/runtime/src/retry.ts",
+		input: { filePath: "packages/runtime/src/retry.ts" },
 	},
 	{
 		at: T.subagent + 16,
-		now: "Searching for session.retrying",
-		text: "withRetry takes an onRetry callback; turn.ts passes one that only logs.",
+		id: "sub-search",
+		tool: "search",
+		summary: "session.retrying",
+		input: { pattern: "session.retrying", path: "packages" },
 	},
 	{
 		at: T.subagent + 32,
-		now: "Checking EVENTS in the contract",
-		text: "The contract's EVENTS has no session.retrying type, so the stream would drop it anyway.",
+		id: "sub-events",
+		tool: "read",
+		summary: "packages/contract/src/events.ts",
+		input: { filePath: "packages/contract/src/events.ts" },
 	},
 ]
 
 type Phase = "queued" | "running" | "done"
 const phase = (t: number, start: number, end: number): Phase =>
 	t < start ? "queued" : t < end ? "running" : "done"
-const toolState = (p: Phase) => (p === "running" ? "running" : "completed")
 const streamed = (text: string, t: number, start: number, perTick: number) =>
 	text.slice(0, Math.max(0, (t - start) * perTick))
 
@@ -137,6 +149,8 @@ const styles = stylex.create({
 		paddingInline: { default: space.lg, [MOBILE]: space.md },
 	},
 	column: { maxWidth: "44rem", marginInline: "auto" },
+	// Desktop's run body: a block row sits 16px under the row before it.
+	subBody: { display: "flex", flexDirection: "column", gap: space.md },
 	dock: {
 		paddingBlock: space.sm,
 		paddingInline: { default: space.lg, [MOBILE]: space.sm },
@@ -170,7 +184,49 @@ export function Scene({ compact }: SceneProps) {
 	const subagent = phase(t, T.subagent, T.subagentEnd)
 	const edit = phase(t, T.edit, T.shell)
 	const shell = phase(t, T.shell, T.reply)
-	const steps = SUBAGENT_STEPS.filter((step) => t >= step.at)
+	const subCalls = SUBAGENT_CALLS.filter((call) => t >= call.at)
+	// A call shows up in its group when it starts; its output is there once it is done.
+	const before: ToolGroupCall[] = [
+		{
+			id: "search",
+			tool: "search",
+			summary: "session.retrying",
+			input: { pattern: "session.retrying", path: "packages" },
+			output:
+				search === "done"
+					? 'apps/desktop/src/thread/reducer.ts:88  case "session.retrying":\npackages/runtime/src/turn.ts:41  // TODO: surface retries'
+					: undefined,
+		},
+		{
+			id: "read",
+			tool: "read",
+			summary: "packages/runtime/src/turn.ts",
+			input: { filePath: "packages/runtime/src/turn.ts" },
+		},
+	].slice(0, read === "queued" ? 1 : 2)
+	const after: ToolGroupCall[] = [
+		{
+			id: "edit",
+			tool: "edit",
+			summary: "packages/runtime/src/turn.ts",
+			input: {
+				filePath: "packages/runtime/src/turn.ts",
+				oldString: "onRetry: (e) => log.warn('retrying', e)",
+				newString:
+					"onRetry: (e) => bus.emit('session.retrying', { sessionID, attempt: e.attempt, delayMs: e.delayMs })",
+			},
+		},
+		{
+			id: "shell",
+			tool: "shell",
+			summary: "pnpm test --filter runtime",
+			input: { command: "pnpm test --filter runtime" },
+			output:
+				shell === "done"
+					? "Test Files  9 passed (9)\n     Tests  61 passed (61)\n  Duration  4.18s"
+					: undefined,
+		},
+	].slice(0, shell === "queued" ? 1 : 2)
 	const reply = streamed(REPLY, t, T.reply, REPLY_PER_TICK)
 
 	return (
@@ -214,94 +270,29 @@ export function Scene({ compact }: SceneProps) {
 										</ReasoningFold>
 									</Part>
 									{search !== "queued" && (
-										<Part name="tool-card">
-											<ToolCard
-												tool="search"
-												state={toolState(search)}
-												subtitle="session.retrying"
-												durationMs={search === "done" ? 1100 : undefined}
-											>
-												<ToolInput json={{ pattern: "session.retrying", path: "packages" }} />
-												{search === "done" && (
-													<ToolOutput
-														text={
-															'apps/desktop/src/thread/reducer.ts:88  case "session.retrying":\npackages/runtime/src/turn.ts:41  // TODO: surface retries'
-														}
-													/>
-												)}
-											</ToolCard>
+										<Part name="tool-group">
+											<ToolGroup calls={before} />
 										</Part>
 									)}
-									{read !== "queued" && (
-										<ToolCard
-											tool="read"
-											state={toolState(read)}
-											subtitle="packages/runtime/src/turn.ts"
-											durationMs={read === "done" ? 300 : undefined}
-										>
-											<ToolInput json={{ filePath: "packages/runtime/src/turn.ts" }} />
-										</ToolCard>
-									)}
 									{subagent !== "queued" && (
-										<ToolCard
-											tool="subagent"
-											state={toolState(subagent)}
-											subtitle="Trace retry events end to end"
-											durationLabel={subagent === "done" ? "00:48" : undefined}
-											secondLine={
-												subagent === "running" ? (
-													<SubagentLine model="sonnet-5" now={steps.at(-1)?.now} />
-												) : (
-													<SubagentLine model="sonnet-5" toolCount={6} />
-												)
-											}
-											footer={
-												subagent === "done" ? (
-													<SubagentSummary>
-														withRetry only logs. It never emits, and the contract's EVENTS has no
-														session.retrying type, so the reducer's case for it never runs.
-													</SubagentSummary>
-												) : undefined
-											}
-										>
-											<SubagentThread task={SUBAGENT_TASK}>
-												{steps.map((step) => (
-													<SubagentText key={step.at}>{step.text}</SubagentText>
-												))}
-											</SubagentThread>
-										</ToolCard>
+										<Part name="sub-thread">
+											<SubThreadRow
+												title={SUBAGENT_TASK}
+												status={subagent === "running" ? "running" : "done"}
+												onOpenRun={() =>
+													toast("This is a recorded run", {
+														description: "In the app, this opens the subagent's own thread.",
+													})
+												}
+											>
+												<div {...stylex.props(styles.subBody)}>
+													<TextPart>{SUBAGENT_TEXT}</TextPart>
+													<ToolGroup calls={subCalls} />
+												</div>
+											</SubThreadRow>
+										</Part>
 									)}
-									{edit !== "queued" && (
-										<ToolCard
-											tool="edit"
-											state={toolState(edit)}
-											subtitle="packages/runtime/src/turn.ts"
-											durationMs={edit === "done" ? 400 : undefined}
-										>
-											<ToolInput
-												json={{
-													filePath: "packages/runtime/src/turn.ts",
-													oldString: "onRetry: (e) => log.warn('retrying', e)",
-													newString:
-														"onRetry: (e) => bus.emit('session.retrying', { sessionID, attempt: e.attempt, delayMs: e.delayMs })",
-												}}
-											/>
-										</ToolCard>
-									)}
-									{shell !== "queued" && (
-										<ToolCard
-											tool="shell"
-											state={toolState(shell)}
-											subtitle="pnpm test --filter runtime"
-											durationMs={shell === "done" ? 4200 : undefined}
-										>
-											{shell === "done" && (
-												<ToolOutput
-													text={"Test Files  9 passed (9)\n     Tests  61 passed (61)\n  Duration  4.18s"}
-												/>
-											)}
-										</ToolCard>
-									)}
+									{edit !== "queued" && <ToolGroup calls={after} />}
 									{reply !== "" && <TextPart>{reply}</TextPart>}
 									{!working && (
 										<Part name="action-bar">

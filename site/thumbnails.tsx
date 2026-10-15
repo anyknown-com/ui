@@ -72,6 +72,7 @@ import {
 	StatusChip,
 	StatusCell,
 	Subject,
+	SubThreadRow,
 	Switch,
 	Table,
 	TableCell,
@@ -83,7 +84,7 @@ import {
 	TextPart,
 	Textarea,
 	Thread,
-	ToolCard,
+	ToolGroup,
 	Tr,
 	UserMessage,
 	VoiceIndicator,
@@ -112,6 +113,7 @@ const styles = stylex.create({
 		pointerEvents: "none",
 	},
 	fill: { alignSelf: "stretch", display: "grid", gap: space.xs, minWidth: 0 },
+	flush: { marginInlineStart: 0 },
 	row: {
 		display: "flex",
 		flexWrap: "wrap",
@@ -509,10 +511,20 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 			<PayloadBlock code={'{\n  "filePath": "src/turn.ts",\n  "limit": 200\n}'} />
 		</Fill>
 	),
-	"tool-card": () => (
+	"tool-group": () => (
 		<Fill>
-			<ToolCard tool="read" state="completed" subtitle="reducer.ts" durationMs={300} />
-			<ToolCard tool="shell" state="running" subtitle="pnpm test" />
+			<ToolGroup
+				calls={[
+					{ id: "r", tool: "read", summary: "src/thread/reducer.ts" },
+					{ id: "s", tool: "shell", summary: "pnpm test" },
+				]}
+			/>
+		</Fill>
+	),
+	"sub-thread": () => (
+		<Fill>
+			<SubThreadRow title="Trace retries" status="running" onOpenRun={noop} sx={styles.flush} />
+			<SubThreadRow title="Check events" status="done" onOpenRun={noop} sx={styles.flush} />
 		</Fill>
 	),
 	"reasoning-fold": () => <ReasoningFold durationSec={12}>Search for the event name first.</ReasoningFold>,
