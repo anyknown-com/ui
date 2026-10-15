@@ -10,6 +10,7 @@ import {
 	apiForFolder,
 } from "./content"
 import { Markdown, renderMarkdown } from "./Markdown"
+import { SCENES } from "./scenes"
 
 const MOBILE = breakpoint.tablet
 
@@ -151,6 +152,10 @@ const styles = stylex.create({
 		gap: space.md,
 	},
 	link: { color: color.link, textUnderlineOffset: 2 },
+	seenIn: { listStyle: "none", margin: 0, padding: 0, display: "grid", gap: space.sm, maxWidth: "44rem" },
+	seenItem: { display: "grid", gap: space.xxs },
+	seenLink: { color: color.link, textUnderlineOffset: 2, fontSize: type.t3, fontWeight: 600 },
+	seenMoment: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0 },
 })
 
 const KNOWN = new Set(["When to use", "When not to use", "Usage", "Accessibility", "Keyboard", "Related"])
@@ -289,6 +294,7 @@ export function ComponentPage({ name }: { name: string }) {
 	const whenNot = section("When not to use")
 	const usage = section("Usage")
 	const extra = [...doc.sections.keys()].filter((k) => !KNOWN.has(k))
+	const seenIn = SCENES.filter((scene) => scene.meta.uses.includes(name))
 	return (
 		<article>
 			<p {...stylex.props(styles.eyebrow)}>{groupOf(name) ?? "Component"}</p>
@@ -312,6 +318,21 @@ export function ComponentPage({ name }: { name: string }) {
 						</div>
 					)}
 				</div>
+			)}
+
+			{seenIn.length > 0 && (
+				<Section title="Seen in">
+					<ul {...stylex.props(styles.seenIn)}>
+						{seenIn.map(({ meta }) => (
+							<li key={meta.id} {...stylex.props(styles.seenItem)}>
+								<a href={`#/situations/${meta.id}`} {...stylex.props(styles.seenLink)}>
+									{meta.title}
+								</a>
+								<p {...stylex.props(styles.seenMoment)}>{meta.moment}</p>
+							</li>
+						))}
+					</ul>
+				</Section>
 			)}
 
 			{demos.length > 0 && (

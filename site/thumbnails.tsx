@@ -1,0 +1,706 @@
+// One small live render per component family, for the catalog cards. Real components with
+// static props. The stage is inert and hidden from assistive tech, so the card link around it
+// stays the only focus stop. Overlays (dialog, popover, tooltip, toast, dropdown) portal to
+// <body> when open, so their thumbnails show the real trigger and draw the open layer from the
+// same tokens the overlay uses.
+import {
+	ActionBar,
+	AssistantMessage,
+	AttachButton,
+	AttachmentGrid,
+	AttachmentTile,
+	Badge,
+	Bubble,
+	Button,
+	CallBar,
+	Card,
+	Checkbox,
+	CodeBlock,
+	Composer,
+	DataTable,
+	DiffViewer,
+	DialogActions,
+	DropdownMenu,
+	Dropzone,
+	EmptyState,
+	Field,
+	FileList,
+	FileRow,
+	Ghost,
+	Group,
+	GroupCell,
+	HandoffReceipt,
+	ICON_STROKE,
+	IconButton,
+	Input,
+	Kbd,
+	KbdGroup,
+	ListHead,
+	ListRow,
+	LiveDot,
+	Markdown,
+	PageHead,
+	PageNumber,
+	PasswordInput,
+	PayloadBlock,
+	PendingFiles,
+	PermissionCard,
+	Pill,
+	Popover,
+	PopoverTrigger,
+	Progress,
+	ProgressRing,
+	Radio,
+	RadioGroup,
+	ReasoningFold,
+	RecoveryKey,
+	Segmented,
+	Select,
+	SelectItem,
+	SettingsRow,
+	SettingsRows,
+	SettingsValue,
+	Skeleton,
+	SkeletonGroup,
+	Slider,
+	Spin,
+	Spinner,
+	StatLine,
+	StatBar,
+	Status,
+	StatusBadge,
+	StatusChip,
+	StatusCell,
+	Subject,
+	Switch,
+	Table,
+	TableCell,
+	TableHead,
+	Tabs,
+	TabsList,
+	TabsTab,
+	Text,
+	TextPart,
+	Textarea,
+	Thread,
+	ToolCard,
+	Tr,
+	UserMessage,
+	VoiceIndicator,
+	icon,
+} from "@anyknown/ui"
+import { color, corner, font, shadow, space, type } from "@anyknown/ui/tokens.stylex"
+import * as stylex from "@stylexjs/stylex"
+import type { ComponentType, ReactNode } from "react"
+
+const noop = () => {}
+
+const styles = stylex.create({
+	stage: {
+		position: "relative",
+		height: "10rem",
+		boxSizing: "border-box",
+		padding: space.md,
+		overflow: "hidden",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "safe center",
+		alignItems: "safe center",
+		gap: space.xs,
+		backgroundColor: color.layer2,
+		borderRadius: corner.small,
+		pointerEvents: "none",
+	},
+	fill: { alignSelf: "stretch", display: "grid", gap: space.xs, minWidth: 0 },
+	row: {
+		display: "flex",
+		flexWrap: "wrap",
+		alignItems: "center",
+		justifyContent: "center",
+		gap: space.xs,
+	},
+	muted: { fontSize: type.t2, color: color.textMuted },
+	// The open layer of an overlay, drawn with the tokens the overlay itself uses.
+	float: {
+		display: "grid",
+		gap: space.xxs,
+		backgroundColor: color.surfaceRaised,
+		color: color.text,
+		borderRadius: corner.float,
+		boxShadow: shadow.float,
+		fontFamily: font.body,
+		fontSize: type.t2,
+		lineHeight: type.snug,
+	},
+	modal: {
+		alignSelf: "stretch",
+		display: "grid",
+		gap: space.xxs,
+		backgroundColor: color.surfaceRaised,
+		borderRadius: corner.modal,
+		boxShadow: shadow.modal,
+		padding: space.md,
+	},
+	menu: { minWidth: "11rem", padding: space.xxs },
+	menuItem: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
+		gap: space.xs,
+		paddingBlock: space.xxs,
+		paddingInline: space.xs,
+		borderRadius: corner.control,
+	},
+	menuActive: { backgroundColor: color.accentSubtle },
+	menuDanger: { color: color.danger },
+	panel: { paddingBlock: space.sm, paddingInline: space.md, maxWidth: "14rem" },
+	tip: {
+		display: "inline-flex",
+		alignItems: "center",
+		gap: space.xs,
+		borderRadius: corner.control,
+		paddingBlock: space.xxs,
+		paddingInline: space.xs,
+	},
+	toast: {
+		alignSelf: "stretch",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
+		gap: space.xs,
+		paddingBlock: space.xs,
+		paddingInlineStart: space.md,
+		paddingInlineEnd: space.xs,
+	},
+	title: { fontWeight: 600, color: color.text },
+	listGrid: { gridTemplateColumns: "4.5rem minmax(0, 1fr)" },
+})
+
+const LEDGER = "3rem minmax(0, 1fr) 3rem"
+
+function Glyph({ d, size = "md" }: { d: string; size?: keyof typeof icon }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth={ICON_STROKE}
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+			{...stylex.props(icon[size])}
+		>
+			<path d={d} />
+		</svg>
+	)
+}
+
+const SEARCH = "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm10 2-4.3-4.3"
+const BELL = "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9m4.3 13a1.94 1.94 0 0 0 3.4 0"
+const PLUS = "M5 12h14M12 5v14"
+const PENCIL = "M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"
+const INBOX =
+	"M22 12h-6l-2 3h-4l-2-3H2m3.45-6.89L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"
+
+const Fill = ({ children }: { children: ReactNode }) => <div {...stylex.props(styles.fill)}>{children}</div>
+const Row = ({ children }: { children: ReactNode }) => <div {...stylex.props(styles.row)}>{children}</div>
+
+type Memory = { key: string; memory: string }
+const MEMORIES: Memory[] = [
+	{ key: "pkg", memory: "Prefers pnpm" },
+	{ key: "deploy", memory: "Deploys to Cloudflare" },
+	{ key: "ship", memory: "Desktop ships first" },
+]
+
+/** Folder name → its thumbnail. The smoke test checks every grouped folder has one. */
+export const THUMBNAILS: Record<string, ComponentType> = {
+	button: () => (
+		<Row>
+			<Button variant="secondary">Cancel</Button>
+			<Button>Send</Button>
+		</Row>
+	),
+	"icon-button": () => (
+		<Row>
+			<IconButton label="Search threads">
+				<Glyph d={SEARCH} />
+			</IconButton>
+			<IconButton label="Notifications" badge={3}>
+				<Glyph d={BELL} />
+			</IconButton>
+			<IconButton label="New thread" current>
+				<Glyph d={PLUS} />
+			</IconButton>
+		</Row>
+	),
+	ghost: () => (
+		<Row>
+			<Ghost>Edit</Ghost>
+			<Ghost>Copy link</Ghost>
+			<Ghost danger>Revoke key</Ghost>
+		</Row>
+	),
+	card: () => (
+		<Card>
+			<Text as="p" variant="title">
+				Workspace
+			</Text>
+			<Text as="p" variant="caption">
+				142 threads, last handoff at 14:32.
+			</Text>
+		</Card>
+	),
+	text: () => (
+		<Fill>
+			<Text as="p" variant="title">
+				Memory
+			</Text>
+			<Text as="p">Important things travel with every handoff.</Text>
+			<Text as="p" variant="caption">
+				Last synced 14:32
+			</Text>
+		</Fill>
+	),
+	icon: () => (
+		<Row>
+			{(["xs", "sm", "md", "base", "lg"] as const).map((size) => (
+				<Glyph key={size} d={PENCIL} size={size} />
+			))}
+		</Row>
+	),
+	kbd: () => (
+		<Row>
+			<KbdGroup keys={["⌘", "K"]} />
+			<Kbd>Esc</Kbd>
+		</Row>
+	),
+	badge: () => (
+		<Row>
+			<Badge>Draft</Badge>
+			<Badge variant="accent">New</Badge>
+			<Badge variant="success">Synced</Badge>
+			<Badge dot="danger" count={3}>
+				Stale
+			</Badge>
+		</Row>
+	),
+	"status-badge": () => (
+		<Row>
+			<StatusBadge tone="live">AI is operating</StatusBadge>
+			<StatusBadge tone="warn">Needs your input</StatusBadge>
+			<StatusBadge tone="plain">Done</StatusBadge>
+		</Row>
+	),
+	"status-chip": () => (
+		<>
+			<Row>
+				<StatusChip variant="r">read</StatusChip>
+				<StatusChip variant="w">write</StatusChip>
+				<StatusChip variant="d">delete</StatusChip>
+				<StatusChip variant="a">running</StatusChip>
+			</Row>
+			<Pill status="live">researching</Pill>
+		</>
+	),
+	"live-dot": () => (
+		<Row>
+			<LiveDot label="Still running" />
+			<span {...stylex.props(styles.muted)}>Reading loop.ts</span>
+		</Row>
+	),
+	"empty-state": () => (
+		<Fill>
+			<EmptyState
+				icon={<Glyph d={INBOX} />}
+				title="No memories yet"
+				action={<Button size="sm">Start a thread</Button>}
+			/>
+		</Fill>
+	),
+
+	input: () => (
+		<Fill>
+			<Input defaultValue="Anyknown" aria-label="Workspace name" />
+			<Input placeholder="Search memories" aria-label="Search" />
+		</Fill>
+	),
+	textarea: () => (
+		<Fill>
+			<Textarea defaultValue="Hand off when the context is half full." rows={3} aria-label="Note" />
+		</Fill>
+	),
+	label: () => (
+		<Fill>
+			<Field label="Workspace name" help="Everyone in it sees this." required>
+				<Input defaultValue="Anyknown" />
+			</Field>
+		</Fill>
+	),
+	checkbox: () => (
+		<Fill>
+			<Checkbox label="Notify me at every handoff" defaultChecked />
+			<Checkbox label="Send a weekly summary" />
+		</Fill>
+	),
+	radio: () => (
+		<Fill>
+			<RadioGroup legend="Handoff threshold" defaultValue="50">
+				<Radio value="50" label="50%" />
+				<Radio value="75" label="75%" />
+			</RadioGroup>
+		</Fill>
+	),
+	switch: () => (
+		<Fill>
+			<Switch label="Voice wake" defaultChecked />
+			<Switch label="Sounds" />
+		</Fill>
+	),
+	slider: () => (
+		<Fill>
+			<Slider label="Thinking" defaultValue={0.6} />
+		</Fill>
+	),
+	select: () => (
+		<Fill>
+			<Select defaultValue="fable-5" aria-label="Model">
+				<SelectItem value="fable-5">Fable 5</SelectItem>
+				<SelectItem value="sonnet-5">Sonnet 5</SelectItem>
+			</Select>
+		</Fill>
+	),
+	segmented: () => (
+		<Segmented
+			label="Memory scope"
+			defaultValue="personal"
+			options={[
+				{ value: "personal", label: "Personal" },
+				{ value: "team", label: "Team" },
+				{ value: "all", label: "All" },
+			]}
+		/>
+	),
+	dropdown: () => (
+		<>
+			<DropdownMenu trigger={<Button variant="secondary">Actions</Button>}>{null}</DropdownMenu>
+			<div {...stylex.props(styles.float, styles.menu)}>
+				<span {...stylex.props(styles.menuItem, styles.menuActive)}>
+					Rename <Kbd>R</Kbd>
+				</span>
+				<span {...stylex.props(styles.menuItem)}>Duplicate</span>
+				<span {...stylex.props(styles.menuItem, styles.menuDanger)}>Delete</span>
+			</div>
+		</>
+	),
+	"password-input": () => (
+		<Fill>
+			<PasswordInput defaultValue="correct horse battery" meter aria-label="Passphrase" />
+		</Fill>
+	),
+
+	dialog: () => (
+		<div {...stylex.props(styles.modal)}>
+			<span {...stylex.props(styles.title)}>Delete this thread?</span>
+			<span {...stylex.props(styles.muted)}>Its memories stay in the vault.</span>
+			<DialogActions>
+				<Button size="sm" variant="secondary">
+					Cancel
+				</Button>
+				<Button size="sm" variant="danger">
+					Delete
+				</Button>
+			</DialogActions>
+		</div>
+	),
+	popover: () => (
+		<>
+			<Popover>
+				<PopoverTrigger>
+					<Button size="sm" variant="secondary">
+						Prefers pnpm
+					</Button>
+				</PopoverTrigger>
+			</Popover>
+			<div {...stylex.props(styles.float, styles.panel)}>
+				<span {...stylex.props(styles.title)}>Prefers pnpm</span>
+				<span {...stylex.props(styles.muted)}>Learned on Aug 20 from a handoff.</span>
+			</div>
+		</>
+	),
+	tooltip: () => (
+		<>
+			<span {...stylex.props(styles.float, styles.tip)}>
+				Search threads <KbdGroup keys={["⌘", "K"]} />
+			</span>
+			<IconButton label="Search threads">
+				<Glyph d={SEARCH} />
+			</IconButton>
+		</>
+	),
+	toast: () => (
+		<div {...stylex.props(styles.float, styles.toast)}>
+			<span>Deleted “prefers pnpm”</span>
+			<Ghost>Undo</Ghost>
+		</div>
+	),
+	tabs: () => (
+		<Tabs defaultValue="chat">
+			<TabsList aria-label="Thread view">
+				<TabsTab value="chat">Chat</TabsTab>
+				<TabsTab value="memory">Memory</TabsTab>
+				<TabsTab value="files">Files</TabsTab>
+			</TabsList>
+		</Tabs>
+	),
+
+	progress: () => (
+		<Fill>
+			<Progress value={64} aria-label="Sync thread" valueText="64% · handing off 3 messages" />
+			<Row>
+				<ProgressRing value={42} aria-label="Context use" valueText="42% of context used" />
+				<Spinner />
+			</Row>
+		</Fill>
+	),
+	spin: () => (
+		<Row>
+			<Spin />
+			<span {...stylex.props(styles.muted)}>Syncing</span>
+		</Row>
+	),
+	skeleton: () => (
+		<Fill>
+			<SkeletonGroup label="Loading memory">
+				<Skeleton shape="circle" size="2rem" />
+				<Skeleton />
+				<Skeleton width="61%" />
+			</SkeletonGroup>
+		</Fill>
+	),
+
+	message: () => (
+		<Fill>
+			<Thread>
+				<UserMessage>Are the reducer tests done?</UserMessage>
+				<AssistantMessage>
+					<TextPart>Done. All three cases pass.</TextPart>
+				</AssistantMessage>
+			</Thread>
+		</Fill>
+	),
+	bubble: () => (
+		<Fill>
+			<Bubble from="user">Places in Da'an under 25k?</Bubble>
+			<Bubble from="assistant">I found **three** that fit.</Bubble>
+		</Fill>
+	),
+	markdown: () => (
+		<Fill>
+			<Markdown>{"**Two** places fit:\n\n- Da'an, 23k\n- Zhongshan, 24k"}</Markdown>
+		</Fill>
+	),
+	"code-block": () => (
+		<Fill>
+			<CodeBlock lang="ts" code={"const retry = await withRetry(call)\nemit(retry)"} />
+		</Fill>
+	),
+	"payload-block": () => (
+		<Fill>
+			<PayloadBlock code={'{\n  "filePath": "src/turn.ts",\n  "limit": 200\n}'} />
+		</Fill>
+	),
+	"tool-card": () => (
+		<Fill>
+			<ToolCard tool="read" state="completed" subtitle="reducer.ts" durationMs={300} />
+			<ToolCard tool="shell" state="running" subtitle="pnpm test" />
+		</Fill>
+	),
+	"reasoning-fold": () => <ReasoningFold durationSec={12}>Search for the event name first.</ReasoningFold>,
+	"action-bar": () => (
+		<Fill>
+			<Thread>
+				<AssistantMessage>
+					<TextPart>The retry now reaches the footer.</TextPart>
+					<ActionBar visible>
+						<ActionBar.Copy />
+						<ActionBar.Regenerate onRegenerate={noop} />
+					</ActionBar>
+				</AssistantMessage>
+			</Thread>
+		</Fill>
+	),
+	"interaction-card": () => (
+		<Fill>
+			<PermissionCard verb="Run command" subject="pnpm publish" />
+		</Fill>
+	),
+	"handoff-receipt": () => (
+		<Fill>
+			<HandoffReceipt at="14:32" ctxPercent={50} memory={{ count: 3 }} ledgerCount={42} />
+		</Fill>
+	),
+	composer: () => (
+		<Fill>
+			<Composer placeholder="Message the agent" onSubmit={noop} />
+		</Fill>
+	),
+	"attach-button": () => <AttachButton onFiles={noop} />,
+	"pending-files": () => (
+		<PendingFiles
+			files={[
+				{ id: "1", name: "lease-draft.pdf" },
+				{ id: "2", name: "living-room.jpg" },
+			]}
+			onRemove={noop}
+		/>
+	),
+	attachment: () => (
+		<AttachmentGrid>
+			<AttachmentTile name="lease-draft.pdf" label="PDF" />
+		</AttachmentGrid>
+	),
+	"voice-indicator": () => (
+		<>
+			<VoiceIndicator state="listening" />
+			<VoiceIndicator state="idle" />
+		</>
+	),
+	"call-bar": () => (
+		<Fill>
+			<CallBar status="listening" seconds={83} muted={false} onMute={noop} onHangUp={noop} />
+		</Fill>
+	),
+
+	"data-table": () => (
+		<Fill>
+			<DataTable
+				label="Memories"
+				rows={MEMORIES}
+				rowKey={(row) => row.key}
+				columns={[
+					{ id: "key", header: "key", mono: true, value: (row) => row.key },
+					{ id: "memory", header: "Memory", value: (row) => row.memory },
+				]}
+			/>
+		</Fill>
+	),
+	table: () => (
+		<Fill>
+			<Table>
+				<TableHead columns={LEDGER}>
+					<span>Time</span>
+					<span>Tool</span>
+					<TableCell num>Took</TableCell>
+				</TableHead>
+				<Tr columns={LEDGER}>
+					<TableCell faint>14:32</TableCell>
+					<Subject onPress={noop}>shell</Subject>
+					<TableCell num>8.1s</TableCell>
+				</Tr>
+				<Tr columns={LEDGER}>
+					<TableCell faint>14:28</TableCell>
+					<StatusCell warn>fetch 429</StatusCell>
+					<TableCell num>12.0s</TableCell>
+				</Tr>
+			</Table>
+		</Fill>
+	),
+	list: () => (
+		<Fill>
+			<ListHead sx={styles.listGrid}>
+				<span>Status</span>
+				<span>Memory</span>
+			</ListHead>
+			<ListRow sx={styles.listGrid}>
+				<Status dot="dashed" tone="danger">
+					Stale
+				</Status>
+				<span>Rent cap is 25k</span>
+			</ListRow>
+			<ListRow sx={styles.listGrid}>
+				<Status dot="filled" tone="success">
+					Current
+				</Status>
+				<span>Commute under 20 min</span>
+			</ListRow>
+		</Fill>
+	),
+	"file-row": () => (
+		<Fill>
+			<FileList label="Files">
+				<FileRow item={{ kind: "folder", name: "Tax documents", mtime: "Aug 20" }} />
+				<FileRow item={{ kind: "file", name: "passport-scan.pdf", size: 2_400_000, mtime: "Aug 26" }} />
+			</FileList>
+		</Fill>
+	),
+	dropzone: () => (
+		<Fill>
+			<Dropzone onFiles={noop} />
+		</Fill>
+	),
+	"diff-viewer": () => (
+		<Fill>
+			<DiffViewer
+				file={{
+					path: "src/turn.ts",
+					before: "onRetry: log,\nmaxTries: 3,",
+					after: "onRetry: emit,\nmaxTries: 3,",
+				}}
+			/>
+		</Fill>
+	),
+	"recovery-key": () => (
+		<Fill>
+			<RecoveryKey value="K7PQ-WM2X-9RDF-H4TN-ZC8B-JE6V-A3YS-UG5L" />
+		</Fill>
+	),
+
+	group: () => (
+		<Fill>
+			<Group header="Model">
+				<GroupCell label="Auto" checked onPress={noop} />
+				<GroupCell label="Fable 5" checked={false} onPress={noop} />
+			</Group>
+		</Fill>
+	),
+	"settings-rows": () => (
+		<Fill>
+			<SettingsRows>
+				<SettingsRow label="Voice wake" help="Say “Anyknown” to talk.">
+					<Switch defaultChecked aria-label="Voice wake" />
+				</SettingsRow>
+				<SettingsRow label="Handoff threshold">
+					<SettingsValue>50%</SettingsValue>
+				</SettingsRow>
+			</SettingsRows>
+		</Fill>
+	),
+	page: () => (
+		<Fill>
+			<PageHead
+				title="Connections"
+				lead={
+					<>
+						<PageNumber>3</PageNumber> connected · <PageNumber>49</PageNumber> tools
+					</>
+				}
+				summary={
+					<StatLine>
+						Quota <StatBar percent={62} label="Monthly quota used" text="62% of the monthly quota" />
+						<PageNumber>62%</PageNumber>
+					</StatLine>
+				}
+			/>
+		</Fill>
+	),
+}
+
+/** The inert stage a catalog card shows: the family's thumbnail, or nothing for an unknown name. */
+export function Thumbnail({ name }: { name: string }) {
+	const Render = THUMBNAILS[name]
+	return (
+		<div aria-hidden="true" inert {...stylex.props(styles.stage)}>
+			{Render != null && <Render />}
+		</div>
+	)
+}

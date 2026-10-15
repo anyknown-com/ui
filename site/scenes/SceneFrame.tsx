@@ -109,7 +109,9 @@ export function SceneFrame({ entry }: { entry: SceneEntry }) {
 			<h1 {...stylex.props(styles.title)}>{meta.title}</h1>
 			<p {...stylex.props(styles.moment)}>{meta.moment}</p>
 			<div {...stylex.props(styles.bar)}>
-				<p {...stylex.props(styles.barNote)}>Built only from @anyknown/ui. Try it in light, dark and on a phone.</p>
+				<p {...stylex.props(styles.barNote)}>
+					Built only from @anyknown/ui. Try it in light, dark and on a phone.
+				</p>
 				<Switch label="Inspect" checked={inspect} onCheckedChange={setInspect} />
 			</div>
 			<div {...stylex.props(styles.desk)}>

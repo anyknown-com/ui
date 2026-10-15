@@ -7,6 +7,7 @@ import { Markdown, renderMarkdown } from "./Markdown"
 import { NotFound } from "./ComponentPage"
 import { sceneById } from "./scenes"
 import { SceneTiles } from "./situations"
+import { Thumbnail } from "./thumbnails"
 
 const MOBILE = breakpoint.tablet
 
@@ -105,7 +106,13 @@ const styles = stylex.create({
 		backgroundColor: color.layer2,
 		borderRadius: corner.card,
 	},
-	bar: { display: "block", height: space.xs, width: "60%", borderRadius: corner.pill, backgroundColor: color.bone },
+	bar: {
+		display: "block",
+		height: space.xs,
+		width: "60%",
+		borderRadius: corner.pill,
+		backgroundColor: color.bone,
+	},
 	barLong: { width: "85%" },
 	barShort: { width: "45%" },
 	restCard: {
@@ -127,25 +134,34 @@ const styles = stylex.create({
 	h2: { fontFamily: font.display, fontSize: type.t5, lineHeight: type.dense, fontWeight: 600, margin: 0 },
 	cards: {
 		display: "grid",
-		gridTemplateColumns: { default: "repeat(auto-fill, minmax(15rem, 1fr))", [MOBILE]: "minmax(0, 1fr)" },
+		gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 16rem), 1fr))",
 		gap: space.sm,
 	},
+	// A recessed surface holding the paper stage; the stage's corner is this one minus the padding.
 	card: {
 		display: "grid",
-		gap: space.xxs,
+		gap: space.xs,
 		alignContent: "start",
 		textDecoration: "none",
 		color: color.text,
 		backgroundColor: { default: color.layer3, ":hover": color.layer4 },
 		borderRadius: corner.card,
-		paddingBlock: space.sm,
-		paddingInline: space.md,
+		padding: space.xs,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 		minWidth: 0,
 	},
+	cardBody: { display: "grid", gap: space.xxs, paddingInline: space.xs, paddingBottom: space.xs },
 	cardTitle: { fontWeight: 600, fontSize: type.t3 },
-	cardText: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted },
+	cardText: {
+		fontSize: type.t2,
+		lineHeight: type.snug,
+		color: color.textMuted,
+		display: "-webkit-box",
+		WebkitLineClamp: 2,
+		WebkitBoxOrient: "vertical",
+		overflow: "hidden",
+	},
 	foot: { marginTop: space.xxl, fontSize: type.t2, color: color.textMuted },
 	link: { color: color.link, textUnderlineOffset: 2 },
 })
@@ -337,7 +353,7 @@ export function HomePage() {
 	)
 }
 
-/** The catalog index: every family by group. Step 3 of plan 03 turns the cards into live thumbnails. */
+/** The catalog index: every family by group, each card a live thumbnail, its name and its purpose. */
 export function ComponentsPage() {
 	return (
 		<article>
@@ -354,8 +370,11 @@ export function ComponentsPage() {
 							const doc = COMPONENT_DOCS.get(name)
 							return (
 								<a key={name} href={`#/components/${name}`} {...stylex.props(styles.card)}>
-									<span {...stylex.props(styles.cardTitle)}>{doc?.title ?? name}</span>
-									{doc != null && <span {...stylex.props(styles.cardText)}>{plain(doc.lead)}</span>}
+									<Thumbnail name={name} />
+									<span {...stylex.props(styles.cardBody)}>
+										<span {...stylex.props(styles.cardTitle)}>{doc?.title ?? name}</span>
+										{doc != null && <span {...stylex.props(styles.cardText)}>{plain(doc.lead)}</span>}
+									</span>
 								</a>
 							)
 						})}

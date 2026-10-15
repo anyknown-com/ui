@@ -71,7 +71,11 @@ const END = T.reply + Math.ceil(REPLY.length / REPLY_PER_TICK)
 const PAUSE = { full: 90, compact: 50 }
 
 const SUBAGENT_STEPS = [
-	{ at: T.subagent, now: "Reading packages/runtime/src/retry.ts", text: "Starting where withRetry is called…" },
+	{
+		at: T.subagent,
+		now: "Reading packages/runtime/src/retry.ts",
+		text: "Starting where withRetry is called…",
+	},
 	{
 		at: T.subagent + 16,
 		now: "Searching for session.retrying",
@@ -221,7 +225,7 @@ export function Scene({ compact }: SceneProps) {
 												{search === "done" && (
 													<ToolOutput
 														text={
-															"apps/desktop/src/thread/reducer.ts:88  case \"session.retrying\":\npackages/runtime/src/turn.ts:41  // TODO: surface retries"
+															'apps/desktop/src/thread/reducer.ts:88  case "session.retrying":\npackages/runtime/src/turn.ts:41  // TODO: surface retries'
 														}
 													/>
 												)}

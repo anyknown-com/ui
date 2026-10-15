@@ -8,6 +8,7 @@ import { COMPONENT_DOCS, COMPONENT_GROUPS, GUIDES } from "./content"
 import { SCENES } from "./scenes"
 import { InspectContext } from "./scenes/Inspect"
 import { Site } from "./Site"
+import { THUMBNAILS } from "./thumbnails"
 
 // Node's own experimental localStorage shadows jsdom's and has no methods; give the site a
 // working one, and a no-op scrollTo (jsdom has none).
@@ -44,6 +45,12 @@ describe("site content", () => {
 			for (const section of ["When to use", "Usage", "Accessibility", "Keyboard", "Related"])
 				expect(doc.sections.has(section), `${name}: ${section}`).toBe(true)
 		}
+	})
+
+	test("every grouped component folder has a catalog thumbnail, and nothing else does", () => {
+		const grouped = COMPONENT_GROUPS.flatMap((g) => g.names).filter((name) => folders.includes(name))
+		for (const name of grouped) expect(THUMBNAILS[name], name).toBeDefined()
+		expect(Object.keys(THUMBNAILS).sort()).toEqual([...grouped].sort())
 	})
 
 	test("demo covers name real folders", () => {
@@ -84,7 +91,9 @@ describe("scenes", () => {
 				<First />
 			</InspectContext>,
 		)
-		const labels = [...container.querySelectorAll<HTMLAnchorElement>("[data-part] > a[href^='#/components/']")]
+		const labels = [
+			...container.querySelectorAll<HTMLAnchorElement>("[data-part] > a[href^='#/components/']"),
+		]
 		expect(labels.length).toBeGreaterThan(0)
 		for (const label of labels) expect(folders).toContain(label.getAttribute("href")!.split("/").at(-1))
 	})
@@ -182,6 +191,43 @@ describe("site smoke", () => {
 		expect(
 			screen.getByRole("heading", { level: 1, name: COMPONENT_DOCS.get("dialog")!.title }),
 		).toBeInTheDocument()
+	})
+
+	test("catalog cards show an inert thumbnail and stay one focus stop each", () => {
+		location.hash = ""
+		render(<Site />)
+		goto("#/components")
+		const cards = [
+			...screen.getByRole("main").querySelectorAll<HTMLAnchorElement>("a[href^='#/components/']"),
+		]
+		expect(cards.length).toBe(folders.length)
+		for (const card of cards) {
+			const name = card.getAttribute("href")!.split("/").at(-1)!
+			const stage = card.querySelector("[inert][aria-hidden='true']")
+			expect(stage, name).not.toBeNull()
+			expect(stage!.childElementCount, name).toBeGreaterThan(0)
+			// the card's name is the link's accessible text; the thumbnail adds none
+			expect(within(card).getByText(COMPONENT_DOCS.get(name)!.title)).toBeInTheDocument()
+		}
+	})
+
+	test("component pages link back to the situations that use them, and only those", () => {
+		location.hash = ""
+		render(<Site />)
+		for (const name of folders) {
+			goto(`#/components/${name}`)
+			const main = screen.getByRole("main")
+			const users = SCENES.filter((scene) => scene.meta.uses.includes(name))
+			const heading = within(main).queryByRole("heading", { level: 2, name: "Seen in" })
+			if (users.length === 0) {
+				expect(heading, name).toBeNull()
+				continue
+			}
+			expect(heading, name).not.toBeNull()
+			const block = heading!.closest("section")!
+			const links = [...block.querySelectorAll("a")].map((a) => a.getAttribute("href"))
+			expect(links, name).toEqual(users.map((scene) => `#/situations/${scene.meta.id}`))
+		}
 	})
 
 	test("theme toggle stamps html with data-theme and a theme class", async () => {
