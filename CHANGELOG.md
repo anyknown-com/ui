@@ -7,6 +7,10 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.13.0 — 2026-10-15
+
 ### Breaking
 
 - **ToolCard:** removed, with `ToolInput`, `ToolOutput`, `ToolError`, `SubagentLine`, `SubagentSummary`, `SubagentThread`, `SubagentText` and their prop types, `ToolState`, `ToolRetry` and `ToolCardLabels`. No product drew tool calls with it. Use `ToolGroup` for tool calls and `SubThreadRow` for a sub agent; see [MIGRATION.md](MIGRATION.md).
@@ -15,6 +19,16 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 - **ToolGroup:** tool calls as Anyknown Desktop draws them. A header counts the calls and names each tool once ("用了 3 次工具：read ×2、shell"); a framed list has one row per call (`{ id, tool, summary, input?, output?, risk? }`), and a row opens to the input in a `PayloadBlock` and the output. `open` / `defaultOpen` / `onOpenChange`, `highlight`, `labels`.
 - **SubThreadRow:** a sub agent's run as a filled pill with its title, a status (`SubThreadStatus`: `queued`, `running`, `waiting`, `blocked`, `done`, `failed`, `cancelled`) and a chevron; the pill calls `onOpenRun`. `children` shows under the pill until the run is over.
+
+### Changed
+
+- **Message:** turns follow the Anyknown Desktop rhythm. `Thread` puts 32px between turns (was 24px) and no longer adds inline padding, so it shares edges with the Composer in the same column. Inside an `AssistantMessage`, consecutive `TextPart`s sit 8px apart and every other part (tool group, sub thread, reasoning fold, cards, code, attachments) gets 16px on both sides (was 8px everywhere).
+
+### Fixed
+
+- **Message:** an `InteractionCard` (or any part with a ring drawn outside its box) inside an `AssistantMessage` showed its frame only at the top and bottom; the turn's paint containment cut the sides. The turn now paints 8px past its edges.
+- **Skeleton:** a `line` with no `height` rendered 0px tall; it is 0.8rem again.
+- **Group:** the header and footer text started 4px further in than the cells' text; they now share the cells' inset.
 
 ## 0.12.2 — 2026-10-15
 
