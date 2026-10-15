@@ -3,7 +3,7 @@ import type { CSSProperties } from "react"
 import { Children, type ReactNode, type Ref, createContext, isValidElement, useContext, useRef } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, corner, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // 觸控裝置沒有 hover:只在 hover 才出現的東西要一直顯示
@@ -17,14 +17,17 @@ const blink = stylex.keyframes({ "50%": { opacity: 0 } })
 const pulse = stylex.keyframes({ "50%": { opacity: 0.3, scale: 0.8 } })
 
 const styles = stylex.create({
+	// 和 desktop thread 同一套節奏:換人說話 32,turn 裡區塊前後 16,連續文字 8。
+	// 左右不留白:Thread 和 Composer 放在同一欄,共用左右邊。
 	thread: {
 		display: "flex",
 		flexDirection: "column",
-		gap: space.lg,
-		paddingInline: space.md,
-		paddingBlock: space.lg,
+		gap: space.xl,
+		paddingBlockStart: { default: space.lg, [breakpoint.phone]: space.md },
+		paddingBlockEnd: space.lg,
 	},
-	turn: { display: "flex", flexDirection: "column", gap: space.xs },
+	turn: { display: "flex", flexDirection: "column", gap: space.md },
+	textRun: { display: "flex", flexDirection: "column", gap: space.xs },
 	userTurn: { alignItems: "flex-end" },
 	bubble: {
 		maxWidth: "85%",
@@ -46,6 +49,8 @@ const styles = stylex.create({
 		marginBottom: `calc(${space.xl} * -1)`,
 		contentVisibility: "auto",
 		containIntrinsicSize: "auto 200px",
+		// content-visibility 帶 paint containment,會切掉貼邊的 ring(InteractionCard 的 1px 框)
+		overflowClipMargin: space.xs,
 		"--ak-action-bar-opacity": { default: "0", ":hover": "1", [NO_HOVER]: "1" },
 	},
 	part: { margin: 0, fontSize: type.t3, lineHeight: type.body, color: color.text },
@@ -170,10 +175,8 @@ export function AssistantMessage({
 	const t = useStrings(strings, labels)
 	const body = useRef<HTMLDivElement>(null)
 	const parts = Children.toArray(children)
-	const lastText = parts.reduce(
-		(found, part, index) => (isValidElement(part) && part.type === TextPart ? index : found),
-		-1,
-	)
+	const lastText = parts.reduce<number>((found, part, index) => (isTextPart(part) ? index : found), -1)
+	const runs = runsOf(parts)
 
 	return (
 		<MessageBodyContext value={body}>
@@ -185,18 +188,47 @@ export function AssistantMessage({
 						<span {...stylex.props(styles.srOnly)}>{pendingLabel ?? t.pending}</span>
 					</span>
 				) : (
-					parts.map((part, index) => (
-						<StreamingContext
-							key={isValidElement(part) && part.key != null ? part.key : index}
-							value={streaming && index === lastText}
-						>
-							{part}
-						</StreamingContext>
-					))
+					runs.map((run) => {
+						const items = run.parts.map(({ part, index }) => (
+							<StreamingContext key={keyOf(part, index)} value={streaming && index === lastText}>
+								{part}
+							</StreamingContext>
+						))
+						const first = run.parts[0]
+						return run.text ? (
+							<div key={`text-${keyOf(first.part, first.index)}`} {...stylex.props(styles.textRun)}>
+								{items}
+							</div>
+						) : (
+							items[0]
+						)
+					})
 				)}
 			</div>
 		</MessageBodyContext>
 	)
+}
+
+const isTextPart = (part: ReactNode) => isValidElement(part) && part.type === TextPart
+
+const keyOf = (part: ReactNode, index: number) =>
+	isValidElement(part) && part.key != null ? part.key : index
+
+type Run = { text: boolean; parts: { part: ReactNode; index: number }[] }
+
+/**
+ * Splits a turn's parts into runs. Consecutive `TextPart`s share one run (8px apart); any other
+ * part is a block and stands alone, so the turn's 16px gap sits on both sides of it.
+ */
+function runsOf(parts: ReactNode[]): Run[] {
+	const runs: Run[] = []
+	parts.forEach((part, index) => {
+		const text = isTextPart(part)
+		const last = runs.at(-1)
+		if (text && last?.text) last.parts.push({ part, index })
+		else runs.push({ text, parts: [{ part, index }] })
+	})
+	return runs
 }
 
 export type TextPartProps = { children: ReactNode }

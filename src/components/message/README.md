@@ -17,11 +17,18 @@ The desktop conversation layout: a `Thread` of turns, where the person's words s
 
 The family:
 
-- `Thread` — the column of turns (24px between turns).
+- `Thread` — the column of turns (32px between turns, 24px above the first; 16px on phone). It adds no inline padding: put the `Thread` and the [Composer](../composer/README.md) in one column so they share the same left and right edges.
 - `UserMessage` — the person's bubble, right aligned, at most 85% wide.
 - `AssistantMessage` — a full-width turn; `streaming` and `pending` show progress.
 - `TextPart` — one paragraph of reply text. `ActionBar.Copy` copies these parts.
 - `useMessageBody()` — returns a ref to the current assistant turn's element, for parts that read the message (as `ActionBar.Copy` does).
+
+Inside an assistant turn the parts follow the desktop rhythm:
+
+- `TextPart` next to `TextPart`: 8px. Consecutive text parts are grouped into one run.
+- Any other part is a block (a ToolGroup, SubThreadRow, ReasoningFold, InteractionCard, HandoffReceipt, PayloadBlock or CodeBlock, attachments, your own card): 16px above and below it.
+- A `TextPart` counts as text only when it is a direct child of `AssistantMessage`. Wrapped in another component, it is a block.
+- Do not add margins between parts; the turn spaces them.
 
 ```tsx
 import { AssistantMessage, TextPart, Thread, UserMessage } from "@anyknown/ui"

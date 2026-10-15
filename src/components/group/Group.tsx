@@ -24,9 +24,9 @@ const styles = stylex.create({
 		gap: 6,
 		lineHeight: type.body,
 	},
-	header: { color: color.textMuted, fontSize: type.t2, paddingInline: 16 },
+	header: { color: color.textMuted, fontSize: type.t2, paddingInline: space.sm },
 	cells: { backgroundColor: color.surface, borderRadius: corner.card, overflow: "hidden" },
-	footer: { color: color.textMuted, fontSize: type.t2, lineHeight: type.snug, paddingInline: 16 },
+	footer: { color: color.textMuted, fontSize: type.t2, lineHeight: type.snug, paddingInline: space.sm },
 	item: {
 		boxShadow: { default: "none", ":not(:first-child)": `inset 0 1px 0 ${color.border}` },
 		fontSize: type.t2,

@@ -127,4 +127,41 @@ describe("Message regressions", () => {
 		)
 		expect(node).not.toBeNull()
 	})
+
+	test("consecutive text parts share one run; a block stands alone between runs", () => {
+		render(
+			<Thread>
+				<AssistantMessage>
+					<TextPart>一</TextPart>
+					<TextPart>二</TextPart>
+					<div data-testid="block">工具</div>
+					<TextPart>三</TextPart>
+				</AssistantMessage>
+			</Thread>,
+		)
+		const turn = screen.getByText("助理說:").parentElement
+		const one = screen.getByText("一").parentElement
+		expect(one).not.toBe(turn)
+		expect(screen.getByText("二").parentElement).toBe(one)
+		expect(screen.getByTestId("block").parentElement).toBe(turn)
+		const three = screen.getByText("三").parentElement
+		expect(three).not.toBe(one)
+		expect(three?.parentElement).toBe(turn)
+	})
+
+	test("the run keeps the streaming cursor on the last text part", () => {
+		render(
+			<Thread>
+				<AssistantMessage streaming>
+					<TextPart>前</TextPart>
+					<div>工具</div>
+					<TextPart>後一</TextPart>
+					<TextPart>後二</TextPart>
+				</AssistantMessage>
+			</Thread>,
+		)
+		expect(screen.getByText("後二").querySelector("[aria-hidden='true']")).not.toBeNull()
+		expect(screen.getByText("後一").querySelector("[aria-hidden='true']")).toBeNull()
+		expect(screen.getByText("前").querySelector("[aria-hidden='true']")).toBeNull()
+	})
 })

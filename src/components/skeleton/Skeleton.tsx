@@ -65,7 +65,9 @@ export type SkeletonProps = Omit<ComponentProps<"div">, "children" | "width" | "
 /** One placeholder bone, hidden from screen readers; wrap bones in `SkeletonGroup` to announce loading. */
 export function Skeleton({ shape = "line", width, height, size, sx, ...props }: SkeletonProps) {
 	const resolvedWidth = shape === "circle" ? (size ?? width ?? "2.25rem") : (width ?? "100%")
-	const resolvedHeight = shape === "circle" ? (size ?? height ?? "2.25rem") : (height ?? "")
+	// 動態 size 會蓋掉 line 的預設高度，所以 line 的 0.8rem 在這裡給
+	const resolvedHeight =
+		shape === "circle" ? (size ?? height ?? "2.25rem") : (height ?? (shape === "line" ? "0.8rem" : ""))
 	return (
 		<div
 			aria-hidden="true"
