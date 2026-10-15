@@ -9,6 +9,12 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 Nothing yet.
 
+## 0.12.1 — 2026-10-15
+
+### Changed
+
+- **Bubble:** the reply sits in the same sunken `surface` bubble as the person's words, with its small corner at the start instead of the end, so both sides of a thread read as messages. Before, the reply had no bubble.
+
 ## 0.12.0 — 2026-10-09
 
 ### Added

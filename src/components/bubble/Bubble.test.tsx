@@ -3,6 +3,8 @@ import { describe, expect, test } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Bubble } from "./Bubble"
 
+const classes = (el: HTMLElement) => new Set(el.className.split(" "))
+
 describe("Bubble", () => {
 	test("人說的話照打的樣子顯示,不當 markdown", () => {
 		render(<Bubble from="user">{"**先**看記憶"}</Bubble>)
@@ -14,6 +16,21 @@ describe("Bubble", () => {
 		expect(screen.getByText("好").tagName).toBe("STRONG")
 		expect(screen.getByRole("columnheader", { name: "項目" })).toHaveStyle({ fontWeight: "500" })
 		expect(screen.getByRole("cell", { name: "房租" })).toHaveStyle({ borderBottomWidth: "0px" })
+	})
+
+	test("兩邊都是沉下去的泡泡,尾巴各在自己那側", () => {
+		render(
+			<>
+				<Bubble from="user">先</Bubble>
+				<Bubble from="assistant">好</Bubble>
+			</>,
+		)
+		const user = screen.getByText("先")
+		const assistant = screen.getByText("好").closest("div[class]") as HTMLElement
+		const shared = [...classes(user)].filter((one) => classes(assistant).has(one))
+		// 同一組底色、圓角、內距的 class,只差尾巴那一個角
+		expect(shared.length).toBeGreaterThan(3)
+		expect(user.className).not.toBe(assistant.className)
 	})
 
 	test("has no axe violations from either side", async () => {

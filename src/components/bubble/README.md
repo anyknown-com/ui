@@ -1,6 +1,6 @@
 # Bubble
 
-One message as the product shell's thread shows it: the person's words verbatim in a sunken bubble, or the reply as markdown on the paper with ruled tables.
+One message as the product shell's thread shows it: a sunken bubble on either side, the person's words verbatim with the tail at the end, or the reply as markdown with ruled tables and the tail at the start.
 
 ## When to use
 
@@ -28,7 +28,7 @@ import { Bubble } from "@anyknown/ui"
 - A plain `<div>`; no role and no author label. The thread must make clear who is speaking if the layout alone does not.
 - An assistant bubble inherits everything [Markdown](../markdown/README.md) does: real headings, lists and tables, links that open in a new tab with `rel="noopener noreferrer nofollow"`, and HTML shown as source.
 - No motion.
-- In forced-colors mode the user bubble gets a 1px outline so it stays apart from the reply.
+- In forced-colors mode both bubbles get a 1px outline so they stay apart from the paper.
 
 ## Keyboard
 
