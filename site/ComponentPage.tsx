@@ -10,59 +10,34 @@ import {
 	apiForFolder,
 } from "./content"
 import { Markdown, renderMarkdown } from "./Markdown"
+import { Page, PageHead, Section, grid } from "./layout"
 import { SCENES } from "./scenes"
 
 const MOBILE = breakpoint.tablet
 
 const styles = stylex.create({
-	eyebrow: {
-		fontFamily: font.mono,
-		fontSize: type.t1,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
-		color: color.textMuted,
-		margin: 0,
-	},
 	title: {
 		fontFamily: font.display,
 		fontSize: type.t6,
 		lineHeight: type.dense,
 		fontWeight: 600,
 		color: color.text,
-		marginBlock: `${space.xxs} ${space.sm}`,
-		overflowWrap: "anywhere",
-	},
-	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, maxWidth: "44rem", margin: 0 },
-	section: {
-		marginTop: space.xl,
-		display: "grid",
-		gridTemplateColumns: "minmax(0, 1fr)",
-		gap: space.sm,
-		minWidth: 0,
-	},
-	h2: {
-		fontFamily: font.display,
-		fontSize: type.t5,
-		lineHeight: type.dense,
-		fontWeight: 600,
-		color: color.text,
 		margin: 0,
 	},
-	when: {
-		display: "grid",
-		gridTemplateColumns: { default: "repeat(2, minmax(0, 1fr))", [MOBILE]: "minmax(0, 1fr)" },
-		gap: space.sm,
-		marginTop: space.lg,
-	},
+	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, maxWidth: "44rem", margin: 0 },
+	apiEntry: { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm, minWidth: 0 },
 	whenCard: {
+		display: "grid",
+		alignContent: "start",
+		gap: space.xs,
 		backgroundColor: color.layer3,
 		borderRadius: corner.card,
-		paddingBlock: space.sm,
-		paddingInline: space.md,
+		padding: space.lg,
 		minWidth: 0,
 	},
 	whenTitle: {
-		fontSize: type.t2,
+		fontSize: type.t4,
+		lineHeight: type.tight,
 		fontWeight: 600,
 		color: color.text,
 		margin: 0,
@@ -90,8 +65,6 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		fontWeight: 600,
-		letterSpacing: "0.06em",
-		textTransform: "uppercase",
 		color: color.textMuted,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
@@ -144,7 +117,6 @@ const styles = stylex.create({
 		marginInlineEnd: space.xxs,
 	},
 	foot: {
-		marginTop: space.xxl,
 		fontSize: type.t2,
 		color: color.textMuted,
 		display: "flex",
@@ -159,18 +131,6 @@ const styles = stylex.create({
 })
 
 const KNOWN = new Set(["When to use", "When not to use", "Usage", "Accessibility", "Keyboard", "Related"])
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-	const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-	return (
-		<section aria-labelledby={`s-${id}`} {...stylex.props(styles.section)}>
-			<h2 id={`s-${id}`} {...stylex.props(styles.h2)}>
-				{title}
-			</h2>
-			{children}
-		</section>
-	)
-}
 
 function Inline({ text, from }: { text: string; from: string }) {
 	// JSDoc is markdown-ish; render it inline so `code` and links work.
@@ -241,7 +201,7 @@ function ApiEntry({ entry }: { entry: ApiComponent }) {
 	}
 	const note = extendsNote(entry.extends ?? [])
 	return (
-		<div {...stylex.props(styles.section)}>
+		<div {...stylex.props(styles.apiEntry)}>
 			<h3 id={`api-${entry.name}`} {...stylex.props(styles.apiName)}>
 				{`<${entry.name}>`}
 				{entry.deprecated !== false && <span {...stylex.props(styles.tag)}>deprecated</span>}
@@ -296,15 +256,15 @@ export function ComponentPage({ name }: { name: string }) {
 	const extra = [...doc.sections.keys()].filter((k) => !KNOWN.has(k))
 	const seenIn = SCENES.filter((scene) => scene.meta.uses.includes(name))
 	return (
-		<article>
-			<p {...stylex.props(styles.eyebrow)}>{groupOf(name) ?? "Component"}</p>
-			<h1 {...stylex.props(styles.title)}>{doc.title}</h1>
-			<div {...stylex.props(styles.lead)}>
-				<Markdown body={doc.lead} from={from} />
-			</div>
+		<Page>
+			<PageHead
+				crumb={{ href: "#/components", label: groupOf(name) ?? "Components" }}
+				title={doc.title}
+				lead={<Markdown body={doc.lead} from={from} />}
+			/>
 
 			{(when != null || whenNot != null) && (
-				<div {...stylex.props(styles.when)}>
+				<div {...stylex.props(grid.halves)}>
 					{when != null && (
 						<div {...stylex.props(styles.whenCard)}>
 							<h2 {...stylex.props(styles.whenTitle)}>When to use</h2>
@@ -385,7 +345,7 @@ export function ComponentPage({ name }: { name: string }) {
 					Source
 				</a>
 			</footer>
-		</article>
+		</Page>
 	)
 }
 

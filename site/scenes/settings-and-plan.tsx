@@ -63,11 +63,9 @@ const styles = stylex.create({
 		minHeight: 0,
 		overflowY: "auto",
 		paddingBlock: { default: space.lg, [MOBILE]: space.md },
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
+		paddingInline: { default: space.lg, [MOBILE]: space.md },
 	},
 	column: { maxWidth: "42rem", marginInline: "auto", display: "grid" },
-	head: { paddingInline: { default: 0, [MOBILE]: space.xs } },
-	label: { paddingInline: { default: 0, [MOBILE]: space.xs } },
 	// Too long next to the segmented control on a phone.
 	wide: { display: { default: "inline", [MOBILE]: "none" } },
 	select: { width: { default: "11rem", [MOBILE]: "8.5rem" } },
@@ -93,12 +91,10 @@ export function Scene({ compact }: SceneProps) {
 			<div {...stylex.props(styles.scroll)}>
 				<div {...stylex.props(styles.column)}>
 					<Part name="page">
-						<PageHead title="Settings" lead="mei.chen@example.com" sx={styles.head} />
+						<PageHead title="Settings" lead="mei.chen@example.com" />
 					</Part>
 
-					<SectionLabel first sx={styles.label}>
-						General
-					</SectionLabel>
+					<SectionLabel first>General</SectionLabel>
 					<Part name="settings-rows">
 						<SettingsRows>
 							<SettingsRow
@@ -134,14 +130,13 @@ export function Scene({ compact }: SceneProps) {
 									</Part>
 								</SettingsRow>
 							)}
-							<SettingsRow
-								label="Open at login"
-								help={compact ? undefined : "Start Anyknown when you sign in to this computer."}
-							>
-								<Part name="switch" inline>
-									<Switch checked={login} onCheckedChange={setLogin} aria-label="Open at login" />
-								</Part>
-							</SettingsRow>
+							{compact ? null : (
+								<SettingsRow label="Open at login" help="Start Anyknown when you sign in to this computer.">
+									<Part name="switch" inline>
+										<Switch checked={login} onCheckedChange={setLogin} aria-label="Open at login" />
+									</Part>
+								</SettingsRow>
+							)}
 							<SettingsRow
 								label="When the agent needs you"
 								help="Notify me when a question or permission waits."
@@ -160,9 +155,15 @@ export function Scene({ compact }: SceneProps) {
 						</SettingsRows>
 					</Part>
 
-					<SectionLabel sx={styles.label}>Plan and usage</SectionLabel>
+					<SectionLabel>Plan and usage</SectionLabel>
 					<Part name="group">
-						<Group footer="Usage resets on Nov 1. If you reach a limit, agents pause until then; nothing is charged without asking you.">
+						<Group
+							footer={
+								compact
+									? undefined
+									: "Usage resets on Nov 1. If you reach a limit, agents pause until then; nothing is charged without asking you."
+							}
+						>
 							<GroupCell
 								label="Pro"
 								detail="$20 a month · renews Nov 1"
@@ -187,19 +188,19 @@ export function Scene({ compact }: SceneProps) {
 								detail="31 of 40 hours used"
 								control={<StatBar percent={78} label="Agent hours used" text="31 of 40 hours" />}
 							/>
-							<GroupCell
-								label="Vault storage"
-								detail="12.4 of 50 GB used"
-								control={<StatBar percent={25} label="Vault storage used" text="12.4 of 50 GB" />}
-							/>
+							{compact ? null : (
+								<GroupCell
+									label="Vault storage"
+									detail="12.4 of 50 GB used"
+									control={<StatBar percent={25} label="Vault storage used" text="12.4 of 50 GB" />}
+								/>
+							)}
 						</Group>
 					</Part>
 
 					{compact ? null : (
 						<>
-							<SectionLabel sx={styles.label} end={<PageNumber>{devices.length}</PageNumber>}>
-								Signed-in devices
-							</SectionLabel>
+							<SectionLabel end={<PageNumber>{devices.length}</PageNumber>}>Signed-in devices</SectionLabel>
 							<SettingsRows>
 								{devices.map((device) => (
 									<SettingsRow key={device.id} label={device.name} help={device.detail}>

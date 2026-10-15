@@ -75,9 +75,6 @@ function sectionOf(route: Route): Section | null {
 	}
 }
 
-/** Pages that show a live scene or a grid get the wider column; reading pages stay narrow. */
-const WIDE = new Set<Route["page"]>(["home", "situations", "situation", "components"])
-
 const MOBILE = breakpoint.tablet
 
 const focus = { default: "none", ":focus-visible": `2px solid ${color.focusRing}` }
@@ -216,7 +213,7 @@ const styles = stylex.create({
 	// runs to both edges and the bottom.
 	main: {
 		minWidth: 0,
-		paddingBlock: { default: space.xl, [MOBILE]: space.lg },
+		paddingBlock: { default: space.xxl, [MOBILE]: space.lg },
 		paddingInline: { default: space.xl, [MOBILE]: space.md },
 		marginBottom: { default: space.xs, [MOBILE]: 0 },
 		marginInline: { default: space.xs, [MOBILE]: 0 },
@@ -224,8 +221,9 @@ const styles = stylex.create({
 		borderRadius: { default: corner.sheet, [MOBILE]: `${corner.sheet} ${corner.sheet} 0 0` },
 	},
 	mainWithRail: { marginInlineStart: 0 },
-	content: { maxWidth: "56rem", marginInline: "auto" },
-	contentWide: { maxWidth: "72rem" },
+	// One content width for every page. Reading text inside it keeps its own measure and stays
+	// on the start edge, so every page shares the same start edge.
+	content: { maxWidth: "72rem", marginInline: "auto" },
 	skip: {
 		position: "absolute",
 		insetInlineStart: space.sm,
@@ -462,11 +460,7 @@ export function Site() {
 					</nav>
 				)}
 				<main id="main" tabIndex={-1} {...stylex.props(styles.main, rail != null && styles.mainWithRail)}>
-					<div
-						key={hash}
-						ref={scrollOnMount(anchor)}
-						{...stylex.props(styles.content, WIDE.has(route.page) && styles.contentWide)}
-					>
+					<div key={hash} ref={scrollOnMount(anchor)} {...stylex.props(styles.content)}>
 						<Page route={route} />
 					</div>
 				</main>

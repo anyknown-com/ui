@@ -23,7 +23,7 @@ import * as stylex from "@stylexjs/stylex"
 import { useCallback, useState } from "react"
 import { Part } from "./Inspect"
 import type { SceneMeta, SceneProps } from "./scene"
-import { Sheet } from "./Sheet"
+import { Sheet, chat } from "./Sheet"
 
 export const meta: SceneMeta = {
 	id: "agent-needs-you",
@@ -85,16 +85,6 @@ function finalReply(published: boolean, price: string) {
 
 const styles = stylex.create({
 	sheet: { height: { default: "44rem", [MOBILE]: "40rem" } },
-	header: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: space.sm,
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		minHeight: "3.5rem",
-		boxSizing: "border-box",
-	},
 	now: {
 		display: "flex",
 		alignItems: "center",
@@ -104,19 +94,8 @@ const styles = stylex.create({
 		color: color.textMuted,
 	},
 	nowText: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-	scroll: {
-		flexGrow: 1,
-		minHeight: 0,
-		overflowY: "auto",
-		overscrollBehavior: "contain",
-		paddingBlock: space.xs,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-	},
-	column: { maxWidth: "44rem", marginInline: "auto" },
-	dock: {
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
-	},
+	// The tile opens on the status and the permission card; the decision card runs off the bottom.
+	still: { overflowY: "hidden" },
 })
 
 export function Scene({ compact }: SceneProps) {
@@ -184,20 +163,26 @@ export function Scene({ compact }: SceneProps) {
 
 	return (
 		<Sheet fill={compact} sx={!compact && styles.sheet}>
-			<div {...stylex.props(styles.header)}>
-				<span {...stylex.props(styles.now)}>{status}</span>
-				<Part name="status-badge" inline>
-					{working ? (
-						<StatusBadge tone="live">Agent working</StatusBadge>
-					) : resumed ? (
-						<StatusBadge tone="plain">Done</StatusBadge>
-					) : (
-						<StatusBadge tone="warn">Needs your input</StatusBadge>
-					)}
-				</Part>
+			<div {...stylex.props(chat.header)}>
+				<div {...stylex.props(chat.column, chat.headerRow)}>
+					<span {...stylex.props(styles.now)}>{status}</span>
+					<Part name="status-badge" inline>
+						{working ? (
+							<StatusBadge tone="live">Agent working</StatusBadge>
+						) : resumed ? (
+							<StatusBadge tone="plain">Done</StatusBadge>
+						) : (
+							<StatusBadge tone="warn">Needs your input</StatusBadge>
+						)}
+					</Part>
+				</div>
 			</div>
-			<div key={run} ref={lineUp} {...stylex.props(styles.scroll)}>
-				<div {...stylex.props(styles.column)}>
+			<div
+				key={run}
+				ref={compact ? undefined : lineUp}
+				{...stylex.props(chat.scroll, compact && styles.still)}
+			>
+				<div {...stylex.props(chat.column)}>
 					<Part name="message">
 						<Thread>
 							{!compact && <UserMessage>{REQUEST}</UserMessage>}
@@ -224,7 +209,7 @@ export function Scene({ compact }: SceneProps) {
 										/>
 									</Part>
 								)}
-								<TextPart>{ASK}</TextPart>
+								{!compact && <TextPart>{ASK}</TextPart>}
 								<Part name="interaction-card">
 									<PermissionCard
 										verb="Run command"
@@ -275,27 +260,29 @@ export function Scene({ compact }: SceneProps) {
 					</Part>
 					{working && <div ref={resume} />}
 				</div>
-				<div key={`${notes.length}:${String(answered)}:${String(resumed)}`} ref={showEnd} />
+				{!compact && <div key={`${notes.length}:${String(answered)}:${String(resumed)}`} ref={showEnd} />}
 			</div>
-			<div {...stylex.props(styles.dock)}>
-				<div {...stylex.props(styles.column)}>
-					<Part name="composer">
-						<Composer
-							placeholder={answered ? "Message the agent" : "Reply while the questions wait"}
-							models={["Opus 5", "Sonnet 5", "Fable 5"]}
-							model={model}
-							onModelChange={setModel}
-							onSubmit={(text) => {
-								if (resumed) {
-									toast("This is a recorded run", { description: "Nothing is sent from ui.anyknown.com." })
-								} else {
-									setNotes((list) => [...list, text])
-								}
-							}}
-						/>
-					</Part>
+			{!compact && (
+				<div {...stylex.props(chat.dock)}>
+					<div {...stylex.props(chat.column)}>
+						<Part name="composer">
+							<Composer
+								placeholder={answered ? "Message the agent" : "Reply while the questions wait"}
+								models={["Opus 5", "Sonnet 5", "Fable 5"]}
+								model={model}
+								onModelChange={setModel}
+								onSubmit={(text) => {
+									if (resumed) {
+										toast("This is a recorded run", { description: "Nothing is sent from ui.anyknown.com." })
+									} else {
+										setNotes((list) => [...list, text])
+									}
+								}}
+							/>
+						</Part>
+					</div>
 				</div>
-			</div>
+			)}
 		</Sheet>
 	)
 }

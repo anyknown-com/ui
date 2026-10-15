@@ -79,7 +79,7 @@ const styles = stylex.create({
 	body: {
 		flexGrow: 1,
 		paddingBlockEnd: space.lg,
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
+		paddingInline: { default: space.lg, [MOBILE]: space.md },
 	},
 	// The locked and set-up screens: one narrow column in the middle of the sheet.
 	gate: {

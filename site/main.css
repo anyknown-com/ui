@@ -37,6 +37,10 @@ body {
 	margin-top: 0;
 }
 
+.prose > :last-child {
+	margin-bottom: 0;
+}
+
 .prose h1 {
 	font-family: var(--ak-font-display);
 	font-size: var(--ak-type-t6);

@@ -20,7 +20,7 @@ import * as stylex from "@stylexjs/stylex"
 import { useCallback, useRef, useState } from "react"
 import { Part } from "./Inspect"
 import type { SceneMeta, SceneProps } from "./scene"
-import { Sheet } from "./Sheet"
+import { Sheet, chat, startOnWholeTurn } from "./Sheet"
 
 export const meta: SceneMeta = {
 	id: "agent-working",
@@ -121,16 +121,6 @@ function nowLine(t: number) {
 
 const styles = stylex.create({
 	sheet: { height: { default: "40rem", [MOBILE]: "36rem" } },
-	header: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: space.sm,
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		minHeight: "3.5rem",
-		boxSizing: "border-box",
-	},
 	now: {
 		display: "flex",
 		alignItems: "center",
@@ -140,21 +130,8 @@ const styles = stylex.create({
 		color: color.textMuted,
 	},
 	nowText: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-	scroll: {
-		flexGrow: 1,
-		minHeight: 0,
-		overflowY: "auto",
-		overscrollBehavior: "contain",
-		paddingBlock: space.xs,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-	},
-	column: { maxWidth: "44rem", marginInline: "auto" },
-	// Desktop's run body: a block row sits 16px under the row before it.
+	// The sub agent's run body follows the turn rhythm: a block sits 16px under the text.
 	subBody: { display: "flex", flexDirection: "column", gap: space.md },
-	dock: {
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
-	},
 })
 
 export function Scene({ compact }: SceneProps) {
@@ -171,10 +148,14 @@ export function Scene({ compact }: SceneProps) {
 	)
 
 	// Keep the newest line in view, unless the person scrolled up to read.
+	// A tile has no reader to scroll it, so it always follows, and never opens mid-turn.
 	const pinned = useRef(true)
+	const thread = useRef<HTMLDivElement>(null)
 	const followBottom = (node: HTMLElement | null) => {
 		const box = node?.parentElement
-		if (box != null && pinned.current) box.scrollTop = box.scrollHeight
+		if (box == null || (!compact && !pinned.current)) return
+		box.scrollTop = box.scrollHeight
+		if (compact) startOnWholeTurn(box, thread.current)
 	}
 
 	const working = t < END
@@ -231,31 +212,33 @@ export function Scene({ compact }: SceneProps) {
 
 	return (
 		<Sheet fill={compact} sx={!compact && styles.sheet}>
-			<div ref={clock} {...stylex.props(styles.header)}>
-				<span {...stylex.props(styles.now)}>
-					{working ? (
-						<Part name="live-dot" inline align="start">
-							<LiveDot />
-						</Part>
-					) : null}
-					<span {...stylex.props(styles.nowText)}>
-						{working ? nowLine(t) : `Finished in ${Math.round(END / 10)} s`}
+			<div ref={clock} {...stylex.props(chat.header)}>
+				<div {...stylex.props(chat.column, chat.headerRow)}>
+					<span {...stylex.props(styles.now)}>
+						{working ? (
+							<Part name="live-dot" inline align="start">
+								<LiveDot />
+							</Part>
+						) : null}
+						<span {...stylex.props(styles.nowText)}>
+							{working ? nowLine(t) : `Finished in ${Math.round(END / 10)} s`}
+						</span>
 					</span>
-				</span>
-				<Part name="status-badge" inline>
-					<StatusBadge tone={working ? "live" : "plain"}>{working ? "Agent working" : "Done"}</StatusBadge>
-				</Part>
+					<Part name="status-badge" inline>
+						<StatusBadge tone={working ? "live" : "plain"}>{working ? "Agent working" : "Done"}</StatusBadge>
+					</Part>
+				</div>
 			</div>
 			<div
 				onScroll={(event) => {
 					const box = event.currentTarget
 					pinned.current = box.scrollHeight - box.scrollTop - box.clientHeight < 48
 				}}
-				{...stylex.props(styles.scroll)}
+				{...stylex.props(chat.scroll)}
 			>
-				<div {...stylex.props(styles.column)}>
+				<div {...stylex.props(chat.column)}>
 					<Part name="message">
-						<Thread>
+						<Thread ref={thread}>
 							<UserMessage>{REQUEST}</UserMessage>
 							{t < T.reasoning ? (
 								<AssistantMessage pending />
@@ -277,6 +260,7 @@ export function Scene({ compact }: SceneProps) {
 									{subagent !== "queued" && (
 										<Part name="sub-thread">
 											<SubThreadRow
+												sx={chat.flush}
 												title={SUBAGENT_TASK}
 												status={subagent === "running" ? "running" : "done"}
 												onOpenRun={() =>
@@ -309,8 +293,8 @@ export function Scene({ compact }: SceneProps) {
 				</div>
 				<div ref={followBottom} />
 			</div>
-			<div {...stylex.props(styles.dock)}>
-				<div {...stylex.props(styles.column)}>
+			<div {...stylex.props(chat.dock)}>
+				<div {...stylex.props(chat.column)}>
 					<Part name="composer">
 						<Composer
 							placeholder="Message the agent"

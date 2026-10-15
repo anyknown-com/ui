@@ -1,84 +1,62 @@
-import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
+import { color, corner, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { NotFound } from "./ComponentPage"
+import { Page, PageHead, grid, item } from "./layout"
 import { SCENES, sceneById, type SceneEntry } from "./scenes"
 import { SceneFrame, ScenePreview } from "./scenes/SceneFrame"
 
-const TABLET = breakpoint.tablet
-const MOBILE = breakpoint.phone
-
 const styles = stylex.create({
-	title: {
-		fontFamily: font.display,
-		fontSize: type.t6,
-		lineHeight: type.dense,
-		fontWeight: 600,
-		color: color.text,
-		marginBlock: `0 ${space.sm}`,
-	},
-	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, maxWidth: "44rem", margin: 0 },
-	tiles: {
-		display: "grid",
-		gridTemplateColumns: {
-			default: "repeat(4, minmax(0, 1fr))",
-			[TABLET]: "repeat(2, minmax(0, 1fr))",
-		},
-		gap: { default: space.md, [MOBILE]: space.sm },
-	},
-	tilesPage: { marginTop: space.xl, gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))" },
 	tile: {
-		display: "grid",
-		alignContent: "start",
-		gap: space.xs,
-		minWidth: 0,
 		color: color.text,
 		textDecoration: "none",
 		borderRadius: corner.card,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
-	tileTitle: {
-		fontWeight: 600,
-		fontSize: type.t3,
-		lineHeight: type.tight,
-		textDecoration: { default: "none", ":hover": "underline" },
-		textUnderlineOffset: 2,
-	},
-	tileMoment: {
-		fontSize: type.t2,
-		lineHeight: type.snug,
-		color: color.textMuted,
-		display: "-webkit-box",
-		WebkitLineClamp: 3,
-		WebkitBoxOrient: "vertical",
-		overflow: "hidden",
-	},
 	pager: {
 		display: "flex",
 		justifyContent: "space-between",
 		gap: space.sm,
-		marginTop: space.xxl,
-		fontSize: type.t2,
+		fontSize: type.t3,
 	},
 	pagerLink: { color: color.link, textUnderlineOffset: 2 },
 })
 
-/** One situation as a link: live preview, title, and (unless `short`) its moment. */
-export function SceneTile({ entry, short }: { entry: SceneEntry; short?: boolean }) {
+// One line per situation for its tile; the full moment is on the situation's own page.
+const TAGLINES: Record<string, string> = {
+	"agent-working": "The agent reads, runs tools and shows how far it got.",
+	"agent-needs-you": "The agent stops to ask; you answer in the thread.",
+	"review-changes": "Read what the agent changed, file by file, then decide.",
+	"hand-over-files": "Files wait in the composer, then travel with your message.",
+	"voice-call": "The composer becomes a call bar; speech lands as text.",
+	vault: "Unlock encrypted files and keep the recovery key once.",
+	"settings-and-plan": "Change how the app behaves and see what is left this month.",
+	"data-editing": "Fix a memory where it stands and forget the stale ones.",
+}
+
+/** One situation as a link: live preview, title and one line. */
+export function SceneTile({ entry }: { entry: SceneEntry }) {
 	return (
-		<a href={`#/situations/${entry.meta.id}`} {...stylex.props(styles.tile)}>
+		<a
+			href={`#/situations/${entry.meta.id}`}
+			{...stylex.props(stylex.defaultMarker(), item.root, styles.tile)}
+		>
 			<ScenePreview entry={entry} />
-			<span {...stylex.props(styles.tileTitle)}>{entry.meta.title}</span>
-			{!short && <span {...stylex.props(styles.tileMoment)}>{entry.meta.moment}</span>}
+			<span {...stylex.props(item.text)}>
+				<span {...stylex.props(item.title, item.hoverTitle)}>{entry.meta.title}</span>
+				<span {...stylex.props(item.line)}>{TAGLINES[entry.meta.id] ?? entry.meta.moment}</span>
+			</span>
 		</a>
 	)
 }
 
-export function SceneTiles({ short, page }: { short?: boolean; page?: boolean }) {
+/** Situation tiles, two to a row. `ids` picks and orders a subset; all of them by default. */
+export function SceneTiles({ ids }: { ids?: string[] }) {
+	const entries = ids == null ? SCENES : SCENES.filter((entry) => ids.includes(entry.meta.id))
 	return (
-		<div {...stylex.props(styles.tiles, page && styles.tilesPage)}>
-			{SCENES.map((entry) => (
-				<SceneTile key={entry.meta.id} entry={entry} short={short} />
+		<div {...stylex.props(grid.halves)}>
+			{entries.map((entry) => (
+				<SceneTile key={entry.meta.id} entry={entry} />
 			))}
 		</div>
 	)
@@ -86,14 +64,13 @@ export function SceneTiles({ short, page }: { short?: boolean; page?: boolean })
 
 export function SituationsPage() {
 	return (
-		<article>
-			<h1 {...stylex.props(styles.title)}>Situations</h1>
-			<p {...stylex.props(styles.lead)}>
-				The moments an agent product has, each one a full screen built only from @anyknown/ui. Open one to see
-				it run, switch on Inspect to see which component is which, and read why it looks the way it does.
-			</p>
-			<SceneTiles page />
-		</article>
+		<Page>
+			<PageHead
+				title="Situations"
+				lead="The moments an agent product has, each one a full screen built only from @anyknown/ui. Open one to see it run, switch on Inspect to see which component is which, and read why it looks the way it does."
+			/>
+			<SceneTiles />
+		</Page>
 	)
 }
 
@@ -104,7 +81,7 @@ export function SituationPage({ id }: { id: string }) {
 	const prev = SCENES[index - 1]
 	const next = SCENES[index + 1]
 	return (
-		<>
+		<Page>
 			<SceneFrame entry={entry} />
 			<nav aria-label="More situations" {...stylex.props(styles.pager)}>
 				{prev != null ? (
@@ -120,6 +97,6 @@ export function SituationPage({ id }: { id: string }) {
 					</a>
 				)}
 			</nav>
-		</>
+		</Page>
 	)
 }

@@ -175,12 +175,16 @@ const styles = stylex.create({
 	body: {
 		display: "flex",
 		flexDirection: "column",
-		gap: space.sm,
+		// Two groups: the page head, then the table with its bulk strip. The strip's own height
+		// already adds air above its text, so 16px reads as the step between groups.
+		gap: space.md,
 		paddingBlock: { default: space.lg, [MOBILE]: space.md },
 		paddingInline: { default: space.lg, [MOBILE]: space.md },
 	},
 	compactBody: { paddingBlock: space.lg, paddingInline: space.lg },
 	sub: { marginBlock: 0 },
+	// The bulk strip belongs to the table under it.
+	table: { display: "flex", flexDirection: "column", gap: space.xs },
 	bulk: {
 		display: "flex",
 		alignItems: "center",
@@ -299,101 +303,105 @@ export function Scene({ compact }: SceneProps) {
 	return (
 		<Sheet fill={compact}>
 			<div {...stylex.props(styles.body, compact && styles.compactBody)}>
-				<Part name="page">
-					<PageHead
-						title="Memories"
-						lead={
-							<>
-								<PageNumber>{memories.length}</PageNumber> kept
-								{outdated > 0 && (
-									<>
-										{" · "}
-										<PageNumber>{outdated}</PageNumber> out of date
-									</>
-								)}
-							</>
-						}
-						actions={
-							<Part name="segmented" inline>
-								<Segmented label="Scope" value={scope} onValueChange={setScope} options={[...SCOPES]} />
-							</Part>
-						}
-					/>
-					{!compact && (
-						<PageSub sx={styles.sub}>
-							The agent reads these at the start of every thread. Double-click a memory to fix it.
-						</PageSub>
-					)}
-				</Part>
-				<div {...stylex.props(styles.bulk, count > 0 && styles.bulkOn)}>
-					<span aria-live="polite" {...stylex.props(styles.bulkText)}>
-						{count === 0 ? "Select memories to forget them together." : `${count} selected`}
-					</span>
-					{count > 0 && (
-						<>
-							{/* On a phone the header checkbox clears; the row keeps room for the action. */}
-							<span {...stylex.props(styles.wide)}>
-								<Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
-									Clear selection
-								</Button>
-							</span>
-							<Part name="button" inline>
-								<Button variant="dangerGhost" size="sm" onClick={forget}>
-									{count === 1 ? "Forget 1 memory" : `Forget ${count} memories`}
-								</Button>
-							</Part>
-						</>
-					)}
-				</div>
-				<Part name="data-table">
-					<DataTable
-						label="Memories"
-						rows={rows}
-						total={inScope.length}
-						rowKey={(row) => row.id}
-						columns={columns}
-						filter={filter}
-						onFilterChange={compact ? undefined : setFilter}
-						sort={sort}
-						onSortChange={setSort}
-						selected={selected}
-						onSelectedChange={setSelected}
-						maxHeight={compact ? "40rem" : "26rem"}
-						labels={{
-							filterPlaceholder: "Filter memories",
-							count: (shown, total) => `${shown} of ${total}`,
-							select: (id) => `Select “${textOf(id)}”`,
-							selectAll: "Select all shown",
-							edit: (header, id) => `Edit ${header.toLowerCase()} “${textOf(id)}”`,
-						}}
-						emptyState={(text) => (
-							<Part name="empty-state">
-								<EmptyState
-									icon={<SearchIcon />}
-									title={text === "" ? `No ${kind}memories` : `No ${kind}memory matches “${text}”`}
-									description={
-										scope !== "all"
-											? `It may be kept under ${scope === "personal" ? "Workspace" : "Personal"}.`
-											: text === ""
-												? "Memories show up here as the agent learns them."
-												: "Try a shorter word, or clear the filter to see every memory."
-									}
-									action={
-										scope !== "all" ? (
-											<Button variant="secondary" size="sm" onClick={() => setScope("all")}>
-												Search all scopes
-											</Button>
-										) : text === "" ? undefined : (
-											<Button variant="secondary" size="sm" onClick={() => setFilter("")}>
-												Clear filter
-											</Button>
-										)
-									}
-								/>
-							</Part>
+				<div>
+					<Part name="page">
+						<PageHead
+							title="Memories"
+							lead={
+								<>
+									<PageNumber>{memories.length}</PageNumber> kept
+									{outdated > 0 && (
+										<>
+											{" · "}
+											<PageNumber>{outdated}</PageNumber> out of date
+										</>
+									)}
+								</>
+							}
+							actions={
+								<Part name="segmented" inline>
+									<Segmented label="Scope" value={scope} onValueChange={setScope} options={[...SCOPES]} />
+								</Part>
+							}
+						/>
+						{!compact && (
+							<PageSub sx={styles.sub}>
+								The agent reads these at the start of every thread. Double-click a memory to fix it.
+							</PageSub>
 						)}
-					/>
-				</Part>
+					</Part>
+				</div>
+				<div {...stylex.props(styles.table)}>
+					<div {...stylex.props(styles.bulk, count > 0 && styles.bulkOn)}>
+						<span aria-live="polite" {...stylex.props(styles.bulkText)}>
+							{count === 0 ? "Select memories to forget them together." : `${count} selected`}
+						</span>
+						{count > 0 && (
+							<>
+								{/* On a phone the header checkbox clears; the row keeps room for the action. */}
+								<span {...stylex.props(styles.wide)}>
+									<Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+										Clear selection
+									</Button>
+								</span>
+								<Part name="button" inline>
+									<Button variant="dangerGhost" size="sm" onClick={forget}>
+										{count === 1 ? "Forget 1 memory" : `Forget ${count} memories`}
+									</Button>
+								</Part>
+							</>
+						)}
+					</div>
+					<Part name="data-table">
+						<DataTable
+							label="Memories"
+							rows={rows}
+							total={inScope.length}
+							rowKey={(row) => row.id}
+							columns={columns}
+							filter={filter}
+							onFilterChange={compact ? undefined : setFilter}
+							sort={sort}
+							onSortChange={setSort}
+							selected={selected}
+							onSelectedChange={setSelected}
+							maxHeight={compact ? "40rem" : "26rem"}
+							labels={{
+								filterPlaceholder: "Filter memories",
+								count: (shown, total) => `${shown} of ${total}`,
+								select: (id) => `Select “${textOf(id)}”`,
+								selectAll: "Select all shown",
+								edit: (header, id) => `Edit ${header.toLowerCase()} “${textOf(id)}”`,
+							}}
+							emptyState={(text) => (
+								<Part name="empty-state">
+									<EmptyState
+										icon={<SearchIcon />}
+										title={text === "" ? `No ${kind}memories` : `No ${kind}memory matches “${text}”`}
+										description={
+											scope !== "all"
+												? `It may be kept under ${scope === "personal" ? "Workspace" : "Personal"}.`
+												: text === ""
+													? "Memories show up here as the agent learns them."
+													: "Try a shorter word, or clear the filter to see every memory."
+										}
+										action={
+											scope !== "all" ? (
+												<Button variant="secondary" size="sm" onClick={() => setScope("all")}>
+													Search all scopes
+												</Button>
+											) : text === "" ? undefined : (
+												<Button variant="secondary" size="sm" onClick={() => setFilter("")}>
+													Clear filter
+												</Button>
+											)
+										}
+									/>
+								</Part>
+							)}
+						/>
+					</Part>
+				</div>
 			</div>
 		</Sheet>
 	)

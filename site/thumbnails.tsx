@@ -97,20 +97,46 @@ import type { ComponentType, ReactNode } from "react"
 const noop = () => {}
 
 const styles = stylex.create({
+	// The recessed frame (card corner) and the paper inside it (card corner minus the padding).
+	frame: {
+		aspectRatio: "16 / 10",
+		boxSizing: "border-box",
+		padding: space.xs,
+		// The card link around the thumbnail carries the marker.
+		// In dark the recessed steps sit too close to the sheet, so the frame takes layer4 there.
+		backgroundColor: {
+			default: `light-dark(${color.layer3}, ${color.layer4})`,
+			[stylex.when.ancestor(":hover")]: `light-dark(${color.layer4}, ${color.layer5})`,
+		},
+		borderRadius: corner.card,
+		display: "grid",
+		minWidth: 0,
+		pointerEvents: "none",
+	},
 	stage: {
 		position: "relative",
-		height: "10rem",
 		boxSizing: "border-box",
 		padding: space.md,
-		overflow: "hidden",
-		display: "flex",
-		flexDirection: "column",
-		justifyContent: "safe center",
-		alignItems: "safe center",
-		gap: space.xs,
+		overflow: "clip",
+		display: "grid",
+		gridTemplateColumns: "minmax(0, 1fr)",
+		gridTemplateRows: "minmax(0, 1fr)",
+		// Unsafe so a canvas taller than the stage still centres; `fit` then scales it into view.
+		placeItems: "unsafe center",
+		minWidth: 0,
+		minHeight: 0,
 		backgroundColor: color.layer2,
 		borderRadius: corner.small,
-		pointerEvents: "none",
+	},
+	// What the thumbnail draws, at its own size; `fit` scales it down if it would not fit.
+	canvas: {
+		boxSizing: "border-box",
+		width: "min(100%, 20rem)",
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "center",
+		gap: space.xs,
+		transformOrigin: "center",
 	},
 	fill: { alignSelf: "stretch", display: "grid", gap: space.xs, minWidth: 0 },
 	flush: { marginInlineStart: 0 },
@@ -176,6 +202,9 @@ const styles = stylex.create({
 	},
 	title: { fontWeight: 600, color: color.text },
 	listGrid: { gridTemplateColumns: "4.5rem minmax(0, 1fr)" },
+	// A reply skips rendering while off screen and stands in at 200px, so `fit` would shrink the
+	// thumbnail to that guess. Thumbnails always render it at its real height.
+	rendered: { contentVisibility: "visible" },
 })
 
 const LEDGER = "3rem minmax(0, 1fr) 3rem"
@@ -484,7 +513,7 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 		<Fill>
 			<Thread>
 				<UserMessage>Are the reducer tests done?</UserMessage>
-				<AssistantMessage>
+				<AssistantMessage sx={styles.rendered}>
 					<TextPart>Done. All three cases pass.</TextPart>
 				</AssistantMessage>
 			</Thread>
@@ -531,7 +560,7 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 	"action-bar": () => (
 		<Fill>
 			<Thread>
-				<AssistantMessage>
+				<AssistantMessage sx={styles.rendered}>
 					<TextPart>The retry now reaches the footer.</TextPart>
 					<ActionBar visible>
 						<ActionBar.Copy />
@@ -663,7 +692,13 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 	),
 	"recovery-key": () => (
 		<Fill>
-			<RecoveryKey value="K7PQ-WM2X-9RDF-H4TN-ZC8B-JE6V-A3YS-UG5L" />
+			<RecoveryKey
+				value="K7PQ-WM2X-9RDF-H4TN-ZC8B"
+				intro="Shown only this once."
+				revealLabel="Show"
+				warning="We don't keep a copy."
+				ackLabel="I saved it"
+			/>
 		</Fill>
 	),
 
@@ -707,12 +742,92 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 	),
 }
 
+/** Scales the canvas down until it fits the stage, so no thumbnail is ever cut off. */
+function fit(stage: HTMLDivElement | null) {
+	const canvas = stage?.firstElementChild
+	if (stage == null || !(canvas instanceof HTMLElement)) return
+	const measure = () => {
+		const style = getComputedStyle(stage)
+		const height = stage.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+		const scale = Math.min(1, height / canvas.offsetHeight, canvas.clientWidth / canvas.scrollWidth)
+		canvas.style.transform = scale < 1 ? `scale(${scale})` : ""
+	}
+	const observer = new ResizeObserver(measure)
+	observer.observe(stage)
+	observer.observe(canvas)
+	return () => observer.disconnect()
+}
+
 /** The inert stage a catalog card shows: the family's thumbnail, or nothing for an unknown name. */
 export function Thumbnail({ name }: { name: string }) {
 	const Render = THUMBNAILS[name]
 	return (
-		<div aria-hidden="true" inert {...stylex.props(styles.stage)}>
-			{Render != null && <Render />}
+		<div aria-hidden="true" inert {...stylex.props(styles.frame)}>
+			<div ref={fit} {...stylex.props(styles.stage)}>
+				<div {...stylex.props(styles.canvas)}>{Render != null && <Render />}</div>
+			</div>
 		</div>
 	)
+}
+
+/** One line per family for its catalog card: what it is for, short enough never to be cut. */
+export const BLURBS: Record<string, string> = {
+	button: "Pill buttons, from the one ink action to quiet options.",
+	"icon-button": "A round button with one glyph and a tooltip name.",
+	ghost: "A word that acts as a button, with no fill until hover.",
+	card: "A raised sheet of paper for one standalone object.",
+	text: "Text in one of the library's type styles, as any element.",
+	icon: "Size and stroke helpers so your icons match the library.",
+	kbd: "Key caps for keyboard shortcuts.",
+	badge: "Small pill labels with an optional dot or count.",
+	"status-badge": "A state pill for something that runs on its own.",
+	"status-chip": "Mono chips that mark what a tool call did.",
+	"live-dot": "A breathing blue dot that says it is still running.",
+	"empty-state": "An invitation to act where there is nothing yet.",
+	input: "A single-line text field, sunken into the page.",
+	textarea: "A multi-line text field that grows with its content.",
+	label: "Form labels and a field wrapper with help and errors.",
+	checkbox: "An on/off choice that applies when the form is sent.",
+	radio: "One choice from a short list, under a legend.",
+	switch: "An on/off toggle that takes effect at once.",
+	slider: "One continuous amount, with no tick marks.",
+	select: "A field that opens a searchable floating list.",
+	segmented: "A few short options on a sunken track.",
+	dropdown: "A menu of actions that opens from a button.",
+	"password-input": "A passphrase field with show/hide and a strength meter.",
+	dialog: "A modal dialog, with a confirm variant for deletes.",
+	popover: "A floating card anchored to a trigger.",
+	tooltip: "A one-line hint on hover or keyboard focus.",
+	toast: "Non-blocking notices that stack in a corner.",
+	tabs: "Switches between panels at the same level.",
+	progress: "Bars for agent work, rings for readings.",
+	spin: "A small spinning ring for a button or chip that waits.",
+	skeleton: "Placeholders shaped like the content to come.",
+	message: "The thread layout: your bubbles, the agent's full-width replies.",
+	bubble: "One message as a sunken bubble on either side.",
+	markdown: "Renders a message's markdown as React elements.",
+	"code-block": "Monospace code with a language label and copy.",
+	"payload-block": "What a tool was called with or gave back.",
+	"tool-group": "A run of tool calls under one counting header.",
+	"sub-thread": "A sub agent's run as one pill in the thread.",
+	"reasoning-fold": "A pill that folds away the agent's thinking.",
+	"action-bar": "Quiet actions under a reply: copy, regenerate.",
+	"interaction-card": "Cards for when the agent waits on the person.",
+	"handoff-receipt": "A divider that marks a session handoff.",
+	composer: "The prompt bar at the bottom of a conversation.",
+	"attach-button": "A round + button that opens the file picker.",
+	"pending-files": "Chips for files picked for the next message.",
+	attachment: "The files a sent message carries, as tiles.",
+	"voice-indicator": "Shows if the voice agent listens, thinks or speaks.",
+	"call-bar": "The bar a composer turns into during a call.",
+	"data-table": "A table with sorting, filtering and inline edits.",
+	table: "Low-level parts for a mono ledger.",
+	list: "Rows of things you open, with no frame.",
+	"file-row": "One row of a file browser.",
+	dropzone: "A drop area for uploads, with a button too.",
+	"diff-viewer": "A unified diff of one file, changed words marked.",
+	"recovery-key": "Shows a vault's recovery key once, blurred until revealed.",
+	group: "A grouped settings list in one sunken region.",
+	"settings-rows": "Settings rows with a name, help and a control.",
+	page: "The heading and surfaces around a settings page.",
 }

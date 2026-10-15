@@ -120,14 +120,17 @@ describe("site smoke", () => {
 		location.hash = ""
 		render(<Site />)
 		expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument()
-		for (const { meta } of SCENES)
-			expect(document.querySelector(`main a[href="#/situations/${meta.id}"]`), meta.id).not.toBeNull()
+		// The home page shows a few situations and links to the rest.
+		expect(document.querySelector('main a[href="#/situations"]')).not.toBeNull()
+		expect(document.querySelectorAll('main a[href^="#/situations/"]').length).toBeGreaterThan(0)
 		const sections = screen.getByRole("navigation", { name: "Sections" })
 		for (const name of ["Situations", "Components", "Foundations", "Guides", "For agents"])
 			expect(within(sections).getByRole("link", { name })).toBeInTheDocument()
 
 		goto("#/situations")
 		expect(screen.getByRole("heading", { level: 1, name: "Situations" })).toBeInTheDocument()
+		for (const { meta } of SCENES)
+			expect(document.querySelector(`main a[href="#/situations/${meta.id}"]`), meta.id).not.toBeNull()
 		for (const { meta } of SCENES) {
 			goto(`#/situations/${meta.id}`)
 			const main = screen.getByRole("main")

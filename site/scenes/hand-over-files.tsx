@@ -20,7 +20,7 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, useCallback, useReducer, useRef, type DragEvent } from "react"
 import { Part } from "./Inspect"
 import type { SceneMeta, SceneProps } from "./scene"
-import { Sheet } from "./Sheet"
+import { Sheet, chat, startOnWholeTurn } from "./Sheet"
 
 export const meta: SceneMeta = {
 	id: "hand-over-files",
@@ -45,7 +45,7 @@ type Upload = { id: string; name: string; size: number; sent: number; preview?: 
 type Turn = { id: string; files: Upload[]; text: string; reply: string[]; age: number }
 type State = { t: number; auto: boolean; dragging: boolean; pending: Upload[]; draft: string; turns: Turn[] }
 type Action =
-	| { type: "tick"; last: number }
+	| { type: "tick"; first: State; last: number }
 	| { type: "drag"; on: boolean }
 	| { type: "add"; files: Upload[] }
 	| { type: "remove"; id: string }
@@ -85,6 +85,8 @@ const END = T.send + REPLY_WAIT + Math.ceil(SCRIPT_REPLY.join(" ").length / REPL
 const PAUSE = { full: 80, compact: 40 }
 
 const INITIAL: State = { t: 0, auto: true, dragging: false, pending: [], draft: "", turns: [HISTORY] }
+// A tile skips the drag and opens on the files landing in the composer.
+const COMPACT_START: State = { ...INITIAL, t: T.drop - 1 }
 
 const kind = (name: string) => name.split(".").pop()?.toUpperCase() ?? "FILE"
 const isImage = (name: string) => /\.(png|jpe?g|gif|webp|heic)$/i.test(name)
@@ -122,8 +124,8 @@ function send(state: State, id: string, text: string, reply?: string[]): State {
 }
 
 /** One tick: uploads move, the newest reply streams, and the recorded run takes its next step. */
-function tick(state: State, last: number): State {
-	if (state.auto && state.t >= last) return INITIAL
+function tick(state: State, first: State, last: number): State {
+	if (state.auto && state.t >= last) return first
 	let next = state
 	if (next.pending.some((file) => file.sent < file.size))
 		next = {
@@ -150,7 +152,7 @@ function tick(state: State, last: number): State {
 function reduce(state: State, action: Action): State {
 	switch (action.type) {
 		case "tick":
-			return tick(state, action.last)
+			return tick(state, action.first, action.last)
 		case "drag":
 			return state.dragging === action.on ? state : { ...state, auto: false, dragging: action.on }
 		case "add":
@@ -197,16 +199,6 @@ const styles = stylex.create({
 		flexGrow: 1,
 		minHeight: 0,
 	},
-	header: {
-		display: "flex",
-		alignItems: "baseline",
-		justifyContent: "space-between",
-		gap: space.sm,
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		minHeight: "3.5rem",
-		boxSizing: "border-box",
-	},
 	title: {
 		margin: 0,
 		fontFamily: font.display,
@@ -217,15 +209,6 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	count: { flexShrink: 0, fontSize: type.t2, color: color.textMuted, fontVariantNumeric: "tabular-nums" },
-	scroll: {
-		flexGrow: 1,
-		minHeight: 0,
-		overflowY: "auto",
-		overscrollBehavior: "contain",
-		paddingBlock: space.xs,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-	},
-	column: { maxWidth: "44rem", marginInline: "auto" },
 	sent: { display: "flex", flexDirection: "column", gap: space.xs },
 	tiles: { display: "flex", justifyContent: "flex-end" },
 	// While files are dragged over the scene, the drop target covers the thread on the same paper.
@@ -239,12 +222,8 @@ const styles = stylex.create({
 		backgroundColor: color.layer2,
 	},
 	drop: { width: "100%", maxWidth: "30rem" },
-	dock: {
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
-	},
 	stack: { display: "grid", gap: space.xs },
-	tray: { display: "grid", gap: space.xs, paddingInline: space.xxs },
+	tray: { display: "grid", gap: space.xs },
 	upload: { display: "grid", gap: space.xxs },
 	uploadLine: {
 		display: "flex",
@@ -260,22 +239,27 @@ const styles = stylex.create({
 })
 
 export function Scene({ compact }: SceneProps) {
-	const [state, dispatch] = useReducer(reduce, INITIAL)
+	const first = compact ? COMPACT_START : INITIAL
+	const [state, dispatch] = useReducer(reduce, first)
 	const last = END + (compact ? PAUSE.compact : PAUSE.full)
 	const clock = useCallback(
 		(node: HTMLElement | null) => {
 			if (node == null) return
-			const id = setInterval(() => dispatch({ type: "tick", last }), 100)
+			const id = setInterval(() => dispatch({ type: "tick", first, last }), 100)
 			return () => clearInterval(id)
 		},
-		[last],
+		[first, last],
 	)
 
 	// Keep the newest line in view, unless the person scrolled up to read.
+	// A tile has no reader to scroll it, so it always follows, and never opens mid-turn.
 	const pinned = useRef(true)
+	const thread = useRef<HTMLDivElement>(null)
 	const followBottom = (node: HTMLElement | null) => {
 		const box = node?.parentElement
-		if (box != null && pinned.current) box.scrollTop = box.scrollHeight
+		if (box == null || (!compact && !pinned.current)) return
+		box.scrollTop = box.scrollHeight
+		if (compact) startOnWholeTurn(box, thread.current)
 	}
 
 	const add = (files: File[]) => {
@@ -311,24 +295,26 @@ export function Scene({ compact }: SceneProps) {
 				}}
 				{...stylex.props(styles.stage)}
 			>
-				<div {...stylex.props(styles.header)}>
-					<p {...stylex.props(styles.title)}>Lease renewal</p>
-					{held > 0 && (
-						<span {...stylex.props(styles.count)}>
-							{held} {held === 1 ? "file" : "files"} in this thread
-						</span>
-					)}
+				<div {...stylex.props(chat.header)}>
+					<div {...stylex.props(chat.column, chat.headerRow)}>
+						<p {...stylex.props(styles.title)}>Lease renewal</p>
+						{held > 0 && (
+							<span {...stylex.props(styles.count)}>
+								{held} {held === 1 ? "file" : "files"} in this thread
+							</span>
+						)}
+					</div>
 				</div>
 				<div
 					onScroll={(event) => {
 						const box = event.currentTarget
 						pinned.current = box.scrollHeight - box.scrollTop - box.clientHeight < 48
 					}}
-					{...stylex.props(styles.scroll)}
+					{...stylex.props(chat.scroll)}
 				>
-					<div {...stylex.props(styles.column)}>
+					<div {...stylex.props(chat.column)}>
 						<Part name="message">
-							<Thread>
+							<Thread ref={thread}>
 								{turns.map((turn) => {
 									const paragraphs = streamedParagraphs(turn)
 									const streaming = !replyDone(turn)
@@ -370,8 +356,8 @@ export function Scene({ compact }: SceneProps) {
 					</div>
 					<div ref={followBottom} />
 				</div>
-				<div {...stylex.props(styles.dock)}>
-					<div {...stylex.props(styles.column, styles.stack)}>
+				<div {...stylex.props(chat.dock)}>
+					<div {...stylex.props(chat.column, styles.stack)}>
 						{pending.length > 0 && (
 							<div {...stylex.props(styles.tray)}>
 								<Part name="pending-files">

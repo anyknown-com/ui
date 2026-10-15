@@ -15,7 +15,7 @@ import * as stylex from "@stylexjs/stylex"
 import { useCallback, useReducer, useRef } from "react"
 import { Part } from "./Inspect"
 import type { SceneMeta, SceneProps } from "./scene"
-import { Sheet } from "./Sheet"
+import { Sheet, chat, startOnWholeTurn } from "./Sheet"
 
 export const meta: SceneMeta = {
 	id: "voice-call",
@@ -131,14 +131,6 @@ const clock = (ticks: number) => {
 
 const styles = stylex.create({
 	sheet: { height: { default: "40rem", [MOBILE]: "36rem" } },
-	header: {
-		display: "flex",
-		alignItems: "center",
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		minHeight: "3.5rem",
-		boxSizing: "border-box",
-	},
 	title: {
 		margin: 0,
 		fontFamily: font.display,
@@ -148,30 +140,23 @@ const styles = stylex.create({
 		textOverflow: "ellipsis",
 		whiteSpace: "nowrap",
 	},
-	scroll: {
-		flexGrow: 1,
-		minHeight: 0,
-		overflowY: "auto",
-		overscrollBehavior: "contain",
-		paddingBlock: space.md,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
+	// The same rhythm as Thread: 32px when the speaker changes (every line here), 24px above the first.
+	thread: {
+		display: "flex",
+		flexDirection: "column",
+		gap: space.xl,
+		paddingBlockStart: { default: space.lg, [MOBILE]: space.md },
+		paddingBlockEnd: space.lg,
 	},
-	column: { maxWidth: "44rem", marginInline: "auto" },
-	thread: { display: "flex", flexDirection: "column", gap: space.sm },
 	line: { maxWidth: "85%" },
 	user: { alignSelf: "flex-end" },
 	assistant: { alignSelf: "flex-start" },
 	marker: {
 		alignSelf: "center",
 		margin: 0,
-		paddingBlock: space.xs,
 		fontSize: type.t2,
 		color: color.textMuted,
 		fontVariantNumeric: "tabular-nums",
-	},
-	dock: {
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.sm },
 	},
 	stack: { display: "grid", gap: space.sm },
 	voice: { display: "flex", justifyContent: "center" },
@@ -199,10 +184,14 @@ export function Scene({ compact }: SceneProps) {
 	)
 
 	// Keep the newest line in view, unless the person scrolled up to read.
+	// A tile has no reader to scroll it, so it always follows, and never opens mid-turn.
 	const pinned = useRef(true)
+	const thread = useRef<HTMLDivElement>(null)
 	const followBottom = (node: HTMLElement | null) => {
 		const box = node?.parentElement
-		if (box != null && pinned.current) box.scrollTop = box.scrollHeight
+		if (box == null || (!compact && !pinned.current)) return
+		box.scrollTop = box.scrollHeight
+		if (compact) startOnWholeTurn(box, thread.current)
 	}
 
 	const stage = stageAt(state.t)
@@ -210,19 +199,21 @@ export function Scene({ compact }: SceneProps) {
 
 	return (
 		<Sheet fill={compact} sx={!compact && styles.sheet}>
-			<div ref={run} {...stylex.props(styles.header)}>
-				<p {...stylex.props(styles.title)}>Afternoon plans</p>
+			<div ref={run} {...stylex.props(chat.header)}>
+				<div {...stylex.props(chat.column, chat.headerRow)}>
+					<p {...stylex.props(styles.title)}>Afternoon plans</p>
+				</div>
 			</div>
 			<div
 				onScroll={(event) => {
 					const box = event.currentTarget
 					pinned.current = box.scrollHeight - box.scrollTop - box.clientHeight < 48
 				}}
-				{...stylex.props(styles.scroll)}
+				{...stylex.props(chat.scroll)}
 			>
-				<div {...stylex.props(styles.column)}>
+				<div {...stylex.props(chat.column)}>
 					<Part name="bubble">
-						<div {...stylex.props(styles.thread)}>
+						<div ref={thread} {...stylex.props(styles.thread)}>
 							<Lines lines={HISTORY} />
 							<p {...stylex.props(styles.marker)}>Voice call</p>
 							<Lines lines={transcriptAt(state.t)} />
@@ -232,8 +223,8 @@ export function Scene({ compact }: SceneProps) {
 				</div>
 				<div ref={followBottom} />
 			</div>
-			<div {...stylex.props(styles.dock)}>
-				<div {...stylex.props(styles.column, styles.stack)}>
+			<div {...stylex.props(chat.dock)}>
+				<div {...stylex.props(chat.column, styles.stack)}>
 					{state.live ? (
 						<>
 							<div {...stylex.props(styles.voice)}>

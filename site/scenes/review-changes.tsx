@@ -19,7 +19,7 @@ import * as stylex from "@stylexjs/stylex"
 import { useState } from "react"
 import { Part } from "./Inspect"
 import type { SceneMeta, SceneProps } from "./scene"
-import { Sheet } from "./Sheet"
+import { Sheet, chat } from "./Sheet"
 
 export const meta: SceneMeta = {
 	id: "review-changes",
@@ -194,16 +194,6 @@ const styles = stylex.create({
 		gap: space.xs,
 	},
 	sheet: { height: { default: "40rem", [STACKED]: "34rem", [MOBILE]: "32rem" } },
-	header: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: space.sm,
-		paddingBlock: space.sm,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		minHeight: "3.5rem",
-		boxSizing: "border-box",
-	},
 	now: {
 		minWidth: 0,
 		overflow: "hidden",
@@ -221,14 +211,6 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	count: { fontSize: type.t2, fontWeight: 400, color: color.textMuted },
-	scroll: {
-		flexGrow: 1,
-		minHeight: 0,
-		overflowY: "auto",
-		overscrollBehavior: "contain",
-		paddingBlock: space.xs,
-		paddingInline: { default: space.lg, [MOBILE]: space.md },
-	},
 	diffs: {
 		flexGrow: 1,
 		minHeight: 0,
@@ -240,10 +222,9 @@ const styles = stylex.create({
 		gridAutoRows: "max-content",
 		gridTemplateColumns: "minmax(0, 1fr)",
 		gap: space.sm,
-		paddingBlockEnd: space.md,
-		paddingInline: { default: space.md, [MOBILE]: space.xs },
+		paddingBlock: space.md,
+		paddingInline: { default: space.lg, [MOBILE]: space.md },
 	},
-	column: { maxWidth: "44rem", marginInline: "auto" },
 	footer: {
 		display: "flex",
 		flexWrap: "wrap",
@@ -251,7 +232,7 @@ const styles = stylex.create({
 		justifyContent: "flex-end",
 		gap: space.xs,
 		paddingBlock: space.sm,
-		paddingInline: { default: space.md, [MOBILE]: space.sm },
+		paddingInline: { default: space.lg, [MOBILE]: space.md },
 		backgroundColor: color.surface,
 	},
 	footerNote: {
@@ -276,10 +257,12 @@ function Changes({
 }) {
 	return (
 		<Sheet fill={compact} sx={!compact && styles.sheet}>
-			<div {...stylex.props(styles.header)}>
-				<h2 {...stylex.props(styles.title)}>
-					Changes <span {...stylex.props(styles.count)}>· {FILES.length} files</span>
-				</h2>
+			<div {...stylex.props(chat.header)}>
+				<div {...stylex.props(chat.headerRow)}>
+					<h2 {...stylex.props(styles.title)}>
+						Changes <span {...stylex.props(styles.count)}>· {FILES.length} files</span>
+					</h2>
+				</div>
 			</div>
 			<div {...stylex.props(styles.diffs)}>
 				{FILES.map((file, index) =>
@@ -334,16 +317,18 @@ export function Scene({ compact }: SceneProps) {
 	return (
 		<div {...stylex.props(styles.layout)}>
 			<Sheet sx={styles.sheet}>
-				<div {...stylex.props(styles.header)}>
-					<span {...stylex.props(styles.now)}>
-						{committed ? "Committed to main" : "Finished in 2 min 14 s · waiting for your review"}
-					</span>
-					<Part name="status-badge" inline>
-						<StatusBadge tone="plain">Done</StatusBadge>
-					</Part>
+				<div {...stylex.props(chat.header)}>
+					<div {...stylex.props(chat.column, chat.headerRow)}>
+						<span {...stylex.props(styles.now)}>
+							{committed ? "Committed to main" : "Finished in 2 min 14 s · waiting for your review"}
+						</span>
+						<Part name="status-badge" inline>
+							<StatusBadge tone="plain">Done</StatusBadge>
+						</Part>
+					</div>
 				</div>
-				<div {...stylex.props(styles.scroll)}>
-					<div {...stylex.props(styles.column)}>
+				<div {...stylex.props(chat.scroll)}>
+					<div {...stylex.props(chat.column)}>
 						<Part name="message">
 							<Thread>
 								<UserMessage>{REQUEST}</UserMessage>

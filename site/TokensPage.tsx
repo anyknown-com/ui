@@ -4,6 +4,7 @@ import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/token
 import * as stylex from "@stylexjs/stylex"
 import type { CSSProperties, ReactNode } from "react"
 import { type TokenEntry, type TokenGroup, TOKEN_GROUPS, tokenGroup } from "./content"
+import { Page, PageHead, Section, grid } from "./layout"
 
 const MOBILE = breakpoint.tablet
 
@@ -72,20 +73,11 @@ const TONE_ROLES: Record<string, string> = {
 }
 
 const styles = stylex.create({
-	title: {
-		fontFamily: font.display,
-		fontSize: type.t6,
-		lineHeight: type.dense,
-		fontWeight: 600,
-		color: color.text,
-		marginBlock: `0 ${space.sm}`,
-	},
-	lead: { fontSize: type.t4, lineHeight: type.snug, color: color.textMuted, maxWidth: "44rem", margin: 0 },
 	toc: {
 		display: "flex",
 		flexWrap: "wrap",
 		gap: space.xs,
-		marginTop: space.md,
+		margin: 0,
 		padding: 0,
 		listStyle: "none",
 	},
@@ -101,23 +93,9 @@ const styles = stylex.create({
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
-	section: {
-		marginTop: space.xxl,
-		display: "grid",
-		gridTemplateColumns: "minmax(0, 1fr)",
-		gap: space.sm,
-		minWidth: 0,
-		scrollMarginTop: space.lg,
-	},
-	h2: { fontFamily: font.display, fontSize: type.t5, lineHeight: type.dense, fontWeight: 600, margin: 0 },
 	note: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0, maxWidth: "44rem" },
 	mono: { fontFamily: font.mono, fontSize: type.code, color: color.text, overflowWrap: "anywhere" },
 	faint: { fontFamily: font.mono, fontSize: type.t1, color: color.textMuted, overflowWrap: "anywhere" },
-	grid: {
-		display: "grid",
-		gridTemplateColumns: "repeat(auto-fill, minmax(15rem, 1fr))",
-		gap: space.sm,
-	},
 	card: {
 		display: "grid",
 		gap: space.xxs,
@@ -203,28 +181,6 @@ function cssVar(group: string, key: string) {
 		: `--ak-${group.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}-${kebab}`
 }
 
-function Section({
-	id,
-	title,
-	note,
-	children,
-}: {
-	id: string
-	title: string
-	note?: ReactNode
-	children: ReactNode
-}) {
-	return (
-		<section id={id} aria-labelledby={`${id}-h`} {...stylex.props(styles.section)}>
-			<h2 id={`${id}-h`} {...stylex.props(styles.h2)}>
-				{title}
-			</h2>
-			{note != null && <p {...stylex.props(styles.note)}>{note}</p>}
-			{children}
-		</section>
-	)
-}
-
 function Description({ entry, roles }: { entry: TokenEntry; roles?: Record<string, string> }) {
 	const text =
 		typeof entry.deprecated === "string" ? entry.deprecated : entry.description || roles?.[entry.key]
@@ -243,7 +199,7 @@ function Swatch({ value, label }: { value: string; label: string }) {
 
 function Colors({ group, roles }: { group: TokenGroup; roles: Record<string, string> }) {
 	return (
-		<div {...stylex.props(styles.grid)}>
+		<div {...stylex.props(grid.thirds)}>
 			{group.tokens.map((entry) => (
 				<div key={entry.key} {...stylex.props(styles.card)}>
 					<div {...stylex.props(styles.swatches)}>
@@ -315,32 +271,38 @@ export function TokensPage() {
 	const shown = new Set<string>([...SECTIONS.map(([id]) => id), "radius"])
 	const others = TOKEN_GROUPS.filter((group) => !shown.has(group.name))
 	return (
-		<article>
-			<h1 {...stylex.props(styles.title)}>Foundations</h1>
-			<p {...stylex.props(styles.lead)}>
-				Every value the components use, read from <code {...stylex.props(styles.mono)}>tokens.stylex.ts</code>{" "}
-				at build time. In StyleX, import the group:{" "}
-				<code
-					{...stylex.props(styles.mono)}
-				>{`import { color, space } from "@anyknown/ui/tokens.stylex"`}</code>
-				. Without StyleX, use the matching <code {...stylex.props(styles.mono)}>--ak-*</code> variable from{" "}
-				<code {...stylex.props(styles.mono)}>@anyknown/ui/tokens.css</code>.
-			</p>
-			<ul {...stylex.props(styles.toc)} aria-label="Token groups">
-				{SECTIONS.map(([id, title]) => (
-					<li key={id}>
-						<a href={`#/tokens/${id}`} {...stylex.props(styles.tocLink)}>
-							{title}
-						</a>
-					</li>
-				))}
-			</ul>
+		<Page>
+			<PageHead
+				title="Foundations"
+				lead={
+					<>
+						Every value the components use, read from{" "}
+						<code {...stylex.props(styles.mono)}>tokens.stylex.ts</code> at build time. In StyleX, import the
+						group:{" "}
+						<code
+							{...stylex.props(styles.mono)}
+						>{`import { color, space } from "@anyknown/ui/tokens.stylex"`}</code>
+						. Without StyleX, use the matching <code {...stylex.props(styles.mono)}>--ak-*</code> variable
+						from <code {...stylex.props(styles.mono)}>@anyknown/ui/tokens.css</code>.
+					</>
+				}
+			>
+				<ul {...stylex.props(styles.toc)} aria-label="Token groups">
+					{SECTIONS.map(([id, title]) => (
+						<li key={id}>
+							<a href={`#/tokens/${id}`} {...stylex.props(styles.tocLink)}>
+								{title}
+							</a>
+						</li>
+					))}
+				</ul>
+			</PageHead>
 
 			{colorGroup != null && (
 				<Section
 					id="color"
 					title="Color"
-					note="Neutral gray, chroma 0. Ink is the primary action; blue (signal) only means the agent is working, focus, or progress. Each card shows the light and the dark value; dark follows the OS unless a theme is applied."
+					lead="Neutral gray, chroma 0. Ink is the primary action; blue (signal) only means the agent is working, focus, or progress. Each card shows the light and the dark value; dark follows the OS unless a theme is applied."
 				>
 					<Colors group={colorGroup} roles={COLOR_ROLES} />
 				</Section>
@@ -350,7 +312,7 @@ export function TokensPage() {
 				<Section
 					id="type"
 					title="Type scale"
-					note="One rem scale: t1–t4 are UI, t5–t7 are headings. Line heights live in the same group. The old `text` group is deprecated; each of its keys names the replacement."
+					lead="One rem scale: t1–t4 are UI, t5–t7 are headings. Line heights live in the same group. The old `text` group is deprecated; each of its keys names the replacement."
 				>
 					<Rows
 						group={{ ...typeGroup, tokens: typeGroup.tokens.filter(isSize) }}
@@ -368,7 +330,7 @@ export function TokensPage() {
 				<Section
 					id="font"
 					title="Fonts"
-					note="Figtree for UI and headings, Geist Mono for code and numbers, Noto Sans TC for Chinese."
+					lead="Figtree for UI and headings, Geist Mono for code and numbers, Noto Sans TC for Chinese."
 				>
 					<Rows
 						group={g("font")!}
@@ -388,7 +350,7 @@ export function TokensPage() {
 				<Section
 					id="space"
 					title="Space"
-					note="Padding and gaps. rem, so they follow the reader's font size."
+					lead="Padding and gaps. rem, so they follow the reader's font size."
 				>
 					<Rows
 						group={g("space")!}
@@ -401,7 +363,7 @@ export function TokensPage() {
 				<Section
 					id="corner"
 					title="Corners"
-					note="Corners follow size: the closer a surface is to the reader, the rounder. Nested: inner radius = outer − padding. `radius` is the older numeric scale."
+					lead="Corners follow size: the closer a surface is to the reader, the rounder. Nested: inner radius = outer − padding. `radius` is the older numeric scale."
 				>
 					<Rows
 						group={g("corner")!}
@@ -418,9 +380,9 @@ export function TokensPage() {
 				<Section
 					id="shadow"
 					title="Elevation"
-					note="Three steps, rest → float → modal. Shadows are black, never tinted. Samples render in the current theme."
+					lead="Three steps, rest → float → modal. Shadows are black, never tinted. Samples render in the current theme."
 				>
-					<div {...stylex.props(styles.grid)}>
+					<div {...stylex.props(grid.thirds)}>
 						{g("shadow")!.tokens.map((entry) => (
 							<div key={entry.key} {...stylex.props(styles.card)}>
 								<div
@@ -436,25 +398,25 @@ export function TokensPage() {
 			)}
 
 			{g("motion") != null && (
-				<Section id="motion" title="Motion" note={g("motion")!.description}>
+				<Section id="motion" title="Motion" lead={g("motion")!.description}>
 					<Rows group={g("motion")!} />
 				</Section>
 			)}
 
 			{g("zIndex") != null && (
-				<Section id="zIndex" title="Stacking (zIndex)" note={g("zIndex")!.description}>
+				<Section id="zIndex" title="Stacking (zIndex)" lead={g("zIndex")!.description}>
 					<Rows group={g("zIndex")!} />
 				</Section>
 			)}
 
 			{g("breakpoint") != null && (
-				<Section id="breakpoint" title="Breakpoints" note={g("breakpoint")!.description}>
+				<Section id="breakpoint" title="Breakpoints" lead={g("breakpoint")!.description}>
 					<Rows group={g("breakpoint")!} />
 				</Section>
 			)}
 
 			{g("iconSize") != null && (
-				<Section id="iconSize" title="Icon sizes" note={g("iconSize")!.description}>
+				<Section id="iconSize" title="Icon sizes" lead={g("iconSize")!.description}>
 					<Rows
 						group={g("iconSize")!}
 						render={(e) => (
@@ -468,7 +430,7 @@ export function TokensPage() {
 			)}
 
 			{g("focusRing") != null && (
-				<Section id="focusRing" title="Focus ring" note={g("focusRing")!.description}>
+				<Section id="focusRing" title="Focus ring" lead={g("focusRing")!.description}>
 					<Rows group={g("focusRing")!} />
 				</Section>
 			)}
@@ -485,6 +447,6 @@ export function TokensPage() {
 					</details>
 				))}
 			</Section>
-		</article>
+		</Page>
 	)
 }
