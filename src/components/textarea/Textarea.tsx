@@ -130,11 +130,11 @@ export function Textarea({
 	const { value, placeholder } = props
 	const attach = useCallback(
 		(area: HTMLTextAreaElement | null) => {
-			assignRef(ref, area)
+			const release = assignRef(ref, area)
 			const cleanup = area && grow ? autoGrow(area, maxRows) : undefined
 			return () => {
 				cleanup?.()
-				assignRef(ref, null)
+				release?.()
 			}
 		},
 		// 受控值從外面改(例如送出後清空)不會觸發 input 事件,ref callback 換一個才會重量

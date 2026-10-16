@@ -50,6 +50,18 @@ describe("Button", () => {
 		expect(button).toHaveStyle({ width: "160px" })
 	})
 
+	test("keeps the cleanup a callback ref returns and calls it once on unmount", () => {
+		const cleanup = vi.fn()
+		const ref = vi.fn(() => cleanup)
+		const { unmount } = render(<Button ref={ref}>儲存</Button>)
+		expect(ref).toHaveBeenCalledOnce()
+		expect(ref).toHaveBeenCalledWith(screen.getByRole("button"))
+		expect(cleanup).not.toHaveBeenCalled()
+		unmount()
+		expect(cleanup).toHaveBeenCalledOnce()
+		expect(ref).toHaveBeenCalledOnce()
+	})
+
 	test("each variant and size draws differently", () => {
 		const { container } = render(
 			<>

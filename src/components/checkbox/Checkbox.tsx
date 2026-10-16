@@ -129,7 +129,7 @@ export function Checkbox({
 	const setNode = useCallback(
 		(element: HTMLInputElement | null) => {
 			if (element) element.indeterminate = indeterminate
-			assignRef(ref, element)
+			return assignRef(ref, element)
 		},
 		[ref, indeterminate],
 	)

@@ -9,6 +9,12 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 Nothing yet.
 
+## 0.13.1 — 2026-10-16
+
+### Fixed
+
+- **Button, Checkbox, Textarea:** a callback `ref` that returns a cleanup lost it; React called the ref with `null` instead. The cleanup now runs when the node unmounts or the ref changes.
+
 ## 0.13.0 — 2026-10-15
 
 ### Breaking
