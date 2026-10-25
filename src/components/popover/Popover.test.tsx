@@ -1,7 +1,10 @@
+import * as stylex from "@stylexjs/stylex"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, test } from "vitest"
+import { type StyleArg } from "../../lib/styled"
 import { expectNoAxeViolations } from "../../test/axe"
+import { space } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 import { Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger } from "./Popover"
 
@@ -17,6 +20,18 @@ function holdExits() {
 		finish: () => act(async () => finish()),
 		restore: () => delete (Element.prototype as Partial<Element>).getAnimations,
 	}
+}
+
+const probe = stylex.create({
+	basePadding: { padding: space.md },
+	tightPadding: { padding: space.xs },
+})
+
+function atom(style: StyleArg): string {
+	const classes = stylex.props(style).className?.split(" ") ?? []
+	const hashed = classes.filter((name) => /^x[a-z0-9]+$/.test(name))
+	expect(hashed).toHaveLength(1)
+	return hashed[0] as string
 }
 
 function MemoryPopover() {
@@ -35,6 +50,22 @@ function MemoryPopover() {
 }
 
 describe("Popover", () => {
+	test("sx replaces the panel padding instead of stacking on top of it", async () => {
+		render(
+			<Popover defaultOpen>
+				<PopoverTrigger>
+					<Button variant="secondary">模型</Button>
+				</PopoverTrigger>
+				<PopoverContent aria-label="模型" sx={probe.tightPadding}>
+					內容
+				</PopoverContent>
+			</Popover>,
+		)
+		const classes = (await screen.findByRole("dialog")).className.split(" ")
+		expect(classes).toContain(atom(probe.tightPadding))
+		expect(classes).not.toContain(atom(probe.basePadding))
+	})
+
 	test("trigger reports its expanded state", async () => {
 		render(<MemoryPopover />)
 		const trigger = screen.getByRole("button", { name: "部署走 Cloudflare" })

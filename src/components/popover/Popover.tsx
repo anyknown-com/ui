@@ -2,7 +2,7 @@ import { Popover as BasePopover } from "@base-ui/react/popover"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactElement, ReactNode } from "react"
 import { popupStyles, returnFocusOnExit } from "../../lib/popup"
-import { styled } from "../../lib/styled"
+import { type StyleArg, styled } from "../../lib/styled"
 import { color, font, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
@@ -90,8 +90,10 @@ type PopoverContentBase = {
 	align?: "start" | "center" | "end"
 	/** Gap to the trigger in px. @default 8 */
 	sideOffset?: number
-	/** Extra class names for the panel. */
+	/** Extra class names for the panel. To restyle the panel, use `sx`: a class string is not guaranteed to win over StyleX. */
 	className?: string
+	/** StyleX styles merged last on the panel, so they override its `padding`, `minWidth` and `maxWidth`. */
+	sx?: StyleArg
 	/** The panel's content. */
 	children: ReactNode
 }
@@ -108,7 +110,7 @@ export function PopoverContent({
 	children,
 	...props
 }: PopoverContentProps) {
-	const { titled: _titled, ...rest } = props as PopoverContentBase & { titled?: true }
+	const { titled: _titled, sx, ...rest } = props as PopoverContentBase & { titled?: true }
 	return (
 		<BasePopover.Portal>
 			<BasePopover.Positioner
@@ -120,7 +122,7 @@ export function PopoverContent({
 				<BasePopover.Popup
 					ref={returnFocusOnExit}
 					{...rest}
-					{...styled(rest, popupStyles.surface, styles.panel)}
+					{...styled(rest, popupStyles.surface, styles.panel, sx)}
 				>
 					{children}
 				</BasePopover.Popup>

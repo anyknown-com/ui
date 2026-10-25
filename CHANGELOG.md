@@ -11,6 +11,7 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 - **DropdownMenu:** `DropdownRadioGroup` (`value`, `onValueChange`) and `DropdownRadioItem` (`value`, `disabled`, `closeOnClick`, `role="menuitemradio"`). The check sits at the inline end and the label has no empty column in front of it; choosing an item closes the menu by default.
 - **DropdownMenu:** `fit` drops the popup's 14rem minimum width, so the menu is as wide as its widest item.
+- **Popover:** `PopoverContent` takes `sx`. The styles are applied last on the panel, so they override its `padding`, `minWidth` and `maxWidth`.
 
 ## 0.13.1 — 2026-10-16
 

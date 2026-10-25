@@ -323,6 +323,10 @@ sit on top of it, and it also carries rich content directly (memory details, mem
   no exit
 - Popover panel padding 16px, max width `min(22rem, 100vw − 2rem)`, so long text wraps on
   narrow screens
+- `PopoverContent` takes `sx`, applied last in the panel's `stylex.props`, so a caller can set
+  a fixed size or a tighter padding (a picker panel of rows, for example). `className` stays for
+  compatibility, but StyleX classes are atomic and an appended class string is not guaranteed
+  to override `padding` or `minWidth`
 
 Stacking values live in the `zIndex` consts in `tokens.stylex.ts` (`lib/popup.ts` re-exports
 them as `layer`); components don't write magic numbers. Base UI popups always portal to body and

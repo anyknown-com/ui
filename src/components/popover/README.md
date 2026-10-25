@@ -30,7 +30,9 @@ import { Button, Popover, PopoverContent, PopoverDescription, PopoverTitle, Popo
 </Popover>
 ```
 
-The family is `Popover` (root; `open` / `defaultOpen` / `onOpenChange`, `modal`), `PopoverTrigger`, `PopoverContent` (`side`, `align`, `sideOffset`), `PopoverTitle`, `PopoverDescription` and `PopoverClose`.
+The family is `Popover` (root; `open` / `defaultOpen` / `onOpenChange`, `modal`), `PopoverTrigger`, `PopoverContent` (`side`, `align`, `sideOffset`, `sx`), `PopoverTitle`, `PopoverDescription` and `PopoverClose`.
+
+To give the panel another size or padding, pass StyleX styles as `sx` (for example `sx={styles.picker}` with `width`, `height` and `padding`). They are applied last, so they override the panel's `padding`, `minWidth` and `maxWidth`; a `className` is not guaranteed to win.
 
 ## Accessibility
 
