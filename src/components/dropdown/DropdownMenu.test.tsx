@@ -9,6 +9,8 @@ import {
 	DropdownGroup,
 	DropdownItem,
 	DropdownMenu,
+	DropdownRadioGroup,
+	DropdownRadioItem,
 	DropdownSeparator,
 	DropdownSub,
 } from "./DropdownMenu"
@@ -264,5 +266,76 @@ describe("DropdownMenu accessibility", () => {
 		await userEvent.click(screen.getByRole("button", { name: "Thread 動作" }))
 		const item = await screen.findByRole("menuitem", { name: "新增交接備註" })
 		expect(item).toHaveAttribute("aria-keyshortcuts", "⌘N")
+	})
+})
+
+function EffortMenu({ onValueChange }: { onValueChange?: (value: string) => void }) {
+	const [effort, setEffort] = useState("medium")
+	return (
+		<DropdownMenu fit trigger={<Button>思考強度</Button>}>
+			<DropdownRadioGroup
+				value={effort}
+				onValueChange={(value) => {
+					setEffort(value)
+					onValueChange?.(value)
+				}}
+			>
+				<DropdownRadioItem value="low">低</DropdownRadioItem>
+				<DropdownRadioItem value="medium">中</DropdownRadioItem>
+				<DropdownRadioItem value="high">高</DropdownRadioItem>
+			</DropdownRadioGroup>
+		</DropdownMenu>
+	)
+}
+
+describe("DropdownRadioItem", () => {
+	test("items are menuitemradio and the chosen one is aria-checked", async () => {
+		render(<EffortMenu />)
+		await userEvent.click(screen.getByRole("button", { name: "思考強度" }))
+		await screen.findByRole("menu")
+		const items = screen.getAllByRole("menuitemradio")
+		expect(items.map((item) => item.textContent)).toEqual(["低", "中", "高"])
+		expect(screen.getByRole("menuitemradio", { name: "中" })).toHaveAttribute("aria-checked", "true")
+		expect(screen.getByRole("menuitemradio", { name: "低" })).toHaveAttribute("aria-checked", "false")
+	})
+
+	test("clicking an item calls onValueChange with its value and closes the menu", async () => {
+		const onValueChange = vi.fn()
+		render(<EffortMenu onValueChange={onValueChange} />)
+		await userEvent.click(screen.getByRole("button", { name: "思考強度" }))
+		await userEvent.click(await screen.findByRole("menuitemradio", { name: "高" }))
+		expect(onValueChange).toHaveBeenCalledWith("high")
+		await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
+	})
+
+	test("arrows and Enter choose an item; the check follows the value", async () => {
+		const onValueChange = vi.fn()
+		render(<EffortMenu onValueChange={onValueChange} />)
+		const trigger = screen.getByRole("button", { name: "思考強度" })
+		trigger.focus()
+		await userEvent.keyboard("{Enter}")
+		await screen.findByRole("menu")
+		await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}")
+		await waitFor(() => expect(onValueChange).toHaveBeenCalledWith("high"))
+		await waitFor(() => expect(trigger).toHaveFocus())
+		await userEvent.keyboard("{Enter}")
+		expect(await screen.findByRole("menuitemradio", { name: "高" })).toHaveAttribute("aria-checked", "true")
+		expect(screen.getByRole("menuitemradio", { name: "中" })).toHaveAttribute("aria-checked", "false")
+	})
+
+	test("the check comes after the label", async () => {
+		render(<EffortMenu />)
+		await userEvent.click(screen.getByRole("button", { name: "思考強度" }))
+		const item = await screen.findByRole("menuitemradio", { name: "中" })
+		const [label, check] = Array.from(item.children)
+		expect(label).toHaveTextContent("中")
+		expect(check?.querySelector("svg")).not.toBeNull()
+	})
+
+	test("an open radio menu has no axe violations", async () => {
+		render(<EffortMenu />)
+		await userEvent.click(screen.getByRole("button", { name: "思考強度" }))
+		await screen.findByRole("menu")
+		await expectNoAxeViolations()
 	})
 })

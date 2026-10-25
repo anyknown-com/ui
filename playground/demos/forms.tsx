@@ -5,6 +5,8 @@ import {
 	DropdownGroup,
 	DropdownItem,
 	DropdownMenu,
+	DropdownRadioGroup,
+	DropdownRadioItem,
 	DropdownSeparator,
 	DirectionProvider,
 	DropdownSub,
@@ -285,12 +287,14 @@ function SliderDemo() {
 
 function DropdownDemo() {
 	const [receipts, setReceipts] = useState(false)
+	const [effort, setEffort] = useState("medium")
+	const efforts: Record<string, string> = { low: "Low", medium: "Medium", high: "High" }
 
 	return (
 		<Demo
 			id="dropdown"
 			title="dropdown"
-			note="Enter, Space or ↓ opens the menu; ↑↓ wrap, Home and End jump, typing a letter jumps to the item. → opens a submenu and ← closes it. Escape or Tab closes the menu and focus returns to the trigger. The checkbox item keeps the menu open."
+			note="Enter, Space or ↓ opens the menu; ↑↓ wrap, Home and End jump, typing a letter jumps to the item. → opens a submenu and ← closes it. Escape or Tab closes the menu and focus returns to the trigger. The checkbox item keeps the menu open. The second menu is a radio group with fit: the check sits on the right and the menu is as wide as its longest label."
 		>
 			<Row>
 				<DropdownMenu trigger={<Button variant="secondary">Thread actions</Button>}>
@@ -311,6 +315,15 @@ function DropdownDemo() {
 						Show handoff receipts
 					</DropdownCheckboxItem>
 					<DropdownItem variant="danger">Delete this day's history</DropdownItem>
+				</DropdownMenu>
+				<DropdownMenu fit trigger={<Button variant="secondary">{efforts[effort]}</Button>}>
+					<DropdownRadioGroup value={effort} onValueChange={setEffort}>
+						{Object.entries(efforts).map(([value, label]) => (
+							<DropdownRadioItem key={value} value={value}>
+								{label}
+							</DropdownRadioItem>
+						))}
+					</DropdownRadioGroup>
 				</DropdownMenu>
 			</Row>
 		</Demo>

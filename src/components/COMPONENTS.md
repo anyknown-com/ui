@@ -148,7 +148,19 @@ Action menu (versus Select, which picks a value). The popup is the float tier (s
 item inner corner 12.
 
 - Settled requirements: nested submenus (any depth), group label, separator, checkbox item,
-  shortcut hint, danger item
+  radio item, shortcut hint, danger item
+- Radio item check at the inline end: a radio group is a short list of values on a toolbar
+  button (effort, a filter), read as "label, and is it on". A leading tick column pushes every
+  label in by its width even though only one row is checked, and the menu reads as indented.
+  The end slot is always reserved (empty when unchecked), so the width does not change with
+  the value. The checkbox item keeps its leading tick: it sits next to actions, where labels
+  line up with icons.
+- Radio item closes on choose by default (Base UI's default is to stay open): choosing one
+  value ends the task, unlike toggling a checkbox.
+- `fit` is an option, not the default: the 14rem minimum keeps action menus from changing width
+  between triggers and gives short labels a comfortable target. A choice menu on a compact
+  toolbar wants the opposite (as wide as its longest label plus the check), so it opts in.
+  Changing the default would resize every existing menu.
 
 ---
 

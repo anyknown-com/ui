@@ -1,12 +1,13 @@
 # DropdownMenu
 
-A menu of actions that opens from a trigger button, with groups, separators, checkbox items, shortcut hints, danger items and nested submenus, built on Base UI Menu.
+A menu of actions that opens from a trigger button, with groups, separators, checkbox items, radio items, shortcut hints, danger items and nested submenus, built on Base UI Menu.
 
 ## When to use
 
 - A set of actions on one object ("Thread actions": rename, export, delete).
 - Overflow actions behind a "more" icon button.
 - A few view toggles next to actions (`DropdownCheckboxItem`).
+- A short list of choices on a compact toolbar button, one of which is on (`DropdownRadioGroup` with `fit`).
 
 ## When not to use
 
@@ -38,11 +39,25 @@ import {
 </DropdownMenu>
 ```
 
-The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`), `DropdownItem` (`onSelect`, `icon`, `shortcut`, `variant`, `disabled`, `closeOnClick`), `DropdownCheckboxItem` (`checked` / `defaultChecked` / `onCheckedChange`, `disabled`, `closeOnClick`), `DropdownGroup`, `DropdownSeparator` and `DropdownSub` (`label`, `icon`, `disabled`; submenus nest to any depth).
+A choice menu: `DropdownRadioGroup` holds the value, each `DropdownRadioItem` shows its check at the inline end, and `fit` lets the popup shrink to its widest label plus the check.
+
+```tsx
+import { Button, DropdownMenu, DropdownRadioGroup, DropdownRadioItem } from "@anyknown/ui"
+
+<DropdownMenu fit trigger={<Button variant="ghost">Medium</Button>}>
+  <DropdownRadioGroup value={effort} onValueChange={setEffort}>
+    <DropdownRadioItem value="low">Low</DropdownRadioItem>
+    <DropdownRadioItem value="medium">Medium</DropdownRadioItem>
+    <DropdownRadioItem value="high">High</DropdownRadioItem>
+  </DropdownRadioGroup>
+</DropdownMenu>
+```
+
+The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`, `fit`), `DropdownItem` (`onSelect`, `icon`, `shortcut`, `variant`, `disabled`, `closeOnClick`), `DropdownCheckboxItem` (`checked` / `defaultChecked` / `onCheckedChange`, `disabled`, `closeOnClick`), `DropdownRadioGroup` (`value`, `onValueChange`), `DropdownRadioItem` (`value`, `disabled`, `closeOnClick`), `DropdownGroup`, `DropdownSeparator` and `DropdownSub` (`label`, `icon`, `disabled`; submenus nest to any depth).
 
 ## Accessibility
 
-- Base UI Menu: the `trigger` element gets `aria-haspopup` and `aria-expanded`; the popup is `role="menu"` with `menuitem`, `menuitemcheckbox` (with `aria-checked`) and `separator`. `DropdownGroup`'s `label` names its group.
+- Base UI Menu: the `trigger` element gets `aria-haspopup` and `aria-expanded`; the popup is `role="menu"` with `menuitem`, `menuitemcheckbox` and `menuitemradio` (both with `aria-checked`), and `separator`; a `DropdownRadioGroup` is a `group`. `DropdownGroup`'s `label` names its group.
 - The trigger must be a single focusable element with its own name (a `Button`, or an `IconButton` with `label`).
 - `shortcut` is shown visually with `aria-hidden` and exposed as `aria-keyshortcuts`, so it is not part of the item's name. The menu does not bind the shortcut; the app must.
 - `icon` and the submenu chevron are `aria-hidden`. Under `<DirectionProvider direction="rtl">` the chevron points to the inline end (left), where the submenu opens.
@@ -62,7 +77,7 @@ Base UI Menu handles these keys (APG menu button).
 | <kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>↓</kbd> on the trigger | Opens the menu with the first item highlighted. |
 | <kbd>↓</kbd> / <kbd>↑</kbd> | Moves the highlight through every item, disabled ones included; wraps at the ends. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Moves to the first or last item. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the item. A `DropdownItem` closes the menu (unless `closeOnClick={false}`); a checkbox item toggles and stays open (unless `closeOnClick`). |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the item. A `DropdownItem` closes the menu (unless `closeOnClick={false}`); a checkbox item toggles and stays open (unless `closeOnClick`); a radio item is chosen, calls `onValueChange` and closes the menu (unless `closeOnClick={false}`). |
 | <kbd>→</kbd> | Opens the highlighted submenu (<kbd>←</kbd> under `<DirectionProvider direction="rtl">`). |
 | <kbd>←</kbd> | Closes the current submenu (<kbd>→</kbd> under `<DirectionProvider direction="rtl">`). |
 | <kbd>Escape</kbd> | Closes the menu and returns focus to the trigger. |

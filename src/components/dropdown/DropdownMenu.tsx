@@ -9,6 +9,7 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
 	popup: { minWidth: "14rem", padding: space.xxs, margin: 0 },
+	fit: { minWidth: 0 },
 	subPopup: { animationDuration: { default: motion.fast, [REDUCED]: "0s" } },
 	item: {
 		position: "relative",
@@ -46,6 +47,7 @@ const styles = stylex.create({
 	// The submenu opens on the inline end, which is the left under RTL: the chevron points there.
 	arrowRtl: { transform: "scaleX(-1)" },
 	tick: { width: "0.9rem", flex: "none", color: color.accent, display: "flex", justifyContent: "center" },
+	radioLabel: { flexGrow: 1, whiteSpace: "nowrap" },
 	groupLabel: {
 		fontSize: type.t1,
 		fontWeight: 500,
@@ -168,6 +170,52 @@ export function DropdownCheckboxItem({ children, ...rest }: DropdownCheckboxItem
 	)
 }
 
+export type DropdownRadioGroupProps = {
+	/** The chosen item's `value` (controlled). */
+	value?: string
+	/** Called with the `value` of the item that was chosen. */
+	onValueChange?: (value: string) => void
+	/** The `DropdownRadioItem`s to choose from. */
+	children: ReactNode
+}
+
+/** A set of `DropdownRadioItem`s where exactly one is chosen (`role="group"`). */
+export function DropdownRadioGroup({ value, onValueChange, children }: DropdownRadioGroupProps) {
+	return (
+		<Menu.RadioGroup value={value} onValueChange={(next: string) => onValueChange?.(next)}>
+			{children}
+		</Menu.RadioGroup>
+	)
+}
+
+export type DropdownRadioItemProps = {
+	/** The value this item stands for in its `DropdownRadioGroup`. */
+	value: string
+	/** Focusable but not choosable. */
+	disabled?: boolean
+	/** Close the menu after the item is chosen. @default true */
+	closeOnClick?: boolean
+	/** The item's label. */
+	children: ReactNode
+}
+
+/**
+ * One choice in a `DropdownRadioGroup` (`role="menuitemradio"`). The check sits at the inline
+ * end, so the label starts at the item's edge with no empty column in front of it.
+ */
+export function DropdownRadioItem({ value, closeOnClick = true, children, ...rest }: DropdownRadioItemProps) {
+	return (
+		<Menu.RadioItem {...rest} value={value} closeOnClick={closeOnClick} className={itemClassName()}>
+			<span {...stylex.props(styles.radioLabel)}>{children}</span>
+			<span {...stylex.props(styles.tick)}>
+				<Menu.RadioItemIndicator>
+					<Tick />
+				</Menu.RadioItemIndicator>
+			</span>
+		</Menu.RadioItem>
+	)
+}
+
 export type DropdownGroupProps = {
 	/** A small heading that names the group. */
 	label?: string
@@ -250,6 +298,11 @@ export type DropdownMenuProps = {
 	side?: "top" | "bottom" | "left" | "right"
 	/** Alignment along that side. @default "start" */
 	align?: "start" | "center" | "end"
+	/**
+	 * Drop the popup's minimum width, so it is as wide as its widest item. For short choice
+	 * lists (a few `DropdownRadioItem`s) that should not stretch to the default width. @default false
+	 */
+	fit?: boolean
 	/** Items, groups, separators and submenus. */
 	children: ReactNode
 }
@@ -265,6 +318,7 @@ export function DropdownMenu({
 	onOpenChange,
 	side = "bottom",
 	align = "start",
+	fit = false,
 	children,
 }: DropdownMenuProps) {
 	return (
@@ -272,7 +326,10 @@ export function DropdownMenu({
 			<Menu.Trigger render={trigger as never} />
 			<Menu.Portal>
 				<Menu.Positioner side={side} align={align} sideOffset={6} {...stylex.props(popupStyles.positioner)}>
-					<Menu.Popup ref={returnFocusOnExit} {...stylex.props(popupStyles.surface, styles.popup)}>
+					<Menu.Popup
+						ref={returnFocusOnExit}
+						{...stylex.props(popupStyles.surface, styles.popup, fit && styles.fit)}
+					>
 						{children}
 					</Menu.Popup>
 				</Menu.Positioner>
