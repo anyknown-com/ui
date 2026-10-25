@@ -242,6 +242,35 @@ irreversible actions (delete a memory, clear a thread).
   mounts only after this one's `onOpenChangeComplete(true)`, which is why `render` has to return
   a DialogContent (with the Popup)
 
+### sheet
+A modal panel from the bottom: the narrow-dock picker (model, effort, environment) opens one per
+control. The look and behaviour follow the CEO-approved model-picker prototype.
+
+- **Built on Base UI Drawer**, not on Dialog plus a hand-written drag. Drawer is a Dialog
+  underneath, so the focus trap, inert page, scroll lock, Escape and backdrop dismissal are the
+  same as `Dialog`; on top it gives swipe-to-dismiss (`swipeDirection="down"`) with velocity,
+  scroll awareness (a list that is not at its top scrolls instead of dragging the sheet) and the
+  `--drawer-swipe-movement-y` / `--drawer-swipe-progress` variables. The prototype dragged with
+  `@use-gesture/react` and had no focus trap; that is the dead end
+- `head` and `children` sit inside `Drawer.Content`, so a mouse drag there selects text instead
+  of moving the sheet; the grab bar and the title row drag. Touch swipes work everywhere
+- The popup carries `returnFocusOnExit`, as in Dialog, so focus is back on the trigger when the
+  slide-out starts
+- **No portal container option**: only the prototype's phone frame needed one; a real app always
+  portals to body, on the dialog layers (`zIndex.dialogBackdrop` / `dialog`)
+- **Two heights, not a number**: `auto` fits the content up to 85dvh; `tall` is 60dvh, for a
+  list whose length changes while you step through it (the model picker), so the sheet does not
+  jump at each step. Snap points are left out; nothing asked for a half-open sheet
+- Numbers from the prototype: full width up to 35rem (560px), 16px top corners
+  (`corner.float`), 8px padding plus `env(safe-area-inset-bottom)` at the bottom, a 36 × 4px
+  grab bar in `borderStrong` with 12px under it, the title `type.t3` on one line with an
+  ellipsis. Modal tier for the rest: `surfaceRaised`, `shadow.modal`, `color.scrim` backdrop,
+  no blur
+- Motion: the popup slides `translateY(100%)` ↔ its swipe offset, the backdrop fades, both
+  `motion.slide` (240ms) with `easeOut` — no overshoot, no spring. While a finger drags, Base UI
+  writes the transform inline with `transition: none`, and the backdrop fades with the drag
+  progress. Under reduced motion both durations are `0s`
+
 ### toast
 Non-blocking notices: stacked bottom-right by default (`Toaster`'s `position` takes any of the
 four corners), slide + fade in, auto-dismiss after 5 seconds (paused on hover), optionally one

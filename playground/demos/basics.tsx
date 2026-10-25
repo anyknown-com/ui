@@ -27,6 +27,9 @@ import {
 	Segmented,
 	Select,
 	SelectItem,
+	Sheet,
+	SheetContent,
+	SheetTrigger,
 	Skeleton,
 	SkeletonGroup,
 	Spin,
@@ -50,6 +53,7 @@ import { type ReactNode, useEffect, useState } from "react"
 import { type DemoEntry, Demo, Label, Row } from "../shell"
 
 const styles = stylex.create({
+	sheetRows: { display: "flex", flexDirection: "column", alignItems: "stretch" },
 	pane: {
 		borderWidth: 1,
 		borderStyle: "solid",
@@ -644,6 +648,71 @@ function PopoverDemo() {
 	)
 }
 
+function SheetDemo() {
+	const efforts = ["Auto", "Low", "Medium", "High", "Max"]
+	const models = Array.from({ length: 14 }, (_, index) => `Model ${index + 1}`)
+	const [effort, setEffort] = useState("Auto")
+	const [effortOpen, setEffortOpen] = useState(false)
+	const [model, setModel] = useState("Model 1")
+	const [modelOpen, setModelOpen] = useState(false)
+	return (
+		<Demo
+			id="sheet"
+			title="sheet"
+			note="A modal panel from the bottom. The backdrop, Escape and a swipe down close it; here a pick closes it too. Height fits the content, or tall is 60% of the window."
+		>
+			<Row>
+				<Sheet open={effortOpen} onOpenChange={setEffortOpen}>
+					<SheetTrigger>
+						<Button variant="secondary">Effort: {effort}</Button>
+					</SheetTrigger>
+					<SheetContent title={`Effort · ${effort}`}>
+						<div {...stylex.props(styles.sheetRows)}>
+							{efforts.map((name) => (
+								<Button
+									key={name}
+									variant="ghost"
+									onClick={() => {
+										setEffort(name)
+										setEffortOpen(false)
+									}}
+								>
+									{name}
+								</Button>
+							))}
+						</div>
+					</SheetContent>
+				</Sheet>
+				<Sheet open={modelOpen} onOpenChange={setModelOpen}>
+					<SheetTrigger>
+						<Button variant="secondary">Model: {model}</Button>
+					</SheetTrigger>
+					<SheetContent
+						title={`${model} · Your subscription`}
+						height="tall"
+						head={<Text variant="caption">The list scrolls; this line stays.</Text>}
+					>
+						<div {...stylex.props(styles.sheetRows)}>
+							{models.map((name) => (
+								<Button
+									key={name}
+									variant="ghost"
+									onClick={() => {
+										setModel(name)
+										setModelOpen(false)
+									}}
+								>
+									{name}
+								</Button>
+							))}
+						</div>
+					</SheetContent>
+				</Sheet>
+			</Row>
+		</Demo>
+	)
+}
+
 function TabsDemo() {
 	return (
 		<Demo id="tabs" title="tabs">
@@ -949,6 +1018,7 @@ export const basicsDemos: DemoEntry[] = [
 	{ id: "toast", covers: ["toast"], Component: ToastDemo },
 	{ id: "tooltip", covers: ["tooltip"], Component: TooltipDemo },
 	{ id: "popover", covers: ["popover"], Component: PopoverDemo },
+	{ id: "sheet", covers: ["sheet"], Component: SheetDemo },
 	{ id: "tabs", covers: ["tabs"], Component: TabsDemo },
 	{ id: "badge", covers: ["badge"], Component: BadgeDemo },
 	{ id: "status-chip", covers: ["status-chip"], Component: StatusChipDemo },

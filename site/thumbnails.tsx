@@ -169,6 +169,25 @@ const styles = stylex.create({
 		boxShadow: shadow.modal,
 		padding: space.md,
 	},
+	sheet: {
+		alignSelf: "stretch",
+		display: "grid",
+		gap: space.xxs,
+		backgroundColor: color.surfaceRaised,
+		borderTopLeftRadius: corner.float,
+		borderTopRightRadius: corner.float,
+		boxShadow: shadow.modal,
+		padding: space.xs,
+		marginBottom: `calc(-1 * ${space.md})`,
+	},
+	grabber: {
+		justifySelf: "center",
+		width: "2.25rem",
+		height: space.xxs,
+		marginBottom: space.xs,
+		borderRadius: corner.pill,
+		backgroundColor: color.borderStrong,
+	},
 	menu: { minWidth: "11rem", padding: space.xxs },
 	menuItem: {
 		display: "flex",
@@ -441,6 +460,14 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 					Delete
 				</Button>
 			</DialogActions>
+		</div>
+	),
+	sheet: () => (
+		<div {...stylex.props(styles.sheet)}>
+			<span {...stylex.props(styles.grabber)} />
+			<span {...stylex.props(styles.title, styles.menuItem)}>Opus 5.5 · Your subscription</span>
+			<span {...stylex.props(styles.menuItem, styles.menuActive)}>Opus 5.5</span>
+			<span {...stylex.props(styles.menuItem)}>Sonnet 5</span>
 		</div>
 	),
 	popover: () => (

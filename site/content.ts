@@ -84,7 +84,7 @@ export const COMPONENT_GROUPS: { title: string; names: string[] }[] = [
 			"password-input",
 		],
 	},
-	{ title: "Overlays & navigation", names: ["dialog", "popover", "tooltip", "toast", "tabs"] },
+	{ title: "Overlays & navigation", names: ["dialog", "sheet", "popover", "tooltip", "toast", "tabs"] },
 	{ title: "Progress", names: ["progress", "spin", "skeleton"] },
 	{
 		title: "Agent & chat",

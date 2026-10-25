@@ -12,6 +12,7 @@ release can break the API; every break is listed under **Breaking** and explaine
 - **DropdownMenu:** `DropdownRadioGroup` (`value`, `onValueChange`) and `DropdownRadioItem` (`value`, `disabled`, `closeOnClick`, `role="menuitemradio"`). The check sits at the inline end and the label has no empty column in front of it; choosing an item closes the menu by default.
 - **DropdownMenu:** `fit` drops the popup's 14rem minimum width, so the menu is as wide as its widest item.
 - **Popover:** `PopoverContent` takes `sx`. The styles are applied last on the panel, so they override its `padding`, `minWidth` and `maxWidth`.
+- **Sheet:** a modal panel that slides up from the bottom, on Base UI Drawer. `Sheet` (`open` / `defaultOpen` / `onOpenChange`), `SheetTrigger` and `SheetContent` (`title`, `height` `"auto"` up to 85% of the window or `"tall"` at 60%, `head` that does not scroll, `children` that scroll). Full width up to 560px, a grab bar and a one-line title on top, room for the bottom safe area. The backdrop, Escape and a swipe down close it; focus is trapped inside and returns to the trigger. Slides in with ease-out, no movement under reduced motion.
 
 ## 0.13.1 — 2026-10-16
 

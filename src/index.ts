@@ -70,6 +70,8 @@ export type {
 	ConfirmOptions,
 	AlertOptions,
 } from "./components/dialog/Dialog"
+export { Sheet, SheetTrigger, SheetContent } from "./components/sheet/Sheet"
+export type { SheetProps, SheetTriggerProps, SheetContentProps } from "./components/sheet/Sheet"
 export { Toaster, toast, useToast, toastManager, createToastManager } from "./components/toast/Toast"
 export type {
 	ToasterProps,
