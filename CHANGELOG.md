@@ -5,7 +5,7 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
-## Unreleased
+## 0.14.0 — 2026-10-25
 
 ### Added
 
