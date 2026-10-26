@@ -22,15 +22,15 @@ The package never imports `@chenglou/pretext` itself. If you install it, registe
 
 ### Fonts
 
-The font stacks in the tokens name Figtree (headings and body), Geist Mono (code and data) and Noto Sans TC (Chinese). The package does not load fonts. Install them as packages:
+The font stacks in the tokens name Geist (headings and body), Geist Mono (code and data) and Noto Sans TC (Chinese). The package does not load fonts. Install them as packages:
 
 ```bash
-pnpm add @fontsource-variable/figtree @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
+pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
 ```
 
 ```ts
 // main.tsx
-import "@fontsource-variable/figtree"
+import "@fontsource-variable/geist"
 import "@fontsource-variable/geist-mono"
 import "@fontsource-variable/noto-sans-tc"
 ```
@@ -40,7 +40,7 @@ Or link Google Fonts in your HTML (the stacks list both the `Variable` names and
 ```html
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap"
 />
 ```
 

@@ -105,8 +105,8 @@ export const shadow = stylex.defineVars({
 
 export const font = stylex.defineVars({
 	display:
-		"'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
-	body: "'Figtree Variable', 'Figtree', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+		"'Geist Variable', 'Geist', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
+	body: "'Geist Variable', 'Geist', 'Noto Sans TC Variable', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif",
 	mono: "'Geist Mono Variable', 'Geist Mono', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
@@ -271,7 +271,7 @@ export const type = stylex.defineVars({
 	t6: "1.75rem",
 	/** 36px: display (`<Text variant="display">`). */
 	t7: "2.25rem",
-	/** 13px: monospace code blocks and diffs (Geist Mono reads larger than Figtree). */
+	/** 13px: monospace code blocks and diffs (monospace reads larger than the body font). */
 	code: "0.8125rem",
 	/**
 	 * 16px: text inputs at `breakpoint.phone` only. iOS Safari zooms the page when a focused

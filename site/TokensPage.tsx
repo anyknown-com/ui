@@ -330,7 +330,7 @@ export function TokensPage() {
 				<Section
 					id="font"
 					title="Fonts"
-					lead="Figtree for UI and headings, Geist Mono for code and numbers, Noto Sans TC for Chinese."
+					lead="Geist for UI and headings, Geist Mono for code and numbers, Noto Sans TC for Chinese."
 				>
 					<Rows
 						group={g("font")!}

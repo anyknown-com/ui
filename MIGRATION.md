@@ -1,5 +1,22 @@
 # Migrating to the next release (unreleased)
 
+## Body font: Figtree → Geist
+
+**What changed:** `font.body` and `font.display` name Geist first (`'Geist Variable', 'Geist'`), not Figtree. Chinese still falls through to Noto Sans TC, and `font.mono` is still Geist Mono.
+
+**What to do:** the package does not load fonts. Swap the one you load:
+
+```sh
+pnpm remove @fontsource-variable/figtree
+pnpm add @fontsource-variable/geist
+```
+
+```css
+@import "@fontsource-variable/geist";
+```
+
+With a Google Fonts `<link>`, change `family=Figtree:...` to `family=Geist:wght@100..900`. An app that keeps loading only Figtree falls back to Noto Sans TC for Latin text.
+
 ## `ToolCard` → `ToolGroup` / `SubThreadRow`
 
 **What changed:** `ToolCard` and its parts (`ToolInput`, `ToolOutput`, `ToolError`, `SubagentLine`,
@@ -590,4 +607,4 @@ These do not need code changes, but they can change screenshots, tests or how a 
 - [ ] Rename `B`, `Sub`, `Item`, `Row`, `Head`, `Value`, `Cell` to their family-prefixed names.
 - [ ] Move `text` tokens to `type`, and legacy `corner` / `shadow` / `motion.spring` names to the new ones.
 - [ ] Update tests that look for `<mark>` in DiffViewer, ListSort by its old name, or dialogs right after close.
-- [ ] Re-check screenshots: new palette, pill buttons, Figtree, 15px body text, rounder cards.
+- [ ] Re-check screenshots: new palette, pill buttons, Geist, 15px body text, rounder cards.

@@ -5,6 +5,12 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## Unreleased
+
+### Changed
+
+- **Tokens:** `font.body` and `font.display` (`--ak-font-body`, `--ak-font-display`) are Geist again instead of Figtree; Noto Sans TC, PingFang TC and Microsoft JhengHei stay as the Chinese fallbacks and `font.mono` is unchanged. `brand.css` imports Geist from Google Fonts. Apps that load fonts themselves should load `@fontsource-variable/geist` instead of `@fontsource-variable/figtree`; see [MIGRATION.md](MIGRATION.md).
+
 ## 0.14.0 — 2026-10-25
 
 ### Added

@@ -11,4 +11,4 @@ How to run:
 
 Success isn't zero errors; it is the same kind of complaint showing up less often in the next round of the same kind of scenario. Record each round's numbers at the end of `docs/plans/01-design-md.md`.
 
-The pages are written in Traditional Chinese, like `example.html` (`lang="zh-Hant"`), so each round also exercises the Figtree + Noto Sans TC mix. That is why the scenario instructions are in English but the data, which becomes page content, stays in Chinese. Pass the whole scenario file to the subagent as the prompt.
+The pages are written in Traditional Chinese, like `example.html` (`lang="zh-Hant"`), so each round also exercises the Geist + Noto Sans TC mix. That is why the scenario instructions are in English but the data, which becomes page content, stays in Chinese. Pass the whole scenario file to the subagent as the prompt.

@@ -19,7 +19,7 @@ There are two kinds of reader: agents inside our apps (which already use `@anykn
 
 Lives at the repo root, next to the README. It covers only what the code and tokens can't tell you and copies no values (values are generated and appended, see section 3). Sections:
 
-1. What this is: one paragraph on the visual tone. Today that is Tactile: white paper on a neutral gray desk, ink for the primary action and links, blue only for agent activity, focus and progress; Figtree with Noto Sans TC for text, Geist Mono for data.
+1. What this is: one paragraph on the visual tone. Today that is Tactile: white paper on a neutral gray desk, ink for the primary action and links, blue only for agent activity, focus and progress; Geist with Noto Sans TC for text, Geist Mono for data.
 2. Frame the reader's task, then pick a structure. For every one-off page, first answer "what does the reader need to decide when they open this?", then pick from a few skeletons: single-column long read (report), conclusion first plus evidence grid (proposal, benchmark), controls first (interactive planning page). Same type scale and spacing; structure follows the reader's goal.
 3. Laying out evidence: numbers that are compared go on the same ruler (same column, same unit, same baseline); evidence tables run full width, never inset in a card; one main chart per page, everything else is a table.
 4. Hierarchy and type: one display heading per page; `text.xl` and up only at the start of a block; body lines 60–75 characters; spacing only from the `space.*` steps, never made-up values such as 13px.
@@ -32,7 +32,7 @@ Written per `writing-and-planning-style`: no bold, short sentences, and every ru
 
 ## 2. `brand.css` (bounded vocabulary, plain CSS)
 
-For pages without a bundler: one file to `<link>` and it works. The source is `src/brand.css`. At build time `tokens.css` is inlined into it (one file, no relative paths to manage) and a Google Fonts `@import` is added (Figtree, Noto Sans TC and Geist Mono are all on Google Fonts; outside pages have no `@fontsource`).
+For pages without a bundler: one file to `<link>` and it works. The source is `src/brand.css`. At build time `tokens.css` is inlined into it (one file, no relative paths to manage) and a Google Fonts `@import` is added (Geist, Noto Sans TC and Geist Mono are all on Google Fonts; outside pages have no `@fontsource`).
 
 The vocabulary is small on purpose, around fifteen classes, all prefixed `ak-`:
 

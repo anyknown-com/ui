@@ -16,7 +16,7 @@ Tactile. White paper on a neutral gray desk: content is paper, and anything that
 - The primary action is a solid ink pill, one per page. Links are ink too and stand apart from body text by their underline (`a` inside `ak-prose` already does this), not by blue. Solid red (`--ak-danger-solid` with `--ak-on-danger-solid` text) is only for deletes that can't be undone.
 - `--ak-text-faint` has only 3:1 contrast, so it never carries text; it is for icons, placeholders and separators. Use `ak-muted` for secondary text. `--ak-border` is a divider; control edges use `--ak-border-control`.
 - Status labels are a tinted background with text in the same hue (`--ak-success-subtle` background with `--ak-success` text), never a solid fill. The three `ak-callout` variants already work this way.
-- Headings and body text use Figtree (headings 600 to 700, body 400), falling back to Noto Sans TC for Chinese. Data and code use Geist Mono. Figtree's round letterforms match the pills and large corners.
+- Headings and body text use Geist (headings 600 to 700, body 400), falling back to Noto Sans TC for Chinese. Data and code use Geist Mono, from the same family.
 
 The tone is still a ledger: quiet, comparable, no ornament. Readers come to make a decision, and the page's job is to line up the evidence, not to persuade.
 

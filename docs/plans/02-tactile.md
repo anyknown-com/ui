@@ -101,7 +101,7 @@ Radius follows size; no single value fits everything. When nesting, inner radius
 
 ## Type
 
-- Body and headings: Figtree, falling back to Noto Sans TC for Chinese. Headings 600–700, body 400. Figtree has a large x-height and round letterforms, matching the pills and large corners; Geist's geometric feel is cooler and is kept for mono.
+- Body and headings: Geist, falling back to Noto Sans TC for Chinese. Headings 600–700, body 400. (0.10 to 0.14 used Figtree.)
 - Data, code and identifiers: Geist Mono, unchanged.
 - Body text is 15px with 1.6 line height; the other steps of the type scale stay as they are.
 

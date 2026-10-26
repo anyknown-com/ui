@@ -116,10 +116,10 @@ The full Vite and PostCSS setup, fonts, Tailwind mapping and a first screen are 
 
 ## Visual direction: tactile
 
-White paper sheets on a neutral gray desk (OKLCH chroma 0), ink text, an ink primary action and ink links (`#171717`). Blue `signal` is reserved for "the agent is working", focus and progress. Depth comes from light and dark steps and three shadow levels (rest, float, modal), not from borders. Buttons are pills. Headings and body text use Figtree, timelines and data use Geist Mono, and Chinese uses Noto Sans TC (falling back to PingFang TC or Microsoft JhengHei when it isn't installed). The spec is [docs/plans/02-tactile.md](./docs/plans/02-tactile.md). Colors are computed by `scripts/palette.mjs` from five 12-step OKLCH scales (1–2 backgrounds, 3–5 fills, 6–8 borders, 9–10 solids, 11–12 text): to change a color, change the scale, rerun it and paste the output back; never hand-tune a value (see [Theming](./docs/guides/theming.md#change-the-palette)). The earlier woven design language and its ledger palette are archived on the `archive/fiber` branch.
+White paper sheets on a neutral gray desk (OKLCH chroma 0), ink text, an ink primary action and ink links (`#171717`). Blue `signal` is reserved for "the agent is working", focus and progress. Depth comes from light and dark steps and three shadow levels (rest, float, modal), not from borders. Buttons are pills. Headings and body text use Geist, timelines and data use Geist Mono, and Chinese uses Noto Sans TC (falling back to PingFang TC or Microsoft JhengHei when it isn't installed). The spec is [docs/plans/02-tactile.md](./docs/plans/02-tactile.md). Colors are computed by `scripts/palette.mjs` from five 12-step OKLCH scales (1–2 backgrounds, 3–5 fills, 6–8 borders, 9–10 solids, 11–12 text): to change a color, change the scale, rerun it and paste the output back; never hand-tune a value (see [Theming](./docs/guides/theming.md#change-the-palette)). The earlier woven design language and its ledger palette are archived on the `archive/fiber` branch.
 
 Apps install the fonts themselves:
 
 ```bash
-pnpm add @fontsource-variable/figtree @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
+pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono @fontsource-variable/noto-sans-tc
 ```

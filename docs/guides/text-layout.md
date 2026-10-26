@@ -50,7 +50,7 @@ The same entry point is public:
 import { measureTextHeight } from "@anyknown/ui"
 
 const height = measureTextHeight("First line\nSecond line", {
-  font: '400 15px "Figtree Variable"',
+  font: '400 15px "Geist Variable"',
   width: 320,
   lineHeight: 24,
   whiteSpace: "pre-wrap",
