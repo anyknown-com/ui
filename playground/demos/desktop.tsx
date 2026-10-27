@@ -131,6 +131,7 @@ const CALLS: ToolGroupCall[] = [
 		summary: "pnpm test --filter runtime",
 		input: { command: "pnpm test --filter runtime" },
 		output: "Test Files  12 passed (12)\n     Tests  84 passed (84)",
+		duration: "18 s",
 	},
 	{
 		id: "c4",
@@ -138,6 +139,8 @@ const CALLS: ToolGroupCall[] = [
 		summary: "stripe/charges_create",
 		input: { tool: "stripe/charges_create", amount: 2500, currency: "usd" },
 		risk: ["Spends money", "Deletes"],
+		failed: true,
+		duration: "0.3 s",
 	},
 ]
 
@@ -148,7 +151,7 @@ function ToolGroupDemo() {
 		<Demo
 			id="tool-group"
 			title="tool-group"
-			note="The header counts the calls and names each tool once; Enter or Space hides or shows the list. Each row is a button that opens the call's input and output. The last row declares risks, drawn muted after the summary. The second group is controlled: open and onOpenChange belong to the page."
+			note="The header is one muted line that counts the calls and names each tool once, or shows a title; Enter or Space hides or shows the list. Each row is a button that opens the call's input and output. The last row failed (a red ✕) and declares risks, drawn muted after the summary; durations sit at the row's end. The second group is controlled: open and onOpenChange belong to the page."
 		>
 			<ToolGroup calls={CALLS} />
 			<Row>

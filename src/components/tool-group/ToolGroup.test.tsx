@@ -58,7 +58,7 @@ describe("ToolGroup", () => {
 	test("一列一個呼叫,點開看 input 和 output", async () => {
 		render(<ToolGroup calls={CALLS} />)
 		expect(screen.getAllByRole("listitem")).toHaveLength(3)
-		const row = screen.getByRole("button", { name: "example.com" })
+		const row = screen.getByRole("button", { name: /example\.com/ })
 		expect(row).toHaveAttribute("title", "web.fetch")
 		expect(row).toHaveAttribute("aria-expanded", "false")
 		await userEvent.click(row)
@@ -69,14 +69,14 @@ describe("ToolGroup", () => {
 
 	test("沒有 input 就沒有 PayloadBlock", async () => {
 		render(<ToolGroup calls={CALLS} />)
-		await userEvent.click(screen.getByRole("button", { name: "report.pdf" }))
+		await userEvent.click(screen.getByRole("button", { name: /report\.pdf/ }))
 		expect(screen.queryByRole("button", { name: "複製" })).toBeNull()
 	})
 
 	test("highlight 交給 PayloadBlock", async () => {
 		const highlight = vi.fn((code: string) => <code data-testid="lit">{code.length}</code>)
 		render(<ToolGroup calls={CALLS} highlight={highlight} />)
-		await userEvent.click(screen.getByRole("button", { name: "example.com" }))
+		await userEvent.click(screen.getByRole("button", { name: /example\.com/ }))
 		expect(screen.getByTestId("lit")).toBeInTheDocument()
 	})
 
@@ -87,7 +87,7 @@ describe("ToolGroup", () => {
 			/>,
 		)
 		expect(screen.getByRole("button", { name: /stripe/ }).textContent).toBe(
-			"stripe/charges_create花錢 · 刪除",
+			"✓stripe/charges_create花錢 · 刪除",
 		)
 	})
 
@@ -96,10 +96,34 @@ describe("ToolGroup", () => {
 		expect(screen.getByRole("button", { name: "3 calls" })).toBeInTheDocument()
 	})
 
+	test("failed 的呼叫畫 ✕,其他畫 ✓", () => {
+		render(
+			<ToolGroup
+				calls={[
+					{ id: "1", tool: "shell", summary: "ok" },
+					{ id: "2", tool: "shell", summary: "boom", failed: true },
+				]}
+			/>,
+		)
+		expect(screen.getByRole("button", { name: /boom/ })).toHaveTextContent("✕")
+		expect(screen.getByRole("button", { name: /ok/ })).toHaveTextContent("✓")
+	})
+
+	test("duration 寫在列尾", () => {
+		render(<ToolGroup calls={[{ id: "1", tool: "shell", summary: "build", duration: "2.1 秒" }]} />)
+		expect(screen.getByText("2.1 秒")).toBeInTheDocument()
+	})
+
+	test("title 取代計數標題", () => {
+		render(<ToolGroup calls={CALLS} title="查了 3 個地方" />)
+		expect(screen.getByRole("button", { name: "查了 3 個地方" })).toBeInTheDocument()
+		expect(screen.queryByRole("button", { name: /用了 3 次工具/ })).toBeNull()
+	})
+
 	test("has no axe violations, closed and open", async () => {
 		const { container } = render(<ToolGroup calls={CALLS} />)
 		await expectNoAxeViolations(container)
-		await userEvent.click(screen.getByRole("button", { name: "example.com" }))
+		await userEvent.click(screen.getByRole("button", { name: /example\.com/ }))
 		await expectNoAxeViolations(container)
 	})
 })

@@ -501,16 +501,14 @@ it is the image, `object-fit: cover`, and the caption turns white with a shadow;
 Tool calls as Anyknown Desktop ships them, copied from shell-ui's `thread/tool-group`. It
 replaced `ToolCard` (icon tile, verb + target, progress bar, duration), which no product used.
 
-- A Ghost header, 28px, transparent even on hover: "用了 N 次工具：read ×2、shell", counting
-  calls and naming each tool once in first-use order. A 16px chevron turns −90° when closed
-  (`motion.fast`, ease-out)
-- The list is a 1px `color.border` frame, `corner.card`, `overflow: hidden`; rows are split by
-  a 1px top border, none on the first
-- A row is one 44px-minimum line: summary cut with `…`, then the risk words in muted, then a
-  right / down chevron. Muted until hovered. Its focus ring is drawn inside (offset −2) because
-  the frame clips it; that is the one change from desktop
-- Open, a row shows the input in a PayloadBlock and the output as plain `t2` text, 12px apart,
-  16px in from the frame
+- A Ghost header, one `textMuted` `type.t2` line, at least 28px, with the chevron after the words;
+  it points right and turns 90° when open (`motion.fast`, ease-out). Text is "用了 N 次工具：
+  read ×2、shell" (calls counted, each tool once in first-use order) or `title` when given
+- The list is indented 16px, no frame, no rules, rows `space.xxs` apart
+- A row is at least 28px: a ✓ (`textMuted`) or a `danger` ✕ when `failed`, the summary in Geist Mono,
+  the risk words in muted, then `duration` in muted tabular `t1`
+- Open, a row shows the input in a PayloadBlock and the output as muted Geist Mono `t1`
+  (at most 9.6em tall, scrolls), indented under the summary
 - Risk comes in as words, not keys: the package does not know the product's risk names
 
 ### sub-thread

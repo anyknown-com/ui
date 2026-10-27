@@ -1,6 +1,6 @@
 # ToolGroup
 
-A run of tool calls in a thread, drawn the way Anyknown Desktop draws it: a quiet header that counts the calls and names each tool once ("用了 3 次工具：read ×2、shell"), and a framed list with one row per call. A row opens to the call's input and output.
+A run of tool calls in a thread, drawn the way Anyknown Desktop draws it: one muted line that counts the calls and names each tool once ("用了 3 次工具：read ×2、shell"), with the chevron after the words, and a list indented one step with no frame and no rules. Each row is a ✓ (or a red ✕), the summary in Geist Mono and a muted duration. A row opens to the call's input and output.
 
 ## When to use
 
@@ -31,8 +31,10 @@ import { ToolGroup } from "@anyknown/ui"
 <ToolGroup calls={calls} open={open} onOpenChange={setOpen} highlight={(code) => <Highlighted code={code} />} />
 ```
 
-- A call is `{ id, tool, summary, input?, output?, risk? }`. `summary` is the row's one line (cut with `…`); `tool` is counted in the header and is the row's tooltip.
+- A call is `{ id, tool, summary, input?, output?, risk?, failed?, duration? }`. `summary` is the row's one line (cut with `…`); `tool` is counted in the header and is the row's tooltip.
 - `input` shows in a [PayloadBlock](../payload-block/README.md) as `JSON.stringify(input, null, 2)`; `highlight` is passed through to it. `output` is plain text under it. Leave either out and it is not drawn.
+- `failed` turns the row's ✓ into a red ✕. `duration` is a string already in the reader's language ("2.1 秒"), drawn grey at the row's end.
+- `title` replaces the built-in count title ("查了 3 個地方").
 - `risk` is a list of words already in the reader's language, drawn muted after the summary and joined with " · ".
 - The group starts open (`defaultOpen`, default `true`); `open` and `onOpenChange` control it. Each row starts closed and keeps its own state.
 
@@ -40,7 +42,6 @@ import { ToolGroup } from "@anyknown/ui"
 
 - The header and each row are native `<button>`s ([Ghost](../ghost/README.md)) with `aria-expanded`. Closed content is not rendered.
 - A row's `title` is the tool name, so the tooltip says which tool made the call.
-- Rows sit inside a framed list with `overflow: hidden`, so their focus ring is drawn inside the row (offset −2).
 - `prefers-reduced-motion: reduce` removes the header chevron's turn.
 - Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `title(count, tools)`. Override it with `labels`.
 

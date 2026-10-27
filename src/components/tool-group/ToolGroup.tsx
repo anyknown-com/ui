@@ -2,16 +2,17 @@ import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, font, motion, space, type } from "../../tokens.stylex"
+import { color, font, motion, space, type } from "../../tokens.stylex"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
 import { ICON_STROKE, icon } from "../icon/icon"
 import { PayloadBlock } from "../payload-block/PayloadBlock"
 
 /**
- * A run of tool calls in a thread: a header that says how many calls and which tools
- * (「用了 3 次工具：read ×2、shell」), and a framed list with one row per call. A row opens to
- * the call's input and output. The numbers are desktop's, copied from shell-ui's tool-group.
+ * A run of tool calls in a thread: one muted line that says how many calls and which tools
+ * (「用了 3 次工具：read ×2、shell」) or a `title`, with the chevron after the words, and a list
+ * indented one step (16px) with no frame and no rules. Each row is a ✓ (or a red ✕), the
+ * summary in Geist Mono and a muted duration at the end. A row opens to the call's input and output.
  */
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
@@ -21,7 +22,7 @@ const styles = stylex.create({
 		color: color.text,
 		display: "flex",
 		flexDirection: "column",
-		fontSize: type.t3,
+		fontSize: type.t2,
 		gap: space.xxs,
 		lineHeight: type.snug,
 	},
@@ -29,79 +30,82 @@ const styles = stylex.create({
 		alignItems: "center",
 		alignSelf: "flex-start",
 		backgroundColor: "transparent",
-		color: color.text,
+		color: { default: color.textMuted, ":hover": color.text },
 		display: "inline-flex",
-		fontSize: type.t3,
+		fontSize: type.t2,
 		gap: space.xxs,
-		height: 28,
 		maxWidth: "100%",
-		paddingInline: space.xxs,
+		minHeight: 28,
+		paddingInline: 0,
 	},
 	chevron: {
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionProperty: "transform",
 		transitionTimingFunction: motion.easeOut,
 	},
-	closed: { transform: "rotate(-90deg)" },
+	opened: { transform: "rotate(90deg)" },
 	clip: { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	list: {
-		borderColor: color.border,
-		borderRadius: corner.card,
-		borderStyle: "solid",
-		borderWidth: 1,
+		display: "flex",
+		flexDirection: "column",
+		gap: space.xxs,
 		listStyle: "none",
 		margin: 0,
-		overflow: "hidden",
 		padding: 0,
+		paddingInlineStart: space.md,
 	},
 	item: {
-		borderBlockStartColor: color.border,
-		borderBlockStartStyle: { default: "solid", ":first-child": "none" },
-		borderBlockStartWidth: 1,
 		color: color.text,
-		fontSize: type.t3,
+		fontSize: type.t2,
 		lineHeight: type.snug,
 	},
 	row: {
-		alignItems: "center",
+		alignItems: "baseline",
 		backgroundColor: "transparent",
-		borderRadius: 0,
-		color: { default: color.textMuted, ":hover": color.text },
-		display: "flex",
-		fontSize: type.t3,
-		gap: 6,
+		color: color.text,
+		columnGap: 8,
+		display: "grid",
+		fontSize: type.t2,
+		gridTemplateColumns: "14px minmax(0, 1fr) auto auto",
 		height: "auto",
 		justifyContent: "flex-start",
-		minHeight: 44,
-		// 列在有框、overflow hidden 的清單裡:焦點環往內畫,不然會被裁掉
-		outlineOffset: -2,
-		paddingBlock: 10,
-		paddingInline: space.md,
+		minHeight: 28,
+		paddingInline: 0,
 		textAlign: "start",
+		whiteSpace: "normal",
 		width: "100%",
 	},
+	mark: { color: color.textMuted, fontSize: type.t1 },
+	failedMark: { color: color.danger },
+	summary: { fontFamily: font.mono, overflowWrap: "anywhere", textAlign: "start" },
 	risk: {
 		color: color.textMuted,
-		flexShrink: 0,
-		fontSize: type.t3,
-		lineHeight: type.snug,
+		fontSize: type.t1,
+		whiteSpace: "nowrap",
+	},
+	time: {
+		color: color.textMuted,
+		fontSize: type.t1,
+		fontVariantNumeric: "tabular-nums",
+		gridColumn: 4,
 		whiteSpace: "nowrap",
 	},
 	body: {
 		display: "flex",
 		flexDirection: "column",
-		gap: space.sm,
-		paddingBlockEnd: space.md,
-		paddingInline: space.md,
+		gap: space.xxs,
+		paddingBlockEnd: space.xxs,
+		paddingInlineStart: 22,
 	},
 	output: {
-		color: color.text,
-		fontFamily: font.body,
-		fontSize: type.t2,
+		color: color.textMuted,
+		fontFamily: font.mono,
+		fontSize: type.t1,
 		lineHeight: type.snug,
 		margin: 0,
-		paddingInline: space.xxs,
-		whiteSpace: "pre-wrap",
+		maxHeight: "9.6em",
+		overflow: "auto",
+		whiteSpace: "pre",
 	},
 })
 
@@ -132,11 +136,17 @@ export type ToolGroupCall = {
 	output?: string
 	/** Risk words drawn after the summary, already in the reader's language (「花錢」「刪除」). */
 	risk?: readonly string[]
+	/** The call ended in failure: the mark is a red ✕ instead of ✓. */
+	failed?: boolean
+	/** How long it took, already formatted in the reader's language (「2.1 秒」). Drawn grey at the row's end. */
+	duration?: string
 }
 
 export type ToolGroupProps = {
 	/** The calls, in the order they ran. */
 	calls: readonly ToolGroupCall[]
+	/** Replaces the built-in "n tool calls" title. */
+	title?: string
 	/** Controlled: whether the list shows. */
 	open?: boolean
 	/** Uncontrolled: whether the list starts shown. @default true */
@@ -159,6 +169,7 @@ function toolNames(calls: readonly ToolGroupCall[]) {
 
 export function ToolGroup({
 	calls,
+	title,
 	open: openProp,
 	defaultOpen = true,
 	onOpenChange,
@@ -172,10 +183,10 @@ export function ToolGroup({
 	return (
 		<section {...stylex.props(styles.root, sx)}>
 			<Ghost aria-expanded={open} onClick={() => setOpen(!open)} sx={styles.head}>
-				<span {...stylex.props(styles.clip)}>{t.title(calls.length, toolNames(calls))}</span>
+				<span {...stylex.props(styles.clip)}>{title ?? t.title(calls.length, toolNames(calls))}</span>
 				<Chevron
-					direction="down"
-					{...stylex.props(icon.md, styles.chevron, !open && styles.closed)}
+					direction="right"
+					{...stylex.props(icon.md, styles.chevron, open && styles.opened)}
 					strokeWidth={ICON_STROKE}
 				/>
 			</Ghost>
@@ -197,9 +208,12 @@ function ToolItem({ call, highlight }: { call: ToolGroupCall; highlight?: (code:
 	return (
 		<li {...stylex.props(styles.item)}>
 			<Ghost aria-expanded={open} title={call.tool} onClick={() => setOpen(!open)} sx={styles.row}>
-				<span {...stylex.props(styles.clip)}>{call.summary}</span>
-				{risk.length > 0 && <span {...stylex.props(styles.risk)}>{risk.join(" · ")}</span>}
-				<Chevron direction={open ? "down" : "right"} {...stylex.props(icon.md)} strokeWidth={ICON_STROKE} />
+				<span {...stylex.props(styles.mark, call.failed && styles.failedMark)}>
+					{call.failed ? "✕" : "✓"}
+				</span>
+				<span {...stylex.props(styles.summary)}>{call.summary}</span>
+				{risk.length > 0 ? <span {...stylex.props(styles.risk)}>{risk.join(" · ")}</span> : <span />}
+				{call.duration ? <span {...stylex.props(styles.time)}>{call.duration}</span> : null}
 			</Ghost>
 			{open && (
 				<div {...stylex.props(styles.body)}>
