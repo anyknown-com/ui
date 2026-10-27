@@ -6,16 +6,20 @@ There are two kinds of reader. Agents inside our apps already use `@anyknown/ui`
 
 ## 1. What this is
 
-Tactile. White paper on a neutral gray desk: content is paper, and anything that floats is more paper stacked on top. The closer something is to the user, the rounder its corners and the deeper its shadow.
+Pencil sketch. One sheet of paper, no lines on it, nothing behind the words, and color only for status. Hierarchy comes from space, weight, size and one gray. Shape is only for things you press and things that float.
 
-- Depth comes from tone and shadow, not borders. The desk is `layer1` and the main sheet is `layer2`. To divide a sheet, use a recessed `surface` with no frame. Borders are only for controls that need a 3:1 edge to be seen (inputs, checkboxes). A page full of frames looks like a form.
-- There are three shadow levels. Rest is for cards on the paper (tool cards, file rows, attachments), float is for popovers, dropdowns, tooltips and toasts, and modal is for dialogs and sheets. Anything else has no shadow; with more shadows the reader can't tell what sits on top.
-- Corner radius follows size; no single value fits everything. Small parts 6, inputs 12, cards 14, floating layers 16, the main sheet 20, dialogs 24, and buttons and badges are pills. A clickable row (a nav item, a list row) is not a button: it takes the input radius 12, or the card radius 14 when it carries more than one line, never a pill. When nesting, the inner radius is the outer radius minus the padding, or the corners look off.
-- Colors come from five 12-step scales. The gray scale has chroma 0 (pure gray, neither cool nor warm), and every step has a fixed job (1–2 backgrounds, 3–5 fills, 6–8 borders, 9–10 solids, 11–12 text). Pages use only the semantic `--ak-*` variables; the scales themselves are not public.
-- One color, one meaning, so the reader never has to guess. Blue (`--ak-signal`, `--ak-focus-ring`, `--ak-info`) means only that the agent is working, focus, or progress. Red means only delete and failure, amber only warning, green only success. Color used as decoration is always wrong.
-- The primary action is a solid ink pill, one per page. Links are ink too and stand apart from body text by their underline (`a` inside `ak-prose` already does this), not by blue. Solid red (`--ak-danger-solid` with `--ak-on-danger-solid` text) is only for deletes that can't be undone.
-- `--ak-text-faint` has only 3:1 contrast, so it never carries text; it is for icons, placeholders and separators. Use `ak-muted` for secondary text. `--ak-border` is a divider; control edges use `--ak-border-control`.
-- Status labels are a tinted background with text in the same hue (`--ak-success-subtle` background with `--ak-success` text), never a solid fill. The three `ak-callout` variants already work this way.
+- No lines. No 1px frames, no dividers, no ring around a resting block, no rule between dates or list items. The keyboard focus ring is the only line, plus the one exception for unchecked checkboxes and radios below.
+- Nothing behind the words. No bubbles, no frame around a list of tool calls, no gray fill behind code or table headers, no gray row for background work, no card around a question. Only things you press (chips, buttons, the selected row) carry a wash: ink at 6% (`--ak-wash`), 11% on hover (`--ak-wash-hover`). A wash is a tint, not another sheet.
+- Hierarchy uses four things only: space, weight, size and one gray (`--ak-text-muted`, the `ak-muted` class). There is no fainter gray for text. Don't shrink text and gray it too to say "secondary"; pick one.
+- A surface is only for something that floats above the page, and never more than one level. Text fields and the composer, menus, sheets, dialogs, toasts and tooltips use `--ak-surface-raised` with `--ak-shadow-float` (dialogs and sheets use `--ak-shadow-modal`). The page and the thread are always level zero: no desk under a sheet, no card on the paper, no card inside a card.
+- Color reports status and nothing else, and only on text or a 6px dot. Blue (`--ak-signal`) means working, red (`--ak-danger`) failed, amber (`--ak-warning`) waiting for you, green (`--ak-success`) done. Blue also draws the focus ring and progress. No tinted status chips, no tinted backgrounds, no colored circles behind icons. Color used as decoration is always wrong.
+- Who is speaking is shown by position and weight. The user's words sit on the right at weight 500 with no bubble; the reply starts at the left edge at weight 400 and fills the column.
+- One left edge, at most one step of indent (16px, `space.md`). Reply text, tool calls, failures, questions, reports and the working row all start at the same edge; only what is folded inside one of them steps in.
+- Three corners, each with one job. `corner.shape` (a pill) is for shapes that are always one line tall: buttons, chips, single-line text fields, icon buttons, a row in a menu. `corner.box` (24px) is for boxes that grow with their content: the composer, textareas, the menu itself, dialogs, the top edge of a sheet, toasts, tooltips, images, maps; a box keeps this corner when its text wraps. `corner.check` (4px) is only for the checkbox square, because a pill-shaped square is a circle and looks like a radio. Radios stay round; switch tracks and thumbs and slider thumbs are pills.
+- Sections are separated by space only, and density is tight: 24px between speakers (`space.lg`), 12px within one turn (`space.sm`), 4px inline (`space.xxs`). A row is at least 28px tall; a row you tap in a sheet or under `breakpoint.phone` is at least 44px.
+- There is no accent color; all color is kept for status. The primary action is a solid ink pill, one per page. Links are ink and stand apart from body text by their underline (`a` inside `ak-prose` already does this). A destructive action is red text on a wash, never a solid red fill.
+- `--ak-border-control` is the one edge left, and only for unchecked checkboxes and radios (1.5px): WCAG 1.4.11 asks for 3:1 against the background, and a wash reaches only about 1.3:1. Text fields get their edge from the floating shadow, not a frame. A switch needs no edge; its gray thumb already passes 3:1.
+- Grays have chroma 0, neither cool nor warm. Pages use only the semantic `--ak-*` variables; the scales behind them are not public.
 - Headings and body text use Geist (headings 600 to 700, body 400), falling back to Noto Sans TC for Chinese. Data and code use Geist Mono, from the same family.
 
 The tone is still a ledger: quiet, comparable, no ornament. Readers come to make a decision, and the page's job is to line up the evidence, not to persuade.
@@ -35,7 +39,7 @@ All three share the same type scale and spacing. Structure follows the reader's 
 ## 3. Laying out evidence
 
 - Put numbers that are compared on the same ruler: same column, same unit, same baseline. When two numbers sit in different columns or units, the reader has to convert them and the comparison fails.
-- Evidence tables run full width, never inset in a card. Put `ak-table` straight into `ak-section`, as wide as the body text. A card is for one standalone object (a file, an attachment, the result of one tool call); a table is part of the text, and wrapping it in a card cuts it off from the text.
+- Evidence tables run full width, never inset in a card. Put `ak-table` straight into `ak-section`, as wide as the body text. There are no cards: one object (a file, an attachment, the result of one tool call) is one block of text separated by space, and a table is part of the text like everything else.
 - One main chart per page; everything else is a table. A chart gives an impression and a table allows comparison. With two or more charts the reader doesn't know where to look.
 - Use `ak-stat` for big numbers (one `ak-stat-value` and one `ak-stat-label` inside), at most four in a row, and only for conclusion-level numbers. A conclusion-level number is one the reader can decide on after seeing it, usually a difference computed from the table: a ratio, a delta, what's left, how far over budget. Don't enlarge a cell the table already has (a total, a cost, one option's score); lint checks every stat value against the table cells. If a page has no conclusion-level number, it has no stats. Three stats are not required.
 - Numbers in the same unit get exactly one table. If pricing, cost and competitors are all USD per minute, that is one table; split into three, the reader has to compare across tables. Another dimension means another column, not another table.
@@ -46,7 +50,7 @@ All three share the same type scale and spacing. Structure follows the reader's 
 ## 4. Hierarchy and type
 
 - One display heading (`ak-display`) per page. A second display heading means a second page.
-- `ak-h1` is for section titles and `ak-h2` for subsections within a section. Text at `text.xl` or larger may only open a block, never sit mid-paragraph or inside a table.
+- `ak-h1` is for section titles and `ak-h2` for subsections within a section. Text at `type.t5` or larger may only open a block, never sit mid-paragraph or inside a table.
 - Body lines are 60 to 75 characters long. `ak-prose` already sets a max width; don't stretch it. On wide screens, leave the extra space empty instead of filling it.
 - Spacing uses only the `space.*` steps (table in the appendix). Made-up values such as 13px or 18px are never allowed; if neither neighboring token fits, pick the smaller one.
 - Color uses only the `--ak-*` variables. Made-up hex is the most often broken rule in this file, so lint counts it. Never hand-tune a color: to change one, edit the scale in `scripts/palette.mjs` and rerun it, rather than swapping in a similar hex on the page.
@@ -64,7 +68,7 @@ All three share the same type scale and spacing. Structure follows the reader's 
 
 ## 6. Motion
 
-- Only ease-out and linear. No bounce, no overshoot, no spring. `--ak-motion-spring` stays in the tokens only for compatibility; don't use it.
+- Only ease-out and linear. No bounce, no overshoot, no spring.
 - If something can stay still, keep it still. One-off pages usually need no motion at all; when they do, animate only opacity and transform, with `--ak-motion-*` durations.
 - Respect `prefers-reduced-motion`. `brand.css` already handles `ak-btn`; any animation you add is yours to handle.
 
@@ -74,7 +78,7 @@ Each one by name. When you see one, fix it without asking.
 
 - The generic SaaS row of three KPI cards: three rounded cards, each with a number and an icon. Use a row of `ak-stat`, no cards.
 - Gradient cards, frosted glass, `backdrop-filter`. Paper has none of these.
-- Icons on colored circles. Icons are line, single-color, and the same color as the text. The only exception is the `signalSubtle` icon background on the left of a tool card; it means the agent is working, not decoration.
+- Icons on colored circles. Icons are line, single-color, and the same color as the text.
 - A hero image for every section. At most one main image per page (section 3).
 - Two primary buttons on one page. One `ak-btn` per page; everything else is `ak-btn-secondary`.
 - A table stuffed into a card with a shadow. Tables run full width with no shadow.
@@ -83,8 +87,8 @@ Each one by name. When you see one, fix it without asking.
 - Inline styles. One-off pages are no exception; inline style is how made-up values get in.
 - Fonts that aren't tokens: Inter, Roboto or `system-ui` written straight into `font-family`. Use `--ak-font-*`.
 - Overshoot béziers and `animation: bounce`. See section 6.
-- A card inside a card. One rest level is enough; to divide a card, use a recessed `surface`. Nested frames and shadows mean the hierarchy wasn't thought through.
-- A 1px border around every block. Depth comes from tone and shadow; borders are only for controls that need a 3:1 edge (section 1).
+- Any card. The page is one sheet; to group things, use space, and to rank them, use weight and size. A card, a frame or a shadow on the page means the hierarchy wasn't thought through.
+- Any line: borders, dividers, rules between rows. Space separates; the only edges are the focus ring and the unchecked checkbox or radio (section 1).
 - All-caps eyebrows (`text-transform: uppercase` plus letter-spacing). That is someone else's language.
 - `useEffect` (internal agents). Use a ref callback with cleanup; see `src/components/button` for an example.
 
