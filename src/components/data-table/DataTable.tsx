@@ -23,18 +23,16 @@ const styles = stylex.create({
 		insetInlineStart: space.xs,
 		insetBlockStart: "50%",
 		translate: "0 -50%",
-		color: color.textFaint,
+		color: color.textMuted,
 		pointerEvents: "none",
 		display: "flex",
 	},
 	filterInput: {
 		width: "100%",
 		boxSizing: "border-box",
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: { default: color.border, ":hover": color.borderStrong, ":focus-visible": color.focusRing },
-		borderRadius: corner.control,
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
+		borderWidth: 0,
+		borderRadius: corner.shape,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: type.t2,
@@ -42,10 +40,10 @@ const styles = stylex.create({
 		paddingInlineStart: space.xl,
 		paddingInlineEnd: space.xs,
 		minHeight: "1.9rem",
-		transitionProperty: "border-color",
+		transitionProperty: "background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
-		outlineOffset: -1,
+		outlineOffset: 1,
 		"::placeholder": { color: color.textMuted },
 	},
 	count: {
@@ -56,11 +54,11 @@ const styles = stylex.create({
 		lineHeight: 1,
 		whiteSpace: "nowrap",
 	},
-	// Full width in its section, never a card: no frame, no fill. The head is a sunken strip.
+	// Full width in its section, never a card: no frame, no fill, no lines. The head is muted small labels.
 	wrap: {
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
-		borderRadius: corner.small,
+		borderRadius: corner.box,
 		overflow: "auto",
 		marginTop: space.xs,
 	},
@@ -76,11 +74,7 @@ const styles = stylex.create({
 		position: "sticky",
 		insetBlockStart: 0,
 		zIndex: 1, // literal-ok: local stacking, the sticky head over its own rows
-		backgroundColor: color.surface,
-		borderStartStartRadius: { default: 0, ":first-child": corner.small },
-		borderEndStartRadius: { default: 0, ":first-child": corner.small },
-		borderStartEndRadius: { default: 0, ":last-child": corner.small },
-		borderEndEndRadius: { default: 0, ":last-child": corner.small },
+		backgroundColor: color.bg,
 		textAlign: "start",
 		padding: 0,
 		whiteSpace: "nowrap",
@@ -95,12 +89,12 @@ const styles = stylex.create({
 		cursor: "pointer",
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
-		fontFamily: font.mono,
+		fontFamily: font.body,
 		fontSize: type.t1,
-		fontWeight: 600,
+		fontWeight: 500,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
@@ -108,17 +102,20 @@ const styles = stylex.create({
 		display: "block",
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
-		fontFamily: font.mono,
+		fontFamily: font.body,
 		fontSize: type.t1,
-		fontWeight: 600,
+		fontWeight: 500,
 		lineHeight: 1,
 		color: color.textMuted,
 	},
-	arrow: { color: color.accent, fontSize: type.t1 },
+	arrow: { color: color.text, fontSize: type.t1 },
+	// a numeric column: its head and cells sit on the right
+	endAlign: { justifyContent: "flex-end", textAlign: "end" },
+	numeric: { fontVariantNumeric: "tabular-nums", textAlign: "end" },
 	row: {
-		backgroundColor: { default: "transparent", ":hover": color.layer3 },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 	},
-	rowSelected: { backgroundColor: color.accentSubtle },
+	rowSelected: { backgroundColor: color.washHover },
 	rowOpenable: {
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
@@ -126,9 +123,6 @@ const styles = stylex.create({
 	},
 	spacer: (height: number) => ({ height }),
 	td: {
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		verticalAlign: "middle",
@@ -137,16 +131,16 @@ const styles = stylex.create({
 	tdCheck: { width: "2rem" },
 	mono: { fontFamily: font.mono, fontSize: type.t1, color: color.textMuted, whiteSpace: "nowrap" },
 	editable: { cursor: "text" },
-	empty: { color: color.textFaint },
+	empty: { color: color.textMuted },
 	cellInput: {
 		width: "100%",
 		fontFamily: font.body,
 		fontSize: type.t2,
 		boxShadow: `inset 0 0 0 2px ${color.focusRing}`,
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		paddingInline: "0.2rem",
 		marginInline: "-0.2rem",
-		backgroundColor: color.surface,
+		backgroundColor: color.bg,
 		color: color.text,
 	},
 	// 方框 14px,外面包一層 24px 的 label 當可以按的範圍(WCAG 2.5.8),點 label 就是點方框
@@ -160,7 +154,7 @@ const styles = stylex.create({
 	},
 	checkbox: {
 		margin: 0,
-		accentColor: color.accent,
+		accentColor: color.text,
 		width: "0.85rem",
 		height: "0.85rem",
 		cursor: "pointer",
@@ -174,7 +168,7 @@ const styles = stylex.create({
 		color: color.textMuted,
 	},
 	clear: {
-		color: color.link,
+		color: color.text,
 		cursor: "pointer",
 		textDecorationLine: "underline",
 		textUnderlineOffset: 2,
@@ -232,6 +226,8 @@ export type DataTableColumn<Row> = {
 	header: string
 	/** Keys, ids, numbers: the cells in mono. */
 	mono?: boolean
+	/** Numbers: right-aligned with tabular figures, the head too. */
+	numeric?: boolean
 	/** The header is a button that cycles ascending → descending → none. */
 	sortable?: boolean
 	/** Double-click, Enter or F2 on a cell edits it in place; `onCommit` gets the new text. */
@@ -563,7 +559,7 @@ export function DataTable<Row>({
 										<button
 											type="button"
 											onClick={() => toggleSort(column)}
-											{...stylex.props(reset.control, styles.sort)}
+											{...stylex.props(reset.control, styles.sort, column.numeric && styles.endAlign)}
 										>
 											{column.header}
 											{sort?.col === column.id && (
@@ -573,7 +569,9 @@ export function DataTable<Row>({
 											)}
 										</button>
 									) : (
-										<span {...stylex.props(styles.plainHeader)}>{column.header}</span>
+										<span {...stylex.props(styles.plainHeader, column.numeric && styles.endAlign)}>
+											{column.header}
+										</span>
 									)}
 								</th>
 							))}
@@ -672,6 +670,7 @@ export function DataTable<Row>({
 														{...stylex.props(
 															styles.td,
 															column.mono && styles.mono,
+															column.numeric && styles.numeric,
 															column.editable && styles.editable,
 														)}
 													>

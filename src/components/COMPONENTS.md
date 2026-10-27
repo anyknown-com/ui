@@ -690,7 +690,7 @@ one `Chip` per file with `×` to remove, gap 6, wrapping.
 - Keyboard and screen readers reach the button; the real `<input type="file">` is `hidden` with
   `tabIndex -1`, used only via `.click()` to open the picker. After picking, its `value` is
   cleared so the same file can be picked again
-- Not `Dropzone` / `UploadList`: those are a whole dashed drop area and an upload list with
+- Not `Dropzone` / `UploadList`: those are a whole drop area and an upload list with
   progress bars; the chatbox needs only a button and a row of chips
 
 ### call-bar
@@ -759,12 +759,11 @@ Recovery key card, **shown once** when a vault is created or its key reissued.
   and action buttons are `wash` pills
 
 ### dropzone
-Drag-and-drop upload area: idle is a sunken `surface` background with a `borderStrong` dashed
-line (`corner.card`); on dragover the dash turns `accent`, the icon `text` and the background
-`accentSubtle` (dropping isn't the agent working, so no blue). **A file-picker button fallback**
-(drag is never the only way in; a pill, `accentSubtle` background, no frame). An uploading list
-(file name + pill progress bar + cancel; card-like, background `tone.railLayer2`, same value as
-`surfaceRaised`), and failed rows.
+Drag-and-drop upload area: idle has no fill and no dashed line (`corner.box`); on dragover the
+whole zone takes a `wash` and the icon turns `text` (dropping isn't the agent working, so no
+blue). **A file-picker button fallback** (drag is never the only way in; a `wash` pill). An
+uploading list (file name + progress bar + cancel; no card, no lines), and failed rows in red
+text.
 
 - A failed row says the actual reason; not every failure is "too big". A rejection for size
   carries `limit` (the Dropzone's `maxSize`) and reads "Over the 10 MB limit, not uploaded. Pick
@@ -773,8 +772,6 @@ line (`corner.card`); on dragover the dash turns `accent`, the icon `text` and t
 - Announcements go through a visually hidden `role="status"` outside the list, holding only
   "file name: state" text. The list itself isn't a live region: wrapped around the cancel
   buttons, those buttons would stay exposed in the accessibility tree while a modal is open
-- The dashed line is an SVG `rect` inset 1.5px, so its `rx` is computed in CSS as
-  `corner.card − 1.5px`; the corner follows the token instead of being hard-coded
 
 ### file-row
 One row of a file list: type icon + name + size (mono, tabular) + modified time + actions and
@@ -786,8 +783,9 @@ uploading).
 - A name that doesn't fit is cut with `…`, with the full name in `title` (the same goes for
   attachment tile names, `Group` row names and status, `Pill`, `Cell mono`, `Subject`: cut text
   is always visible in full on hover)
-- `FileList` is a rest card on the paper: `surfaceRaised` background, the `shadow.rest` ring as
-  its only edge, `corner.card`, hairlines between rows
+- `FileList` is the rows on the page: no card, no lines. A row is 28px at least, hover `wash`,
+  selected `washHover`, `corner.shape`; the folder icon is `textMuted`; a row that is
+  uploading shows a 6px `signal` dot and the percent
 
 ### diff-viewer
 Line-level unified diff plus inline word-level highlight. For plan review takeovers and i18n
@@ -807,7 +805,7 @@ translation comparison.
 Data table with sorting, filtering, selection and inline edit. First consumer: the i18n
 dictionary editor.
 
-- Clicking a header sorts asc → desc → none, with `aria-sort` and an accent arrow; one column
+- Clicking a header sorts asc → desc → none, with `aria-sort` and a `text` arrow; one column
   at a time
 - A filter box on top; the table doesn't filter itself. The caller owns `filter` /
   `onFilterChange`, passes the filtered `rows` and `total`, and the counter on the right reads
@@ -817,12 +815,11 @@ dictionary editor.
 - Row selection checkboxes; the header checkbox selects all / some (indeterminate, set in one of
   the three remaining `useEffect`s)
 - The table runs full width in its own section, **not inside a card**: the scroll area has no
-  frame and no background. The header is a sunken `surface` strip (`corner.small` at both ends);
-  column names are lowercase mono, never uppercase with tracking; a `border` hairline between
-  rows (drawn at the bottom of each cell), hover rises to `layer3`
-- `border-collapse: separate` + `border-spacing: 0`: the header strip's corners are drawn on
-  `th`, and under collapse cell corners don't count; under separate the sticky header also no
-  longer needs an `inset box-shadow` to fake its bottom line
+  frame and no background. The header is `type.t1` `textMuted` labels with no fill (it stays
+  `bg` so rows scroll under it); column names are never uppercase with tracking; no lines
+  between rows, hover `wash`, selected `washHover`. The filter box is a `wash` `corner.shape`
+  with no frame (it is not raised). A `numeric` column is right-aligned with tabular figures,
+  head included (prototype `data-part="numeric-table"`)
 - On narrow screens the table scrolls horizontally inside its scroll area and never widens the
   page
 - Empty result: a centered message with the query plus a "Clear filter" action
@@ -882,9 +879,9 @@ and selection are a `wash` (`washHover` when selected). The old names `Row`, `It
   36px (`minHeight`), 6px above and below, the control right-aligned (`data-part="picker-row"`,
   `switch` in the prototype's settings tab). There is no `Card`; a block of content is just
   a block on the page
-- `Table` runs full width: no background, no frame. `TableHead` is a sunken
-  `surface` strip (`corner.small`), a hairline under every row (not the last), and `Detail` is
-  drawn under it the same way
+- `Table` runs full width: no background, no frame. `TableHead` is muted labels with no fill,
+  there is no line under any row, hover is `wash`, rows are 28px at least. A `num` cell is
+  sans with tabular figures, right-aligned (prototype `data-part="numeric-table"`)
 
 ### group (grouped list)
 The settings page's grouped list. `Group` has a muted `header` above, the lines in the middle on
@@ -924,7 +921,7 @@ working), `warn` is `warning` text plus a 6px dot, `plain` is `textMuted` text p
 ### list
 A "click to open" list (memories, questions): `ListHead` is one line of `type.t1` `textMuted`
 column names, no line under it; each `ListRow` is a `Ghost`, 28px minimum, `type.t3`, hover
-`wash`, selected `washHover`, `corner.shape`, no frame. Unlike `Table`: `Table` is a mono ledger; here
+`wash`, selected `washHover`, `corner.shape`, no frame. Unlike `Table`: `Table` is a ledger with columns; here
 there is no mono at all.
 
 - **Column widths belong to the caller**: the same grid template goes to the header and every

@@ -4,25 +4,18 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { reset } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
 import { formatBytes } from "../../lib/format"
-import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { Glyph } from "../icon/glyphs"
 
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // 觸控裝置沒有 hover:checkbox 與動作鈕一直顯示
 const NO_HOVER = "@media (hover: none)"
-
-const spin = stylex.keyframes({ to: { rotate: "360deg" } })
 
 // 清單比這窄時,大小與時間排到檔名下面第二行,動作鈕跨兩行靠右,檔名才有位置
 const NARROW = "@container (max-width: 30rem)"
 
 const styles = stylex.create({
-	// A rest card on the sheet: `surfaceRaised` (white in light, one step up in dark), the ring is
-	// its only edge.
+	// No card and no lines: the rows sit on the page.
 	list: {
-		borderRadius: corner.card,
-		backgroundColor: color.surfaceRaised,
-		boxShadow: shadow.rest,
 		overflow: "hidden",
 		containerType: "inline-size",
 	},
@@ -35,24 +28,21 @@ const styles = stylex.create({
 		alignItems: "center",
 		columnGap: space.xxs,
 		rowGap: { default: space.xxs, [NARROW]: 0 },
-		height: { default: "2.6rem", [NARROW]: "auto" },
+		minHeight: { default: 28, [NARROW]: "auto" },
+		borderRadius: corner.shape,
 		paddingBlock: { default: 0, [NARROW]: space.xs },
 		paddingInline: space.xxs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		fontFamily: font.body,
 		fontSize: type.t2,
 		color: color.text,
 		cursor: "default",
 		userSelect: "none",
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		"--ak-row-affordance": { default: "0", ":hover": "1", ":focus-within": "1", [NO_HOVER]: "1" },
-		":last-child": { borderBottomWidth: 0 },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 	},
-	selected: { backgroundColor: color.accentSubtle, "--ak-row-affordance": "1" },
+	selected: { backgroundColor: color.washHover, "--ak-row-affordance": "1" },
 	busy: { color: color.textMuted, cursor: "progress" },
 	checkCell: { display: "grid", placeItems: "center", gridRow: { default: "auto", [NARROW]: "1 / 3" } },
 	iconCell: { gridRow: { default: "auto", [NARROW]: "1 / 3" } },
@@ -69,11 +59,10 @@ const styles = stylex.create({
 		width: "1rem",
 		height: "1rem",
 		margin: 0,
-		accentColor: color.accent,
+		accentColor: color.text,
 		opacity: { default: "var(--ak-row-affordance, 0)", ":focus-visible": 1 },
 	},
 	icon: { color: color.textMuted },
-	folderIcon: { color: color.accent },
 	name: {
 		overflow: "hidden",
 		textOverflow: "ellipsis",
@@ -110,9 +99,9 @@ const styles = stylex.create({
 		height: "1.6rem",
 		display: "grid",
 		placeItems: "center",
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.surface },
+		backgroundColor: { default: "transparent", ":hover": color.washHover },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
 	count: {
@@ -130,36 +119,15 @@ const styles = stylex.create({
 		gap: space.xs,
 		fontSize: type.t1,
 	},
-	track: {
-		flex: 1,
-		height: "0.2rem",
-		borderRadius: corner.pill,
-		backgroundColor: color.border,
-		overflow: "hidden",
-	},
+	// 6px dot in the live colour; the number beside it is the progress
+	dot: { flex: "none", width: 6, height: 6, borderRadius: corner.shape, backgroundColor: color.signal },
 	// 數字變動時寬度不跳:等寬數字,留得下「100%」
 	percent: { flex: "none", fontVariantNumeric: "tabular-nums", minWidth: "4ch", textAlign: "end" },
-	fill: (percent: number) => ({ width: `${percent}%` }),
-	bar: { display: "block", height: "100%", backgroundColor: color.accent },
-	spinner: {
-		width: 12,
-		height: 12,
-		flex: "none",
-		borderWidth: 1.5,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderTopColor: color.accent,
-		borderRadius: corner.pill,
-		animationName: { default: spin, [REDUCED]: "none" },
-		animationDuration: motion.loop,
-		animationTimingFunction: motion.linear,
-		animationIterationCount: "infinite",
-	},
 })
 
 function FolderIcon() {
 	return (
-		<Glyph width={16} height={16} {...stylex.props(styles.icon, styles.folderIcon)}>
+		<Glyph width={16} height={16} {...stylex.props(styles.icon)}>
 			<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
 		</Glyph>
 	)
@@ -301,7 +269,7 @@ export function FileRow({
 				<span role="gridcell" aria-colspan={3} {...stylex.props(styles.busyCell)}>
 					{state === "encrypting" ? (
 						<>
-							<span aria-hidden="true" {...stylex.props(styles.spinner)} />
+							<span aria-hidden="true" {...stylex.props(styles.dot)} />
 							{t.encrypting}
 						</>
 					) : (
@@ -313,10 +281,8 @@ export function FileRow({
 								aria-valuemax={100}
 								aria-valuenow={percent}
 								aria-valuetext={t.uploading(item.name, percent)}
-								{...stylex.props(styles.track)}
-							>
-								<b {...stylex.props(styles.bar, styles.fill(progress))} />
-							</span>
+								{...stylex.props(styles.dot)}
+							/>
 							<span {...stylex.props(styles.percent)}>{`${percent}%`}</span>
 						</>
 					)}

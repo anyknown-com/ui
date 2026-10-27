@@ -3,11 +3,9 @@ import { type DragEvent, type ReactNode, useRef, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { press, reset } from "../../lib/styled"
 import { formatBytes } from "../../lib/format"
-import { color, corner, focusRing, font, motion, shadow, space, tone, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
-
-const sew = stylex.keyframes({ to: { strokeDashoffset: -13 } })
 
 const styles = stylex.create({
 	zone: {
@@ -15,37 +13,19 @@ const styles = stylex.create({
 		display: "grid",
 		justifyItems: "center",
 		gap: space.xs,
-		borderRadius: corner.card,
+		borderRadius: corner.box,
 		paddingBlock: space.xl,
 		paddingInline: space.lg,
 		textAlign: "center",
 		fontFamily: font.body,
-		backgroundColor: color.surface,
+		backgroundColor: "transparent",
 		transitionProperty: "background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
-	over: { backgroundColor: color.accentSubtle },
+	over: { backgroundColor: color.wash },
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
-	stitch: { position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" },
-	// The stitch runs 1.5px inside the zone, so its corner is the zone's less that.
-	seam: {
-		rx: `calc(${corner.card} - 1.5px)`,
-		fill: "none",
-		stroke: color.borderStrong,
-		strokeWidth: 2,
-		strokeDasharray: "7 6",
-		transitionProperty: "stroke",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-	},
-	seamOver: {
-		stroke: color.accent,
-		animationName: { default: sew, [REDUCED]: "none" },
-		animationDuration: motion.loopFast,
-		animationTimingFunction: motion.linear,
-		animationIterationCount: "infinite",
-	},
 	icon: {
-		color: color.textFaint,
+		color: color.textMuted,
 		transitionProperty: "color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
@@ -53,9 +33,9 @@ const styles = stylex.create({
 	title: { margin: 0, fontSize: type.t2, color: color.text },
 	hint: { color: color.textMuted, fontSize: type.t2 },
 	pick: {
-		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 		borderWidth: 0,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: type.t2,
@@ -83,10 +63,6 @@ const styles = stylex.create({
 		listStyle: "none",
 		margin: 0,
 		padding: 0,
-		borderRadius: corner.card,
-		backgroundColor: tone.railLayer2,
-		boxShadow: shadow.rest,
-		overflow: "hidden",
 		fontFamily: font.body,
 	},
 	srOnly: {
@@ -106,14 +82,10 @@ const styles = stylex.create({
 		gap: `${space.xxs} ${space.xs}`,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		fontSize: type.t2,
 		color: color.text,
-		":last-child": { borderBottomWidth: 0 },
 	},
-	jobError: { backgroundColor: color.dangerSubtle },
+	jobError: { color: color.danger },
 	name: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	// 看起來 22px、可以按 24px 以上(WCAG 2.5.8):::after 往外撐,不影響版面
 	cancel: {
@@ -121,28 +93,28 @@ const styles = stylex.create({
 		"::after": { content: '""', position: "absolute", inset: "-0.25rem" },
 		cursor: "pointer",
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		width: "1.4rem",
 		height: "1.4rem",
 		display: "grid",
 		placeItems: "center",
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		justifySelf: "end",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
 	track: {
 		gridColumn: "1 / -1",
 		height: "0.25rem",
-		borderRadius: corner.pill,
-		backgroundColor: color.border,
+		borderRadius: corner.shape,
+		backgroundColor: color.wash,
 		overflow: "hidden",
 	},
 	fill: (percent: number) => ({ width: `${percent}%` }),
 	bar: {
 		display: "block",
 		height: "100%",
-		backgroundColor: color.accent,
-		borderRadius: corner.pill,
+		backgroundColor: color.text,
+		borderRadius: corner.shape,
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.linear,
@@ -325,15 +297,6 @@ export function Dropzone({
 			}}
 			{...stylex.props(styles.zone, over && styles.over, disabled && styles.disabled)}
 		>
-			<svg aria-hidden="true" {...stylex.props(styles.stitch)}>
-				<rect
-					x="1.5"
-					y="1.5"
-					width="calc(100% - 3px)"
-					height="calc(100% - 3px)"
-					{...stylex.props(styles.seam, over && styles.seamOver)}
-				/>
-			</svg>
 			<UploadIcon over={over} />
 			{children ?? (
 				<>

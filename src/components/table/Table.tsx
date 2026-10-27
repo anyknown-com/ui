@@ -1,13 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
+import { breakpoint, color, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
  * `.tbl`: a ledger, full width in its section and never in a card. The head is one line of small
- * muted sans labels on a sunken `surface` strip. Every row has `space.xs` above and below its
- * cells and a hairline under it; cells line up on their first line, so a chip or switch beside a
- * cell that wraps stays level with its first line. Identifiers and numbers are mono and numbers
- * sit on the right. On a phone the head goes and each row wraps to two lines, in the order the
+ * muted sans labels with no fill. Rows have no lines between them and a `wash` under the pointer;
+ * cells line up on their first line, so a chip or switch beside a cell that wraps stays level
+ * with its first line. Identifiers are mono; numbers are sans with tabular figures and sit on
+ * the right. On a phone the head goes and each row wraps to two lines, in the order the
  * caller gives each cell.
  */
 
@@ -23,8 +23,6 @@ const styles = stylex.create({
 	cols: (columns: string) => ({ gridTemplateColumns: columns }),
 	head: {
 		alignItems: "center",
-		backgroundColor: color.surface,
-		borderRadius: corner.small,
 		color: color.textMuted,
 		display: { default: "grid", [breakpoint.phone]: "none" },
 		fontFamily: font.body,
@@ -32,35 +30,31 @@ const styles = stylex.create({
 		fontWeight: 500,
 		gap: space.sm,
 		height: 28,
-		lineHeight: type.tight,
+		lineHeight: type.dense,
 		paddingInline: space.sm,
-		// a `TableCell num` in the head keeps its end alignment but takes the head's sans
-		"--ak-table-num-font": font.body,
 	},
 	sticky: { position: "sticky", top: 0, zIndex: 1 }, // literal-ok: local stacking, the head over its own rows
 	row: {
 		// first-line alignment: a chip or switch beside a cell that wraps stays on its first line
 		alignItems: "start",
-		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
 		columnGap: { default: space.sm, [breakpoint.phone]: space.xs },
 		display: { default: "grid", [breakpoint.phone]: "flex" },
 		flexWrap: "wrap",
 		fontSize: type.t2,
 		lineHeight: { default: type.body, [breakpoint.phone]: "1.4" },
-		minHeight: { default: null, [breakpoint.phone]: 52 },
+		minHeight: { default: 28, [breakpoint.phone]: 52 },
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
 		rowGap: 0,
 	},
-	hover: { backgroundColor: { default: "transparent", ":hover": color.layer3 } },
+	hover: { backgroundColor: { default: "transparent", ":hover": color.wash } },
 	detail: {
-		boxShadow: { default: `inset 0 -1px 0 ${color.border}`, ":last-child": "none" },
 		paddingBlock: `0 ${space.xs}`,
 		paddingInline: space.sm,
 	},
 	more: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":hover": color.layer3 },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -86,7 +80,7 @@ const styles = stylex.create({
 		overscrollBehavior: "contain",
 		scrollbarColor: {
 			default: "transparent transparent",
-			":hover": `color-mix(in srgb, ${color.text} 24%, transparent) transparent`,
+			":hover": `${color.washStrong} transparent`,
 		},
 		scrollbarWidth: "thin",
 	},
@@ -102,7 +96,7 @@ export type TableProps = {
 	children: ReactNode
 } & Sx
 
-/** A full-width ledger of rows: a muted sans head, padded rows with hairlines, numbers on the right. */
+/** A full-width ledger of rows: a muted sans head, padded rows with no lines, numbers on the right. */
 export function Table({ children, sx }: TableProps) {
 	return <div {...stylex.props(styles.table, sx)}>{children}</div>
 }
@@ -150,7 +144,7 @@ export type DetailProps = {
 	children: ReactNode
 } & Sx
 
-/** The opened detail under a `Tr`, with a hairline under it. */
+/** The opened detail under a `Tr`, with no line under it. */
 export function Detail({ id, children, sx }: DetailProps) {
 	return (
 		<div {...(id ? { id } : {})} {...stylex.props(styles.detail, sx)}>

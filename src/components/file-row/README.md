@@ -17,7 +17,7 @@ One row of a file browser (type icon, name, mono size, modified time, and a chec
 
 The family:
 
-- `FileList` — the rest card (`surfaceRaised`, `shadow.rest`) with hairlines between rows. Given `selectedCount`, it shows a live selection count under it.
+- `FileList` — the rows on the page, with no card and no lines. Given `selectedCount`, it shows a live selection count under it.
 - `FileRow` — one row for a `FileItem` (`kind`, `name`, `size`, `mtime`). A click toggles the selection and a double-click calls `onOpen`. `actions` are icon buttons; pressing one does not change the selection.
 
 ```tsx

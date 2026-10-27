@@ -1,10 +1,10 @@
 # Table
 
-Low-level parts for a mono ledger: a full-width grid with one line of small muted labels on a sunken strip, padded rows with a hairline under each, and rows that wrap to two lines on a phone.
+Low-level parts for a ledger: a full-width grid with one line of small muted labels, rows with no lines between them, and rows that wrap to two lines on a phone.
 
 ## When to use
 
-- A read-only record of things on a dashboard or settings page: keys, hosts, sizes, states. Identifiers and numbers are mono, and numbers are right-aligned.
+- A read-only record of things on a dashboard or settings page: keys, hosts, sizes, states. Identifiers are mono; numbers are sans with tabular figures, right-aligned.
 - Rows that open a detail under them (`Toggle` + `Detail`), or end with a "show more" line (`MoreRow`).
 - A ledger that scrolls on its own to the bottom of the window (`ListScroll`), with a `sticky` head.
 
@@ -19,7 +19,7 @@ Low-level parts for a mono ledger: a full-width grid with one line of small mute
 The family:
 
 - `Table` — the wrapper. It is full width and never in a card.
-- `TableHead` — the head line: small muted sans labels on a sunken `surface` strip. Write the labels in sentence case ("Calls · 7d", not "calls · 7d"). `columns` is the grid template that every row shares; a `TableCell num` label stays right-aligned. `sticky` keeps it at the top of a `ListScroll`. It is hidden on a phone.
+- `TableHead` — the head line: small muted labels with no fill. Write the labels in sentence case ("Calls · 7d", not "calls · 7d"). `columns` is the grid template that every row shares; a `TableCell num` label stays right-aligned. `sticky` keeps it at the top of a `ListScroll`. It is hidden on a phone.
 - `Tr` — a row on the same `columns`, with `space.xs` (8px) above and below its cells. Cells line up on their first line, so a chip, switch or number beside a cell that wraps stays level with that cell's first line. `hover` lifts it to `layer3`.
 - `TableCell` — a cell: `mono`, `num` (right-aligned), `faint`. For the phone layout: `order`, `prefixed` (`· ` before it), `pushed` (to the line end), `grow` and `hidden`.
 - `StatusCell` — the state column: nothing when fine, a warning dot and a code when `warn`.

@@ -1,16 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import {
-	breakpoint,
-	color,
-	corner,
-	focusRing,
-	font,
-	ink,
-	motion,
-	space,
-	tone,
-	type,
-} from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
 import type { ReactNode } from "react"
 import { icon } from "../icon/icon"
@@ -29,7 +18,7 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	num: {
-		fontFamily: `var(--ak-table-num-font, ${font.mono})`,
+		fontVariantNumeric: "tabular-nums",
 		textAlign: { default: "end", [breakpoint.phone]: "start" },
 		whiteSpace: "nowrap",
 	},
@@ -51,11 +40,11 @@ const styles = stylex.create({
 	hidden: { display: { default: "block", [breakpoint.phone]: "none" } },
 	toggle: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":hover": ink.n8 },
-		borderRadius: corner.small,
+		backgroundColor: { default: "transparent", ":hover": color.wash },
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
-		color: { default: tone.faint, ":hover": color.text },
+		color: { default: color.textMuted, ":hover": color.text },
 		cursor: "pointer",
 		display: "inline-grid",
 		height: 24,
@@ -76,8 +65,8 @@ const styles = stylex.create({
 	},
 	turned: { rotate: "180deg" },
 	subject: {
-		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: corner.small,
+		backgroundColor: { default: "transparent", ":hover": color.wash },
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: color.text,
@@ -109,7 +98,7 @@ export type TableCellProps = {
 	children?: ReactNode
 	/** Mono and truncated, with the full text on hover when it is a string: for ids and keys. */
 	mono?: boolean
-	/** A number: mono, on one line, aligned to the end of the column (to the start on a phone). */
+	/** A number: sans with tabular figures, on one line, aligned to the end of the column (to the start on a phone). */
 	num?: boolean
 	/** Small, muted and mono, for a secondary reading such as a time. */
 	faint?: boolean
