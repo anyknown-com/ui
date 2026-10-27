@@ -45,6 +45,7 @@ const styles = stylex.create({
 		margin: 0,
 		color: color.text,
 	},
+	questionDone: { color: color.textMuted },
 	markdown: { fontSize: type.t2, lineHeight: type.body, margin: 0, color: color.textMuted },
 	// 要跑的指令:縮一格、Geist Mono,沒有底;長的折行,不用橫向捲
 	command: {
@@ -245,19 +246,9 @@ export function PermissionCard({
 	return (
 		<div role="group" aria-label={t.cardName(verb, subject)} {...stylex.props(styles.ask)}>
 			<Label done={resolved != null}>{resolved ? t.replied : (blockingLabel ?? t.blocking)}</Label>
-			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
-				{resolved != null && (
-					<>
-						<ReceiptIcon rejected={resolved.rejected} />
-						{resolved.text}
-						{" · "}
-						<code {...stylex.props(styles.receiptMono)}>{subject}</code>
-					</>
-				)}
-			</p>
+			<p {...stylex.props(styles.question, resolved != null && styles.questionDone)}>{verb}</p>
 			{resolved ? null : (
 				<>
-					<p {...stylex.props(styles.question)}>{verb}</p>
 					<pre {...stylex.props(styles.command)}>{subject}</pre>
 					<div {...stylex.props(styles.actions)}>
 						<Button size="sm" onKeyDown={onKeyDown} onClick={() => onReply?.("once")}>
@@ -296,6 +287,16 @@ export function PermissionCard({
 					{policyHint != null && <p {...stylex.props(styles.note)}>{policyHint}</p>}
 				</>
 			)}
+			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
+				{resolved != null && (
+					<>
+						<ReceiptIcon rejected={resolved.rejected} />
+						{resolved.text}
+						{" · "}
+						<code {...stylex.props(styles.receiptMono)}>{subject}</code>
+					</>
+				)}
+			</p>
 		</div>
 	)
 }
@@ -393,17 +394,9 @@ export function DecisionCard({
 	return (
 		<div {...stylex.props(styles.ask)}>
 			<Label done={resolved != null}>{resolved ? t.decided : (deadlineLabel ?? t.waiting)}</Label>
-			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
-				{resolved != null && (
-					<>
-						<ReceiptIcon />
-						{resolved.text}
-					</>
-				)}
-			</p>
+			<p {...stylex.props(styles.question, resolved != null && styles.questionDone)}>{title}</p>
 			{resolved ? null : (
 				<>
-					<p {...stylex.props(styles.question)}>{title}</p>
 					{blocks.map((block) => {
 						if (block.kind === "markdown") {
 							return (
@@ -492,6 +485,14 @@ export function DecisionCard({
 					</div>
 				</>
 			)}
+			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
+				{resolved != null && (
+					<>
+						<ReceiptIcon />
+						{resolved.text}
+					</>
+				)}
+			</p>
 		</div>
 	)
 }

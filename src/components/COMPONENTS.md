@@ -614,8 +614,8 @@ that's the difference from `CodeBlock`.
 
 ### interaction-card
 The two asks where the agent waits for you: Permission (a permission request) and Decision (a
-question you answer). Pending, it is actionable; after the reply it shrinks to a grey label and
-one unchangeable muted line.
+question you answer). Pending, it is actionable; after the reply it shrinks to a grey label, the
+question in grey, and one unchangeable muted line.
 
 - No card and no ring: drawn straight on the paper from the thread's left edge, separated by
   space only. A `type.t1` weight-600 label with a 6px dot in `color.warning` says it waits on you
@@ -629,8 +629,8 @@ one unchangeable muted line.
   that floats: `surfaceRaised`, `shadow.float`, `corner.box`, no frame). Submit is the ink
   `Button` and is disabled while a required block is empty; with a recommended option a chip,
   "Go with the recommendation", submits it. `deadlineLabel` replaces the label's words
-- Answered: the label turns `textMuted` (「已回覆」 / 「已回答」) and the question, command and
-  replies give way to one `textMuted` `type.t2` line. Its mark is a check, or a cross for a
+- Answered: the label and the question turn `textMuted` (「已回覆」 / 「已回答」); the command and
+  replies give way to one `textMuted` `type.t2` line under the question. Its mark is a check, or a cross for a
   rejected permission: the line has no color, so the mark is what tells them apart
 - Shortcuts **intercept only Esc and ⌘⏎**; a bare ⏎ is left to the focused button. Otherwise
   tabbing to "Deny" and pressing ⏎ would allow

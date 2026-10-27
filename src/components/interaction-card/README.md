@@ -1,6 +1,6 @@
 # InteractionCard
 
-The two asks an agent shows when it is waiting on the person — `PermissionCard` asks to do something, `DecisionCard` asks a question — drawn straight on the page with no card: an amber 「等你允許」/「等你回答」 label with a 6px dot, the question in weight 500, then the replies. Once answered, each collapses to a grey 「已回覆」/「已回答」 label and one muted line.
+The two asks an agent shows when it is waiting on the person — `PermissionCard` asks to do something, `DecisionCard` asks a question — drawn straight on the page with no card: an amber 「等你允許」/「等你回答」 label with a 6px dot, the question in weight 500, then the replies. Once answered, each collapses to a grey 「已回覆」/「已回答」 label, the question in grey, and one muted line.
 
 ## When to use
 

@@ -67,7 +67,7 @@ describe("PermissionCard", () => {
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})
 
-	test("waiting shows the amber label; answered keeps only a grey label and the receipt line", () => {
+	test("waiting shows the amber label; answered keeps a grey label, the muted question and the receipt line", () => {
 		const { rerender } = render(<PermissionCard verb="執行指令" subject="pnpm publish" />)
 		expect(screen.getByText("等你允許").classList).toContain(classOf(probe.warning))
 		expect(screen.getByText("執行指令")).toBeInTheDocument()
@@ -75,7 +75,8 @@ describe("PermissionCard", () => {
 		const label = screen.getByText("已回覆")
 		expect(label.classList).toContain(classOf(probe.muted))
 		expect(label.classList).not.toContain(classOf(probe.warning))
-		expect(screen.queryByText("執行指令")).not.toBeInTheDocument()
+		expect(screen.getByText("執行指令").classList).toContain(classOf(probe.muted))
+		expect(screen.queryByText("pnpm publish", { selector: "pre" })).not.toBeInTheDocument()
 		expect(screen.queryByText("等你允許")).not.toBeInTheDocument()
 	})
 })
@@ -153,7 +154,7 @@ describe("DecisionCard", () => {
 		)
 		expect(screen.getByText("已決定 · 你選了三檔方案")).toBeInTheDocument()
 		expect(screen.getByText("已回答")).toBeInTheDocument()
-		expect(screen.queryByText("先出哪一版?")).not.toBeInTheDocument()
+		expect(screen.getByText("先出哪一版?").classList).toContain(classOf(probe.muted))
 		expect(screen.queryByRole("radio")).not.toBeInTheDocument()
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})

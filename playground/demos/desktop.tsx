@@ -276,7 +276,7 @@ function InteractionCardDemo() {
 		<Demo
 			id="interaction-card"
 			title="interaction-card"
-			note="PermissionCard: Enter activates the focused reply, ⌘/Ctrl+Enter always allows, Escape rejects. DecisionCard: the options are a radio group; once answered, each ask collapses to a grey label and one muted line."
+			note="PermissionCard: Enter activates the focused reply, ⌘/Ctrl+Enter always allows, Escape rejects. DecisionCard: the options are a radio group; once answered, each ask collapses to a grey label, the grey question and one muted line."
 		>
 			<PermissionCard
 				verb="Run command"
