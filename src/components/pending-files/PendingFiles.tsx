@@ -42,7 +42,7 @@ export function PendingFiles({ files, onRemove, removeLabel, labels, sx }: Pendi
 	return (
 		<div {...stylex.props(styles.row, sx)}>
 			{files.map(({ id, name }) => (
-				<Chip key={id} variant="outline" removeLabel={nameOf(name)} onRemove={() => onRemove(id)}>
+				<Chip key={id} removeLabel={nameOf(name)} onRemove={() => onRemove(id)}>
 					{name}
 				</Chip>
 			))}

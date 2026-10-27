@@ -2,10 +2,13 @@ import * as stylex from "@stylexjs/stylex"
 import type { ComponentProps, Ref } from "react"
 import { type StyleArg, reset, styled } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 
+const FORCED = "@media (forced-colors: active)"
+
 const styles = stylex.create({
+	// 字加可選的 6px 點:沒有底、框、環,顏色只標狀態
 	base: {
 		display: "inline-flex",
 		alignItems: "center",
@@ -15,49 +18,45 @@ const styles = stylex.create({
 		fontWeight: 500,
 		lineHeight: 1,
 		paddingBlock: space.xxs,
-		paddingInline: space.xs,
-		borderRadius: corner.pill,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: "transparent",
 	},
-	// 凹下去的一塊,不加框;框只留給 outline 這一種。accentSubtle 在白紙與 surface 上都看得到
-	neutral: { backgroundColor: color.accentSubtle, color: color.textMuted },
-	accent: { backgroundColor: color.accentSubtle, color: color.accent },
-	success: { backgroundColor: color.successSubtle, color: color.success },
-	danger: { backgroundColor: color.dangerSubtle, color: color.danger },
-	outline: { borderColor: color.borderStrong, color: color.text },
-	mono: {
-		fontFamily: font.mono,
-		backgroundColor: color.accentSubtle,
-		color: color.textMuted,
-		letterSpacing: "0.02em",
-	},
+	neutral: { color: color.textMuted },
+	mono: { fontFamily: font.mono, color: color.textMuted, letterSpacing: "0.02em" },
+	// live = 正在做(跟 StatusBadge 的 live 同名)
+	live: { color: color.signal },
+	success: { color: color.success },
+	warning: { color: color.warning },
+	danger: { color: color.danger },
 	dot: {
-		width: "0.4rem",
-		height: "0.4rem",
-		borderRadius: corner.pill,
+		width: 6,
+		height: 6,
+		borderRadius: corner.shape,
 		backgroundColor: "currentColor",
+		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		flex: "none",
 	},
-	dotAccent: { color: color.accent },
-	dotFaint: { color: color.textFaint },
-	dotDanger: { color: color.danger },
-	dotWarning: { color: color.warning },
 	count: { fontFamily: font.mono, fontSize: type.t1, fontWeight: 600, lineHeight: 1 },
+	// 可按的 chip:一層 wash,形狀只給會按的東西
+	chip: {
+		minHeight: 28,
+		paddingBlock: 0,
+		paddingInline: space.sm,
+		borderRadius: corner.shape,
+		fontSize: type.t2,
+		backgroundColor: color.wash,
+		color: color.text,
+	},
 	pressable: {
 		cursor: "pointer",
-		backgroundColor: {
-			default: "transparent",
-			":hover": "color-mix(in srgb, currentColor 10%, transparent)",
-		},
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
+		transitionProperty: "background-color",
+		transitionDuration: motion.fast,
+		transitionTimingFunction: motion.linear,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
 	pressed: {
-		backgroundColor: { default: color.text, ":hover": color.text },
-		borderColor: color.text,
-		color: color.bg,
+		backgroundColor: { default: color.washHover, ":hover": color.washHover },
+		fontWeight: 600,
 	},
 	remove: {
 		position: "relative",
@@ -68,13 +67,13 @@ const styles = stylex.create({
 		// 圓鈕比字高:負的 block margin 讓它不撐高 chip(跟其他 badge 等高)
 		marginBlock: "-0.2rem",
 		marginInlineEnd: "-0.2rem",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		cursor: "pointer",
 		color: "inherit",
 		opacity: { default: 0.7, ":hover": 1, ":focus-visible": 1 },
 		backgroundColor: {
 			default: "transparent",
-			":hover": "color-mix(in srgb, currentColor 14%, transparent)",
+			":hover": color.washHover,
 		},
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 1,
@@ -83,29 +82,22 @@ const styles = stylex.create({
 	},
 })
 
-const DOT_TONES = {
-	accent: styles.dotAccent,
-	faint: styles.dotFaint,
-	danger: styles.dotDanger,
-	warning: styles.dotWarning,
-} as const
-
 export type BadgeProps = Omit<ComponentProps<"span">, "color"> & {
-	/** The badge's colour: `neutral` grey, `accent`, `success` green, `danger` red, `outline` bordered, `mono` grey in the mono face. @default "neutral" */
-	variant?: "neutral" | "accent" | "success" | "danger" | "outline" | "mono"
-	/** A small dot before the words, in this tone. */
-	dot?: keyof typeof DOT_TONES
+	/** The words' colour: `neutral` grey, `mono` grey in the mono face, `live` blue (doing), `success` green, `warning` amber (waiting on you), `danger` red. @default "neutral" */
+	variant?: "neutral" | "mono" | "live" | "success" | "warning" | "danger"
+	/** A 6px dot before the words, in the same colour. */
+	dot?: boolean
 	/** A number after the words, in the mono face. */
 	count?: number
 	/** StyleX styles merged after the component's own. */
 	sx?: StyleArg
 }
 
-/** A small pill label for a status, category or count. Native `<span>` props pass through. */
+/** A short word, with an optional 6px dot, that marks a status, category or count. Native `<span>` props pass through. */
 export function Badge({ variant = "neutral", dot, count, children, sx, ...props }: BadgeProps) {
 	return (
 		<span {...props} {...styled(props, styles.base, styles[variant], sx)}>
-			{dot != null && <span aria-hidden="true" {...stylex.props(styles.dot, DOT_TONES[dot])} />}
+			{dot === true && <span aria-hidden="true" {...stylex.props(styles.dot)} />}
 			{children}
 			{count != null && <span {...stylex.props(styles.count)}>{count}</span>}
 		</span>
@@ -113,7 +105,7 @@ export function Badge({ variant = "neutral", dot, count, children, sx, ...props 
 }
 
 /** removeLabel 只有在真的有 × 的時候才必填 —— 沒有按鈕就沒有要唸的東西。 */
-export type ChipProps = Omit<BadgeProps, "ref"> &
+export type ChipProps = Omit<BadgeProps, "ref" | "variant" | "dot"> &
 	(
 		| {
 				/** Shows a × button that calls this, for removing the chip (a filter, a tag). */
@@ -151,7 +143,6 @@ export function Chip({
 	pressed,
 	defaultPressed,
 	onPressedChange,
-	variant = "outline",
 	children,
 	sx,
 	ref,
@@ -177,9 +168,13 @@ export function Chip({
 
 	if (onClick == null && !toggle) {
 		return (
-			<Badge variant={variant} sx={sx} ref={ref} {...props}>
+			<span
+				ref={ref as Ref<HTMLSpanElement> | undefined}
+				{...props}
+				{...styled(props, styles.base, styles.chip, sx)}
+			>
 				{body}
-			</Badge>
+			</span>
 		)
 	}
 	return (
@@ -196,8 +191,8 @@ export function Chip({
 				props,
 				reset.control,
 				styles.base,
+				styles.chip,
 				styles.pressable,
-				styles[variant],
 				toggle && isPressed && styles.pressed,
 				sx,
 			)}

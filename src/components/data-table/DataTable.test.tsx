@@ -30,7 +30,7 @@ function Dictionary({ onCommit }: { onCommit?: (row: Entry, next: string) => voi
 				header: "狀態",
 				value: (row) => row.status,
 				cell: (row) => (
-					<Badge variant={row.status === "ok" ? "accent" : row.status === "missing" ? "danger" : "neutral"}>
+					<Badge variant={row.status === "ok" ? "live" : row.status === "missing" ? "danger" : "neutral"}>
 						{row.status}
 					</Badge>
 				),

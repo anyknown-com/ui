@@ -1,9 +1,9 @@
 # Badge
 
-Small pill labels. The family exports:
+Short words, some with a 6px dot. The family exports:
 
-- `Badge` — a read-only semantic label, with an optional status `dot` and `count`.
-- `Chip` — an interactive filter unit: removable with `onRemove`, a button with `onClick`, or a toggle with `pressed` / `defaultPressed` / `onPressedChange`.
+- `Badge` — a read-only word coloured by state, with an optional 6px `dot` and `count`. No fill, frame or ring.
+- `Chip` — an interactive filter unit on a `wash` pill: removable with `onRemove`, a button with `onClick`, or a toggle with `pressed` / `defaultPressed` / `onPressedChange`.
 
 ## When to use
 
@@ -24,8 +24,8 @@ Small pill labels. The family exports:
 import { Badge, Chip } from "@anyknown/ui"
 
 <Badge variant="success">Handed off</Badge>
-<Badge dot="danger">Disconnected</Badge>
-<Badge variant="accent" count={3}>Waiting · </Badge>
+<Badge variant="danger" dot>Disconnected</Badge>
+<Badge variant="warning" count={3}>Waiting · </Badge>
 
 <Chip onRemove={clearWorkspace} removeLabel="Remove filter: workspace anyknown">
   Workspace: anyknown
@@ -34,12 +34,12 @@ import { Badge, Chip } from "@anyknown/ui"
 <Chip defaultPressed>Mine</Chip>
 ```
 
-Badge variants: `neutral` (default), `accent`, `success`, `danger`, `outline`, `mono`. Dots: `accent`, `faint`, `danger`, `warning`. `Chip` defaults to `outline`. Any of `pressed`, `defaultPressed` or `onPressedChange` makes the chip a toggle; `onClick` alone makes a plain button.
+Badge variants: `neutral` (default), `mono`, `live` (doing, `signal`), `success`, `warning` (waiting on you), `danger`. Colour is on the text and the dot only. `dot` is a boolean and takes the variant's colour. A `Chip` is a `wash` pill (`washHover` on hover); a pressed chip is `washHover` with weight 600, not solid ink and not a colour. Any of `pressed`, `defaultPressed` or `onPressedChange` makes the chip a toggle; `onClick` alone makes a plain button.
 
 ## Accessibility
 
 - `Badge` is a `<span>` with no role; its text is the label. The `dot` is `aria-hidden`, so the text must carry the state on its own. The `count` is plain text read after the children.
-- `Chip` with neither `onClick` nor a toggle prop is a `Badge`. Otherwise it is a native `<button type="button">`. A toggle chip carries `aria-pressed`; a chip with only `onClick` does not. The pressed state inverts colors, not only the hue.
+- `Chip` with neither `onClick` nor a toggle prop is a `Badge`. Otherwise it is a native `<button type="button">`. A toggle chip carries `aria-pressed`; a chip with only `onClick` does not. The pressed state changes weight and fill, not only the hue.
 - The remove control is a native `<button>` whose `aria-label` is `removeLabel`. `removeLabel` is required by the type whenever `onRemove` is given. Its hit area is 24 px through an invisible `::after`, though it looks 16 px.
 - Do not give one `Chip` both `onClick` and `onRemove`: that renders a button inside a button.
 - Focus ring: a 2 px `focusRing` outline on `:focus-visible` for both the chip button and the remove button.

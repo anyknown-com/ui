@@ -757,22 +757,26 @@ function BadgeDemo() {
 		>
 			<Row>
 				<Badge>Draft</Badge>
-				<Badge variant="accent">In progress</Badge>
+				<Badge variant="live">In progress</Badge>
 				<Badge variant="success">Handed off</Badge>
 				<Badge variant="danger">Interrupted</Badge>
-				<Badge variant="outline">Read-only</Badge>
+				<Badge variant="warning">Needs you</Badge>
 			</Row>
 			<Row>
-				<Badge variant="accent" count={3}>
+				<Badge variant="live" count={3}>
 					Waiting on you ·{" "}
 				</Badge>
 				<Badge count={12}>Read · </Badge>
 				<Badge variant="mono">128k · 42%</Badge>
 			</Row>
 			<Row>
-				<Badge dot="accent">Fable online</Badge>
-				<Badge dot="faint">Handing off</Badge>
-				<Badge dot="danger">Disconnected</Badge>
+				<Badge variant="live" dot>
+					Fable online
+				</Badge>
+				<Badge dot>Handing off</Badge>
+				<Badge variant="danger" dot>
+					Disconnected
+				</Badge>
 			</Row>
 			<Row>
 				<Chip onRemove={() => {}} removeLabel="Remove filter: workspace anyknown">

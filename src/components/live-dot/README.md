@@ -6,7 +6,7 @@ A single breathing `signal` dot that says "still running", for the current actio
 
 - Next to the line that describes what the agent is doing right now.
 - On a sub thread or task row while it is in progress.
-- Inside a custom status pill (as [StatusBadge](../status-badge/README.md) does).
+- Inside a custom status word (as [StatusBadge](../status-badge/README.md) does).
 
 ## When not to use
 

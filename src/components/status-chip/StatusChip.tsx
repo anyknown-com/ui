@@ -1,56 +1,46 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, space, tone, type } from "../../tokens.stylex"
+import { color, corner, font, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { Spin } from "../spin/Spin"
 
 /**
- * `.tchip` / `.achip`: a mono word in a 16px pill. `r` read-only (outline), `w` writes (layer),
- * `d` destructive (danger on dangerSubtle), `n` unmarked (outline), `a` active (signal, spinning),
- * `f` failed (danger outline + dot), `plain` the catalogue's auth chip.
+ * `.tchip` / `.achip`: a mono word whose colour is its only mark. `r`, `w`, `n` and `plain` are
+ * muted, `d` destructive (danger), `a` active (signal, spinning), `f` failed (danger + a 6px dot).
  */
 
 const styles = stylex.create({
 	root: {
 		alignItems: "center",
-		borderRadius: corner.pill,
 		display: "inline-flex",
 		flex: "none",
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		gap: space.xxs,
 		lineHeight: "16px",
-		paddingInline: 6,
 		whiteSpace: "nowrap",
 	},
-	r: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
-	w: { backgroundColor: color.layer4, color: color.text },
-	d: { backgroundColor: color.dangerSubtle, color: color.danger },
-	n: { boxShadow: `inset 0 0 0 1px ${color.border}`, color: color.textMuted },
+	r: { color: color.textMuted },
+	w: { color: color.textMuted },
+	d: { color: color.danger },
+	n: { color: color.textMuted },
 	// 執行中 = agent 在做事
-	a: { backgroundColor: color.signalSubtle, color: color.signal },
-	f: {
-		boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color.danger} 55%, transparent)`,
-		color: color.danger,
-	},
-	plain: { backgroundColor: color.layer3, color: color.textMuted, textAlign: "center" },
-	dot: { backgroundColor: color.danger, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	a: { color: color.signal },
+	f: { color: color.danger },
+	plain: { color: color.textMuted },
+	dot: { backgroundColor: color.danger, borderRadius: corner.shape, flex: "none", height: 6, width: 6 },
 	pill: {
 		alignItems: "center",
-		backgroundColor: color.layer3,
-		borderRadius: corner.pill,
 		color: color.textMuted,
 		display: "inline-flex",
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		gap: space.xxs,
-		height: 22,
-		paddingInline: space.xs,
+		lineHeight: "22px",
 		whiteSpace: "nowrap",
 	},
-	status: { paddingInlineStart: 6 },
-	live: { backgroundColor: color.signal, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	live: { backgroundColor: color.signal, borderRadius: corner.shape, flex: "none", height: 6, width: 6 },
 	paused: { backgroundColor: color.warning },
-	done: { backgroundColor: tone.faint },
+	done: { backgroundColor: color.success },
 	title: {
 		color: color.text,
 		display: "inline-block",
@@ -66,7 +56,7 @@ const styles = stylex.create({
 export type StatusChipProps = {
 	/**
 	 * `r` read-only, `w` writes, `d` destructive, `n` unmarked, `a` active (with a spinner), `f` failed
-	 * (with a red dot), `plain` a neutral chip.
+	 * (with a red dot), `plain` a neutral word. Only the word's colour differs.
 	 */
 	variant: "r" | "w" | "d" | "n" | "a" | "f" | "plain"
 	/** The chip's word. */
@@ -75,7 +65,7 @@ export type StatusChipProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** A short mono word in a small pill that marks what a tool call does or how it went. */
+/** A short mono word, coloured by what a tool call does or how it went. */
 export function StatusChip({ variant, children, sx }: StatusChipProps) {
 	return (
 		<span {...stylex.props(styles.root, styles[variant], sx)}>
@@ -97,12 +87,12 @@ export type PillProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** `.pill-s`: the 22px mono pills a fold's first line is made of. */
+/** `.pill-s`: the mono words, with an optional 6px dot, a fold's first line is made of. */
 export function Pill({ status, title = false, children, sx }: PillProps) {
 	return (
 		<span
 			{...(title && typeof children === "string" ? { title: children } : {})}
-			{...stylex.props(styles.pill, status !== undefined && styles.status, title && styles.title, sx)}
+			{...stylex.props(styles.pill, title && styles.title, sx)}
 		>
 			{status !== undefined && (
 				<span

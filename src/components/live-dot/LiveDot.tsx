@@ -12,9 +12,9 @@ const styles = stylex.create({
 	wrap: { display: "inline-flex", alignItems: "center", gap: space.xxs },
 	dot: {
 		flex: "none",
-		width: "0.375rem",
-		height: "0.375rem",
-		borderRadius: corner.pill,
+		width: 6,
+		height: 6,
+		borderRadius: corner.shape,
 		// 「agent 正在做事」是 signal 的意思
 		// Forced colors wipe backgrounds and the dot would vanish: paint Highlight and keep it.
 		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },

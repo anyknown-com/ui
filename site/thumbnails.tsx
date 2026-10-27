@@ -326,9 +326,9 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 	badge: () => (
 		<Row>
 			<Badge>Draft</Badge>
-			<Badge variant="accent">New</Badge>
+			<Badge variant="live">New</Badge>
 			<Badge variant="success">Synced</Badge>
-			<Badge dot="danger" count={3}>
+			<Badge variant="danger" dot count={3}>
 				Stale
 			</Badge>
 		</Row>

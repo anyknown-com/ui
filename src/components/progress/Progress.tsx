@@ -39,7 +39,7 @@ const progressStrings = defineStrings({
  */
 export type ProgressLabels = StringsOf<typeof progressStrings>
 
-// 進度 = 一條膠囊軌加一段填充:軌是凹下去的 accentSubtle 6px 帶,填充是實心 signal
+// 進度 = 一條膠囊軌加一段填充:軌是 washStrong 6px 帶,填充是實心 signal
 // (進度條說的是 agent 正在做事),寬度就是讀數。不定量時同一段填充在軌上等速滑過。
 // ring / ball 是讀數(context 用量)不是工作中,留墨色。全部 CSS,零 rAF。
 const TRACK_H = 6
@@ -62,8 +62,8 @@ const styles = stylex.create({
 		width: "100%",
 		height: TRACK_H,
 		boxSizing: "border-box",
-		borderRadius: corner.pill,
-		backgroundColor: color.accentSubtle,
+		borderRadius: corner.shape,
+		backgroundColor: color.washStrong,
 		borderStyle: { default: null, [FORCED]: "solid" },
 		borderWidth: { default: null, [FORCED]: 1 },
 		borderColor: { default: null, [FORCED]: "CanvasText" },
@@ -74,7 +74,7 @@ const styles = stylex.create({
 		top: 0,
 		bottom: 0,
 		insetInlineStart: 0,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		backgroundColor: { default: color.signal, [FORCED]: "Highlight" },
 		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		transitionProperty: "width",
@@ -103,12 +103,12 @@ const styles = stylex.create({
 	ringWrap: { position: "relative", display: "inline-grid", placeItems: "center" },
 	ringTrack: {
 		fill: "none",
-		stroke: { default: color.border, [FORCED]: "GrayText" },
+		stroke: { default: color.washStrong, [FORCED]: "GrayText" },
 		forcedColorAdjust: { default: null, [FORCED]: "none" },
 	},
 	ringArc: {
 		fill: "none",
-		stroke: { default: color.accent, [FORCED]: "Highlight" },
+		stroke: { default: color.text, [FORCED]: "Highlight" },
 		forcedColorAdjust: { default: null, [FORCED]: "none" },
 		strokeLinecap: "round",
 		transform: "rotate(-90deg)",

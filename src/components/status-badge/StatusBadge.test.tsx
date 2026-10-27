@@ -10,7 +10,7 @@ describe("StatusBadge", () => {
 		expect(screen.getAllByText("AI 操作中")).toHaveLength(2)
 	})
 
-	test("warn 與 plain 沒有點,也不是 live region", () => {
+	test("warn 與 plain 帶靜態點,不是 live region", () => {
 		render(
 			<>
 				<StatusBadge tone="warn">需要處理</StatusBadge>
@@ -19,6 +19,7 @@ describe("StatusBadge", () => {
 		)
 		expect(screen.queryByRole("status")).toBeNull()
 		expect(screen.getByText("需要處理")).toBeInTheDocument()
+		expect(screen.getByText("需要處理").parentElement?.querySelector("[aria-hidden='true']")).not.toBeNull()
 	})
 })
 

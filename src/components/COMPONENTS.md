@@ -411,14 +411,16 @@ switching.
 A badge is a read-only semantic label; a chip is an interactive filter unit (removable,
 pressable). Same family.
 
-- Pill (`corner.pill`). `neutral` / `mono` are a sunken `accentSubtle` background with no frame;
-  a frame is reserved for `outline`
+- A badge is a word plus an optional 6px dot (`dot`, a boolean in the variant's colour): no fill,
+  frame or ring. Variants `neutral` / `mono` (muted), `live` (`signal`, doing), `success`,
+  `warning` (waiting on you), `danger`; colour is only on the text and the dot. A chip is a
+  `wash` pill (`corner.shape`, `washHover` on hover); there is no `outline` or `accent` variant
 - The chip `×`: a negative block margin keeps the round button from making the chip taller, and
   `::after` extends the hit target to 24px (WCAG 2.2) without affecting layout. The same trick
   applies to other small targets
 - `removeLabel` is required only when `onRemove` is given; no × means nothing to read
 - Given `onClick`, it renders a real `<button aria-pressed>` (otherwise a `<span>`). Selected is
-  **inverted** (text background, bg text), not an added ring: scanning a row of filter chips,
+  `washHover` with weight 600, not solid ink and not a ring: scanning a row of filter chips,
   you must see at a glance which are on. A pressable chip doesn't forward `ref` (it would be the
   button's ref, not the span's)
 
@@ -434,10 +436,10 @@ skeleton looks like a thread) so nothing jumps when loading finishes.
   avatar circle
 
 ### progress
-A progress bar says "the agent is working", so its fill is `signal`; ring / ball are readouts
-(context usage), not work in progress, so they stay ink `accent`.
+A progress bar says "the agent is working", so its fill is `signal` on a `washStrong` track;
+ring / ball are readouts (context usage), not work in progress, so the arc is ink `text`.
 
-1. **bar (determinate)** — a 6px `accentSubtle` pill track with a solid `signal` fill whose
+1. **bar (determinate)** — a 6px `washStrong` pill track with a solid `signal` fill whose
    width follows the value (updates are frequent, so a short `motion.fast` linear transition;
    expo would lag behind)
 2. **bar (indeterminate)** — a 40% segment slides across in 1.8s linear; under it a mono line
@@ -692,7 +694,7 @@ blocked by a pending card.
 ### attach-button / pending-files
 Chatbox attachments (0.9, moved from the product shell). `AttachButton` is a 36px `IconButton`
 (an 18px `+`) that opens the file picker; `PendingFiles` shows files picked but not yet sent,
-one outline `Chip` per file with `×` to remove, gap 6, wrapping.
+one `Chip` per file with `×` to remove, gap 6, wrapping.
 
 - Keyboard and screen readers reach the button; the real `<input type="file">` is `hidden` with
   `tabIndex -1`, used only via `.click()` to open the picker. After picking, its `value` is
@@ -842,8 +844,8 @@ Small controls moved from the product's ui-next: `Ghost` / `GhostLink` are text 
 background (background only on hover); `IconButton` carries a Tooltip (its name is the tooltip)
 except while `open` (the popover it owns is showing); `Segmented` is a group of `aria-pressed`
 buttons, not tabs; `Spin` is the 12px ring inside a button (9px `small`); `StatusChip`'s variant
-is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`); `Pill` is the 22px mono pill on a
-fold's first line.
+is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`), told apart by the word's colour only
+(no fill or ring); `Pill` is the mono words, with an optional 6px dot, on a fold's first line.
 
 - `IconButton` is a circle (`corner.pill`), presses to 0.98, focus ring `focusRing`, hover
   `ink.n8`
@@ -851,7 +853,7 @@ fold's first line.
   (`corner.control`, no frame), the selected segment a `surfaceRaised` + `shadow.rest` sheet
   with a 1px `borderControl` ring (as in pills tabs, over 3:1 against the track). In a grid it
   still wraps only its own options
-- `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`: the agent is working
+- `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`, and `Pill`'s `done` dot is `success`: the agent is working
 
 ### card
 `Card` is a rest card on the paper: `surfaceRaised` background, `corner.card` (14px),
@@ -937,12 +939,11 @@ had no users and was replaced outright.
   `dot` it is text only. `warn` is shorthand for `tone="warning"` + a filled dot (the 0.8 API)
 
 ### status-badge
-The status pill placed over something that is running by itself (a screen the AI is operating):
-`type.t2`, 4 top and bottom, 10 left and right, pill. `live` is `signalSubtle` background with
-`signal` text plus a breathing `LiveDot` (the AI is working), `warn` is `warningSubtle` with
-`warning` text, `plain` is `accentSubtle` with muted text.
+The status word placed over something that is running by itself (a screen the AI is operating):
+`type.t2`, weight 500, no fill. `live` is `signal` text plus a breathing `LiveDot` (the AI is
+working), `warn` is `warning` text plus a 6px dot, `plain` is `textMuted` text plus a 6px dot.
 
-- Not `Pill` (the 22px mono pill on a fold's first line), nor `StatusChip` (the 16px tool status
+- Not `Pill` (the mono words on a fold's first line), nor `StatusChip` (the 16px tool status
   code)
 - `live` text is read once: the `LiveDot` carries `role="status"` and reads the state, and the
   visible text is `aria-hidden`

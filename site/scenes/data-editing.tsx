@@ -148,7 +148,12 @@ const shortDate = (iso: string) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${Num
 
 function StatusBadgeCell({ status }: { status: Status }) {
 	if (status === "confirmed") return <Badge variant="success">{STATUS_NAME.confirmed}</Badge>
-	if (status === "outdated") return <Badge dot="warning">{STATUS_NAME.outdated}</Badge>
+	if (status === "outdated")
+		return (
+			<Badge variant="warning" dot>
+				{STATUS_NAME.outdated}
+			</Badge>
+		)
 	return <Badge>{STATUS_NAME.learned}</Badge>
 }
 

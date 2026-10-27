@@ -1,6 +1,6 @@
 # StatusBadge
 
-A state pill for the head of something that runs on its own, such as a screen the AI is driving: `live` while it runs, `warn` when it needs you, `plain` when it is over.
+A state word with a 6 px dot, in its state's colour and with no fill, for the head of something that runs on its own, such as a screen the AI is driving: `live` while it runs, `warn` when it needs you, `plain` when it is over.
 
 ## When to use
 
@@ -11,7 +11,7 @@ A state pill for the head of something that runs on its own, such as a screen th
 ## When not to use
 
 - For a tool's status code inside a tool card, use [StatusChip](../status-chip/README.md).
-- For the 22 px mono pills on a fold's first line, use `Pill` from [StatusChip](../status-chip/README.md).
+- For the mono words on a fold's first line, use `Pill` from [StatusChip](../status-chip/README.md).
 - For a dot plus a word in a settings row, use `Status` from [Group](../group/README.md).
 - For a general label such as "draft" or "read-only", use [Badge](../badge/README.md).
 

@@ -1,29 +1,35 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, type } from "../../tokens.stylex"
+import { color, corner, space, type } from "../../tokens.stylex"
 import { LiveDot } from "../live-dot/LiveDot"
 
 /**
- * A state in a pill, for the head of something that runs on its own, like a screen the AI drives:
- * `live` it is running (a breathing dot), `warn` it needs you, `plain` it is over.
+ * A state as a coloured word with a 6px dot, for the head of something that runs on its own, like a
+ * screen the AI drives: `live` it is running (a breathing dot), `warn` it needs you, `plain` it is over.
  */
 
 const styles = stylex.create({
 	badge: {
 		alignItems: "center",
-		borderRadius: corner.pill,
 		display: "inline-flex",
 		flexShrink: 0,
 		fontSize: type.t2,
-		gap: 6,
+		fontWeight: 500,
+		gap: space.xs,
 		lineHeight: type.tight,
-		paddingBlock: 4,
-		paddingInline: 10,
 		whiteSpace: "nowrap",
 	},
-	// 正在跑 = agent 在做事:signal 的字與點放在 signalSubtle 上
-	live: { backgroundColor: color.signalSubtle, color: color.signal },
-	warn: { backgroundColor: color.warningSubtle, color: color.warning },
-	plain: { backgroundColor: color.accentSubtle, color: color.textMuted },
+	// 正在跑 = agent 在做事
+	live: { color: color.signal },
+	warn: { color: color.warning },
+	plain: { color: color.textMuted },
+	dot: {
+		backgroundColor: "currentColor",
+		borderRadius: corner.shape,
+		flex: "none",
+		forcedColorAdjust: { default: null, "@media (forced-colors: active)": "none" },
+		height: 6,
+		width: 6,
+	},
 })
 
 export type StatusBadgeProps = {
@@ -35,11 +41,15 @@ export type StatusBadgeProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** A state in a pill, for the head of something that runs on its own, such as a screen the AI drives. */
+/** A state as a coloured word and dot, for the head of something that runs on its own, such as a screen the AI drives. */
 export function StatusBadge({ tone, children, sx }: StatusBadgeProps) {
 	return (
 		<span {...stylex.props(styles.badge, styles[tone], sx)}>
-			{tone === "live" && <LiveDot label={children} />}
+			{tone === "live" ? (
+				<LiveDot label={children} />
+			) : (
+				<i aria-hidden="true" {...stylex.props(styles.dot)} />
+			)}
 			<span {...(tone === "live" ? { "aria-hidden": true } : {})}>{children}</span>
 		</span>
 	)

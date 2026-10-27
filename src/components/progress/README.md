@@ -1,6 +1,6 @@
 # Progress
 
-Progress and loading indicators. A bar uses the blue `signal` fill because it means "the agent is working"; rings are readings (such as context use) and stay ink. The family exports:
+Progress and loading indicators. A bar uses the blue `signal` fill on a `washStrong` track because it means "the agent is working"; rings are readings (such as context use) and stay ink (`text`). The family exports:
 
 - `Progress` — a 6 px bar. With `value` it is determinate; without it, a segment sweeps the track and a mono line below names the current stage.
 - `ProgressRing` — a 60 px ring with the percentage written in its center, for an exact reading.

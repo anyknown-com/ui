@@ -265,7 +265,7 @@ const columnsFor = (edit: Edit): DataTableColumn<Entry>[] => [
 		sortable: true,
 		value: (row) => row.status,
 		cell: (row) => (
-			<Badge variant={row.status === "current" ? "accent" : row.status === "stale" ? "danger" : "neutral"}>
+			<Badge variant={row.status === "current" ? "live" : row.status === "stale" ? "danger" : "neutral"}>
 				{row.status}
 			</Badge>
 		),

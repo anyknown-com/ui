@@ -7,7 +7,7 @@ import { Badge, Chip } from "./Badge"
 
 describe("Badge", () => {
 	test("renders its text without interactive semantics", () => {
-		render(<Badge variant="accent">進行中</Badge>)
+		render(<Badge variant="live">進行中</Badge>)
 		const badge = screen.getByText("進行中")
 		expect(badge.tagName).toBe("SPAN")
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
@@ -15,7 +15,7 @@ describe("Badge", () => {
 
 	test("renders a count", () => {
 		render(
-			<Badge variant="accent" count={3}>
+			<Badge variant="warning" count={3}>
 				等你 ·{" "}
 			</Badge>,
 		)
@@ -23,9 +23,30 @@ describe("Badge", () => {
 	})
 
 	test("the status dot is decorative", () => {
-		const { container } = render(<Badge dot="accent">Fable 在線</Badge>)
+		const { container } = render(
+			<Badge variant="live" dot>
+				Fable 在線
+			</Badge>,
+		)
 		expect(container.querySelector("[aria-hidden='true']")).not.toBeNull()
 		expect(screen.getByText("Fable 在線")).toBeInTheDocument()
+	})
+})
+
+describe("Badge warning", () => {
+	test("warning with a dot is plain text plus a hidden dot", () => {
+		const { container } = render(
+			<Badge variant="warning" dot>
+				等你
+			</Badge>,
+		)
+		expect(screen.getByText("等你")).toBeInTheDocument()
+		expect(container.querySelectorAll("[aria-hidden='true']")).toHaveLength(1)
+	})
+
+	test("no dot unless asked", () => {
+		const { container } = render(<Badge variant="warning">等你</Badge>)
+		expect(container.querySelector("[aria-hidden='true']")).toBeNull()
 	})
 })
 
@@ -126,15 +147,15 @@ test("axe: every badge variant, a dot, a count, removable, pressable and pressed
 	const { container } = render(
 		<>
 			<Badge>neutral</Badge>
-			<Badge variant="accent" dot="accent">
-				accent
+			<Badge variant="live" dot>
+				live
 			</Badge>
 			<Badge variant="success">success</Badge>
-			<Badge variant="danger" dot="danger">
+			<Badge variant="danger" dot>
 				danger
 			</Badge>
-			<Badge variant="outline" count={3}>
-				outline
+			<Badge variant="warning" count={3}>
+				warning
 			</Badge>
 			<Badge variant="mono">mono</Badge>
 			<Chip onRemove={() => {}} removeLabel="移除">

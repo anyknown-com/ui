@@ -1,8 +1,8 @@
 # StatusChip
 
-A mono word in a 16 px pill that marks what a tool call does or how it went, keyed by a one-letter status code. The folder also exports `Pill`, the 22 px mono pill a fold's first line is made of.
+A mono word, told apart by its colour alone (no fill, frame or ring), that marks what a tool call does or how it went, keyed by a one-letter status code. The folder also exports `Pill`, the mono words (with an optional 6 px dot) a fold's first line is made of.
 
-- `StatusChip` variants: `r` read-only (outline), `w` writes (filled layer), `d` destructive (danger on `dangerSubtle`), `n` unmarked (outline), `a` active (`signal`, with a spinning ring), `f` failed (danger outline and a dot), `plain` (the catalogue's auth chip).
+- `StatusChip` variants: `r` read-only, `w` writes, `n` unmarked and `plain` (the catalogue's auth word) in `textMuted`, `d` destructive (`danger`), `a` active (`signal`, with a spinning ring), `f` failed (`danger` and a 6 px dot).
 - `Pill` takes an optional `status` dot (`live`, `paused`, `done`) and `title` for the sub thread's name, which uses the body face and truncates.
 
 ## When to use
@@ -44,6 +44,6 @@ No keyboard interaction of its own.
 ## Related
 
 - [Spin](../spin/README.md) — the ring inside an active chip.
-- [StatusBadge](../status-badge/README.md) — the larger live state pill.
+- [StatusBadge](../status-badge/README.md) — the larger live state word.
 - [Badge](../badge/README.md) — general labels and filter chips.
 - [ToolGroup](../tool-group/README.md) and [SubThreadRow](../sub-thread/README.md) — the library's own tool call and sub agent display.
