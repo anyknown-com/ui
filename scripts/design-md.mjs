@@ -109,8 +109,8 @@ ${colorTable}
 ### Fonts, type, space, corners, motion
 
 Every group below is also a CSS variable, named \`--ak-<group>-<key>\` (\`--ak-space-md\`, \`--ak-type-t3\`,
-\`--ak-corner-card\`, \`--ak-motion-ease-out\`). brand.css already uses them in its classes; when you write your own
-CSS, pick values from these tables and do not invent new ones. Deprecated groups (the old \`text\` scale) are left out.
+\`--ak-corner-box\`, \`--ak-motion-ease-out\`). brand.css already uses them in its classes; when you write your own
+CSS, pick values from these tables and do not invent new ones.
 
 ${plainTables}
 `
