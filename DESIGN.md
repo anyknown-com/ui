@@ -46,6 +46,7 @@ All three share the same type scale and spacing. Structure follows the reader's 
 - Don't make a table out of two columns. In a full-width table with only two columns the numbers get pushed to the far right and the eye loses the row. Use a list in `ak-prose` instead, or fold it into another table as a column.
 - For the one sentence the reader must notice, use `ak-callout` with `ak-callout-warning` / `ak-callout-danger` (blue only means working, so there is no info callout). At most two per page; when callouts are everywhere, nothing stands out. A callout doesn't repeat the body text and doesn't take up an `ak-section` of its own; it sits right next to the table or button it is about.
 - Numbers are tabular (`ak-table` and `ak-stat` already turn this on), decimals line up within a column, and units go in the header, not in every cell.
+- `data-num` goes on a whole column, header included, or on none of it. A column that mixes words and numbers (two options side by side, one attribute per row) stays left-aligned; half right-aligned, the column has two edges.
 
 ## 4. Hierarchy and type
 
