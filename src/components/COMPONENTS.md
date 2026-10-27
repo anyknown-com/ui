@@ -515,13 +515,13 @@ replaced `ToolCard` (icon tile, verb + target, progress bar, duration), which no
 A sub agent's run, copied from shell-ui's `thread/sub-thread`. **A sub agent is its own row,
 not a tool call in a group.**
 
-- A filled pill: `layer3`, hover `layer4`, `corner.float` (16px), 44px minimum, 16px in from
-  the thread's edge. Title, then the status, then a faint 16px chevron. The whole pill opens the
-  run
-- Status: `queued` / `running` read 進行中 with a LiveDot; `waiting` 暫停 and `blocked` 卡住了
-  are warning, `done` success, `failed` danger, `cancelled` muted, each with its own circle
-  glyph (14px). Stuck, failed and cancelled differ in colour and shape
-- The run's content (`children`) shows indented under the pill until the run is over
+- No fill. The title is weight 500 from the left edge with a chevron after the words; under it a
+  `type.t2` line carries the status word. At least 28px tall. Hover only darkens the grey line;
+  the whole row opens the run
+- Status colours sit on the word only: `queued` / `running` read 進行中 in `signal`; `waiting` 暫停
+  and `blocked` 卡住了 are `warning`, `done` `success`, `failed` `danger`, `cancelled` muted. No
+  glyph, no dot
+- The run's content (`children`) shows indented one step (16px) under the row until the run is over
 
 ### reasoning-fold
 The fold row for the reasoning process: collapsed by default to just "Thought for N s"

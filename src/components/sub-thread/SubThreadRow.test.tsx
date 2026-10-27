@@ -9,7 +9,7 @@ const noop = () => {}
 
 const statusOf = (status: SubThreadStatus) =>
 	render(<SubThreadRow title="查重試事件" status={status} onOpenRun={noop} />).container.querySelector(
-		"button > span:nth-child(2)",
+		"button > span:nth-child(2) > span",
 	)
 
 describe("SubThreadRow", () => {
@@ -42,11 +42,16 @@ describe("SubThreadRow", () => {
 		expect(screen.getByRole("button", { name: /Find retries/ })).toHaveTextContent("Stuck")
 	})
 
-	test("整顆 pill 打開 run", async () => {
+	test("整列打開 run", async () => {
 		const onOpenRun = vi.fn()
 		render(<SubThreadRow title="查重試事件" status="running" onOpenRun={onOpenRun} />)
 		await userEvent.click(screen.getByRole("button", { name: /查重試事件/ }))
 		expect(onOpenRun).toHaveBeenCalledOnce()
+	})
+
+	test("狀態只上在字:沒有 icon,也沒有點", () => {
+		const { container } = render(<SubThreadRow title="查重試事件" status="running" onOpenRun={noop} />)
+		expect(container.querySelectorAll("svg")).toHaveLength(1)
 	})
 
 	test("run 還沒結束才畫內容", () => {
