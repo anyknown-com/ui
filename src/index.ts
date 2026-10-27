@@ -255,6 +255,7 @@ export { IconButton, type IconButtonProps } from "./components/icon-button/IconB
 export { ICON_STROKE, icon } from "./components/icon/icon"
 export { Segmented, type SegmentedProps } from "./components/segmented/Segmented"
 export { Spin, type SpinProps } from "./components/spin/Spin"
+export { Stack, type StackProps } from "./components/stack/Stack"
 export { Pill, StatusChip, type PillProps, type StatusChipProps } from "./components/status-chip/StatusChip"
 export { StatusBadge, type StatusBadgeProps } from "./components/status-badge/StatusBadge"
 export {

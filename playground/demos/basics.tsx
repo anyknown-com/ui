@@ -33,6 +33,7 @@ import {
 	SkeletonGroup,
 	Spin,
 	Spinner,
+	Stack,
 	StatusChip,
 	Tabs,
 	TabsList,
@@ -847,6 +848,35 @@ function TextDemo() {
 	)
 }
 
+function StackDemo() {
+	return (
+		<Demo
+			id="stack"
+			title="stack"
+			note="Space is the only separator. A row wraps when it gets narrow; gap is sm 12px, md 16px or lg 24px."
+		>
+			<Label>column, gap sm (default)</Label>
+			<Stack>
+				<Text>First line of a reply.</Text>
+				<Text>Second line, 12px below.</Text>
+			</Stack>
+			<Label>row, gap lg (wraps)</Label>
+			<Stack direction="row" gap="lg">
+				<Text>One</Text>
+				<Text>Two</Text>
+				<Text>Three</Text>
+			</Stack>
+			<Label>column, gap md</Label>
+			<Stack gap="md">
+				<Text variant="title" as="h3">
+					This week
+				</Text>
+				<Text>Runs finished and money spent.</Text>
+			</Stack>
+		</Demo>
+	)
+}
+
 function SkeletonDemo() {
 	return (
 		<Demo id="skeleton" title="skeleton">
@@ -992,6 +1022,7 @@ export const basicsDemos: DemoEntry[] = [
 	{ id: "status-chip", covers: ["status-chip"], Component: StatusChipDemo },
 	{ id: "kbd", covers: ["kbd"], Component: KbdDemo },
 	{ id: "text", covers: ["text"], Component: TextDemo },
+	{ id: "stack", covers: ["stack"], Component: StackDemo },
 	{ id: "skeleton", covers: ["skeleton"], Component: SkeletonDemo },
 	{ id: "progress", covers: ["progress"], Component: ProgressDemo },
 	{ id: "spin", covers: ["spin"], Component: SpinDemo },

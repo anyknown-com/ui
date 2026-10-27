@@ -840,6 +840,18 @@ is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`), told apart by the
   capsule in weight 600 (`data-part="toggles"`). In a grid it still wraps only its own options
 - `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`, and `Pill`'s `done` dot is `success`: the agent is working
 
+### stack
+`Stack` is a flex `<div>` with a token gap: `direction` `column` (default) or `row`, `gap` `sm` (12px,
+default), `md` or `lg`. It is the layout base for widgets, so it is plain on purpose.
+
+- Space is the only separator; there is no divider, fill or padding prop. A card or frame around a
+  group is the wrong fix, change the gap
+- Only three gaps (`space.sm`, `md`, `lg`): 4px and 8px are inline spacing a component sets for
+  itself, not a layout step between blocks
+- `row` wraps (`flexWrap: wrap`) and aligns on the first baseline, so a row of `Stat` drops to
+  the next line on a phone instead of scrolling; `minWidth: 0` lets children shrink and truncate
+- No `align` or `justify` props yet: nothing needs them, and a block that wants more can use `sx`
+
 ### text
 `Text` sets running text and headings from the `type` scale. Props: `as` (default `p`),
 `variant` (default `body`), `sx`. Base: `font.body`, `color.text`, `type.snug`, margin 0.
