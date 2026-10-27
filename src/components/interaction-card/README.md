@@ -1,12 +1,12 @@
 # InteractionCard
 
-The two cards an agent shows when it is waiting on the person — `PermissionCard` asks to do something, `DecisionCard` asks for a choice — each of which collapses into a read-only receipt once answered.
+The two asks an agent shows when it is waiting on the person — `PermissionCard` asks to do something, `DecisionCard` asks a question — drawn straight on the page with no card: an amber 「等你允許」/「等你回答」 label with a 6px dot, the question in weight 500, then the replies. Once answered, each collapses to a grey 「已回覆」/「已回答」 label and one muted line.
 
 ## When to use
 
 - `PermissionCard`: the agent wants to run a command or touch something that needs consent (allow once, always allow, reject).
-- `DecisionCard`: the agent needs the person to pick options or write a short answer; `blocking` when work cannot continue until they do.
-- Keeping the answered card in the thread as a receipt (`resolved`).
+- `DecisionCard`: the agent needs the person to pick options or write a short answer.
+- Keeping the answered ask in the thread as a receipt (`resolved`).
 
 ## When not to use
 
@@ -28,7 +28,6 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 />
 
 <DecisionCard
-  blocking
   title="Which pricing section ships first?"
   blocks={[
     { kind: "options", id: "variant", required: true, options: plans },
@@ -41,17 +40,19 @@ import { DecisionCard, PermissionCard } from "@anyknown/ui"
 
 `onReply` receives `"once"`, `{ always: scope }` or `{ reject: true }`; `scope` defaults to the locale's word ("這個指令", "this command" in `en`). `onAnswer` receives `{ [blockId]: string | string[] }`. Both cards take `labels`.
 
+"Allow once" and the submit button are the solid ink `Button`; "Always allow", "Deny" and "照建議" are chips (`wash`, `corner.shape`). The command sits indented one step in mono with no fill; `policyHint` is a muted note under the replies. A free-text block floats like any text field (`surfaceRaised`, `shadow.float`, `corner.box`).
+
 ## Accessibility
 
-- `PermissionCard` is a `role="group"` named "`verb`:`subject`" (`labels.cardName`). The subject is a `<pre role="region" tabIndex={0}>` named by `verb`, so a long command can be scrolled from the keyboard. `DecisionCard` has no group role or name of its own.
+- `PermissionCard` is a `role="group"` named "`verb`:`subject`" (`labels.cardName`). The subject is a `<pre>` that wraps, so a long command never needs a scroll stop. `DecisionCard` has no group role or name of its own.
 - Reply buttons are [Button](../button/README.md)s. The shortcut glyphs (⏎, ⌘⏎, Esc) are `aria-hidden`; "總是允許" and "拒絕" carry `aria-keyshortcuts`.
 - Single-choice options are native radios in a `RadioGroup` with `role="radiogroup"`; a required one sets `aria-required`. Multiple-choice options are native checkboxes in a `<fieldset>` (group semantics), which has no `aria-required`: a required checkbox group is shown only by the disabled submit button. With no block `label`, the group takes `aria-label` from `title`.
 - A free-text block is a `<textarea>` named by its `label`, or by `title`.
 - Each card has an `aria-live="polite"` paragraph that exists while pending (visually hidden, empty) and fills with the receipt when `resolved` arrives, so the answer is announced.
-- A rejected receipt swaps the check for a cross as well as turning red, so it is not color alone.
-- `prefers-reduced-motion: reduce` removes the ring and border transitions.
-- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `cardName`, the badges (`blocking`, `waiting`, `replied`, `decided`), the reply buttons (`allowOnce`, `allowAlways`, `reject`), `scope`, `decide`, `submit`, `acceptRecommended`, `recommended`. Override any with `labels`; `scope`, `blockingLabel`, `deadlineLabel`, `submitLabel` and `recommendedLabel` win over `labels`.
-- Free-text placeholders use `textMuted` (6.35:1 light on `surface`), above 4.5:1.
+- The receipt line is `textMuted` either way; a rejected one swaps the check for a cross, so the mark, not color, tells them apart.
+- The waiting label is amber text, not color alone: its words say it waits on you. The dot is `aria-hidden`.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `cardName`, the labels (`blocking` for a waiting permission, `waiting` for a waiting decision, `replied`, `decided`), the reply buttons (`allowOnce`, `allowAlways`, `reject`), `scope`, `submit`, `acceptRecommended`, `recommended`. Override any with `labels`; `scope`, `blockingLabel`, `deadlineLabel`, `submitLabel` and `recommendedLabel` win over `labels`.
+- Free-text placeholders use `textMuted`, above 4.5:1.
 
 ## Keyboard
 

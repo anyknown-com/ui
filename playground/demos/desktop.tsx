@@ -276,7 +276,7 @@ function InteractionCardDemo() {
 		<Demo
 			id="interaction-card"
 			title="interaction-card"
-			note="PermissionCard: Enter activates the focused reply, ⌘/Ctrl+Enter always allows, Escape rejects. DecisionCard: the options are a radio group; once answered, each card collapses to a receipt."
+			note="PermissionCard: Enter activates the focused reply, ⌘/Ctrl+Enter always allows, Escape rejects. DecisionCard: the options are a radio group; once answered, each ask collapses to a grey label and one muted line."
 		>
 			<PermissionCard
 				verb="Run command"
@@ -294,7 +294,6 @@ function InteractionCardDemo() {
 				resolved={permission ? { text: permission, rejected: permission === "Denied" } : undefined}
 			/>
 			<DecisionCard
-				blocking
 				title="Which pricing section should the landing page ship first?"
 				blocks={[
 					{

@@ -20,6 +20,15 @@ const BLOCKS: DecisionBlock[] = [
 	{ kind: "text", id: "note", label: "補充", placeholder: "想補充什麼…" },
 ]
 
+// the atomic class StyleX gives one color declaration, to look for on an element
+const probe = stylex.create({
+	warning: { color: color.warning },
+	muted: { color: color.textMuted },
+})
+function classOf(style: (typeof probe)[keyof typeof probe]) {
+	return (stylex.props(style).className ?? "").split(" ").find((name) => /^x[a-z0-9]+$/.test(name))
+}
+
 describe("PermissionCard", () => {
 	test("shows the subject and three replies", () => {
 		render(<PermissionCard verb="執行指令" subject="pnpm publish --access public" />)
@@ -57,11 +66,28 @@ describe("PermissionCard", () => {
 		expect(receipt).toHaveTextContent("pnpm publish")
 		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})
+
+	test("waiting shows the amber label; answered keeps only a grey label and the receipt line", () => {
+		const { rerender } = render(<PermissionCard verb="執行指令" subject="pnpm publish" />)
+		expect(screen.getByText("等你允許").classList).toContain(classOf(probe.warning))
+		expect(screen.getByText("執行指令")).toBeInTheDocument()
+		rerender(<PermissionCard verb="執行指令" subject="pnpm publish" resolved={{ text: "已允許一次" }} />)
+		const label = screen.getByText("已回覆")
+		expect(label.classList).toContain(classOf(probe.muted))
+		expect(label.classList).not.toContain(classOf(probe.warning))
+		expect(screen.queryByText("執行指令")).not.toBeInTheDocument()
+		expect(screen.queryByText("等你允許")).not.toBeInTheDocument()
+	})
 })
 
 describe("DecisionCard", () => {
+	test("waiting shows the amber 等你回答 label", () => {
+		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
+		expect(screen.getByText("等你回答").classList).toContain(classOf(probe.warning))
+	})
+
 	test("submit is disabled until every required block is answered", async () => {
-		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} blocking />)
+		render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
 		const submit = screen.getByRole("button", { name: "送出決定" })
 		expect(submit).toBeDisabled()
 		await userEvent.click(screen.getByRole("radio", { name: /三檔方案/ }))
@@ -116,7 +142,7 @@ describe("DecisionCard", () => {
 		expect(onAnswer).toHaveBeenCalledWith({ variant: "single", note: "先看轉換" })
 	})
 
-	test("non-blocking shows the deadline instead of a blocking state", () => {
+	test("deadlineLabel replaces the waiting label", () => {
 		render(<DecisionCard title="要發嗎?" blocks={BLOCKS} deadlineLabel="等你 · 2h 後照建議" />)
 		expect(screen.getByText("等你 · 2h 後照建議")).toBeInTheDocument()
 	})
@@ -126,7 +152,10 @@ describe("DecisionCard", () => {
 			<DecisionCard title="先出哪一版?" blocks={BLOCKS} resolved={{ text: "已決定 · 你選了三檔方案" }} />,
 		)
 		expect(screen.getByText("已決定 · 你選了三檔方案")).toBeInTheDocument()
+		expect(screen.getByText("已回答")).toBeInTheDocument()
+		expect(screen.queryByText("先出哪一版?")).not.toBeInTheDocument()
 		expect(screen.queryByRole("radio")).not.toBeInTheDocument()
+		expect(screen.queryByRole("button")).not.toBeInTheDocument()
 	})
 })
 
@@ -144,7 +173,7 @@ describe("InteractionCard axe", () => {
 		await expectNoAxeViolations(container)
 	})
 
-	test("DecisionCard has no axe violations blocking, waiting, multi-select and resolved", async () => {
+	test("DecisionCard has no axe violations waiting, multi-select and resolved", async () => {
 		const multi: DecisionBlock[] = [
 			{ kind: "markdown", id: "why", text: "先選一個方向。" },
 			{
@@ -159,7 +188,7 @@ describe("InteractionCard axe", () => {
 				],
 			},
 		]
-		const { container, rerender } = render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} blocking />)
+		const { container, rerender } = render(<DecisionCard title="先出哪一版?" blocks={BLOCKS} />)
 		await expectNoAxeViolations(container)
 		rerender(<DecisionCard title="先出哪一版?" blocks={multi} deadlineLabel="等你 · 2h 後照建議" />)
 		await expectNoAxeViolations(container)
@@ -177,7 +206,7 @@ describe("InteractionCard locale", () => {
 			</LocaleProvider>,
 		)
 		expect(screen.getByRole("group", { name: "Run: pnpm publish" })).toBeInTheDocument()
-		expect(screen.getByText("Blocked on you")).toBeInTheDocument()
+		expect(screen.getByText("Waiting for your OK")).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Allow once" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "No" })).toBeInTheDocument()
 		await userEvent.click(screen.getByRole("button", { name: "Always allow" }))
@@ -190,8 +219,7 @@ describe("InteractionCard locale", () => {
 				<DecisionCard title="Which first?" blocks={BLOCKS} submitLabel="Go" />
 			</LocaleProvider>,
 		)
-		expect(screen.getByText("Decision")).toBeInTheDocument()
-		expect(screen.getByText("Waiting on you")).toBeInTheDocument()
+		expect(screen.getByText("Waiting for your answer")).toBeInTheDocument()
 		expect(screen.getByText("Recommended")).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Go" })).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Use recommendation" })).toBeInTheDocument()

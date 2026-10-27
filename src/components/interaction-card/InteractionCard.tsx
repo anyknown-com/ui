@@ -1,90 +1,43 @@
 import * as stylex from "@stylexjs/stylex"
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
-import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, shadow, space, type } from "../../tokens.stylex"
 import { Button } from "../button/Button"
 import { Checkbox } from "../checkbox/Checkbox"
 import { Radio } from "../radio/Radio"
 import { RadioGroup } from "../radio/RadioGroup"
 import { Glyph } from "../icon/glyphs"
 
-const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
-	// rest 卡片;等你回覆時外圈的環換成 warning(權限)或墨色(要你決定)
-	card: {
-		backgroundColor: color.surfaceRaised,
-		boxShadow: shadow.rest,
-		borderRadius: corner.card,
-		paddingBlock: space.md,
-		paddingInline: space.md,
-		display: "grid",
-		gap: space.sm,
+	// 沒有卡、沒有環:直接畫在紙上,只用間距、字重與一個灰分層次
+	ask: {
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "flex-start",
+		gap: space.xs,
 		fontFamily: font.body,
-		transitionProperty: "box-shadow",
-		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
-		transitionTimingFunction: motion.easeOut,
+		color: color.text,
 	},
-	// forced colors 下陰影和環都會消失:等你回覆的卡片改畫一圈 CanvasText
-	permissionPending: {
-		boxShadow: `0 0 0 1px ${color.warning}, ${shadow.rest}`,
-		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
-	},
-	decisionPending: {
-		boxShadow: `0 0 0 1px ${color.accent}, ${shadow.rest}`,
-		outline: { default: null, [FORCED]: `${focusRing.width} solid CanvasText` },
-	},
-	head: { display: "flex", alignItems: "center", gap: space.xs },
-	headIconWarning: { flex: "none", color: color.warning },
-	headIconAccent: { flex: "none", color: color.accent },
-	verb: { fontSize: type.t2, fontWeight: 500, lineHeight: type.snug, color: color.text },
-	state: {
-		marginInlineStart: "auto",
-		fontFamily: font.mono,
+	// 「等你允許／等你回答」:琥珀字加 6px 點;答完變灰
+	label: {
+		display: "inline-flex",
+		alignItems: "center",
+		gap: "6px",
 		fontSize: type.t1,
 		fontWeight: 600,
-		lineHeight: 1,
-		letterSpacing: "0.06em",
-		textTransform: "uppercase",
-		whiteSpace: "nowrap",
+		lineHeight: type.dense,
+		color: color.warning,
 	},
-	stateWarning: { color: color.warning },
-	stateAccent: { color: color.accent },
-	stateQuiet: { color: color.textMuted },
-	body: { display: "grid", gap: space.xs },
-	mono: {
-		fontFamily: font.mono,
-		fontSize: type.t2,
-		lineHeight: type.snug,
-		backgroundColor: color.surface,
-		borderRadius: corner.small,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
-		overflowX: "auto",
-		whiteSpace: "pre",
-		margin: 0,
-		color: color.text,
-		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
-		outlineOffset: -2,
+	labelDone: { color: color.textMuted },
+	dot: {
+		flex: "none",
+		width: 6,
+		height: 6,
+		borderRadius: corner.shape,
+		backgroundColor: { default: "currentColor", [FORCED]: "CanvasText" },
 	},
-	actions: { display: "flex", gap: space.xs, flexWrap: "wrap" },
-	shortcut: {
-		fontFamily: font.mono,
-		fontSize: type.t1,
-		fontWeight: 500,
-		opacity: 0.65,
-		marginInlineStart: space.xxs,
-	},
-	policy: {
-		display: "flex",
-		alignItems: "center",
-		gap: space.xxs,
-		fontSize: type.t2,
-		color: color.textMuted,
-		margin: 0,
-	},
-	policyIcon: { flex: "none", color: color.textFaint },
 	question: {
 		fontSize: type.t3,
 		fontWeight: 500,
@@ -93,6 +46,33 @@ const styles = stylex.create({
 		color: color.text,
 	},
 	markdown: { fontSize: type.t2, lineHeight: type.body, margin: 0, color: color.textMuted },
+	// 要跑的指令:縮一格、Geist Mono,沒有底;長的折行,不用橫向捲
+	command: {
+		fontFamily: font.mono,
+		fontSize: type.t2,
+		lineHeight: type.snug,
+		margin: 0,
+		paddingInlineStart: space.md,
+		whiteSpace: "pre-wrap",
+		overflowWrap: "anywhere",
+		color: color.text,
+	},
+	actions: { display: "flex", alignItems: "center", gap: space.xs, flexWrap: "wrap" },
+	// 次要的回覆是 chip:wash 底、膠囊、28px 高
+	chip: {
+		color: color.text,
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
+		minHeight: "1.75rem",
+		paddingInline: space.sm,
+	},
+	shortcut: {
+		fontFamily: font.mono,
+		fontSize: type.t1,
+		fontWeight: 500,
+		opacity: 0.65,
+		marginInlineStart: space.xxs,
+	},
+	note: { fontSize: type.t1, lineHeight: type.snug, color: color.textMuted, margin: 0 },
 	options: {
 		display: "grid",
 		gap: space.xxs,
@@ -100,6 +80,7 @@ const styles = stylex.create({
 		padding: 0,
 		borderWidth: 0,
 		listStyle: "none",
+		alignSelf: "stretch",
 	},
 	srOnly: {
 		position: "absolute",
@@ -113,28 +94,21 @@ const styles = stylex.create({
 		borderWidth: 0,
 	},
 	recommended: {
-		fontFamily: font.mono,
 		fontSize: type.t1,
-		fontWeight: 600,
-		lineHeight: 1,
-		letterSpacing: "0.05em",
-		textTransform: "uppercase",
-		color: color.accent,
-		backgroundColor: color.accentSubtle,
-		borderRadius: corner.pill,
-		paddingBlock: "0.15rem",
-		paddingInline: space.xs,
-		marginInlineStart: space.xxs,
-		verticalAlign: "middle",
+		fontWeight: 400,
+		color: color.textMuted,
+		marginInlineStart: space.xs,
 	},
+	// 文字欄位浮在紙上:surfaceRaised 加 shadow.float,沒有框;透明框只在 forced colors 顯形
 	free: {
-		width: "100%",
+		alignSelf: "stretch",
 		boxSizing: "border-box",
-		backgroundColor: color.surface,
+		backgroundColor: color.surfaceRaised,
+		boxShadow: shadow.float,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: { default: color.border, ":focus-visible": color.focusRing },
-		borderRadius: corner.control,
+		borderColor: "transparent",
+		borderRadius: corner.box,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: type.t2,
@@ -142,10 +116,8 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		resize: "vertical",
 		minHeight: "2.4rem",
-		transitionProperty: "border-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
-		outlineOffset: -1,
+		outlineOffset: 2,
 		"::placeholder": { color: color.textMuted },
 	},
 	receipt: {
@@ -153,49 +125,27 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xs,
 		fontSize: type.t2,
+		lineHeight: type.snug,
 		color: color.textMuted,
 		margin: 0,
 	},
-	receiptIcon: { flex: "none", color: color.accent },
-	receiptIconRejected: { color: color.danger },
+	receiptIcon: { flex: "none" },
 	receiptMono: { fontFamily: font.mono },
 })
 
-function LockIcon() {
+function Label({ done, children }: { done: boolean; children: ReactNode }) {
 	return (
-		<Glyph width={15} height={15} {...stylex.props(styles.headIconWarning)}>
-			<rect x="4" y="10" width="16" height="10" rx="2" />
-			<path d="M8 10V7a4 4 0 0 1 8 0v3" />
-		</Glyph>
-	)
-}
-
-function DecideIcon() {
-	return (
-		<Glyph width={15} height={15} {...stylex.props(styles.headIconAccent)}>
-			<path d="M9 18h6M10 21h4" />
-			<path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z" />
-		</Glyph>
-	)
-}
-
-function InfoIcon() {
-	return (
-		<Glyph width={13} height={13} {...stylex.props(styles.policyIcon)}>
-			<circle cx="12" cy="12" r="9" />
-			<path d="M12 8v4m0 4h.01" />
-		</Glyph>
+		<span {...stylex.props(styles.label, done && styles.labelDone)}>
+			<span aria-hidden="true" {...stylex.props(styles.dot)} />
+			{children}
+		</span>
 	)
 }
 
 function ReceiptIcon({ rejected }: { rejected?: boolean }) {
 	return (
-		<Glyph
-			width={14}
-			height={14}
-			{...stylex.props(styles.receiptIcon, rejected && styles.receiptIconRejected)}
-		>
-			{/* 拒絕不能只靠紅色分辨:換成叉,forced colors 下也看得出來 */}
+		<Glyph width={14} height={14} {...stylex.props(styles.receiptIcon)}>
+			{/* 拒絕換成叉:收據只有灰字,記號是唯一分得出來的地方 */}
 			<path d={rejected ? "M18 6 6 18M6 6l12 12" : "m5 13 4 4L19 7"} />
 		</Glyph>
 	)
@@ -204,30 +154,28 @@ function ReceiptIcon({ rejected }: { rejected?: boolean }) {
 const strings = defineStrings({
 	"zh-TW": {
 		cardName: (verb: string, subject: string) => `${verb}:${subject}`,
-		blocking: "等你才能繼續",
-		waiting: "等你",
+		blocking: "等你允許",
+		waiting: "等你回答",
 		replied: "已回覆",
 		allowOnce: "允許一次",
 		allowAlways: "總是允許",
 		reject: "拒絕",
 		scope: "這個指令",
-		decide: "決定",
-		decided: "已決定",
+		decided: "已回答",
 		submit: "送出決定",
 		acceptRecommended: "照建議",
 		recommended: "建議",
 	},
 	en: {
 		cardName: (verb: string, subject: string) => `${verb}: ${subject}`,
-		blocking: "Blocked on you",
-		waiting: "Waiting on you",
+		blocking: "Waiting for your OK",
+		waiting: "Waiting for your answer",
 		replied: "Replied",
 		allowOnce: "Allow once",
 		allowAlways: "Always allow",
 		reject: "Deny",
 		scope: "this command",
-		decide: "Decision",
-		decided: "Decided",
+		decided: "Answered",
 		submit: "Submit decision",
 		acceptRecommended: "Use recommendation",
 		recommended: "Recommended",
@@ -235,8 +183,8 @@ const strings = defineStrings({
 })
 
 /**
- * PermissionCard's and DecisionCard's built-in words (follow `<LocaleProvider>`): state
- * badges, reply and submit buttons, the default `scope` and the "recommended" tag.
+ * PermissionCard's and DecisionCard's built-in words (follow `<LocaleProvider>`): the waiting
+ * and answered labels, reply and submit buttons, the default `scope` and the "recommended" tag.
  * Override any with `labels`.
  */
 export type InteractionCardLabels = StringsOf<typeof strings>
@@ -246,19 +194,19 @@ export type PermissionReply = "once" | { always: string } | { reject: true; mess
 export type PermissionReceipt = { text: string; rejected?: boolean }
 
 export type PermissionCardProps = {
-	/** What the agent wants to do, e.g. "Run command". Heads the card and names it. */
+	/** What the agent wants to do, e.g. "Run command". The question line; also names the group. */
 	verb: string
-	/** The exact thing it wants to do it to, shown verbatim in a scrollable block. */
+	/** The exact thing it wants to do it to, shown verbatim, indented, in mono. */
 	subject: string
 	/** What "Always allow" covers; reported back as `{ always: scope }`. Wins over `labels.scope`. */
 	scope?: string
-	/** A short note under the buttons, e.g. which policy asked. */
+	/** A short muted note under the buttons, e.g. which policy asked. */
 	policyHint?: ReactNode
-	/** The state badge while waiting. Wins over `labels.blocking`. */
+	/** The amber label while waiting. Wins over `labels.blocking`. */
 	blockingLabel?: string
 	/** Called with the person's reply. */
 	onReply?: (reply: PermissionReply) => void
-	/** Once answered: the card collapses to this receipt. */
+	/** Once answered: the ask collapses to the grey label and this one muted line. */
 	resolved?: PermissionReceipt
 	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<InteractionCardLabels>
@@ -295,18 +243,8 @@ export function PermissionCard({
 	}
 
 	return (
-		<div
-			role="group"
-			aria-label={t.cardName(verb, subject)}
-			{...stylex.props(styles.card, !resolved && styles.permissionPending)}
-		>
-			<div {...stylex.props(styles.head)}>
-				<LockIcon />
-				<span {...stylex.props(styles.verb)}>{verb}</span>
-				<span {...stylex.props(styles.state, resolved ? styles.stateQuiet : styles.stateWarning)}>
-					{resolved ? t.replied : (blockingLabel ?? t.blocking)}
-				</span>
-			</div>
+		<div role="group" aria-label={t.cardName(verb, subject)} {...stylex.props(styles.ask)}>
+			<Label done={resolved != null}>{resolved ? t.replied : (blockingLabel ?? t.blocking)}</Label>
 			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
 				{resolved != null && (
 					<>
@@ -318,12 +256,11 @@ export function PermissionCard({
 				)}
 			</p>
 			{resolved ? null : (
-				<div {...stylex.props(styles.body)}>
-					<pre tabIndex={0} role="region" aria-label={verb} {...stylex.props(styles.mono)}>
-						{subject}
-					</pre>
+				<>
+					<p {...stylex.props(styles.question)}>{verb}</p>
+					<pre {...stylex.props(styles.command)}>{subject}</pre>
 					<div {...stylex.props(styles.actions)}>
-						<Button onKeyDown={onKeyDown} onClick={() => onReply?.("once")}>
+						<Button size="sm" onKeyDown={onKeyDown} onClick={() => onReply?.("once")}>
 							{t.allowOnce}
 							<kbd aria-hidden="true" {...stylex.props(styles.shortcut)}>
 								⏎
@@ -331,6 +268,8 @@ export function PermissionCard({
 						</Button>
 						<Button
 							variant="secondary"
+							size="sm"
+							sx={styles.chip}
 							aria-keyshortcuts="Meta+Enter Control+Enter"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ always: scope })}
@@ -341,7 +280,9 @@ export function PermissionCard({
 							</kbd>
 						</Button>
 						<Button
-							variant="dangerGhost"
+							variant="secondary"
+							size="sm"
+							sx={styles.chip}
 							aria-keyshortcuts="Escape"
 							onKeyDown={onKeyDown}
 							onClick={() => onReply?.({ reject: true })}
@@ -352,13 +293,8 @@ export function PermissionCard({
 							</kbd>
 						</Button>
 					</div>
-					{policyHint != null && (
-						<p {...stylex.props(styles.policy)}>
-							<InfoIcon />
-							{policyHint}
-						</p>
-					)}
-				</div>
+					{policyHint != null && <p {...stylex.props(styles.note)}>{policyHint}</p>}
+				</>
 			)}
 		</div>
 	)
@@ -400,9 +336,7 @@ export type DecisionCardProps = {
 	title: string
 	/** The card's contents in order: markdown notes, option groups and free-text boxes. */
 	blocks: DecisionBlock[]
-	/** The agent cannot continue until this is answered: the card gets a ring and a blocking badge. */
-	blocking?: boolean
-	/** The badge when not blocking, e.g. when the agent will go ahead on its own. Defaults to `labels.waiting`. */
+	/** The amber label while waiting, e.g. when the agent will go ahead on its own. Defaults to `labels.waiting`. */
 	deadlineLabel?: string
 	/** The submit button. Wins over `labels.submit`. */
 	submitLabel?: string
@@ -410,17 +344,16 @@ export type DecisionCardProps = {
 	recommendedLabel?: string
 	/** Called with the answer, keyed by block id. */
 	onAnswer?: (answer: DecisionAnswer) => void
-	/** Once answered: the card collapses to this receipt. */
+	/** Once answered: the ask collapses to the grey label and this one muted line. */
 	resolved?: { text: string }
 	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<InteractionCardLabels>
 }
 
-/** Asks the person to decide: options, free text, and a one-click "use the recommendation". */
+/** Asks the person a question: options, free text, and a one-click "use the recommendation". */
 export function DecisionCard({
 	title,
 	blocks,
-	blocking = false,
 	deadlineLabel,
 	submitLabel,
 	recommendedLabel,
@@ -458,19 +391,8 @@ export function DecisionCard({
 	}
 
 	return (
-		<div {...stylex.props(styles.card, !resolved && blocking && styles.decisionPending)}>
-			<div {...stylex.props(styles.head)}>
-				<DecideIcon />
-				<span {...stylex.props(styles.verb)}>{t.decide}</span>
-				<span
-					{...stylex.props(
-						styles.state,
-						resolved ? styles.stateQuiet : blocking ? styles.stateAccent : styles.stateQuiet,
-					)}
-				>
-					{resolved ? t.decided : blocking ? t.blocking : (deadlineLabel ?? t.waiting)}
-				</span>
-			</div>
+		<div {...stylex.props(styles.ask)}>
+			<Label done={resolved != null}>{resolved ? t.decided : (deadlineLabel ?? t.waiting)}</Label>
 			<p aria-live="polite" {...stylex.props(resolved ? styles.receipt : styles.srOnly)}>
 				{resolved != null && (
 					<>
@@ -480,7 +402,7 @@ export function DecisionCard({
 				)}
 			</p>
 			{resolved ? null : (
-				<div {...stylex.props(styles.body)}>
+				<>
 					<p {...stylex.props(styles.question)}>{title}</p>
 					{blocks.map((block) => {
 						if (block.kind === "markdown") {
@@ -538,7 +460,6 @@ export function DecisionCard({
 								role="radiogroup"
 								aria-label={groupLabel}
 								aria-required={block.required || undefined}
-								variant="card"
 								value={typeof selected === "string" ? selected : ""}
 								onValueChange={(value) => set(block.id, value)}
 							>
@@ -554,16 +475,22 @@ export function DecisionCard({
 						)
 					})}
 					<div {...stylex.props(styles.actions)}>
-						<Button disabled={missing} onClick={() => onAnswer?.(answer)}>
+						<Button size="sm" disabled={missing} onClick={() => onAnswer?.(answer)}>
 							{submitLabel ?? t.submit}
 						</Button>
 						{hasRecommendation && (
-							<Button variant="secondary" disabled={recommendationMissing} onClick={() => onAnswer?.(merged)}>
+							<Button
+								variant="secondary"
+								size="sm"
+								sx={styles.chip}
+								disabled={recommendationMissing}
+								onClick={() => onAnswer?.(merged)}
+							>
 								{recommendedLabel ?? t.acceptRecommended}
 							</Button>
 						)}
 					</div>
-				</div>
+				</>
 			)}
 		</div>
 	)

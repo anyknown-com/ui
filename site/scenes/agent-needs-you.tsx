@@ -221,7 +221,6 @@ export function Scene({ compact }: SceneProps) {
 									/>
 								</Part>
 								<DecisionCard
-									blocking
 									title="What should the Pro license cost?"
 									blocks={[
 										{

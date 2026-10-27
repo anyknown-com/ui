@@ -613,34 +613,31 @@ that's the difference from `CodeBlock`.
 - Copy always copies the original `code`, not what is drawn
 
 ### interaction-card
-The two cards where the agent waits for you: Permission (a permission request) and Decision (you
-must decide). Pending, it is actionable; after the reply it shrinks into an unchangeable receipt
-in the past area.
+The two asks where the agent waits for you: Permission (a permission request) and Decision (a
+question you answer). Pending, it is actionable; after the reply it shrinks to a grey label and
+one unchangeable muted line.
 
-- The card is a rest card (`surfaceRaised`, `shadow.rest`, `corner.card`). Its "border" is a 1px
-  box-shadow ring layered on rest, not a border; the command box is a sunken `surface`. The
-  supplementary text field is the exception: 1px `border` frame, `corner.control`
-- Permission: warning ring, command / target in mono, Allow once (⏎) / Always allow (⌘⏎) /
-  Deny (Esc), and a policy line at the bottom (why it asks; the rule outlives rotation)
-- Decision: the same card comes as blocking (ink `accent` ring, "Waiting on you to continue",
-  「等你才能繼續」) and non-blocking (rest only, `deadlineLabel` or the default "Waiting on you",
-  「等你」; no countdown). Content is a block DSL with three kinds: `markdown` (currently drawn as
-  a plain paragraph, not through `Markdown`) / `options` / `text`. Submit is disabled while a
-  required block is empty; with a recommended option there is one more button, "Go with the
-  recommendation"
-- The three reply buttons: Allow once `primary`, Always allow `secondary`, Deny `dangerGhost`.
-  Deny doesn't get solid danger (a block of red would outweigh primary), but its meaning still
-  has to show: in this component's own token vocabulary danger already means "denied" (the
-  rejected ✓ in the receipt row uses `color.danger`)
-- Multi-select options are **frameless rows**: Checkbox has no card variant, and a frame can't
-  be added from outside (the caller's className lands on the input)
+- No card and no ring: drawn straight on the paper from the thread's left edge, separated by
+  space only. A `type.t1` weight-600 label with a 6px dot in `color.warning` says it waits on you
+  (「等你允許」 for Permission, 「等你回答」 for Decision); the question is weight 500
+- Permission: the command is indented one step (16px) in Geist Mono, wrapped, with no fill. Allow
+  once (⏎) is the solid ink `Button`; Always allow (⌘⏎) and Deny (Esc) are chips (`wash`,
+  `washHover` on hover, `corner.shape`, 28px). `policyHint` is a muted `type.t1` note under them
+- Decision: content is a block DSL with three kinds: `markdown` (currently drawn as a plain
+  muted paragraph, not through `Markdown`) / `options` (plain radios, or checkboxes with
+  `multiple`; a recommended option gets a muted 「建議」 after its label) / `text` (a free-text box
+  that floats: `surfaceRaised`, `shadow.float`, `corner.box`, no frame). Submit is the ink
+  `Button` and is disabled while a required block is empty; with a recommended option a chip,
+  "Go with the recommendation", submits it. `deadlineLabel` replaces the label's words
+- Answered: the label turns `textMuted` (「已回覆」 / 「已回答」) and the question, command and
+  replies give way to one `textMuted` `type.t2` line. Its mark is a check, or a cross for a
+  rejected permission: the line has no color, so the mark is what tells them apart
 - Shortcuts **intercept only Esc and ⌘⏎**; a bare ⏎ is left to the focused button. Otherwise
   tabbing to "Deny" and pressing ⏎ would allow
 - The receipt's `aria-live="polite"` region is **always mounted** (an empty visually hidden
   node while pending) and gets its text only after the reply: a region mounted together with its
   text isn't announced
-- Words are Chinese default props for now (Allow once / Always allow / Deny / Replied are not
-  overridable yet)
+- Words follow `<LocaleProvider>` and `labels`
 
 ### handoff-receipt
 The rotation divider: a quiet thin row in the thread's past area, "Handoff complete · time ·
