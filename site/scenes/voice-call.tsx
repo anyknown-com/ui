@@ -29,7 +29,7 @@ export const meta: SceneMeta = {
 		"Mute holds the call where it is and the waveform goes gray, so you can tell the agent is not hearing you.",
 		"Hanging up gives the composer back in the same place; the mic button in it starts the next call.",
 	],
-	uses: ["call-bar", "voice-indicator", "bubble", "composer"],
+	uses: ["call-bar", "voice-indicator", "composer"],
 }
 
 const MOBILE = breakpoint.phone
