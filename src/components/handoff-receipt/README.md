@@ -1,6 +1,6 @@
 # HandoffReceipt
 
-A quiet divider in the thread's past that marks a session rotation — "換班完成 · time · ctx 50% → 新 session" — and expands in place to show what was handed over.
+One muted line in the thread's past, with the chevron after the words, that marks a session rotation — "換班完成 · time · ctx 50% → 新 session" — and expands in place to show what was handed over.
 
 ## When to use
 
@@ -32,11 +32,11 @@ import { HandoffReceipt } from "@anyknown/ui"
 
 ## Accessibility
 
-- The row is a native `<button>` with `aria-expanded` and `aria-controls`; its accessible name is the full row sentence. The dashed rules are `aria-hidden`. 2px focus ring with an offset.
+- The row is a native `<button>` with `aria-expanded` and `aria-controls`; its accessible name is the full row sentence. 2px focus ring with an offset.
 - The collapsed body uses `inert`, not `hidden`: it is out of the accessibility tree and tab order but stays in layout so the open and close animation can run.
 - The reason is written into the row text, not shown by color alone.
 - `prefers-reduced-motion: reduce` removes the height, opacity, color and chevron transitions.
-- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the row words `rotated`, `newSession`, `hardLimit`, `stateTransition`, and the checks' `memoryTitle` / `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel`, `ledgerTitle` / `ledgerLabel(count)`. Override any with `labels`; the same-named props win over `labels`.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): the row words `rotated`, `newSession`, `hardLimit`, `stateTransition`, and the checks' `memoryTitle` / `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel`, `ledgerTitle` / `ledgerLabel(count)`. Override any with `labels`; there are no per-word props.
 
 ## Keyboard
 

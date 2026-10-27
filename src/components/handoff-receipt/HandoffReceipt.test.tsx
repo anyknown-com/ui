@@ -35,27 +35,6 @@ describe("HandoffReceipt", () => {
 		expect(screen.getByText(/landing 定價區塊/)).toBeInTheDocument()
 	})
 
-	test("the three checks take their words from props", async () => {
-		render(
-			<HandoffReceipt
-				{...props}
-				defaultOpen
-				memoryTitle="Memory"
-				summaryTitle="Summary"
-				ledgerTitle="Records"
-				memoryLabel={(count, items) => `${count} kept: ${items.join(", ")}`}
-				summaryLabel="Handed to the new session."
-				ledgerLabel={(count) => `${count} records stay searchable.`}
-			/>,
-		)
-		expect(screen.getByText("Memory")).toBeInTheDocument()
-		expect(screen.getByText("Summary")).toBeInTheDocument()
-		expect(screen.getByText("Records")).toBeInTheDocument()
-		expect(screen.getByText("3 kept: 偏好 pnpm, 部署走 Cloudflare")).toBeInTheDocument()
-		expect(screen.getByText("Handed to the new session.")).toBeInTheDocument()
-		expect(screen.getByText("42 records stay searchable.")).toBeInTheDocument()
-	})
-
 	test("no items, no brackets", async () => {
 		render(<HandoffReceipt {...props} memory={{ count: 2 }} defaultOpen />)
 		expect(screen.getByText("2 則記憶已存下。")).toBeInTheDocument()
@@ -157,16 +136,16 @@ describe("HandoffReceipt locale", () => {
 		).toBeInTheDocument()
 	})
 
-	test("labels override single words; per-word props win over labels", () => {
+	test("labels override single words", () => {
 		render(
 			<HandoffReceipt
 				{...props}
 				defaultOpen
-				labels={{ rotated: "Rotated", memoryTitle: "From labels" }}
-				memoryTitle="From prop"
+				labels={{ rotated: "Rotated", memoryTitle: "From labels", ledgerLabel: (count) => `${count} stay.` }}
 			/>,
 		)
 		expect(screen.getByRole("button")).toHaveTextContent("Rotated · 14:32")
-		expect(screen.getByText("From prop")).toBeInTheDocument()
+		expect(screen.getByText("From labels")).toBeInTheDocument()
+		expect(screen.getByText("42 stay.")).toBeInTheDocument()
 	})
 })

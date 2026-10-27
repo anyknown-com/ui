@@ -643,18 +643,17 @@ The rotation divider: a quiet thin row in the thread's past area, "Handoff compl
 ctx 50% → new session", expandable to show the handoff summary. Users don't manage sessions;
 **this is the only place they see a handoff**.
 
-- Collapsed by default, with dashed lines on both sides setting it into the timeline. Expanding
-  (an inline toggle, not a dialog) shows three checks: memory ("3 memories saved (…)."), summary
-  ("The handoff summary went to the new session and is deleted once read."), log ("This round's
-  42 log entries are still searchable and won't carry into the new session."). It uses "memory"
-  like everywhere else, never internal words like "durable facts", "flushed to disk" or
-  "Ledger". All three names and sentences are props (`memoryTitle` /
-  `memoryLabel(count, items)`, `summaryTitle` / `summaryLabel`, `ledgerTitle` /
-  `ledgerLabel(count)`); "Handoff complete" and "→ new session" are not yet
+- Collapsed by default, one `textMuted` `type.t2` line with the chevron after the words (it turns
+  90° when open). Expanding (an inline toggle, not a dialog) shows three checks: memory ("3
+  memories saved (…)."), summary ("The handoff summary went to the new session and is deleted
+  once read."), log ("This round's 42 log entries are still searchable and won't carry into the
+  new session."). It uses "memory" like everywhere else, never internal words like "durable
+  facts", "flushed to disk" or "Ledger". All the names and sentences are `labels` (`memoryTitle`,
+  `memoryLabel(count, items)`, `summaryTitle`, `summaryLabel`, `ledgerTitle`,
+  `ledgerLabel(count)`, plus `rotated` and `newSession`); there are no per-word props
 - **A receipt, not a control**: unchangeable, no action buttons
-- No card: drawn straight on the paper, a `surface` pill between dashed lines (on narrow screens
-  the text wraps and the pill grows taller); the expanded summary is a sunken `surface`,
-  `corner.card`. When expanded the dashes turn solid and the link icon turns `accent`
+- No card: drawn straight on the paper with no fill, line or quote bar. The expanded content is
+  indented one step (16px)
 - The collapsed state uses `inert`, not `hidden`: both leave the a11y tree and the tab order,
   but `inert` stays in layout so the 0fr → 1fr transition can run
 - Dead ends: a hard `display: none` cut plus a one-way fade was rejected as "stiff"; expanding

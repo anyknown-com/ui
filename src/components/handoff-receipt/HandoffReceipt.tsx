@@ -8,7 +8,7 @@ import { Glyph } from "../icon/glyphs"
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
-	// 直接畫在紙上:一條分隔線中間一顆膠囊,展開的摘要是凹下去的 surface
+	// 直接畫在紙上:一行灰字,沒有底、線、膠囊;展開的內容縮一格
 	receipt: {
 		position: "relative",
 	},
@@ -21,58 +21,29 @@ const styles = stylex.create({
 		position: "relative",
 		display: "flex",
 		alignItems: "center",
-		gap: space.xs,
+		gap: space.xxs,
 		width: "100%",
 		boxSizing: "border-box",
+		minHeight: 28,
 		paddingBlock: space.xxs,
 		paddingInline: 0,
 		cursor: "pointer",
 		fontFamily: font.body,
 		fontSize: type.t2,
+		textAlign: "start",
 		color: { default: color.textMuted, ":hover": color.text },
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
-	rule: {
-		flex: 1,
-		borderTopWidth: 1,
-		borderTopStyle: "dashed",
-		borderTopColor: color.borderStrong,
-		minWidth: space.md,
-		transitionProperty: "border-color",
-		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
-	},
-	ruleOpen: { borderTopStyle: "solid", borderTopColor: color.accent },
-	label: {
-		display: "flex",
-		alignItems: "center",
-		gap: 6,
-		minWidth: 0,
-		boxSizing: "border-box",
-		minHeight: 32,
-		paddingBlock: space.xxs,
-		paddingInline: space.sm,
-		borderRadius: corner.pill,
-		backgroundColor: color.surface,
-		textAlign: "start",
-	},
 	mono: { fontFamily: font.mono, fontSize: type.t1, lineHeight: 1, whiteSpace: "nowrap" },
-	link: {
-		flex: "none",
-		color: color.textFaint,
-		transitionProperty: "color",
-		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
-	},
-	linkOpen: { color: color.accent },
 	chevron: {
 		flex: "none",
-		color: color.textFaint,
 		transitionProperty: "rotate",
 		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.ease,
 	},
-	chevronOpen: { rotate: "180deg" },
+	chevronOpen: { rotate: "90deg" },
 	// 展開 = 0fr → 1fr(雙向平滑,不是 display 硬切);內容 opacity 跟進
 	bodyWrap: {
 		position: "relative",
@@ -85,11 +56,7 @@ const styles = stylex.create({
 	bodyWrapOpen: { gridTemplateRows: "1fr" },
 	bodyClip: { overflow: "hidden", minHeight: 0 },
 	body: {
-		marginBlockStart: space.xs,
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
-		paddingBlock: space.sm,
-		paddingInline: space.md,
+		marginInlineStart: space.md,
 		fontFamily: font.body,
 		fontSize: type.t2,
 		lineHeight: type.snug,
@@ -102,17 +69,10 @@ const styles = stylex.create({
 	},
 	bodyOpen: { opacity: 1 },
 	check: { display: "flex", alignItems: "baseline", gap: space.xxs, margin: 0 },
-	checkIcon: { flex: "none", color: color.accent, translate: "0 2px" },
+	checkIcon: { flex: "none", color: color.textMuted, translate: "0 2px" },
 	checkTitle: { fontWeight: 500, whiteSpace: "nowrap", color: color.text },
 	checkText: { color: color.textMuted },
-	summary: {
-		margin: 0,
-		color: color.textMuted,
-		borderInlineStartWidth: 2,
-		borderInlineStartStyle: "solid",
-		borderInlineStartColor: color.border,
-		paddingInlineStart: space.xs,
-	},
+	summary: { margin: 0, color: color.textMuted },
 })
 
 const strings = defineStrings({
@@ -180,23 +140,11 @@ export type HandoffReceiptProps = {
 	onOpenChange?: (open: boolean) => void
 	/** Override built-in words for this receipt; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<HandoffReceiptLabels>
-	/** The memory check's name. Wins over `labels.memoryTitle`. */
-	memoryTitle?: string
-	/** The summary check's name. Wins over `labels.summaryTitle`. */
-	summaryTitle?: string
-	/** The records check's name. Wins over `labels.ledgerTitle`. */
-	ledgerTitle?: string
-	/** What was kept: the memory count and, when given, the items in brackets. Wins over `labels.memoryLabel`. */
-	memoryLabel?: (count: number, items: string[]) => string
-	/** What happened to the handoff summary. Wins over `labels.summaryLabel`. */
-	summaryLabel?: string
-	/** What stays behind: this round's records, still searchable, not carried over. Wins over `labels.ledgerLabel`. */
-	ledgerLabel?: (count: number) => string
 }
 
 /**
- * A receipt in the thread where the agent rotated to a new session: one row (time, context
- * fill, reason) that folds open to what was kept, handed over and left behind. The row is a
+ * A receipt in the thread where the agent rotated to a new session: one muted line (time, context
+ * fill, reason) with the chevron after the words, that folds open to what was kept, handed over and left behind. The row is a
  * real button: Enter and Space toggle it.
  */
 export function HandoffReceipt({
@@ -210,12 +158,6 @@ export function HandoffReceipt({
 	defaultOpen = false,
 	onOpenChange,
 	labels,
-	memoryTitle,
-	summaryTitle,
-	ledgerTitle,
-	memoryLabel,
-	summaryLabel,
-	ledgerLabel,
 }: HandoffReceiptProps) {
 	const t = useStrings(strings, labels)
 	const reasonLabel =
@@ -232,44 +174,37 @@ export function HandoffReceipt({
 				onClick={() => setOpen(!open)}
 				{...stylex.props(styles.row)}
 			>
-				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
-				<span {...stylex.props(styles.label)}>
-					<Glyph width={13} height={13} {...stylex.props(styles.link, open && styles.linkOpen)}>
-						<path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" />
-					</Glyph>
-					<span>
-						{`${t.rotated} · `}
-						<span {...stylex.props(styles.mono)}>{at}</span>
-						{" · "}
-						<span {...stylex.props(styles.mono)}>{`ctx ${ctxPercent}%`}</span>
-						{reasonLabel}
-						{` → ${t.newSession}`}
-					</span>
+				<span>
+					{`${t.rotated} · `}
+					<span {...stylex.props(styles.mono)}>{at}</span>
+					{" · "}
+					<span {...stylex.props(styles.mono)}>{`ctx ${ctxPercent}%`}</span>
+					{reasonLabel}
+					{` → ${t.newSession}`}
 				</span>
-				<Glyph width={12} height={12} {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
-					<path d="m6 9 6 6 6-6" />
+				<Glyph width={14} height={14} {...stylex.props(styles.chevron, open && styles.chevronOpen)}>
+					<path d="m9 6 6 6-6 6" />
 				</Glyph>
-				<span aria-hidden="true" {...stylex.props(styles.rule, open && styles.ruleOpen)} />
 			</button>
 			<div {...stylex.props(styles.bodyWrap, open && styles.bodyWrapOpen)}>
 				<div {...stylex.props(styles.bodyClip)}>
 					<div id={bodyId} inert={!open} {...stylex.props(styles.body, open && styles.bodyOpen)}>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>{memoryTitle ?? t.memoryTitle}</b>
+							<b {...stylex.props(styles.checkTitle)}>{t.memoryTitle}</b>
 							<span {...stylex.props(styles.checkText)}>
-								{(memoryLabel ?? t.memoryLabel)(memory.count, memory.items ?? [])}
+								{t.memoryLabel(memory.count, memory.items ?? [])}
 							</span>
 						</p>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>{summaryTitle ?? t.summaryTitle}</b>
-							<span {...stylex.props(styles.checkText)}>{summaryLabel ?? t.summaryLabel}</span>
+							<b {...stylex.props(styles.checkTitle)}>{t.summaryTitle}</b>
+							<span {...stylex.props(styles.checkText)}>{t.summaryLabel}</span>
 						</p>
 						<p {...stylex.props(styles.check)}>
 							<CheckIcon />
-							<b {...stylex.props(styles.checkTitle)}>{ledgerTitle ?? t.ledgerTitle}</b>
-							<span {...stylex.props(styles.checkText)}>{(ledgerLabel ?? t.ledgerLabel)(ledgerCount)}</span>
+							<b {...stylex.props(styles.checkTitle)}>{t.ledgerTitle}</b>
+							<span {...stylex.props(styles.checkText)}>{t.ledgerLabel(ledgerCount)}</span>
 						</p>
 						{handoffSummary != null && <p {...stylex.props(styles.summary)}>{handoffSummary}</p>}
 					</div>
