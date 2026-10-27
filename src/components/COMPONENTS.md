@@ -195,8 +195,9 @@ reduced motion.
 Modal dialog: scale + fade in, closes on Esc / backdrop. The danger confirm variant is for
 irreversible actions (delete a memory, clear a thread).
 
-- It is the modal tier: `surfaceRaised` background, `shadow.modal`, `corner.modal` (24), 28px
-  padding, no frame. The backdrop is `color.scrim` (black at 32% in both themes), **no blur**:
+- It is the modal tier: `surfaceRaised` background, `shadow.modal`, `corner.box` (24), 20px
+  padding, no frame; title, description and buttons are 12px apart (the sketch's
+  `confirm-dialog`). The backdrop is `color.scrim` (black at 32% in both themes), **no blur**:
   `backdrop-filter` is an anti-pattern in DESIGN.md. ConfirmContent's cancel button is secondary
 - The popup is `border-box`: the `size` width includes padding, so at 375px it is never wider
   than the viewport
@@ -261,8 +262,11 @@ control. The look and behaviour follow the CEO-approved model-picker prototype.
 - **Two heights, not a number**: `auto` fits the content up to 85dvh; `tall` is 60dvh, for a
   list whose length changes while you step through it (the model picker), so the sheet does not
   jump at each step. Snap points are left out; nothing asked for a half-open sheet
-- Numbers from the prototype: full width up to 35rem (560px), 16px top corners
-  (`corner.float`), 8px padding plus `env(safe-area-inset-bottom)` at the bottom, a 36 × 4px
+- Numbers from the sketch's `bottom-sheet`: full width up to 35rem (560px), `corner.box` (24)
+  top corners, `shadow.modal`, 8px top padding, 12px at the sides, 8px plus
+  `env(safe-area-inset-bottom)` at the bottom, a 36 × 5px `washStrong` grab bar
+- Rows you can press in a sheet are at least 44px tall; the sheet cannot see its children, so
+  the rows set it (the playground demo does)
   grab bar in `borderStrong` with 12px under it, the title `type.t3` on one line with an
   ellipsis. Modal tier for the rest: `surfaceRaised`, `shadow.modal`, `color.scrim` backdrop,
   no blur

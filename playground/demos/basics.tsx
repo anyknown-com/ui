@@ -54,6 +54,8 @@ import { type DemoEntry, Demo, Label, Row } from "../shell"
 
 const styles = stylex.create({
 	sheetRows: { display: "flex", flexDirection: "column", alignItems: "stretch" },
+	// a row you can press in a sheet is at least 44px tall
+	sheetRow: { minHeight: 44 },
 	pane: {
 		borderWidth: 1,
 		borderStyle: "solid",
@@ -672,6 +674,7 @@ function SheetDemo() {
 								<Button
 									key={name}
 									variant="ghost"
+									sx={styles.sheetRow}
 									onClick={() => {
 										setEffort(name)
 										setEffortOpen(false)
@@ -697,6 +700,7 @@ function SheetDemo() {
 								<Button
 									key={name}
 									variant="ghost"
+									sx={styles.sheetRow}
 									onClick={() => {
 										setModel(name)
 										setModelOpen(false)

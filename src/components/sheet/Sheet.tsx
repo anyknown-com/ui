@@ -29,7 +29,7 @@ const styles = stylex.create({
 		alignItems: "flex-end",
 		justifyContent: "center",
 	},
-	// modal 階的底、陰影;只有上面兩角是圓的(16px,照核可的 prototype)
+	// modal 階的底、陰影;只有上面兩角是圓的(corner.box,照鉛筆稿 prototype 的 bottom-sheet)
 	popup: {
 		display: "flex",
 		flexDirection: "column",
@@ -45,11 +45,11 @@ const styles = stylex.create({
 		borderBottomWidth: 0,
 		borderStyle: "solid",
 		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
-		borderTopLeftRadius: corner.float,
-		borderTopRightRadius: corner.float,
+		borderTopLeftRadius: corner.box,
+		borderTopRightRadius: corner.box,
 		boxShadow: shadow.modal,
 		paddingTop: space.xs,
-		paddingInline: space.xs,
+		paddingInline: space.sm,
 		paddingBottom: `calc(${space.xs} + env(safe-area-inset-bottom))`,
 		outline: {
 			default: "none",
@@ -66,19 +66,20 @@ const styles = stylex.create({
 		transitionTimingFunction: motion.easeOut,
 	},
 	tall: { height: "60dvh" },
+	// 36 × 5px,照 prototype 的 sheet-grab
 	grabber: {
 		flexShrink: 0,
 		width: "2.25rem",
-		height: space.xxs,
+		height: "0.3125rem",
 		marginInline: "auto",
-		marginBottom: space.sm,
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.borderStrong, [FORCED]: "CanvasText" },
+		marginBottom: space.xs,
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.washStrong, [FORCED]: "CanvasText" },
 	},
 	title: {
 		flexShrink: 0,
 		margin: 0,
-		paddingInline: space.xs,
+		paddingInline: space.xxs,
 		paddingBottom: space.xs,
 		fontFamily: font.display,
 		fontSize: type.t3,
@@ -130,7 +131,7 @@ export type SheetContentProps = {
 	height?: "auto" | "tall"
 	/** Content under the title that does not scroll (a back button, a filter). */
 	head?: ReactNode
-	/** The part that scrolls. */
+	/** The part that scrolls. Rows you can press in it are at least 44px tall. */
 	children?: ReactNode
 }
 

@@ -39,17 +39,17 @@ const styles = stylex.create({
 		placeItems: "center",
 		padding: space.md,
 	},
-	// modal 階:浮得最高、最圓。透明的框只為了 forced-colors(那裡陰影會消失)
+	// modal 階:浮得最高的一層,corner.box。透明的框只為了 forced-colors(那裡陰影會消失)
 	popup: {
 		backgroundColor: color.surfaceRaised,
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
-		borderRadius: corner.modal,
+		borderRadius: corner.box,
 		boxShadow: shadow.modal,
-		// 28px
-		padding: `calc(${space.lg} + ${space.xxs})`,
+		// 20px,照 prototype 的 confirm-dialog
+		padding: `calc(${space.md} + ${space.xxs})`,
 		boxSizing: "border-box",
 		width: "min(28rem, calc(100vw - 2rem))",
 		maxHeight: "calc(100vh - 2rem)",
@@ -86,16 +86,17 @@ const styles = stylex.create({
 		fontWeight: 600,
 		lineHeight: type.snug,
 		margin: 0,
-		marginBottom: space.xs,
+		marginBottom: space.sm,
 	},
 	description: {
 		fontSize: type.t2,
 		lineHeight: type.body,
 		color: color.textMuted,
 		margin: 0,
-		marginBottom: space.md,
+		marginBottom: space.sm,
 	},
-	actions: { display: "flex", justifyContent: "flex-end", gap: space.xs, marginTop: space.lg },
+	// 標題、說明、按鈕之間都是 12px(space.sm),照 prototype
+	actions: { display: "flex", justifyContent: "flex-end", gap: space.xs, marginTop: space.sm },
 })
 
 const strings = defineStrings({

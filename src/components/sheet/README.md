@@ -37,7 +37,8 @@ The family is `Sheet` (root; `open` / `defaultOpen` / `onOpenChange`), `SheetTri
 - `title` is required. It sits under the grab bar on one line and is cut off with an ellipsis.
 - `height="auto"` (the default) fits the content, up to 85% of the window. `height="tall"` is always 60% of the window, so the sheet does not jump while the list changes.
 - `head` stays put under the title (a back button, a filter); `children` scroll.
-- The panel is full width up to 560px, centred, and leaves room for the bottom safe area (`env(safe-area-inset-bottom)`).
+- The panel is full width up to 560px, centred, and leaves room for the bottom safe area (`env(safe-area-inset-bottom)`). Its top corners are `corner.box`, and the grab bar is `washStrong`.
+- Make every row you can press in a sheet at least 44px tall: a sheet is a touch surface.
 - To close it after a pick, control `open` and set it to `false` in the row's handler.
 
 ## Accessibility
