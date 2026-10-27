@@ -863,6 +863,26 @@ widget's `Stat` and the prototype's stat row, without the grid.
   reading, and the DOM order (label, value, note) already reads right
 - No `delta` colour: a change is words in `note`. Colour is for status only
 
+### chart
+`BarChart` draws `labels`, `values` and an optional `unit` as one ink bar per value. It is the
+widget's `BarChart`; the library draws its own SVG and ships no chart package, for the same reason
+`Markdown` ships no mermaid.
+
+- Marks are `text`, not a colour: colour is for status. No frame, fill, legend or axis line; the
+  only lines are three 1px `washHover` ticks, faint guides that the tick labels on the right name
+- Three ticks from `axisTicks` (`chart/axis.ts`): round steps (1, 2, 2.5, 3, 4, 5, 6, 8 times a
+  power of ten), evenly spaced, so the y range is exactly bottom to top tick. Bars always include
+  zero. The tick labels have no unit; the unit goes with the value and in the table header
+- Bars are square (no corner has this job) and 60% of their slot, never wider than with six slots
+- One value at a time, above its mark, as plain text with no fill: on mouse hover, on tap (it
+  stays after the finger lifts), or on keyboard focus. Each slot also has a native `title`
+- Screen readers: the `<svg>` is `role="img"` named "type, first to last label" (or `aria-label`),
+  then a visually hidden table of every value. Its rows are the focusable values, with a roving
+  tabindex: one Tab stop, arrows and Home/End move, and the matching slot shows the focus ring.
+  The focusable part is not inside the `img`, whose children are presentational
+- Numbers use `en-US` grouping (`1,200`) and at most two decimals; past seven values only every
+  k-th label is shown under the chart, all of them stay in the table
+
 ### text
 `Text` sets running text and headings from the `type` scale. Props: `as` (default `p`),
 `variant` (default `body`), `sx`. Base: `font.body`, `color.text`, `type.snug`, margin 0.

@@ -10,6 +10,7 @@ import {
 	AttachmentGrid,
 	AttachmentTile,
 	Badge,
+	BarChart,
 	Button,
 	CallBar,
 	Checkbox,
@@ -660,6 +661,15 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 			</Table>
 		</Fill>
 	),
+	chart: () => (
+		<Fill>
+			<BarChart
+				labels={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+				values={[12, 8, 15, 9, 4]}
+				aria-label="Runs per day"
+			/>
+		</Fill>
+	),
 	list: () => (
 		<Fill>
 			<ListHead sx={styles.listGrid}>
@@ -838,6 +848,7 @@ export const BLURBS: Record<string, string> = {
 	"call-bar": "The bar a composer turns into during a call.",
 	"data-table": "A table with sorting, filtering and inline edits.",
 	table: "Low-level parts for a mono ledger.",
+	chart: "Bars in ink on three faint ticks, numbers in a table for screen readers.",
 	list: "Rows of things you open, with no frame.",
 	"file-row": "One row of a file browser.",
 	dropzone: "A drop area for uploads, with a button too.",

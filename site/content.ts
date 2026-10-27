@@ -109,7 +109,7 @@ export const COMPONENT_GROUPS: { title: string; names: string[] }[] = [
 	},
 	{
 		title: "Data & files",
-		names: ["data-table", "table", "list", "file-row", "dropzone", "diff-viewer", "recovery-key"],
+		names: ["data-table", "table", "chart", "list", "file-row", "dropzone", "diff-viewer", "recovery-key"],
 	},
 	{ title: "Page layout", names: ["group", "settings-rows", "page", "stack"] },
 ]

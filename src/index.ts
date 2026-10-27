@@ -257,6 +257,7 @@ export { Segmented, type SegmentedProps } from "./components/segmented/Segmented
 export { Spin, type SpinProps } from "./components/spin/Spin"
 export { Stack, type StackProps } from "./components/stack/Stack"
 export { Stat, type StatProps } from "./components/stat/Stat"
+export { BarChart, type BarChartProps } from "./components/chart/BarChart"
 export { Pill, StatusChip, type PillProps, type StatusChipProps } from "./components/status-chip/StatusChip"
 export { StatusBadge, type StatusBadgeProps } from "./components/status-badge/StatusBadge"
 export {

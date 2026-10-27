@@ -1,5 +1,6 @@
 import {
 	Badge,
+	BarChart,
 	DataTable,
 	type DataTableColumn,
 	DiffViewer,
@@ -15,7 +16,7 @@ import {
 	ICON_STROKE,
 } from "@anyknown/ui"
 import { useMemo, useState } from "react"
-import { type DemoEntry, Demo } from "../shell"
+import { type DemoEntry, Demo, Label } from "../shell"
 
 const BEFORE = `import { useSyncExternalStore } from "react";
 import { capacityStore } from "./memory-capacity-store";
@@ -329,6 +330,29 @@ function DataTableDemo() {
 	)
 }
 
+function ChartDemo() {
+	return (
+		<Demo
+			id="chart"
+			title="chart"
+			note="Ink marks on three faint ticks, no frame or fill. Hover, tap or Tab to a value; screen readers get a table of every number."
+		>
+			<Label>bars, a week of runs</Label>
+			<BarChart
+				labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+				values={[12, 8, 15, 9, 4, 0, 6]}
+				unit="runs"
+			/>
+			<Label>bars, 30 days of requests (every 5th label shown)</Label>
+			<BarChart
+				labels={Array.from({ length: 30 }, (_, i) => `10/${i + 1}`)}
+				values={Array.from({ length: 30 }, (_, i) => 28_000 + ((i * 7919) % 16_000))}
+				unit="requests"
+			/>
+		</Demo>
+	)
+}
+
 export const storageDemos: DemoEntry[] = [
 	{ id: "password-input", covers: ["password-input"], Component: PasswordInputDemo },
 	{ id: "recovery-key", covers: ["recovery-key"], Component: RecoveryKeyDemo },
@@ -336,4 +360,5 @@ export const storageDemos: DemoEntry[] = [
 	{ id: "file-row", covers: ["file-row"], Component: FileRowDemo },
 	{ id: "diff-viewer", covers: ["diff-viewer"], Component: DiffViewerDemo },
 	{ id: "data-table", covers: ["data-table"], Component: DataTableDemo },
+	{ id: "chart", covers: ["chart"], Component: ChartDemo },
 ]
