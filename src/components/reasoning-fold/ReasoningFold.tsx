@@ -13,21 +13,21 @@ const shimmer = stylex.keyframes({ to: { backgroundPosition: "-200% 0" } })
 
 const styles = stylex.create({
 	fold: { display: "grid" },
-	// 膠囊:凹下去的 surface 底、無框,hover 深一階
+	// 平常沒有底,hover 是 wash 的膠囊
 	row: {
 		display: "inline-flex",
 		alignItems: "center",
 		gap: 6,
 		boxSizing: "border-box",
-		height: 32,
+		minHeight: 28,
 		paddingInline: space.sm,
 		fontSize: type.t2,
 		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: color.surface, ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		cursor: "pointer",
 		justifySelf: "start",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
@@ -42,14 +42,10 @@ const styles = stylex.create({
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 	},
 	chevronOpen: { rotate: "90deg" },
-	// 左線對齊膠囊裡 chevron 的中線
+	// 內容縮一格,沒有左線
 	body: {
 		marginBlockStart: space.xs,
-		paddingInlineStart: space.sm,
-		borderInlineStartWidth: 2,
-		borderInlineStartStyle: "solid",
-		borderInlineStartColor: color.border,
-		marginInlineStart: `calc(${space.sm} + 6px)`,
+		marginInlineStart: space.md,
 		fontSize: type.t2,
 		lineHeight: type.body,
 		fontStyle: "italic",
@@ -57,7 +53,7 @@ const styles = stylex.create({
 	},
 	shimmer: {
 		backgroundImage: {
-			default: `linear-gradient(90deg, ${color.textMuted} 30%, ${color.textFaint} 50%, ${color.textMuted} 70%)`,
+			default: `linear-gradient(90deg, ${color.textMuted} 30%, ${color.text} 50%, ${color.textMuted} 70%)`,
 			[REDUCED]: "none",
 		},
 		backgroundSize: "200% 100%",

@@ -528,9 +528,9 @@ The fold row for the reasoning process: collapsed by default to just "Thought fo
 (「思考了 N 秒」), expanded while streaming with a shimmering "Thinking…" label. The content is
 always muted italic, a supporting voice.
 
-- The trigger is a pill: 32px tall, `surface` background, no frame, hover one step deeper
-  (`accentSubtle`)
-- Expanded content has a 2px line on the left, aligned to the center of the chevron in the pill
+- The trigger has no background; hover is a `wash` pill (`corner.shape`), at least 28px tall
+- Expanded content is indented one step (16px), with no line on the left; the streaming shimmer
+  runs between `textMuted` and `text`
 - Collapses itself 1 s after streaming ends, unless the user toggled it; if focus was inside
   the body it moves back to the trigger. This timer is one of the three remaining `useEffect`s
 

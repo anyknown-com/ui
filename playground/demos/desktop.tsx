@@ -173,7 +173,7 @@ function SubThreadDemo() {
 		<Demo
 			id="sub-thread"
 			title="sub-thread"
-			note="A sub agent's run is its own pill, not a call in a group. The whole pill opens the run. While the run is not over, what it is doing shows indented under it; once done, failed or cancelled, only the pill stays."
+			note="A sub agent's run is its own row, not a call in a group: a title with a chevron after it, the status as a coloured word under it. The whole row opens the run. While the run is not over, what it is doing shows indented one step under it; once done, failed or cancelled, only the row stays."
 		>
 			<SubThreadRow title="Investigate missing retry events" status="running" onOpenRun={() => {}}>
 				Reading packages/runtime/src/retry.ts for where retries emit events…
