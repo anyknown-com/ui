@@ -26,12 +26,8 @@ const styles = stylex.create({
 		rowGap: space.xs,
 	},
 	barNote: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0 },
-	// The desk the scene's paper lies on, recessed into the page's own sheet.
-	// In dark the desk step sits too close to the sheet, so media frames take layer4 there.
+	// The scene lies on the page's own sheet: no desk, no frame.
 	desk: {
-		backgroundColor: `light-dark(${color.layer1}, ${color.layer4})`,
-		borderRadius: corner.sheet,
-		padding: { default: space.lg, [MOBILE]: space.xs },
 		minWidth: 0,
 	},
 	decisions: {
@@ -58,12 +54,12 @@ const styles = stylex.create({
 		alignItems: "center",
 		minHeight: "2.25rem",
 		paddingInline: space.sm,
-		borderRadius: corner.control,
+		borderRadius: corner.shape,
 		fontSize: type.t2,
 		fontWeight: 500,
 		color: color.text,
 		textDecoration: "none",
-		backgroundColor: { default: color.layer3, ":hover": color.layer4 },
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
@@ -71,8 +67,7 @@ const styles = stylex.create({
 		position: "relative",
 		overflow: "hidden",
 		aspectRatio: "16 / 10",
-		backgroundColor: `light-dark(${color.layer1}, ${color.layer4})`,
-		borderRadius: corner.card,
+		borderRadius: corner.box,
 	},
 	previewInner: {
 		position: "absolute",

@@ -233,7 +233,6 @@ const styles = stylex.create({
 		gap: space.xs,
 		paddingBlock: space.sm,
 		paddingInline: { default: space.lg, [MOBILE]: space.md },
-		backgroundColor: color.surface,
 	},
 	footerNote: {
 		marginInlineEnd: "auto",

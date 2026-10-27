@@ -197,15 +197,15 @@ const styles = stylex.create({
 		gap: space.xs,
 		minHeight: space.xl,
 		paddingBlock: space.xxs,
-		borderRadius: corner.control,
+		borderRadius: corner.shape,
 		fontSize: type.t2,
 		color: color.textMuted,
 	},
-	// Selected: a recessed strip, so the bulk action reads as a mode of the table, not a page button.
+	// Selected: a wash strip, so the bulk action reads as a mode of the table, not a page button.
 	bulkOn: {
 		paddingInlineStart: space.sm,
 		paddingInlineEnd: space.xxs,
-		backgroundColor: color.surface,
+		backgroundColor: color.wash,
 		color: color.text,
 	},
 	bulkText: { flexGrow: 1, minWidth: 0 },

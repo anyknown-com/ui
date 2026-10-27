@@ -1,6 +1,6 @@
-// The paper a scene draws on. The scene frame is the desk (layer1); a Sheet is the app's main
-// sheet on it (layer2, sheet corners, no shadow). Scenes may use more than one.
-import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
+// The paper a scene draws on. There is one sheet: the scene frame has no desk and a Sheet is
+// only a column on it, with no fill, corner or shadow. Scenes may use more than one.
+import { breakpoint, color, font, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 
@@ -12,8 +12,6 @@ const styles = stylex.create({
 		minHeight: 0,
 		overflow: "hidden",
 		color: color.text,
-		backgroundColor: color.layer2,
-		borderRadius: corner.sheet,
 	},
 	fill: { height: "100%" },
 	stub: {

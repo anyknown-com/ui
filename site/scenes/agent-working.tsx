@@ -31,7 +31,7 @@ export const meta: SceneMeta = {
 		"Blue marks only what is running right now: the status dot, the badge and a running subagent. Tool calls carry no live state; the status line says what is happening.",
 		"Reasoning streams open, then folds itself a second after it ends, so thinking never pushes the answer down.",
 		"Calls in a row share one group that counts them, and each call opens to its input and output. A subagent is its own row; it shows its work while it runs and folds to one line when it is done.",
-		"The agent's reply runs full width with no bubble; only your own messages are bubbles.",
+		"The agent's reply runs full width and your own messages sit on the right.",
 		"The composer stays usable the whole time; an agent at work never locks you out.",
 	],
 	uses: [

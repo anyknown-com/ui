@@ -25,7 +25,7 @@ export const meta: SceneMeta = {
 	decisions: [
 		"The call bar takes the composer's place, so the controls stay where your hands already are.",
 		"One waveform shows four states: gray while idle, blue while listening, thinking or speaking.",
-		"The transcript is ordinary bubbles, so a call reads like the rest of the thread afterwards.",
+		"The transcript is ordinary messages, so a call reads like the rest of the thread afterwards.",
 		"Mute holds the call where it is and the waveform goes gray, so you can tell the agent is not hearing you.",
 		"Hanging up gives the composer back in the same place; the mic button in it starts the next call.",
 	],
@@ -217,7 +217,7 @@ export function Scene({ compact }: SceneProps) {
 				{...stylex.props(chat.scroll)}
 			>
 				<div {...stylex.props(chat.column)}>
-					<Part name="bubble">
+					<Part name="message">
 						<div ref={thread} {...stylex.props(styles.thread)}>
 							<Lines lines={HISTORY} />
 							<p {...stylex.props(styles.marker)}>Voice call</p>
