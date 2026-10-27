@@ -105,3 +105,25 @@ A person reviewed the five first-round pages built with the document and found f
 | Round two (with the document) | 4 | 1 |
 
 By eye: same-unit numbers were merged into one table (02), the sign-up page put the form on the first screen with 「剩 12 個名額」 ("12 seats left") next to the button (05), and the callout sat next to its table (03). What didn't converge is stats repeating table values (three in 01, one in 02). The rule was rewritten in positive form, "a stat holds a difference computed from the table: a ratio, a delta, what's left", and the next round checks this item.
+
+## Third round: the pencil-sketch language (2026-10-27)
+
+First round after the language changed to the pencil sketch (one sheet, no lines, nothing behind the words, no accent; ui 0.16.0, not yet released). Two pages per scenario, built by sonnet subagents from the scenario file alone, one with `site/dist/design.md` and one without. Before the round, lint got three new counts for what the new language forbids and the old counts could not see: `line` (border declarations that draw something, and `<hr>`), `shadow` (`box-shadow` that is not `var(--ak-shadow-*)`) and `fill` (`background` that is not `var(--ak-*)`). Measured with `node scripts/design-lint.mjs site/eval/out/*.html`:
+
+| | hex | color | class | font | easing | inline | stat | table2 | line | shadow | fill |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| With design.md (5 pages total) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Without (5 pages total) | 89 | 0 | 99 | 0 | 0 | 24 | 0 | 0 | 13 | 0 | 31 |
+
+The five pages with the document had no `<style>` block and used only the vocabulary, so how they look is decided by brand.css alone. The five without came out as the old generic look: a warm gray desk, KPI cards, a callout with a red side line, row dividers, bar charts on tinted tracks.
+
+Screenshots: agent-browser, light and dark, with the pages pointed at the freshly built `site/dist/brand.css` (ui.anyknown.com still serves 0.15 until the next deploy). By eye, next to `example.html`, three brand.css problems and one judgment problem:
+
+- Every `ak-table` padded its first and last cells, so the first column started 12px right of the heading and the body text: two left edges. brand.css: the edge cells lose their outer padding.
+- `ak-prose` lists indented 24px; the language allows one 16px step. brand.css: 1rem.
+- A callout that wraps a `<p>` (as `example.html` does) put its 6px dot on a line of its own. brand.css: the dot hangs absolutely at the left of the first line.
+- In 03, `data-num` sat on some cells of an options-side-by-side column, so numbers went right and words stayed left in the same column. DESIGN.md section 3: `data-num` on a whole column or none of it.
+
+No lint rule came out of the judgment problem. While adding the new counts, lint got one fix: inline styles were joined with newlines, so one declaration could swallow the next.
+
+The next round checks whether every table column keeps one edge.
