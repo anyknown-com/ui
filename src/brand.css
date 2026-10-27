@@ -128,7 +128,8 @@ body {
 }
 .ak-prose ul,
 .ak-prose ol {
-	padding-inline-start: 1.5rem;
+	/* one step of indent at most (DESIGN.md section 1) */
+	padding-inline-start: 1rem;
 }
 .ak-prose li {
 	margin-bottom: 0.25rem;
@@ -200,6 +201,13 @@ body {
 	vertical-align: top;
 	padding: 0.5rem 0.75rem;
 }
+.ak-table :is(th, td):first-child {
+	/* the first column starts on the page's one left edge, like the heading and body text */
+	padding-inline-start: 0;
+}
+.ak-table :is(th, td):last-child {
+	padding-inline-end: 0;
+}
 .ak-table th {
 	font-weight: 500;
 	font-size: 0.8125rem;
@@ -261,14 +269,21 @@ body {
 .ak-callout > :last-child {
 	margin-bottom: 0;
 }
+.ak-callout-warning,
+.ak-callout-danger {
+	/* the dot hangs left of the text, so a callout that wraps a <p> keeps the dot on its first line */
+	position: relative;
+	padding-inline-start: calc(6px + 0.5rem);
+}
 .ak-callout-warning::before,
 .ak-callout-danger::before {
 	content: "";
-	display: inline-block;
+	position: absolute;
+	inset-inline-start: 0;
+	/* centre of the first line: line-height 1.5 puts it at 0.75em */
+	top: calc(0.75em - 3px);
 	width: 6px;
 	height: 6px;
-	margin-inline-end: 0.5rem;
-	vertical-align: middle;
 	border-radius: var(--ak-corner-shape);
 	background: currentColor;
 }
