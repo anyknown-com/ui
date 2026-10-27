@@ -321,7 +321,7 @@ function HandoffReceiptDemo() {
 		<Demo
 			id="handoff-receipt"
 			title="handoff-receipt"
-			note="A pill in the middle of a divider. The pill is a button: click it, or press Enter or Space, to read what was kept and handed over."
+			note="One muted line with a chevron after it. It is a button: click it, or press Enter or Space, to read what was kept and handed over."
 		>
 			<HandoffReceipt
 				at="14:32"
