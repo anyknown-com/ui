@@ -11,65 +11,32 @@ const MOBILE = breakpoint.tablet
 // tokens.stylex.ts documents most colours with line comments, which the generator cannot
 // read; the roles are short enough to keep here.
 const COLOR_ROLES: Record<string, string> = {
-	bg: "Page background and input fill.",
-	surface: "A sheet one step off the page: code blocks, sunken panels.",
-	surfaceRaised: "Floating surfaces in dark mode (popover, dialog).",
-	border: "Hairlines and dividers. Surfaces separate by tone first.",
-	borderStrong: "A divider that must be seen, hover rings.",
-	borderControl: "Edges of inputs, checkboxes, radios, switch off: 3:1 against the page.",
-	text: "Primary text.",
-	textMuted: "Secondary text; ≥ 4.5:1 on every surface.",
-	textFaint: "Icons, placeholders, separators, disabled. Not for text you must read.",
-	accent: "The primary action: ink. One per view.",
-	accentText: "Text on `accent`.",
-	accentSubtle: "Secondary buttons, selected rows, hover washes.",
-	link: "Links: ink with an underline, never blue.",
-	signal: "Blue, only for agent activity, focus and progress.",
-	signalSubtle: "Background behind signal content.",
-	danger: "Errors and destructive text.",
-	dangerSubtle: "Background of an error notice.",
-	dangerSolid: "Fill of an irreversible delete button.",
-	onDangerSolid: "Text on `dangerSolid`.",
-	success: "Success text and icons.",
-	successSubtle: "Background of a success notice.",
-	warning: "Warning text and icons.",
-	warningSubtle: "Background of a warning notice.",
-	info: "Same as `signal`.",
-	infoSubtle: "Same as `signalSubtle`.",
+	bg: "The one sheet: page background.",
+	surfaceRaised: "Things that float: text fields, composer, menus, sheet, dialog, toast, tooltip.",
+	borderControl: "The only edge: an unchecked checkbox or radio, 3:1 against the page.",
+	text: "Primary text, links (with an underline) and the solid primary button.",
+	textMuted: "Secondary text; the one grey. At least 4.5:1 on the page and on `wash`.",
+	signal: "Blue: the agent is working. Text or a 6px dot, never a fill.",
+	danger: "Red: failed. Text or a 6px dot.",
+	success: "Green: done. Text or a 6px dot.",
+	warning: "Amber: waiting for you. Text or a 6px dot.",
 	focusRing: "Keyboard focus ring (`signal`).",
 	scrim: "Dialog backdrop: black 32%, no blur.",
-	bone: "Skeleton placeholder.",
-	sheen: "Skeleton shimmer.",
-	successHl: "Changed characters on an added diff line.",
-	dangerHl: "Changed characters on a removed diff line.",
-	layer1: "The desk: app rail and page background.",
-	layer2: "The main sheet.",
-	layer3: "Messages and cards on the sheet.",
-	layer4: "A fold inside a message.",
-	layer5: "Rows inside a fold; the deepest step.",
+	wash: "Ink at 6%: chips, secondary buttons, the selected row, skeleton bones.",
+	washHover: "Ink at 11%: the hover of a wash.",
+	washStrong: "Ink at 26%: bars, slider track, sheet handle, scrollbar thumb.",
 }
 
 const SHADOW_ROLES: Record<string, string> = {
-	rest: "Cards on the paper: tool card, file row, attachment.",
-	float: "Popover, dropdown, select, tooltip, toast.",
+	float: "Text field, composer, menu, tooltip, toast.",
 	modal: "Dialog and sheet.",
 }
 
 const CORNER_ROLES: Record<string, string> = {
-	small: "Checkbox, kbd, small chip.",
-	control: "Input, select, textarea, segmented.",
-	card: "Cards at rest.",
-	float: "Toast, popover, dropdown.",
-	sheet: "Composer, the main sheet.",
-	modal: "Dialog.",
-	pill: "Buttons, badges, tags, switch, progress.",
-}
-
-const TONE_ROLES: Record<string, string> = {
-	layer6: "One step past `layer5` (its hover).",
-	faint: "Faint ink for decorations.",
-	railLayer2: "Rail surface, one step up.",
-	railLayer3: "Rail surface, two steps up.",
+	shape:
+		"One-line shapes: buttons, chips, single-line fields, icon buttons, menu rows, switch, slider thumb.",
+	box: "Anything that grows with its content: composer, textarea, menu, dialog, sheet top, toast, tooltip, images.",
+	check: "The checkbox square only. Radio stays a circle.",
 }
 
 const styles = stylex.create({
@@ -86,8 +53,8 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		color: color.text,
 		textDecoration: "none",
-		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
-		borderRadius: corner.pill,
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
+		borderRadius: corner.shape,
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
@@ -100,16 +67,13 @@ const styles = stylex.create({
 		display: "grid",
 		gap: space.xxs,
 		alignContent: "start",
-		backgroundColor: color.layer3,
-		borderRadius: corner.card,
 		padding: space.sm,
 		minWidth: 0,
 	},
 	swatches: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: space.xxs, marginBottom: space.xxs },
 	swatch: {
 		height: "3rem",
-		borderRadius: corner.small,
-		boxShadow: `inset 0 0 0 1px ${color.border}`,
+		borderRadius: corner.box,
 		display: "flex",
 		alignItems: "flex-end",
 		padding: space.xxs,
@@ -119,16 +83,13 @@ const styles = stylex.create({
 		fontSize: type.t1,
 		backgroundColor: color.bg,
 		color: color.text,
-		borderRadius: corner.small,
+		borderRadius: corner.check,
 		paddingInline: space.xxs,
 	},
 	deprecated: {
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		color: color.warning,
-		backgroundColor: color.warningSubtle,
-		borderRadius: corner.pill,
-		paddingInline: space.xs,
 		justifySelf: "start",
 	},
 	rows: { display: "grid", gap: 0 },
@@ -138,28 +99,24 @@ const styles = stylex.create({
 		gap: { default: space.md, [MOBILE]: space.xxs },
 		alignItems: "center",
 		paddingBlock: space.xs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		minWidth: 0,
 	},
 	sample: { color: color.text, margin: 0, overflowWrap: "anywhere", minWidth: 0 },
-	bar: { height: space.sm, backgroundColor: color.signal, borderRadius: corner.pill },
+	bar: { height: space.sm, backgroundColor: color.signal, borderRadius: corner.shape },
 	cornerBox: {
 		width: "4rem",
 		height: "3rem",
-		backgroundColor: color.layer2,
-		boxShadow: `inset 0 0 0 1px ${color.borderStrong}`,
+		backgroundColor: color.wash,
 	},
 	shadowBox: {
 		height: "4rem",
 		backgroundColor: color.surfaceRaised,
-		borderRadius: corner.card,
+		borderRadius: corner.box,
 		marginBlock: space.sm,
 	},
 	iconBox: {
 		backgroundColor: color.text,
-		borderRadius: corner.small,
+		borderRadius: corner.check,
 	},
 	details: { display: "grid", gap: space.sm },
 	summary: { cursor: "pointer", fontSize: type.t2, color: color.textMuted },
@@ -262,13 +219,25 @@ const SECTIONS = [
 	["other", "Other groups"],
 ] as const
 
-const g = (name: string) => tokenGroup(name)
+// Only the tokens the language keeps or adds are described; the rest go in Phase 18.
+const KEPT: Record<string, Record<string, string>> = {
+	color: COLOR_ROLES,
+	shadow: SHADOW_ROLES,
+	corner: CORNER_ROLES,
+}
+const g = (name: string) => {
+	const group = tokenGroup(name)
+	const kept = KEPT[name]
+	return group != null && kept != null
+		? { ...group, tokens: group.tokens.filter((entry) => entry.key in kept) }
+		: group
+}
 const isSize = (e: TokenEntry) => /^t\d$|^code$|^phoneInput$/.test(e.key)
 
 export function TokensPage() {
 	const colorGroup = g("color")
 	const typeGroup = g("type")
-	const shown = new Set<string>([...SECTIONS.map(([id]) => id), "radius"])
+	const shown = new Set<string>(SECTIONS.map(([id]) => id))
 	const others = TOKEN_GROUPS.filter((group) => !shown.has(group.name))
 	return (
 		<Page>
@@ -302,7 +271,7 @@ export function TokensPage() {
 				<Section
 					id="color"
 					title="Color"
-					lead="Neutral gray, chroma 0. Ink is the primary action; blue (signal) only means the agent is working, focus, or progress. Each card shows the light and the dark value; dark follows the OS unless a theme is applied."
+					lead="Neutral gray, chroma 0. Ink is the primary action and the link; blue, red, amber and green each say one status. Colour is for status and goes on text or a 6px dot, never a fill. Each card shows the light and the dark value; dark follows the OS unless a theme is applied."
 				>
 					<Colors group={colorGroup} roles={COLOR_ROLES} />
 				</Section>
@@ -312,7 +281,7 @@ export function TokensPage() {
 				<Section
 					id="type"
 					title="Type scale"
-					lead="One rem scale: t1–t4 are UI, t5–t7 are headings. Line heights live in the same group. The old `text` group is deprecated; each of its keys names the replacement."
+					lead="One rem scale: t1–t4 are UI, t5–t7 are headings. Line heights live in the same group."
 				>
 					<Rows
 						group={{ ...typeGroup, tokens: typeGroup.tokens.filter(isSize) }}
@@ -363,7 +332,7 @@ export function TokensPage() {
 				<Section
 					id="corner"
 					title="Corners"
-					lead="Corners follow size: the closer a surface is to the reader, the rounder. Nested: inner radius = outer − padding. `radius` is the older numeric scale."
+					lead="Three corners. A shape is one line high and fully round; a box grows with its content; the checkbox square is the only 4px."
 				>
 					<Rows
 						group={g("corner")!}
@@ -372,7 +341,6 @@ export function TokensPage() {
 							<div {...stylex.props(styles.cornerBox)} style={{ borderRadius: String(e.value) }} />
 						)}
 					/>
-					{g("radius") != null && <Rows group={g("radius")!} />}
 				</Section>
 			)}
 
@@ -380,7 +348,7 @@ export function TokensPage() {
 				<Section
 					id="shadow"
 					title="Elevation"
-					lead="Three steps, rest → float → modal. Shadows are black, never tinted. Samples render in the current theme."
+					lead="Two steps, float → modal. Only things that float have one. Shadows are black, never tinted. Samples render in the current theme."
 				>
 					<div {...stylex.props(grid.thirds)}>
 						{g("shadow")!.tokens.map((entry) => (
@@ -443,7 +411,7 @@ export function TokensPage() {
 							{group.deprecated !== false && " (deprecated)"} · {group.tokens.length} tokens
 						</summary>
 						{group.description !== "" && <p {...stylex.props(styles.note)}>{group.description}</p>}
-						<Rows group={group} roles={group.name === "tone" ? TONE_ROLES : undefined} />
+						<Rows group={group} />
 					</details>
 				))}
 			</Section>
