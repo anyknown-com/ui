@@ -34,6 +34,7 @@ import {
 	Spin,
 	Spinner,
 	Stack,
+	Stat,
 	StatusChip,
 	Tabs,
 	TabsList,
@@ -877,6 +878,23 @@ function StackDemo() {
 	)
 }
 
+function StatDemo() {
+	return (
+		<Demo
+			id="stat"
+			title="stat"
+			note="A number with a grey label above and one line below. No card, fill or line; size and weight carry the order."
+		>
+			<Label>row of stats</Label>
+			<Stack direction="row" gap="lg">
+				<Stat label="Runs" value="42" />
+				<Stat label="Spend" value="$3.10" note="up 12% on last week" />
+				<Stat label="Failed" value="3" />
+			</Stack>
+		</Demo>
+	)
+}
+
 function SkeletonDemo() {
 	return (
 		<Demo id="skeleton" title="skeleton">
@@ -1023,6 +1041,7 @@ export const basicsDemos: DemoEntry[] = [
 	{ id: "kbd", covers: ["kbd"], Component: KbdDemo },
 	{ id: "text", covers: ["text"], Component: TextDemo },
 	{ id: "stack", covers: ["stack"], Component: StackDemo },
+	{ id: "stat", covers: ["stat"], Component: StatDemo },
 	{ id: "skeleton", covers: ["skeleton"], Component: SkeletonDemo },
 	{ id: "progress", covers: ["progress"], Component: ProgressDemo },
 	{ id: "spin", covers: ["spin"], Component: SpinDemo },

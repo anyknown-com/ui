@@ -852,6 +852,18 @@ default), `md` or `lg`. It is the layout base for widgets, so it is plain on pur
   the next line on a phone instead of scrolling; `minWidth: 0` lets children shrink and truncate
 - No `align` or `justify` props yet: nothing needs them, and a block that wants more can use `sx`
 
+### stat
+`Stat` is a label, a big number and an optional one-line note: `label`, `value`, `note`. It is the
+widget's `Stat` and the prototype's stat row, without the grid.
+
+- No card, fill or line: the label and note are `t1` in `textMuted`, the value is `t5` at weight
+  600 with `tabular-nums`. Size and weight rank it; there is no second grey
+- `value` is a node shown as given. It is not parsed, rounded or given thousands separators, so
+  `"007"` and `"1,200"` stay as written; the caller formats and puts the unit after one space
+- Plain `<span>`s in a `<div>`, no `dl`: a `dl` would claim a term/definition list for what is one
+  reading, and the DOM order (label, value, note) already reads right
+- No `delta` colour: a change is words in `note`. Colour is for status only
+
 ### text
 `Text` sets running text and headings from the `type` scale. Props: `as` (default `p`),
 `variant` (default `body`), `sx`. Base: `font.body`, `color.text`, `type.snug`, margin 0.
