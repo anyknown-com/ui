@@ -1,5 +1,5 @@
-/* @anyknown/ui — custom scrollbars (tactile)
- * Thin, round and quiet: the thumb is a line in borderStrong that darkens to textFaint on hover;
+/* @anyknown/ui — custom scrollbars (pencil sketch)
+ * Thin, round and quiet: the thumb is a line in washStrong that darkens to textMuted on hover;
  * the track and the corner are transparent. Chromium and Safari use ::-webkit-scrollbar, Firefox
  * the standard properties (the two are exclusive, split with @supports). StyleX cannot express
  * these pseudo-elements, which is why this is a plain CSS file. */
@@ -9,13 +9,13 @@
 	height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-	background: var(--ak-border-strong, #d3d3d3);
+	background: var(--ak-wash-strong, rgba(23, 23, 23, 0.26));
 	border-radius: 999px;
 	border: 3px solid transparent;
 	background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: var(--ak-text-faint, #808080);
+	background: var(--ak-text-muted, #5c5c5c);
 	background-clip: padding-box;
 }
 ::-webkit-scrollbar-track,
@@ -26,6 +26,6 @@
 @supports not selector(::-webkit-scrollbar) {
 	* {
 		scrollbar-width: thin;
-		scrollbar-color: var(--ak-border-strong, #d3d3d3) transparent;
+		scrollbar-color: var(--ak-wash-strong, rgba(23, 23, 23, 0.26)) transparent;
 	}
 }

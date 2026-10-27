@@ -120,7 +120,7 @@ copyFileSync(join(root, "dist/brand.css"), join(out, "brand.css"))
 
 const index = `# ${pkg.name}
 
-> ${pkg.description}. Light by default, dark follows the OS. Gray paper on a desk, ink for the primary action, blue only when the agent is working.
+> ${pkg.description}. Light by default, dark follows the OS. A pencil sketch: one sheet, no lines, nothing behind the words, ink for the primary action, color only for status.
 
 Each component has a page at ${site}/#/components/<name> with live demos, props generated from the TypeScript source, and accessibility and keyboard notes. Every entry below links the markdown source; the #/ link is the same document on the site.
 
