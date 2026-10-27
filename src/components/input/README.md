@@ -1,6 +1,6 @@
 # Input
 
-A single-line text field drawn as a sunken cell on the page, with the same border, focus and error styling as Textarea, Select and PasswordInput.
+A single-line text field drawn as a floating pill (`surfaceRaised`, `shadow.float`, no frame), with the same focus and error styling as Textarea, Select and PasswordInput.
 
 ## When to use
 
@@ -33,10 +33,9 @@ import { Field, Input } from "@anyknown/ui"
 - Renders a native `<input>` and forwards every native prop.
 - The accessible name comes from the caller: wrap it in a [Field](../label/README.md) with `label`, point a `Label` at it with `htmlFor`, or pass `aria-label`. Nothing is built in.
 - Inside a Field, the Field owns the `id` (a caller `id` is ignored) and supplies `aria-describedby` (error, then help), `required` and `disabled`.
-- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. The border turns `danger`; the focus ring stays the same. Under `forced-colors: active`, where the danger colour is repainted, the invalid frame is 2px dashed.
+- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. There is no red frame: the error is the `Field` error text. Under `forced-colors: active`, where colour is repainted, the invalid frame is 2px dashed.
 - `leadingIcon` is wrapped in `aria-hidden="true"` and ignores the pointer.
-- Focus ring: on `:focus-visible` the border turns `focusRing` and a 2px solid `focusRing` outline sits 1px outside.
-- The border-color transition is turned off under `prefers-reduced-motion: reduce`.
+- Focus ring: on `:focus-visible` a 2px solid `focusRing` outline sits flush on the edge.
 - On phones the font is 16px so iOS Safari does not zoom the page on focus.
 - The placeholder uses `textMuted` (at least 4.5:1). It is still not a label: put requirements in the Field `help`.
 

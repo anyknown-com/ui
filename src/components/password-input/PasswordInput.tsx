@@ -22,9 +22,9 @@ const styles = stylex.create({
 		placeItems: "center",
 		width: "1.75rem",
 		height: "1.75rem",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		color: color.textMuted,
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 	},
@@ -34,29 +34,23 @@ const styles = stylex.create({
 	bar: {
 		height: "0.25rem",
 		flex: 1,
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.border, [FORCED]: "Canvas" },
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.washStrong, [FORCED]: "Canvas" },
 		forcedColorAdjust: "none",
 		outline: { default: null, [FORCED]: "1px solid GrayText" },
 		outlineOffset: -1,
 		transitionProperty: "background-color",
 		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
 	},
-	barWeak: { backgroundColor: { default: color.danger, [FORCED]: "CanvasText" } },
-	barFair: { backgroundColor: { default: color.warning, [FORCED]: "CanvasText" } },
-	barStrong: { backgroundColor: { default: color.accent, [FORCED]: "CanvasText" } },
+	barFill: { backgroundColor: { default: color.text, [FORCED]: "CanvasText" } },
 	label: { fontFamily: font.body, fontSize: type.t1, color: color.textMuted, minHeight: "1.2em", margin: 0 },
 	labelWeak: { color: color.danger },
-	warningIcon: { color: color.warning, flex: "none" },
+	capsDot: { width: 6, height: 6, borderRadius: corner.shape, backgroundColor: color.warning, flex: "none" },
 	caps: {
 		display: "flex",
 		alignItems: "center",
 		gap: space.xxs,
-		backgroundColor: color.warningSubtle,
-		color: color.text,
-		borderRadius: corner.small,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
+		color: color.warning,
 		fontFamily: font.body,
 		fontSize: type.t1,
 		marginTop: space.xxs,
@@ -118,8 +112,6 @@ export function defaultScorer(value: string): number {
 	return classes >= 2 ? 4 : 3
 }
 
-const BAR_TONE = [null, styles.barWeak, styles.barFair, styles.barStrong, styles.barStrong] as const
-
 function EyeIcon({ off }: { off: boolean }) {
 	return off ? (
 		<svg
@@ -145,23 +137,6 @@ function EyeIcon({ off }: { off: boolean }) {
 		>
 			<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
 			<circle cx="12" cy="12" r="3" />
-		</svg>
-	)
-}
-
-function WarningIcon() {
-	return (
-		<svg
-			width="13"
-			height="13"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-		>
-			<path d="m12 3 10 18H2L12 3Z" />
-			<path d="M12 10v4m0 3h.01" />
 		</svg>
 	)
 }
@@ -302,7 +277,7 @@ export function PasswordInput({
 				<div id={meterId} {...stylex.props(styles.meter)}>
 					<div aria-hidden="true" {...stylex.props(styles.bars)}>
 						{[0, 1, 2, 3].map((index) => (
-							<i key={index} {...stylex.props(styles.bar, index < level && BAR_TONE[level])} />
+							<i key={index} {...stylex.props(styles.bar, index < level && styles.barFill)} />
 						))}
 					</div>
 					<p aria-live="polite" {...stylex.props(styles.label, level === 1 && styles.labelWeak)}>
@@ -314,7 +289,7 @@ export function PasswordInput({
 				<p id={capsId} role="status" {...stylex.props(capsOn ? styles.caps : styles.srOnly)}>
 					{capsOn && (
 						<>
-							<WarningIcon />
+							<span aria-hidden="true" {...stylex.props(styles.capsDot)} />
 							{capsLockLabel ?? t.capsLock}
 						</>
 					)}

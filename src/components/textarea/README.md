@@ -1,6 +1,6 @@
 # Textarea
 
-A multi-line text field with the same styling as Input, which can grow with its content up to a row limit.
+A multi-line text field with the same styling as Input (`corner.box` instead of a pill), which can grow with its content up to a row limit.
 
 ## When to use
 
@@ -54,7 +54,7 @@ setTextLayoutEngine(pretext)
 - Renders a native `<textarea>` and forwards every native prop, including `ref`.
 - The accessible name comes from the caller: a [Field](../label/README.md) `label`, a `Label` with `htmlFor`, or `aria-label`.
 - Inside a Field, the Field owns the `id` and supplies `aria-describedby`, `required` and `disabled`.
-- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. The border turns `danger`, and under `forced-colors: active` the invalid frame is 2px dashed.
+- `aria-invalid="true"` is set from `invalid`, from `aria-invalid`, or from a Field `error`. There is no red frame; under `forced-colors: active` the invalid frame is 2px dashed.
 - Focus ring, reduced-motion handling and the 16px phone font are the same as [Input](../input/README.md).
 - The placeholder uses `textMuted` (at least 4.5:1). It is still not a label: put requirements in the Field `help`.
 

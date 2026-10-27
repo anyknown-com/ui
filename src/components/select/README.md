@@ -40,7 +40,7 @@ import { Field, Select, SelectGroup, SelectItem } from "@anyknown/ui"
 The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`value`, `hint`, `disabled`, and `textValue` when the children are not plain text).
 
 - Value: `value` (controlled) or `defaultValue` (uncontrolled), and `onValueChange`. With `multiple`, the value is a `string[]`.
-- State: `disabled`, `required`, `invalid` (danger border and `aria-invalid`), and `name` to submit with a form. Inside a `Field`, `disabled`, `required`, `invalid` and `aria-describedby` come from the Field; props you pass win.
+- State: `disabled`, `required`, `invalid` (`aria-invalid`; no red frame), and `name` to submit with a form. Inside a `Field`, `disabled`, `required`, `invalid` and `aria-describedby` come from the Field; props you pass win.
 - `searchable={false}` hides the search box. Empty groups are hidden while filtering.
 - Words: `labels` (`placeholder`, `searchPlaceholder`, `searchLabel`, `remove(item)`, `empty(query)`). The single props `placeholder`, `searchPlaceholder`, `searchLabel` and `emptyLabel(query)` still work and win over `labels`.
 
@@ -57,7 +57,7 @@ The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`valu
 - The popup sits above dialogs, so a Select inside a Dialog opens on top.
 - The popup grow-in and fade-out are off under `prefers-reduced-motion: reduce`.
 - Built-in words follow `<LocaleProvider>` (zh-TW by default, or en): `placeholder`, `searchPlaceholder`, `searchLabel`, `remove(item)`, `empty(query)`. Override them per instance with `labels`.
-- The trigger placeholder and the search placeholder use `textMuted` (6.35:1 light on `surface`), above 4.5:1.
+- The trigger placeholder and the search placeholder use `textMuted` (6.35:1 light on `surfaceRaised`), above 4.5:1.
 
 ## Keyboard
 

@@ -3,7 +3,7 @@ import { type ComponentProps, useCallback } from "react"
 import { assignRef } from "../../lib/mergeRefs"
 import { type StyleArg, styled } from "../../lib/styled"
 import { clearTextLayoutCache, getTextLayoutEngine, measureTextHeight } from "../../lib/textLayout"
-import { space, type } from "../../tokens.stylex"
+import { corner, space, type } from "../../tokens.stylex"
 import { controlStyles } from "../input/Input"
 import { useFieldControl } from "../label/fieldContext"
 
@@ -13,6 +13,7 @@ const styles = stylex.create({
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
 		lineHeight: type.body,
+		borderRadius: corner.box,
 		resize: "vertical",
 	},
 	// field-sizing 不支援時由 JS 量高度(見 fitHeight),所以一律不給拉把
@@ -28,7 +29,7 @@ export type TextareaProps = ComponentProps<"textarea"> & {
 	autoGrow?: boolean
 	/** With `autoGrow`, stop growing at this many lines and scroll after. */
 	maxRows?: number
-	/** Draws the danger border and sets `aria-invalid`. Inside a `Field` with an `error`, it is set for you. */
+	/** Sets `aria-invalid`. Inside a `Field` with an `error`, it is set for you. */
 	invalid?: boolean
 	/** The new text on every edit, next to the native `onChange`. Use `value` / `defaultValue` as usual. */
 	onValueChange?: (value: string) => void

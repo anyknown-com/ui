@@ -329,7 +329,7 @@ describe("Select inside a Field", () => {
 	})
 })
 
-// textFaint is 3.75:1 on surface, below 4.5:1 for text; placeholders must be readable
+// textFaint is 3.75:1 on surfaceRaised, below 4.5:1 for text; placeholders must be readable
 const placeholderProbe = stylex.create({
 	muted: { color: color.textMuted },
 	mutedPlaceholder: { "::placeholder": { color: color.textMuted } },

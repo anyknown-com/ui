@@ -14,12 +14,12 @@ Known contrast and hit-target gaps are in [A11Y-DEBT.md](./A11Y-DEBT.md).
 Single- and multi-line text entry. Both share one style language for border, focus and error
 (`controlStyles`).
 
-- A sunken cell in the paper: `surface` background plus a 1px `borderControl` frame (a boundary
-  needs 3:1 to be seen; background alone isn't enough), `corner.control` (12px). On focus the
-  frame turns `focusRing` (= `signal`) with a 2px solid `focusRing` outline around it
-  (`outlineOffset: 1`). Earlier it was a 32% pale ring, under 3:1 against the background, so
-  focus was invisible. When invalid the frame stays `danger` and the focus outline is still
-  solid `focusRing`. Select, Textarea and PasswordInput all use the same `controlStyles`
+- A floating cell: `surfaceRaised` background plus `shadow.float`, no frame; the shadow marks the
+  edge. `corner.shape` for `Input`, `corner.box` for `Textarea` (it grows with its content). On
+  focus a 2px solid `focusRing` outline sits flush on the edge. `invalid` only sets `aria-invalid`;
+  the red words are the `Field` error. Under `forced-colors: active` (no shadow) a transparent 1px
+  border shows as a system colour, and an invalid field gets a 2px dashed one. Select, Textarea
+  and PasswordInput all use the same `controlStyles`
 - **The control sets `boxSizing: border-box` itself**. `<input>` / `<textarea>` get the
   browser's default content-box, so `minHeight` becomes the *content* height plus padding and
   border (the old 36px md actually grew to 54px, and `width: 100%` overflowed the container by
@@ -744,8 +744,8 @@ state of a sub thread.
 ## Storage & data
 
 ### password-input
-Password and vault passphrase field: show / hide toggle, a four-segment strength meter (scored
-on length + character classes), a Caps Lock warning, and a mismatch error for the confirm field.
+Password and vault passphrase field: show / hide toggle, a four-segment strength meter (`washStrong` track, `text` fill; scored
+on length + character classes), a Caps Lock warning (amber words with a 6px dot, no fill), and a mismatch error for the confirm field.
 
 - Requirements go where they can be seen and read, not in the placeholder (it disappears as soon
   as you type, and screen readers may not read it). The meter says, when empty, "At least 12
