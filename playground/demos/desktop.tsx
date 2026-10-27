@@ -81,7 +81,7 @@ function MessageDemo() {
 		<Demo
 			id="message"
 			title="message"
-			note="Turns sit 24px apart, parts 8px. User messages are bubbles; assistant messages run full width. The second user message is Traditional Chinese to show CJK line breaking."
+			note="Turns sit 24px apart, parts 8px. User messages sit on the right; assistant messages run full width. The second user message is Traditional Chinese to show CJK line breaking."
 		>
 			<Thread>
 				<UserMessage>

@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ComponentType, ReactNode } from "react"
-import { color, font, radius, space, type } from "@anyknown/ui/tokens.stylex"
+import { color, font, space, type } from "@anyknown/ui/tokens.stylex"
 
 export interface DemoEntry {
 	/** Section id and `#/demo/<id>` anchor. Keep the existing ids. */
@@ -23,18 +23,12 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		fontWeight: 600,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
 		color: color.textMuted,
 		margin: 0,
 	},
 	sub: { fontFamily: font.mono, fontSize: type.t1, color: color.textMuted, margin: 0 },
 	body: { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: space.sm },
 	panel: {
-		borderWidth: 1,
-		borderStyle: "dashed",
-		borderColor: color.border,
-		borderRadius: radius.lg,
 		padding: space.md,
 		backgroundColor: color.bg,
 	},

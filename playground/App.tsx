@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, corner, font, radius, space, type } from "@anyknown/ui/tokens.stylex"
+import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
 import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
 import { DEMO_GROUPS, DEMOS } from "./demos"
 
@@ -34,29 +34,23 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		fontWeight: 600,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
 		color: color.textMuted,
 		marginBlock: space.sm,
 	},
 	link: {
 		display: "block",
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		textDecoration: "none",
 		fontSize: type.t1,
 		paddingBlock: space.xxs,
 		paddingInline: space.xxs,
-		borderRadius: radius.sm,
+		borderRadius: corner.shape,
 	},
-	// The shell is the desk (layer1 on body); the content is the main sheet on top of it
+	// One sheet: the body is the paper and the content sits on it with no desk or frame
 	main: {
 		padding: { default: space.lg, [breakpoint.tablet]: space.md },
 		minWidth: 0,
-		marginBlock: { default: space.xs, [breakpoint.tablet]: 0 },
-		marginInlineEnd: { default: space.xs, [breakpoint.tablet]: 0 },
-		backgroundColor: color.layer2,
-		borderRadius: { default: corner.sheet, [breakpoint.tablet]: 0 },
 	},
 })
 

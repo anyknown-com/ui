@@ -47,7 +47,7 @@ import {
 	ICON_STROKE,
 } from "@anyknown/ui"
 import * as stylex from "@stylexjs/stylex"
-import { color, radius, space } from "@anyknown/ui/tokens.stylex"
+import { color, corner, space } from "@anyknown/ui/tokens.stylex"
 import { type ReactNode, useEffect, useState } from "react"
 import { type DemoEntry, Demo, Label, Row } from "../shell"
 
@@ -56,11 +56,8 @@ const styles = stylex.create({
 	// a row you can press in a sheet is at least 44px tall
 	sheetRow: { minHeight: 44 },
 	pane: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		backgroundColor: color.surface,
+		borderRadius: corner.box,
+		backgroundColor: color.wash,
 		padding: space.md,
 		overflowY: "auto",
 		height: "11rem",
@@ -68,11 +65,8 @@ const styles = stylex.create({
 	},
 	wide: { width: "52rem" },
 	both: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: radius.lg,
-		backgroundColor: color.surface,
+		borderRadius: corner.box,
+		backgroundColor: color.wash,
 		overflow: "auto",
 		height: "9rem",
 	},
@@ -875,7 +869,7 @@ function ProgressDemo() {
 		<Demo
 			id="progress"
 			title="progress"
-			note="A sunken track with a signal-blue fill: the agent is working. Indeterminate, the fill sweeps across the track and the stage under it cycles. The ring and the ball are readings, not work, so they stay ink."
+			note="A wash track with a signal-blue fill: the agent is working. Indeterminate, the fill sweeps across the track and the stage under it cycles. The ring and the ball are readings, not work, so they stay ink."
 		>
 			<Progress
 				value={percent}

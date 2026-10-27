@@ -5,7 +5,7 @@
 
 body {
 	margin: 0;
-	background: var(--ak-layer1);
+	background: var(--ak-bg);
 	color: var(--ak-text);
 	font-family: var(--ak-font-body);
 }
