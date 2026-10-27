@@ -23,7 +23,7 @@ const styles = stylex.create({
 		fontWeight: 600,
 		lineHeight: type.dense,
 	},
-	// 內文 15px、行高 1.6 (docs/plans/02-tactile.md)
+	// 內文 15px、行高 1.6 (DESIGN.md)
 	body: { fontSize: type.t3, lineHeight: type.body },
 	caption: { fontSize: type.t2, color: color.textMuted },
 	mono: { fontFamily: font.mono, fontSize: type.t2 },

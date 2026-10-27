@@ -69,7 +69,7 @@ Interactive targets are at least 24 × 24px (WCAG 2.2, 2.5.8). Where a control i
 
 - Readable text uses `color.text` or `color.textMuted`. `textMuted` is at least 5.36:1 on every background.
 - `color.textFaint` is a 3:1 color. Use it only for things that are not text you have to read: icons, chevrons, separators, the `—` in an empty cell, and disabled states. A few text uses remain and are listed as debt.
-- Control boundaries (input borders, unchecked checkbox, radio, switch track) use `color.borderControl`, which reaches 3:1.
+- Unchecked checkboxes and radios draw a 1.5px `color.borderControl` edge, which reaches 3:1; it is the only edge in the language. Text fields get their edge from `shadow.float`, and a switch from its gray thumb.
 - Color is never the only signal. A toast's colored dot comes with a visually hidden "Success:", "Error:", "Warning:" or "Info:" word. A diff line has a `+` or `−` sign and a hidden "Added line" or "Removed line" prefix, and changed words are `<ins>` (underlined) or `<del>` (struck through).
 
 Do not hand-tune a color to fix contrast. Change the palette scales; see [Contributing](../../CONTRIBUTING.md).

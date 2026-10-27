@@ -150,7 +150,7 @@ Give the page a background and font yourself, for example:
 ```css
 body {
   margin: 0;
-  background: var(--ak-layer1);
+  background: var(--ak-bg);
   color: var(--ak-text);
   font-family: var(--ak-font-body);
 }
@@ -161,15 +161,13 @@ body {
 Import token groups from `@anyknown/ui/tokens.stylex` and use them in `stylex.create`. Don't write raw colors, sizes or durations: the tokens switch with the theme and the raw values don't.
 
 ```tsx
-import { color, corner, space, type } from "@anyknown/ui/tokens.stylex"
+import { color, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 
 const styles = stylex.create({
   panel: {
-    padding: space.lg,
-    borderRadius: corner.card,
-    backgroundColor: color.surface,
+    paddingBlock: space.lg,
     color: color.text,
     fontSize: type.t3,
   },
@@ -184,7 +182,7 @@ Every group, value and dark variant is listed on the [tokens page](#/tokens).
 
 ## Use the tokens without StyleX
 
-`@anyknown/ui/tokens.css` has the same values as plain CSS variables. Color tokens are `--ak-<name>` (`--ak-bg`, `--ak-text-muted`, `--ak-signal`); other groups carry the group name (`--ak-space-md`, `--ak-corner-pill`, `--ak-shadow-float`, `--ak-type-t3`, `--ak-font-body`). The file is generated from `tokens.stylex.ts`, so the two never disagree.
+`@anyknown/ui/tokens.css` has the same values as plain CSS variables. Color tokens are `--ak-<name>` (`--ak-bg`, `--ak-text-muted`, `--ak-signal`); other groups carry the group name (`--ak-space-md`, `--ak-corner-box`, `--ak-shadow-float`, `--ak-type-t3`, `--ak-font-body`). The file is generated from `tokens.stylex.ts`, so the two never disagree.
 
 With Tailwind v4, map them in `@theme inline`. `inline` makes each utility read the variable where it is used, so light, dark and `data-theme` keep working:
 
@@ -194,18 +192,16 @@ With Tailwind v4, map them in `@theme inline`. `inline` makes each utility read 
 
 @theme inline {
   --color-bg: var(--ak-bg);
-  --color-surface: var(--ak-surface);
-  --color-border: var(--ak-border);
+  --color-surface: var(--ak-surface-raised);
+  --color-wash: var(--ak-wash);
   --color-text: var(--ak-text);
   --color-muted: var(--ak-text-muted);
-  --color-accent: var(--ak-accent);
-  --color-accent-text: var(--ak-accent-text);
   --color-signal: var(--ak-signal);
   --color-danger: var(--ak-danger);
   --font-sans: var(--ak-font-body);
   --font-mono: var(--ak-font-mono);
-  --radius-control: var(--ak-corner-control);
-  --radius-card: var(--ak-corner-card);
+  --radius-shape: var(--ak-corner-shape);
+  --radius-box: var(--ak-corner-box);
   --shadow-float: var(--ak-shadow-float);
 }
 ```

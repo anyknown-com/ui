@@ -1,6 +1,6 @@
 # design.md: letting outside agents build one-off AnyKnown pages
 
-Status: built. The visual language this plan was written against (Ledger: warm paper, a viridian accent, serif headings, a woven button fill) has since been replaced by Tactile; see [02-tactile.md](02-tactile.md). The parts of this plan that described the old look now describe the current system. The structure (DESIGN.md, `brand.css`, the eval loop) is unchanged.
+Status: built. The visual language this plan was written against (Ledger: warm paper, a viridian accent, serif headings, a woven button fill) has since been replaced, first by Tactile and then by the pencil sketch; see [DESIGN.md](../../DESIGN.md) section 1. The parts of this plan that described the old look now describe the current system. The structure (DESIGN.md, `brand.css`, the eval loop) is unchanged.
 
 Based on Vercel's approach (vercel.com/blog/how-our-agents-build-on-brand-pages-with-design-md): one document of judgment, one public stylesheet with a bounded vocabulary, and an eval loop that routes feedback back into them. All three layers are needed; give an agent only a token table and it still builds a generic SaaS dashboard.
 

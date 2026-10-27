@@ -1,6 +1,6 @@
 # Theming
 
-The package has one palette: a neutral gray desk (OKLCH chroma 0) with white paper sheets, ink text, an ink primary action and a blue `signal` for agent activity, focus and progress. It comes in a light and a dark mode. This guide covers how the mode is chosen, how to lock it, how to adjust a component's layout, and how to change the palette.
+The package has one palette: one white sheet with grays of OKLCH chroma 0, ink text, an ink primary action, and color only for status (blue `signal` for agent activity, focus and progress). It comes in a light and a dark mode. This guide covers how the mode is chosen, how to lock it, how to adjust a component's layout, and how to change the palette.
 
 ## Light by default, dark from the OS
 
@@ -10,7 +10,7 @@ The same holds for `tokens.css`: `:root` holds the light values, and the dark va
 
 ## Lock a theme with StyleX
 
-`@anyknown/ui/themes.stylex` exports `light` and `dark`. Each is a set of three themes: color, shadow and tone.
+`@anyknown/ui/themes.stylex` exports `light` and `dark`. Each is a set of two themes: color and shadow.
 
 ```tsx
 import { dark } from "@anyknown/ui/themes.stylex"
@@ -22,7 +22,7 @@ export function DarkSection({ children }: { children: ReactNode }) {
 }
 ```
 
-- **Apply the whole set.** Spread it: `stylex.props(...dark)`. Applying only the color theme leaves shadows and tones on the other mode.
+- **Apply the whole set.** Spread it: `stylex.props(...dark)`. Applying only the color theme leaves shadows on the other mode.
 - **Put an app-wide theme on `<html>`.** Dialogs, popovers, tooltips and toasts portal to `<body>`, so a theme on an inner element does not reach them. A theme on a section is fine for a preview or a mixed page, as long as nothing in it opens a popup.
 - `themes.stylex.ts` is generated from the tokens by `pnpm gen:themes`. Don't edit it by hand; `src/themes.test.ts` fails when it is out of sync.
 
@@ -155,19 +155,19 @@ Colors are not picked one by one. `scripts/palette.mjs` builds five 12-step OKLC
 
 | Steps | Job |
 | --- | --- |
-| 1–2 | Backgrounds (paper, desk) |
-| 3–5 | Fills (subtle backgrounds, hover, pressed) |
-| 6–8 | Borders |
-| 9–10 | Solids (button fills, control borders, icons) |
+| 1–2 | Backgrounds (the page, floating surfaces) |
+| 3–5 | Fills (hover, pressed) |
+| 6–8 | Control edges |
+| 9–10 | Solids (button fills, icons) |
 | 11–12 | Text (secondary, primary) |
 
 It then maps roles to steps and checks contrast. To change a color:
 
 1. Edit the scales or the role mapping in `scripts/palette.mjs`.
 2. Run `node scripts/palette.mjs`. Check the contrast table: `failures` must be 0.
-3. Paste the JSON it prints into the `color` and `tone` groups of `src/tokens.stylex.ts`.
+3. Paste the JSON it prints into the `color` group of `src/tokens.stylex.ts`.
 4. Run `pnpm gen:themes` to regenerate `src/themes.stylex.ts`.
 5. Run `pnpm gen:tokens-css` to regenerate `src/tokens.css`.
 6. Run `pnpm test`. `src/themes.test.ts` and `src/tokens-css.test.ts` fail if either generated file disagrees with the tokens.
 
-Don't hand-tune a single value in `tokens.stylex.ts`, `themes.stylex.ts` or `tokens.css`. A one-off hex breaks the step system, and the generated files would overwrite it anyway. The full rationale is in [docs/plans/02-tactile.md](../plans/02-tactile.md) and [DESIGN.md](../../DESIGN.md); the current values are on the [tokens page](#/tokens).
+Don't hand-tune a single value in `tokens.stylex.ts`, `themes.stylex.ts` or `tokens.css`. A one-off hex breaks the step system, and the generated files would overwrite it anyway. The rationale is in [DESIGN.md](../../DESIGN.md) section 1; the current values are on the [tokens page](#/tokens).

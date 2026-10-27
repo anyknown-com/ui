@@ -873,7 +873,7 @@ fold's first line.
 | --- | --- | --- |
 | `display` | `type.t7` (36px) | `font.display`, 600, `type.dense`, −0.01em tracking |
 | `title` | `type.t5` (22px) | `font.display`, 600, `type.dense` |
-| `body` | `type.t3` (15px) | line height `type.body` (1.6), per `docs/plans/02-tactile.md` |
+| `body` | `type.t3` (15px) | line height `type.body` (1.6), per `DESIGN.md` |
 | `caption` | `type.t2` (13px) | `textMuted` |
 | `mono` | `type.t2` (13px) | `font.mono` |
 

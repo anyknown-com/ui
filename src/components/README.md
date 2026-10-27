@@ -23,14 +23,14 @@ The playground and the docs site use the same section ids.
 
 - **Forms** — `input` `textarea` `label` (with `Field`) `checkbox` `radio` `switch` `slider`
   `select` `dropdown` `password-input` `segmented`
-- **Basics** — `button` `icon-button` `ghost` `card` `text` `icon` `dialog` `toast` `tooltip`
+- **Basics** — `button` `icon-button` `ghost` `text` `icon` `dialog` `toast` `tooltip`
   `popover` `tabs` `badge` `kbd` `skeleton` `progress` `spin` `empty-state` (`scrollbar` is CSS)
 - **Agent & chat (desktop AI-native)** — `message` `markdown` (with `Formula`) `tool-group`
   `sub-thread` `reasoning-fold` `action-bar` `code-block` `interaction-card` `handoff-receipt`
   `composer` `voice-indicator` `live-dot`
 - **Storage & data** — `recovery-key` `dropzone` `file-row` `diff-viewer` `data-table`
 - **Web shell** — `group` (grouped lists and cells) `page` `settings-rows` `table` `list`
-  `status-badge` `status-chip` `bubble` `attachment` `payload-block` `attach-button`
+  `status-badge` `status-chip` `attachment` `payload-block` `attach-button`
   `pending-files` `call-bar`
 
 ## Other docs
@@ -51,9 +51,9 @@ The playground and the docs site use the same section ids.
    use native elements; no primitive needed. Today Base UI backs dialog, popover, tooltip,
    select, dropdown and tabs. Slider is deliberately hand-written (see COMPONENTS.md)
 2. Every color, space, corner, type size and motion value comes from `tokens.stylex.ts`; no
-   hard-coded values. Deprecated token groups (`text.*`, `radius.*`, the pre-tactile `corner`
-   names, `shadow.raised`/`popover`/…) stay only for published API; new code uses the
-   replacements their JSDoc names
+   hard-coded values. From 0.16.0 the old token names (`text.*`, `radius.*`, the old `corner`
+   ladder, the old shadows such as `raised` and `popover`) are deleted; no old name stays as
+   an alias
 3. **Type comes from the `type` scale**: `type.t1`–`t4` (11 / 13 / 15 / 17px) for UI,
    `t5`–`t7` (22 / 28 / 36px) for headings, `type.code` for mono blocks, and the line heights
    `body` / `snug` / `tight` / `dense`. Phone-size inputs use `type.phoneInput` (16px) under
@@ -67,8 +67,8 @@ The playground and the docs site use the same section ids.
    don't add more
 6. Always honor `prefers-reduced-motion`
 7. One focus ring: `:focus-visible` gives a 2px (`focusRing.width`) outline in
-   `color.focusRing` (= `signal`), `outlineOffset` 2; controls that sit inside a frame use −1
-   or −2
+   `color.focusRing` (= `signal`), `outlineOffset` 2; where an outside ring would be clipped,
+   −1 or −2
 8. Form errors: the control sets `aria-invalid` and `aria-describedby`; the Field renders the
    message (`role="alert"`)
 9. **StyleX 0.19 silently drops shorthands** (`all: unset`, `border: 0`, `background: none`):
@@ -82,13 +82,15 @@ The playground and the docs site use the same section ids.
     passing `className`: StyleX classes are atomic, and a class string appended later is not
     guaranteed to win; to override, a style must come later in the same `stylex.props` call
 12. **Apply a theme whole**. `light` / `dark` in `themes.stylex.ts` are each a set (color +
-    shadow + tone), spread with `stylex.props(...light)`. Applying one var group leaves the
-    other two on the other theme. That file is generated from tokens by `pnpm gen:themes`;
+    shadow), spread with `stylex.props(...light)`. Applying one var group leaves the other on
+    the other theme. That file is generated from tokens by `pnpm gen:themes`;
     don't edit it by hand
-13. **Surfaces separate by layer, not border**. `color.layer1`–`layer5` are the five background
-    steps rail → main → message → fold → row; higher numbers are darker. **Hover goes up one
-    step**: `layerUp.layer3` is the hover background for `layer3` (`lib/layers.ts`). `layer5` is
-    the darkest step; the step above it has no name, so `layerUp` gives `borderStrong`
+13. **A surface is only for what floats, and hover is a wash** (DESIGN.md section 1). The
+    page and the thread are `color.bg` with no layers, frames or dividers. Text fields, the
+    composer, menus, toasts and tooltips are `color.surfaceRaised` with `shadow.float`;
+    dialogs and sheets use `shadow.modal`. Things you press rest on `color.wash` and go to
+    `color.washHover` on hover; a wash is a tint, not a layer. The transparent 1px border on
+    floating surfaces stays: it shows only under forced colors
 14. **Stacking comes from the `zIndex` consts** in `tokens.stylex.ts` (dialog backdrop 70,
     dialog 71, popup 75, tooltip 78, toast 80). They are `defineConsts`, so `zIndex:
     zIndex.popup` works in any `stylex.create`. `lib/popup.ts` re-exports them as `layer` and

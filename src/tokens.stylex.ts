@@ -1,8 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 
-// Semantic tokens for all AnyKnown products, in the 軟材 (tactile) language:
-// white paper on a neutral grey desk (chroma 0), ink text, ink accent, ink links, blue `signal`
-// for agent activity, focus and progress. Spec: docs/plans/02-tactile.md. Colour values come
+// Semantic tokens for all AnyKnown products, in the pencil-sketch language: one sheet, no
+// lines, color only for status. Spec: DESIGN.md section 1. Colour values come
 // from scripts/palette.mjs (12-step OKLCH scales → hex); change the scale there, rerun it and
 // paste the output back here. Never hand-tune a single value.
 // Light is the primary mode; dark follows the OS unless a theme from themes.stylex.ts is applied.
