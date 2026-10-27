@@ -5,6 +5,8 @@ import { useControllableState } from "../../lib/useControllableState"
 import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { XGlyph } from "../icon/glyphs"
 
+const REDUCED = "@media (prefers-reduced-motion: reduce)"
+
 const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
@@ -49,7 +51,7 @@ const styles = stylex.create({
 		cursor: "pointer",
 		backgroundColor: { default: color.wash, ":hover": color.washHover },
 		transitionProperty: "background-color",
-		transitionDuration: motion.fast,
+		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.linear,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
