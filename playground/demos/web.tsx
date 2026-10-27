@@ -186,11 +186,11 @@ function GroupDemo() {
 				<Group>
 					<InputCell label="Name" placeholder="STRIPE_TEST_KEY" mono />
 					<TextCell placeholder="What the agent should know about it" aria-label="Description" />
-					<GroupCell icon={<ActionIcon icon={PlusGlyph} />} label="Save" tone="accent" onPress={() => {}} />
+					<GroupCell icon={<ActionIcon icon={PlusGlyph} />} label="Save" onPress={() => {}} />
 				</Group>
 				<Group header="Connections">
 					<GroupItem defaultOpen>
-						<GroupRow mark={<Mark letter="F" tint="currentColor 12%" />} name="Figma" expands>
+						<GroupRow mark={<Mark letter="F" />} name="Figma" expands>
 							<Status warn>Needs attention</Status>
 						</GroupRow>
 						<Expand>
@@ -201,10 +201,8 @@ function GroupDemo() {
 						</Expand>
 					</GroupItem>
 					<GroupItem>
-						<GroupRow mark={<Mark letter="G" tint="currentColor 12%" />} name="GitHub" expands>
-							<Status dot="filled" tone="success">
-								Connected
-							</Status>
+						<GroupRow mark={<Mark letter="G" />} name="GitHub" expands>
+							<Status tone="success">Connected</Status>
 						</GroupRow>
 						<Expand>
 							<Note faint>Read access to 3 repositories.</Note>
@@ -261,16 +259,10 @@ function StatusDemo() {
 			note="Status is a dot and a word; StatusBadge is the pill for something running on its own."
 		>
 			<Row>
-				<Status dot="filled" tone="success">
-					Current
-				</Status>
-				<Status dot="hollow">Needs review</Status>
-				<Status dot="filled" tone="warning">
-					Unsure
-				</Status>
-				<Status dot="dashed" tone="danger">
-					Stale
-				</Status>
+				<Status tone="success">Current</Status>
+				<Status>Needs review</Status>
+				<Status tone="warning">Unsure</Status>
+				<Status tone="danger">Stale</Status>
 			</Row>
 			<Row>
 				<StatusBadge tone="live">Agent working</StatusBadge>
@@ -302,17 +294,13 @@ function ListDemo() {
 					</ListSort>
 				</ListHead>
 				<ListRow sx={styles.memoryGrid}>
-					<Status dot="dashed" tone="danger">
-						Stale
-					</Status>
+					<Status tone="danger">Stale</Status>
 					<span>Rent cap is 25k</span>
 					<span {...stylex.props(styles.muted)}>Personal</span>
 					<span {...stylex.props(styles.muted)}>9/12</span>
 				</ListRow>
 				<ListRow sx={styles.memoryGrid}>
-					<Status dot="filled" tone="success">
-						Current
-					</Status>
+					<Status tone="success">Current</Status>
 					<span>Commute under 20 minutes</span>
 					<span {...stylex.props(styles.muted)}>Personal</span>
 					<span {...stylex.props(styles.muted)}>9/20</span>

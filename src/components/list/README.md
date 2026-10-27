@@ -1,6 +1,6 @@
 # List
 
-A list of things you open, such as memories or questions: a muted head over the columns, then 40px rows, each one button, with no frame and no mono.
+A list of things you open, such as memories or questions: a muted head over the columns, then 28px rows, each one button, with no frame and no mono.
 
 ## When to use
 
@@ -19,10 +19,10 @@ A list of things you open, such as memories or questions: a muted head over the 
 
 The family:
 
-- `ListHead` — the column names, `t1` and muted, with a hairline under them. It accepts any `<div>` attribute, such as `aria-hidden`.
+- `ListHead` — the column names, `t1` and muted. It accepts any `<div>` attribute, such as `aria-hidden`.
 - `ListSort` — a column name (a plain string) that orders the list. When `active`, it goes dark, ` ↓` follows it, and its name gains "sorted". `labels.sorted(column)` changes that word.
 - `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 40` and grows when it wraps.
-- `WeightDot` — the 8px mark in front of a question. `weight="light"` is a grey dot (it goes ahead if nobody answers), `soon` turns it red (about to go ahead), and `weight="heavy"` is an orange ring (it waits for you).
+- `WeightDot` — the 6px dot in front of a question. `weight="light"` is a muted dot (it goes ahead if nobody answers); `soon` (about to go ahead) and `weight="heavy"` (it waits for you) are both an amber dot.
 
 ```tsx
 import { ListHead, ListRow, ListSort, Status } from "@anyknown/ui"
@@ -47,7 +47,7 @@ const styles = stylex.create({
   </ListHead>
   {memories.map((memory) => (
     <ListRow key={memory.id} sx={styles.grid} onClick={() => openMemory(memory.id)}>
-      <Status dot="filled" tone="success">Current</Status>
+      <Status tone="success">Current</Status>
       <span>{memory.text}</span>
       <span>{memory.created}</span>
     </ListRow>

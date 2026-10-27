@@ -1,6 +1,6 @@
 # Group
 
-A grouped settings list: an optional muted header, then one sunken `surface` region of 44px cells with hairlines between them, then an optional muted footer that says what the settings do.
+A grouped settings list: an optional muted header, then the 28px cells (44px on a phone) on the page with only space between them, then an optional muted footer that says what the settings do.
 
 ## When to use
 
@@ -18,11 +18,11 @@ A grouped settings list: an optional muted header, then one sunken `surface` reg
 
 The family:
 
-- `Group` — the header, the sunken region, and the footer.
-- `GroupCell` — a line with `label`, an optional `detail` line, `value` or `control` on the right, and `icon` in front. With `onPress`, the whole line is a [Ghost](../ghost/README.md) button with a chevron. There is no chevron when it has a `tone` (`accent` adds, `danger` removes) or `checked` (one choice of several).
+- `Group` — the header, the lines, and the footer.
+- `GroupCell` — a line with `label`, an optional `detail` line, `value` or `control` on the right, and `icon` in front. With `onPress`, the whole line is a [Ghost](../ghost/README.md) button with a chevron. There is no chevron when it has a `tone` (`danger` removes) or `checked` (one choice of several).
 - `InputCell` — a 96px name column and a borderless [Input](../input/README.md). `TextCell` — a borderless [Textarea](../textarea/README.md) that grows. `SliderCell` — a label and reading on one line, a [Slider](../slider/README.md) under them (`value` / `defaultValue` / `onValueChange`, `onValueCommit`; `onChange` is deprecated).
-- `IconTile` (a 28px tile with a 16px glyph), `LetterTile` (the same tile with a first letter), `ActionIcon` (a bare 18px glyph for action lines). Glyphs are lucide-style components that you pass in.
-- `GroupItem` (`go` adds a hover; `open` / `defaultOpen` / `onOpenChange`) holding a `GroupRow` (`mark`, `name`, state after a `·`, `actions`, `onPress`, `expands`, `chevron`). A row with `expands` toggles the item, and the `Expand` under it follows (its own `open` still wins). `Expand` (`plain`) holds `Note` (`faint`, `err`) and `Acts`. `Mark` is a 22px tinted letter square. `Status` is a dot and words (`dot`: `filled`, `hollow` or `dashed`; `tone`; `warn`). `Tag` is a mono label. `Sep` is the `·` separator. `Empty` is the "nothing here yet" line. `Item` and `Row` (and `RowProps`) are deprecated aliases of `GroupItem` and `GroupRow`.
+- `IconTile` (a 16px glyph in a 28px slot), `LetterTile` (the same slot with a first letter), `ActionIcon` (a bare 18px glyph for action lines). Glyphs are lucide-style components that you pass in.
+- `GroupItem` (`go` adds a hover; `open` / `defaultOpen` / `onOpenChange`) holding a `GroupRow` (`mark`, `name`, state after a `·`, `actions`, `onPress`, `expands`, `chevron`). A row with `expands` toggles the item, and the `Expand` under it follows (its own `open` still wins). `Expand` (`plain`) holds `Note` (`faint`, `err`) and `Acts`. `Mark` is a 22px muted letter. `Status` is a solid 6px dot and words (`tone`; `warn`). `Tag` is a mono label. `Sep` is the `·` separator. `Empty` is the "nothing here yet" line. `Item` and `Row` (and `RowProps`) are deprecated aliases of `GroupItem` and `GroupRow`.
 
 ```tsx
 import { Group, GroupCell, IconTile, SliderCell, Switch } from "@anyknown/ui"
@@ -55,7 +55,7 @@ import { Expand, Group, GroupItem, GroupRow, Note, Status } from "@anyknown/ui"
 <Group header="Connections">
   <GroupItem go>
     <GroupRow name="Figma" expands chevron>
-      <Status dot="hollow" tone="warning">Needs sign-in</Status>
+      <Status tone="warning">Needs sign-in</Status>
     </GroupRow>
     <Expand>
       <Note>The token expired on 9/12. Sign in again to reconnect.</Note>
@@ -68,7 +68,7 @@ import { Expand, Group, GroupItem, GroupRow, Note, Status } from "@anyknown/ui"
 
 - `Group` is plain `<div>`s. The header and footer are not tied to the region by a role or `aria-labelledby`.
 - `GroupCell` with `onPress` is a native `<button>`. Its name is all of its text (label, detail, value). With `checked`, it sets `aria-pressed`, so a choice reads as a toggle button, not a radio. The chevron and check glyphs are `aria-hidden`. Without `onPress`, it is a `<div>`, and a `control` needs its own name (for example, the `Switch`'s `aria-label`).
-- `InputCell` wraps the field in a `<label>`, and `label` (required) is also its `aria-label`. `TextCell` has no label prop, so pass `aria-label`. On both, focus draws a `focusRing` outline around the row and lifts it to `layer4`. On a phone the text is 16px, so iOS does not zoom.
+- `InputCell` wraps the field in a `<label>`, and `label` (required) is also its `aria-label`. `TextCell` has no label prop, so pass `aria-label`. On both, focus draws a `focusRing` outline around the row and tints it with a `wash`. On a phone the text is 16px, so iOS does not zoom.
 - `SliderCell` names the slider with `label`, and `text(value)` becomes its `aria-valuetext`.
 - `LetterTile`, `Mark` and `Sep` are `aria-hidden`. `IconTile` and `ActionIcon` glyphs are `aria-hidden`.
 - `GroupRow` with `onPress` or `expands` is a native button with a `focusRing` outline. With `expands` inside a `GroupItem`, it sets `aria-expanded` and `aria-controls` pointing at the item's `Expand`.

@@ -1,7 +1,6 @@
 import {
 	Badge,
 	Button,
-	Card,
 	Chip,
 	ConfirmDialog,
 	Dialog,
@@ -80,11 +79,6 @@ const styles = stylex.create({
 	ringRow: { display: "flex", gap: space.lg, alignItems: "center" },
 	wideDialog: { width: "min(44rem, calc(100vw - 2rem))", height: "calc(100vh - 2rem)" },
 	stack: { display: "grid", gap: space.xs },
-	cards: {
-		display: "grid",
-		gap: space.md,
-		gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 16rem), 1fr))",
-	},
 	iconCell: { display: "grid", justifyItems: "center", gap: space.xxs },
 })
 
@@ -837,33 +831,6 @@ function KbdDemo() {
 	)
 }
 
-function CardDemo() {
-	return (
-		<Demo
-			id="card"
-			title="card"
-			note="A card on the sheet: rest elevation, and its shadow ring is the only edge."
-		>
-			<div {...stylex.props(styles.cards)}>
-				<Card>
-					<div {...stylex.props(styles.stack)}>
-						<Text variant="title">Pricing page</Text>
-						<Text variant="caption">Handed off at 14:32 · 3 memories</Text>
-						<Text>The three-tier table is drafted. Next up: the FAQ under it.</Text>
-					</div>
-				</Card>
-				<Card>
-					<div {...stylex.props(styles.stack)}>
-						<Text variant="title">Store refactor</Text>
-						<Text variant="caption">Handed off at 09:05 · hit the context limit</Text>
-						<Text>Halfway through the store layer; 3 tests are still failing.</Text>
-					</div>
-				</Card>
-			</div>
-		</Demo>
-	)
-}
-
 function TextDemo() {
 	return (
 		<Demo
@@ -1005,12 +972,12 @@ function ScrollbarDemo() {
 				))}
 			</div>
 			<div {...stylex.props(styles.both)} tabIndex={0}>
-				<Card {...stylex.props(styles.wide)}>
+				<div {...stylex.props(styles.wide)}>
 					<Text variant="caption">
 						This box scrolls both ways. The corner at the bottom right is transparent, so no grey patch shows
 						up.
 					</Text>
-				</Card>
+				</div>
 			</div>
 		</Demo>
 	)
@@ -1030,7 +997,6 @@ export const basicsDemos: DemoEntry[] = [
 	{ id: "badge", covers: ["badge"], Component: BadgeDemo },
 	{ id: "status-chip", covers: ["status-chip"], Component: StatusChipDemo },
 	{ id: "kbd", covers: ["kbd"], Component: KbdDemo },
-	{ id: "card", covers: ["card"], Component: CardDemo },
 	{ id: "text", covers: ["text"], Component: TextDemo },
 	{ id: "skeleton", covers: ["skeleton"], Component: SkeletonDemo },
 	{ id: "progress", covers: ["progress"], Component: ProgressDemo },

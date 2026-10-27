@@ -12,7 +12,6 @@ An invitation to act where there is nothing to show yet: an optional line icon, 
 
 - For content that is still loading, use [Skeleton](../skeleton/README.md).
 - For an error that needs the person's attention now, use [Toast](../toast/README.md) or [Dialog](../dialog/README.md).
-- For a static block of content on a sheet, use [Card](../card/README.md).
 
 ## Usage
 

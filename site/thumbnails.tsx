@@ -12,7 +12,6 @@ import {
 	Badge,
 	Button,
 	CallBar,
-	Card,
 	Checkbox,
 	CodeBlock,
 	Composer,
@@ -288,16 +287,6 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 			<Ghost>Copy link</Ghost>
 			<Ghost danger>Revoke key</Ghost>
 		</Row>
-	),
-	card: () => (
-		<Card>
-			<Text as="p" variant="title">
-				Workspace
-			</Text>
-			<Text as="p" variant="caption">
-				142 threads, last handoff at 14:32.
-			</Text>
-		</Card>
 	),
 	text: () => (
 		<Fill>
@@ -673,15 +662,11 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 				<span>Memory</span>
 			</ListHead>
 			<ListRow sx={styles.listGrid}>
-				<Status dot="dashed" tone="danger">
-					Stale
-				</Status>
+				<Status tone="danger">Stale</Status>
 				<span>Rent cap is 25k</span>
 			</ListRow>
 			<ListRow sx={styles.listGrid}>
-				<Status dot="filled" tone="success">
-					Current
-				</Status>
+				<Status tone="success">Current</Status>
 				<span>Commute under 20 min</span>
 			</ListRow>
 		</Fill>

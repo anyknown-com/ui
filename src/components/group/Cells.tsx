@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { breakpoint, color, focusRing, font, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { useControllableState } from "../../lib/useControllableState"
 import { Ghost } from "../ghost/Ghost"
@@ -10,22 +10,12 @@ import { Slider } from "../slider/Slider"
 import { Textarea, type TextareaProps } from "../textarea/Textarea"
 
 /**
- * The lines of a `Group`: 44px, 16px in, a hairline between them that stops 16px short of the
- * left edge. A cell is a setting to read, a way into a page, one choice of several, or a field.
+ * The lines of a `Group`: 28px (44px on a phone), 16px in, only space between them. A cell is a setting to read, a way into a page, one choice of several, or a field.
  */
 
 // iOS Safari 在 16px 以下的欄位 focus 時會放大整頁;手機上欄位一律 16px
 
 const styles = stylex.create({
-	hairline: {
-		backgroundImage: {
-			default: "none",
-			":not(:first-child)": `linear-gradient(${color.border}, ${color.border})`,
-		},
-		backgroundPosition: "right top",
-		backgroundRepeat: "no-repeat",
-		backgroundSize: "calc(100% - 16px) 1px",
-	},
 	cell: {
 		alignItems: "center",
 		boxSizing: "border-box",
@@ -35,34 +25,34 @@ const styles = stylex.create({
 		fontWeight: 400,
 		gap: 12,
 		lineHeight: type.snug,
-		minHeight: 44,
-		paddingBlock: 10,
+		minHeight: { default: 28, [breakpoint.phone]: 44 },
+		paddingBlock: space.xs,
 		paddingInline: 16,
 		textAlign: "start",
 		width: "100%",
 	},
 	press: {
-		backgroundColor: { default: "transparent", ":hover": color.layer4 },
-		borderRadius: 0,
+		backgroundColor: { default: "transparent", ":hover": color.wash },
+		borderRadius: corner.shape,
 		height: "auto",
 		justifyContent: "flex-start",
-		// 整列滿版的按鈕按下去不縮:縮 0.98 時兩邊會離開卡緣,看起來像列鬆掉了
+		// 整列滿版的按鈕按下去不縮:縮 0.98 時兩邊會離開列緣,看起來像列鬆掉了
 		scale: "1",
 	},
 	text: { display: "flex", flex: 1, flexDirection: "column", gap: 2, minWidth: 0 },
 	label: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	mono: { fontFamily: font.mono, fontSize: type.t2 },
-	accent: { color: color.accent },
 	danger: { color: color.danger },
 	detail: { color: color.textMuted, fontSize: type.t2 },
 	value: { color: color.textMuted, flexShrink: 0, whiteSpace: "nowrap" },
 	warn: { color: color.warning },
-	check: { color: color.accent, flexShrink: 0, height: 18, width: 18 },
-	chevron: { color: color.textFaint, flexShrink: 0, height: 16, width: 16 },
+	check: { color: color.text, flexShrink: 0, height: 18, width: 18 },
+	chevron: { color: color.textMuted, flexShrink: 0, height: 16, width: 16 },
 	// 裡面的欄位拿掉了自己的框與環,焦點改由整列畫:底色一階不到 3:1,所以再加一圈 2px 的環
 	inputCell: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
+		backgroundColor: { default: "transparent", ":focus-within": color.wash },
+		borderRadius: corner.shape,
 		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		color: color.text,
@@ -72,7 +62,7 @@ const styles = stylex.create({
 		gap: 12,
 		gridTemplateColumns: "96px minmax(0, 1fr)",
 		lineHeight: type.snug,
-		minHeight: 44,
+		minHeight: { default: 28, [breakpoint.phone]: 44 },
 		paddingInline: 16,
 	},
 	inputLabel: { whiteSpace: "nowrap" },
@@ -83,14 +73,15 @@ const styles = stylex.create({
 		borderWidth: 0,
 		boxShadow: "none",
 		fontSize: { default: type.t3, [breakpoint.phone]: type.phoneInput },
-		height: 44,
+		height: { default: 28, [breakpoint.phone]: 44 },
 		minHeight: 0,
 		outline: "none",
 		paddingBlock: 0,
 		paddingInline: 0,
 	},
 	textCell: {
-		backgroundColor: { default: "transparent", ":focus-within": color.layer4 },
+		backgroundColor: { default: "transparent", ":focus-within": color.wash },
+		borderRadius: corner.box,
 		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -2,
 		color: color.text,
@@ -138,8 +129,8 @@ export type GroupCellProps = {
 	value?: ReactNode
 	/** A control on the right, like a `Switch`. */
 	control?: ReactNode
-	/** `accent` for an action that adds, `danger` for one that removes; neither gets a chevron. */
-	tone?: "accent" | "danger"
+	/** `danger` for an action that removes; it gets no chevron. */
+	tone?: "danger"
 	/** The value is a warning. */
 	warn?: boolean
 	/** One choice of several: `true` draws the check, `false` leaves room for none. No chevron. */
@@ -172,7 +163,7 @@ export function GroupCell({
 		<>
 			{icon}
 			<span {...stylex.props(styles.text)}>
-				<span {...stylex.props(styles.label, mono && styles.mono, tone !== undefined && styles[tone])}>
+				<span {...stylex.props(styles.label, mono && styles.mono, tone === "danger" && styles.danger)}>
 					{label}
 				</span>
 				{detail !== undefined && <span {...stylex.props(styles.detail)}>{detail}</span>}
@@ -184,10 +175,10 @@ export function GroupCell({
 		</>
 	)
 
-	if (onPress === undefined) return <div {...stylex.props(styles.hairline, styles.cell, sx)}>{body}</div>
+	if (onPress === undefined) return <div {...stylex.props(styles.cell, sx)}>{body}</div>
 
 	return (
-		<Ghost onClick={onPress} aria-pressed={checked} sx={[styles.hairline, styles.cell, styles.press, sx]}>
+		<Ghost onClick={onPress} aria-pressed={checked} sx={[styles.cell, styles.press, sx]}>
 			{body}
 		</Ghost>
 	)
@@ -203,7 +194,7 @@ export type InputCellProps = Omit<InputProps, "sx" | "size" | "aria-label"> & {
 /** A one-line field: its name in a 96px column, the input borderless after it. */
 export function InputCell({ label, sx, ...props }: InputCellProps) {
 	return (
-		<label {...stylex.props(styles.hairline, styles.inputCell, sx)}>
+		<label {...stylex.props(styles.inputCell, sx)}>
 			<span {...stylex.props(styles.inputLabel)}>{label}</span>
 			<Input {...props} aria-label={label} sx={styles.input} />
 		</label>

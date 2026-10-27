@@ -1,6 +1,6 @@
 # SettingsRows
 
-Dense settings rows on one sunken `surface` region: each 44px row has the setting's name and one line of help on the left and its control on the right, with hairlines between rows.
+Dense settings rows on the page: each 36px row has the setting's name and one line of help on the left and its control on the right, with no fill, corners or lines between rows.
 
 ## When to use
 
@@ -9,7 +9,7 @@ Dense settings rows on one sunken `surface` region: each 44px row has the settin
 
 ## When not to use
 
-- For the grouped-list settings layout (header and footer text, 44px `t3` cells, choices, inline fields, a chevron into a sub-page), use [Group](../group/README.md).
+- For the grouped-list settings layout (header and footer text, 28px `t3` cells, choices, inline fields, a chevron into a sub-page), use [Group](../group/README.md).
 - For a sunken region that holds prose or free layout, use [Page](../page/README.md)'s `Panel`.
 - For a form with labeled fields and errors, use [Label](../label/README.md)'s `Field` with an [Input](../input/README.md).
 
@@ -17,7 +17,7 @@ Dense settings rows on one sunken `surface` region: each 44px row has the settin
 
 The family:
 
-- `SettingsRows` — the sunken region (`surface`, `corner.card`, no border).
+- `SettingsRows` — the rows on the page (no fill, no corners, no lines).
 - `SettingsRow` — one row: `label` and an optional `help` line on the left, and `children` (the control) on the right.
 - `Help` — a muted reading inline on the label line.
 - `SettingsValue` — a mono, muted reading, such as a masked key.

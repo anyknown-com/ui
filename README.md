@@ -106,7 +106,7 @@ StyleX needs two passes: Babel turns `stylex.create` into class names, and PostC
 ```
 
 ```tsx
-import { Button, Card, Text } from "@anyknown/ui"
+import { Button, Text } from "@anyknown/ui"
 import { color, space } from "@anyknown/ui/tokens.stylex"
 ```
 

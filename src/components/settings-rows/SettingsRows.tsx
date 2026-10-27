@@ -3,33 +3,24 @@ import { color, corner, font, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 
 /**
- * `.srows` / `.srow`: a setting per line, 44px — its name and one line of help on the left, the
- * control on the right. The rows sit on one sunken `surface` region of the sheet, no ring around
- * it, hairlines between them.
+ * `.srows` / `.srow`: a setting per line, 36px — its name and one line of help on the left, the
+ * control on the right. The rows sit on the page: no fill, no corners, no lines, only space.
  */
 
 const styles = stylex.create({
 	rows: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
 		color: color.text,
 		fontSize: type.t2,
 		lineHeight: type.body,
 	},
 	row: {
 		alignItems: "center",
-		borderRadius: {
-			default: 0,
-			":first-child": `${corner.card} ${corner.card} 0 0`,
-			":last-child": `0 0 ${corner.card} ${corner.card}`,
-		},
-		boxShadow: { default: "none", ":not(:first-child)": `inset 0 1px 0 ${color.border}` },
 		columnGap: space.sm,
 		display: "grid",
 		gridTemplateColumns: "minmax(0, 1fr) auto",
-		minHeight: 44,
-		paddingBlock: space.xs,
-		paddingInline: space.sm,
+		minHeight: 36,
+		paddingBlock: 6,
+		paddingInline: 0,
 	},
 	key: { minWidth: 0 },
 	label: {
@@ -44,7 +35,7 @@ const styles = stylex.create({
 	help: { color: color.textMuted, fontSize: type.t2 },
 	value: { color: color.textMuted, fontFamily: font.mono, fontSize: type.t2, whiteSpace: "nowrap" },
 	ctl: { alignItems: "center", display: "flex", flex: "none", gap: space.xs },
-	dot: { backgroundColor: color.accent, borderRadius: "50%", flex: "none", height: 6, width: 6 },
+	dot: { backgroundColor: color.text, borderRadius: corner.shape, flex: "none", height: 6, width: 6 },
 })
 
 type Sx = {
@@ -57,7 +48,7 @@ export type SettingsRowsProps = {
 	children: ReactNode
 } & Sx
 
-/** A sunken panel of settings, one `SettingsRow` per line with hairlines between them. */
+/** Settings on the page, one `SettingsRow` per line, no fill and no lines. */
 export function SettingsRows({ children, sx }: SettingsRowsProps) {
 	return <div {...stylex.props(styles.rows, sx)}>{children}</div>
 }
@@ -111,7 +102,7 @@ export const Value = SettingsValue
 
 export type DotProps = Sx
 
-/** A 6px accent dot that marks a row's label, hidden from screen readers. */
+/** A 6px ink dot that marks a row's label, hidden from screen readers. */
 export function Dot({ sx }: DotProps) {
 	return <span aria-hidden="true" {...stylex.props(styles.dot, sx)} />
 }

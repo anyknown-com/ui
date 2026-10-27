@@ -31,32 +31,20 @@ function dotOf(text: string) {
 }
 
 describe("Status", () => {
-	test("沒給 dot 就只有字", () => {
-		render(<Status>連上了</Status>)
-		expect(dotOf("連上了")).toBeNull()
-	})
-
-	test("實心、空心、虛線三種點", () => {
+	test("永遠有一個 6px 實心點", () => {
 		render(
 			<>
-				<Status dot="filled" tone="success">
-					還對
-				</Status>
-				<Status dot="hollow">待確認</Status>
-				<Status dot="dashed" tone="danger">
-					過期
-				</Status>
+				<Status tone="success">還對</Status>
+				<Status>待確認</Status>
 			</>,
 		)
-		expect(dotOf("還對")).toHaveStyle({ borderStyle: "none" })
-		expect(dotOf("待確認")).toHaveStyle({ borderStyle: "solid", borderWidth: "1.5px" })
-		expect(dotOf("過期")).toHaveStyle({ borderStyle: "dashed" })
+		expect(dotOf("還對")).not.toBeNull()
+		expect(dotOf("待確認")).not.toBeNull()
 	})
 
 	test("warn 是實心的 warning 點", () => {
 		render(<Status warn>要處理</Status>)
 		expect(dotOf("要處理")).not.toBeNull()
-		expect(dotOf("要處理")).toHaveStyle({ borderStyle: "none" })
 	})
 })
 
@@ -145,10 +133,8 @@ describe("GroupItem disclosure", () => {
 		const { container } = render(
 			<Group header="連線" footer="連上的服務會出現在這裡。">
 				<GroupItem defaultOpen>
-					<GroupRow name="Notion" expands mark={<Mark letter="N" tint="black 20%" />}>
-						<Status dot="filled" tone="success">
-							連上了
-						</Status>
+					<GroupRow name="Notion" expands mark={<Mark letter="N" />}>
+						<Status tone="success">連上了</Status>
 					</GroupRow>
 					<Expand>
 						<Note err>權杖過期了。</Note>

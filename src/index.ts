@@ -1,5 +1,4 @@
 export { Button, type ButtonProps } from "./components/button/Button"
-export { Card, type CardProps } from "./components/card/Card"
 export { Text, type TextProps } from "./components/text/Text"
 
 export { Input, type InputProps } from "./components/input/Input"

@@ -5,8 +5,8 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { Ghost, type GhostProps } from "../ghost/Ghost"
 
 /**
- * A list of things you open: a faint head over the columns, then 40px rows that are each one
- * button, no frame around them. Unlike `Table` (a mono ledger) nothing here is mono. The columns
+ * A list of things you open: a muted head over the columns, then 28px rows that are each one
+ * button, no frame and no lines around them. Unlike `Table` (a mono ledger) nothing here is mono. The columns
  * are the caller's: one grid template in `sx`, the same on the head and every row, and whatever
  * the list does on a phone (drop the head, wrap a row to two lines) goes in that `sx` too.
  */
@@ -14,9 +14,6 @@ import { Ghost, type GhostProps } from "../ghost/Ghost"
 const styles = stylex.create({
 	head: {
 		alignItems: "center",
-		borderBlockEndColor: color.border,
-		borderBlockEndStyle: "solid",
-		borderBlockEndWidth: 1,
 		color: color.textMuted,
 		columnGap: 12,
 		display: "grid",
@@ -36,15 +33,21 @@ const styles = stylex.create({
 	current: { color: color.text },
 	row: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: corner.control,
+		backgroundColor: {
+			default: "transparent",
+			":hover": color.wash,
+			"[aria-pressed=true]": color.washHover,
+			"[aria-current=true]": color.washHover,
+			"[aria-selected=true]": color.washHover,
+		},
+		borderRadius: corner.shape,
 		color: color.text,
 		columnGap: 12,
 		display: "grid",
 		fontSize: type.t3,
 		height: "auto",
 		lineHeight: type.tight,
-		minHeight: 40,
+		minHeight: 28,
 		overflowWrap: "anywhere",
 		paddingBlock: 4,
 		paddingInline: 8,
@@ -55,10 +58,9 @@ const styles = stylex.create({
 		whiteSpace: "normal",
 		width: "100%",
 	},
-	dot: { borderRadius: 999, boxSizing: "border-box", flexShrink: 0, height: 8, width: 8 },
-	light: { backgroundColor: color.textFaint },
-	soon: { backgroundColor: color.danger },
-	heavy: { borderColor: color.warning, borderStyle: "solid", borderWidth: 1.5 },
+	dot: { borderRadius: corner.shape, flexShrink: 0, height: 6, width: 6 },
+	light: { backgroundColor: color.textMuted },
+	waits: { backgroundColor: color.warning },
 })
 
 export type ListHeadProps = Omit<HTMLAttributes<HTMLDivElement>, "className" | "style"> & {
@@ -68,7 +70,7 @@ export type ListHeadProps = Omit<HTMLAttributes<HTMLDivElement>, "className" | "
 	sx?: stylex.StyleXStyles
 }
 
-/** The faint head row over a list's columns. */
+/** The muted head row over a list's columns. */
 export function ListHead({ children, sx, ...props }: ListHeadProps) {
 	return (
 		<div {...props} {...stylex.props(styles.head, sx)}>
@@ -117,9 +119,9 @@ export function ListRow({ sx, ...props }: ListRowProps) {
 }
 
 export type WeightDotProps = {
-	/** `light` goes ahead on its own if nobody answers (a grey dot); `heavy` waits (an orange ring). */
+	/** `light` goes ahead on its own if nobody answers (a muted dot); `heavy` waits (an amber dot). */
 	weight: "light" | "heavy"
-	/** A light one about to go ahead: the dot turns red. */
+	/** A light one about to go ahead: the dot turns amber, like `heavy`. */
 	soon?: boolean
 	/** What the weight means, on hover. */
 	title?: string
@@ -127,8 +129,8 @@ export type WeightDotProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** The 8px mark in front of a question: how much it needs you. */
+/** The 6px dot in front of a question: how much it needs you. */
 export function WeightDot({ weight, soon = false, title, sx }: WeightDotProps) {
-	const look = weight === "heavy" ? styles.heavy : soon ? styles.soon : styles.light
+	const look = weight === "heavy" || soon ? styles.waits : styles.light
 	return <span {...(title ? { title } : {})} {...stylex.props(styles.dot, look, sx)} />
 }

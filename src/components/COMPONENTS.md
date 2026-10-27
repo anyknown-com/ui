@@ -845,13 +845,6 @@ is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`), told apart by the
   capsule in weight 600 (`data-part="toggles"`). In a grid it still wraps only its own options
 - `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`, and `Pill`'s `done` dot is `success`: the agent is working
 
-### card
-`Card` is a rest card on the paper: `surfaceRaised` background, `corner.card` (14px),
-`shadow.rest`, `color.text`, padding `space.lg`. No variants. Props are `div` props plus `sx`.
-
-- No border: the `shadow.rest` ring is its only edge
-- To divide a card, use sunken `surface` blocks inside it; never a card inside a card
-
 ### text
 `Text` sets running text and headings from the `type` scale. Props: `as` (default `p`),
 `variant` (default `body`), `sx`. Base: `font.body`, `color.text`, `type.snug`, margin 0.
@@ -878,55 +871,47 @@ Not a component but the icon conventions: `icon.ts` exports `icon` (StyleX sizes
 - `Chevron.tsx` exports `Chevron` (`direction: "right" | "down"`), drawn on `Glyph`
 
 ### group / page / settings-rows / table
-Page skeleton parts: `Group` + `GroupRow` / `GroupItem` form a list card (see the next section);
+Page skeleton parts: `Group` + `GroupRow` / `GroupItem` form a grouped list (see the next section);
 `PageHead` / `SectionLabel` / `Panel` / `Snippet` are the page's text and surfaces;
 `SettingsRows` + `SettingsRow` are settings rows with the label on the left and the control on
 the right; `Table` + `Tr` + `TableCell` are low-level table parts (for sorting and paging use
-`DataTable`). Type from `type`, corners from `corner`. Hover rises a layer: `Tr`, `MoreRow` and
-`ListRow` go to `layer3`, Group rows to `layer4`; only the table `Toggle` and `IconButton` use
-an `ink` wash. The old names `Row`, `Item`, `Head`, `Cell` are deprecated aliases of
-`GroupRow`, `GroupItem`, `TableHead`, `TableCell`.
+`DataTable`). Type from `type`, corners from `corner`. Rows have no fill and no lines; hover
+and selection are a `wash` (`washHover` when selected). The old names `Row`, `Item`, `Head`,
+`Cell` are deprecated aliases of `GroupRow`, `GroupItem`, `TableHead`, `TableCell`.
 
-- The page is the desk (`layer1`); content sits on the white main sheet (`layer2`,
-  `corner.sheet`). The main sheet is the shell's job; these parts all assume they are on paper
-- `SettingsRows` and `Panel` are sunken `surface` blocks in the paper (`corner.card`), **no
-  frame**; a hairline between rows
-- `Table` runs full width, not in a card: no background, no frame. `TableHead` is a sunken
+- The page is one sheet of paper; these parts all assume they are on it
+- `SettingsRows` is the rows on the page: no fill, no corners, no lines, only space. A row is
+  36px (`minHeight`), 6px above and below, the control right-aligned (`data-part="picker-row"`,
+  `switch` in the prototype's settings tab). There is no `Card`; a block of content is just
+  a block on the page
+- `Table` runs full width: no background, no frame. `TableHead` is a sunken
   `surface` strip (`corner.small`), a hairline under every row (not the last), and `Detail` is
   drawn under it the same way
-- For cards, see `card`
 
 ### group (grouped list)
-The settings page's grouped list, moved as-is from the product shell's design-reviewed `ios/`
-(0.9). `Group` has a muted `header` above, a sunken `surface` block in the paper in the middle
-(`corner.card`, no frame, no shadow), and a muted `footer` below. The 0.8 framed `surface` card
-had no users and was replaced outright.
+The settings page's grouped list. `Group` has a muted `header` above, the lines in the middle on
+the page itself (no fill, no frame, no shadow, no lines; only space between them), and a muted
+`footer` below.
 
-- Rows in the card are cells: `GroupCell` (text, a second `detail` line, `value` / `control` on
-  the right), `InputCell` (a 96px name column + a frameless Input), `TextCell` (a growing
-  Textarea), `SliderCell` (name and reading on one line, slider below). 44px, 16px left and
-  right, `type.t3`
+- Lines are cells: `GroupCell` (text, a second `detail` line, `value` / `control` on the right),
+  `InputCell` (a 96px name column + a frameless Input), `TextCell` (a growing Textarea),
+  `SliderCell` (name and reading on one line, slider below). 28px minimum (44px at
+  `breakpoint.phone`), 16px left and right, `type.t3`; hover and focus-within are a `wash`,
+  `corner.shape` (`corner.box` for `TextCell`, which grows)
 - Fields inside `InputCell` / `TextCell` drop their own frame and ring; the whole row draws
-  focus: on `:focus-within` the background rises to `layer4`, plus a 2px `focusRing` outline
-  (`outlineOffset: -2`, drawn inside the card's corners). Background alone would be 1.09:1, and
-  you couldn't tell where focus is
-- The divider between rows is the cell's own `background-image`, `100% - 16px` wide, aligned
-  right; **not** the card's `gap` or `border`: the first row has no line, and the line starts
-  16px from the left. Currently only `GroupCell` and `InputCell` draw it; `TextCell` and
-  `SliderCell` don't
+  focus: on `:focus-within` the background is a `wash`, plus a 2px `focusRing` outline
+  (`outlineOffset: -2`). Background alone would be too faint to tell where focus is
 - A `GroupCell` with `onPress` is a whole-row `Ghost`; it draws a chevron only when it has no
-  `tone` and isn't an option (`checked`): action rows like "Add" or "Delete" and single-choice
-  options aren't "go in"
-- Leading items: `IconTile` (a 28px `layer4` square, `corner.small`, with a 16px glyph),
-  `LetterTile` (the same square with a first letter), `ActionIcon` (an 18px glyph with no square,
-  for action rows). Glyphs take a lucide component; this package doesn't depend on lucide
-- The 0.8 `Item` / `Row` still work inside the new card but are deprecated in favor of
-  `GroupItem` / `GroupRow`: `Item` drops its own text back to `type.t2`, and with `go` hovers
-  to `layer4`
-- `Status` is dot + text: `dot` takes `filled` (settled) / `hollow` (awaiting confirmation) /
-  `dashed` (expired), three 7px dots, and `tone` colors the dot; `warning` / `danger` tint the
-  text too, `success` / `muted` keep the text muted (calm states don't call attention). Without
-  `dot` it is text only. `warn` is shorthand for `tone="warning"` + a filled dot (the 0.8 API)
+  `tone` and isn't an option (`checked`): action rows like "Delete" and single-choice
+  options aren't "go in". `tone` is `"danger"` only
+- Leading items: `IconTile` (a 28px slot with a 16px glyph, no tile), `LetterTile` (the same
+  slot with a first letter), `ActionIcon` (an 18px glyph, for action rows). Glyphs take a lucide
+  component; this package doesn't depend on lucide. `Mark` is a 22px muted letter, no tint
+- The 0.8 `Item` / `Row` still work but are deprecated in favor of `GroupItem` / `GroupRow`:
+  `Item` drops its own text back to `type.t2`, and with `go` hovers to `wash`
+- `Status` is a solid 6px dot + text: `tone` colors the dot; `warning` / `danger` tint the text
+  too, `success` / `muted` keep the text muted (calm states don't call attention). `warn` is
+  shorthand for `tone="warning"`. There is no `dot` prop
 
 ### status-badge
 The status word placed over something that is running by itself (a screen the AI is operating):
@@ -940,20 +925,20 @@ working), `warn` is `warning` text plus a 6px dot, `plain` is `textMuted` text p
 
 ### list
 A "click to open" list (memories, questions): `ListHead` is one line of `type.t1` `textMuted`
-column names with a thin line under it; each `ListRow` is a `Ghost`, 40px, `type.t3`, hover
-`layer3`, corner `corner.control`, no frame. Unlike `Table`: `Table` is a mono ledger; here
+column names, no line under it; each `ListRow` is a `Ghost`, 28px minimum, `type.t3`, hover
+`wash`, selected `washHover`, `corner.shape`, no frame. Unlike `Table`: `Table` is a mono ledger; here
 there is no mono at all.
 
 - **Column widths belong to the caller**: the same grid template goes to the header and every
   row through `sx`. How it lays out on phones (hide the header, wrap a row onto two lines, 10px
   above and below each row) goes in the same `sx`: the component carries no breakpoint, so the
   shell's 640px and this package's 45rem never fight
-- Rows are `minHeight: 40`, not `height: 40`: they grow when wrapping to two lines
+- Rows are `minHeight: 28`, not `height: 28`: they grow when wrapping to two lines
 - Rows don't inherit `Ghost`'s `nowrap`: text in a cell wraps within its column
   (`overflow-wrap: anywhere`) and never runs into the next column when narrow. The middle column
   gets `minmax(0, 1fr)`; on phones, narrow the other columns so it gets the width
 - A sortable column name uses `ListSort` (a `type.t1` `Ghost`); `active` turns dark and is
   followed by ` ↓`
-- `WeightDot`: the 8px dot in front of a question. `light` solid gray (no answer means the
-  recommendation is followed), `soon` solid red (due soon), `heavy` a 1.5px orange hollow ring (a
-  person must decide). Not `Dot` (the 6px accent dot in settings rows)
+- `WeightDot`: the 6px dot in front of a question. `light` is a muted dot (no answer means the
+  recommendation is followed); `heavy` (a person must decide) and `soon` (due soon) share one
+  look, a `warning` dot. Not `Dot` (the 6px ink dot in settings rows)

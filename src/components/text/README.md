@@ -37,6 +37,5 @@ No keyboard interaction of its own.
 
 ## Related
 
-- [Card](../card/README.md) — the sheet text usually sits on.
 - [Markdown](../markdown/README.md) — for model output with headings, lists and code.
 - [Kbd](../kbd/README.md) — for shortcuts inside a sentence.

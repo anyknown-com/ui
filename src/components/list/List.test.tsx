@@ -81,7 +81,7 @@ describe("ListRow", () => {
 })
 
 describe("WeightDot", () => {
-	test("heavy 是空心環,light 是實心點", () => {
+	test("heavy 與 soon 同一個點,light 另一個", () => {
 		const { container } = render(
 			<>
 				<WeightDot weight="heavy" title="要你決定" />
@@ -91,8 +91,7 @@ describe("WeightDot", () => {
 		)
 		const [heavy, light, soon] = [...container.children]
 		expect(heavy).toHaveAttribute("title", "要你決定")
-		expect(heavy).toHaveStyle({ borderStyle: "solid", borderWidth: "1.5px" })
-		expect(light).toHaveStyle({ borderStyle: "none" })
+		expect(heavy?.className).toBe(soon?.className)
 		expect(light?.className).not.toBe(soon?.className)
 	})
 })

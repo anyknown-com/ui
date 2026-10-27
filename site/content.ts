@@ -57,7 +57,6 @@ export const COMPONENT_GROUPS: { title: string; names: string[] }[] = [
 			"button",
 			"icon-button",
 			"ghost",
-			"card",
 			"text",
 			"icon",
 			"kbd",

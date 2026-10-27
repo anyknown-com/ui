@@ -1,13 +1,13 @@
 import * as stylex from "@stylexjs/stylex"
 import { useControllableState } from "../../lib/useControllableState"
-import { color, corner, focusRing, font, motion, space, tone, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Chevron } from "../icon/Chevron"
 import { type ReactNode, createContext, useContext, useId, useMemo } from "react"
 import { icon } from "../icon/icon"
 
 /**
  * `.group` / `.item` / `.row`: a grouped list. An optional muted header above, the lines on one
- * sunken `surface` region of the sheet with hairlines between them, an optional muted footer below. The lines are cells
+ * page with only space between them, an optional muted footer below. The lines are cells
  * (`GroupCell`, `InputCell`, `TextCell`, `SliderCell`) or, for a thing with its name, its state
  * and its one action on the right, an `Item` holding a `Row`, whose detail unfolds under it in an
  * `Expand`, never over the screen.
@@ -25,27 +25,27 @@ const styles = stylex.create({
 		lineHeight: type.body,
 	},
 	header: { color: color.textMuted, fontSize: type.t2, paddingInline: space.sm },
-	cells: { backgroundColor: color.surface, borderRadius: corner.card, overflow: "hidden" },
+	cells: { display: "flex", flexDirection: "column" },
 	footer: { color: color.textMuted, fontSize: type.t2, lineHeight: type.snug, paddingInline: space.sm },
 	item: {
-		boxShadow: { default: "none", ":not(:first-child)": `inset 0 1px 0 ${color.border}` },
+		borderRadius: corner.shape,
 		fontSize: type.t2,
 		overflow: "hidden",
 	},
-	go: { backgroundColor: { default: "transparent", ":hover": color.layer4 } },
+	go: { backgroundColor: { default: "transparent", ":hover": color.wash } },
 	row: {
 		alignItems: "center",
 		columnGap: space.sm,
 		display: "grid",
 		gridTemplateColumns: "minmax(0, 1fr) auto",
-		minHeight: 40,
+		minHeight: 28,
 		paddingBlock: space.xs,
 		paddingInline: space.sm,
 	},
 	rowgo: {
 		alignItems: "center",
 		backgroundColor: "transparent",
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: "inherit",
@@ -66,8 +66,7 @@ const styles = stylex.create({
 	still: { cursor: "default" },
 	mark: {
 		alignItems: "center",
-		borderRadius: corner.small,
-		color: color.text,
+		color: color.textMuted,
 		display: "grid",
 		flex: "none",
 		fontSize: type.t1,
@@ -77,7 +76,6 @@ const styles = stylex.create({
 		placeItems: "center",
 		width: 22,
 	},
-	markTint: (tint: string) => ({ backgroundColor: `color-mix(in srgb, ${tint}, ${color.surface})` }),
 	name: {
 		flex: "none",
 		fontSize: type.t2,
@@ -86,7 +84,7 @@ const styles = stylex.create({
 		textOverflow: "ellipsis",
 		whiteSpace: "nowrap",
 	},
-	sep: { color: tone.faint, flex: "none", fontSize: type.t2 },
+	sep: { color: color.textMuted, flex: "none", fontSize: type.t2 },
 	status: {
 		alignItems: "center",
 		color: color.textMuted,
@@ -99,17 +97,20 @@ const styles = stylex.create({
 	statusText: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
 	warning: { color: color.warning },
 	danger: { color: color.danger },
-	dot: { borderRadius: "50%", boxSizing: "border-box", flex: "none", height: 7, width: 7 },
-	filled: { backgroundColor: "currentColor" },
-	hollow: { borderColor: "currentColor", borderStyle: "solid", borderWidth: 1.5 },
-	dashed: { borderColor: "currentColor", borderStyle: "dashed", borderWidth: 1.5 },
+	dot: {
+		backgroundColor: "currentColor",
+		borderRadius: corner.shape,
+		flex: "none",
+		height: 6,
+		width: 6,
+	},
 	dotMuted: { color: color.textMuted },
 	dotSuccess: { color: color.success },
 	dotWarning: { color: color.warning },
 	dotDanger: { color: color.danger },
 	tag: { color: color.textMuted, flex: "none", fontFamily: font.mono, fontSize: type.t2 },
 	act: { alignItems: "center", display: "flex", gap: space.xs },
-	chevron: { color: tone.faint },
+	chevron: { color: color.textMuted },
 	expand: {
 		display: "grid",
 		gridTemplateRows: "0fr",
@@ -147,9 +148,9 @@ type Sx = {
 }
 
 export type GroupProps = {
-	/** A muted line above the card that names what the group is about. */
+	/** A muted line above the lines that names what the group is about. */
 	header?: ReactNode
-	/** A muted sentence under the card that says what the settings in it do. */
+	/** A muted sentence under the lines that says what the settings in it do. */
 	footer?: ReactNode
 	/** The lines of the group: `GroupItem`s or cells. */
 	children: ReactNode
@@ -157,7 +158,7 @@ export type GroupProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** A grouped list: an optional header, the lines on one sunken card with hairlines between them, an optional footer. */
+/** A grouped list: an optional header, the lines on the page with only space between them, an optional footer. */
 export function Group({ header, footer, children, sx }: GroupProps) {
 	return (
 		<div {...stylex.props(styles.group, sx)}>
@@ -211,18 +212,16 @@ export function GroupItem({
 export const Item = GroupItem
 
 export type MarkProps = {
-	/** The letter in the square, usually the first of the thing's name. */
+	/** The letter, usually the first of the thing's name. */
 	letter: string
-	/** The square's colour as `<colour> <percent>%`, mixed into the surface. */
-	tint: string
 	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
-/** The 22px square with the first letter; `tint` is `<colour> <percent>%` for the mix. */
-export function Mark({ letter, tint, sx }: MarkProps) {
+/** A 22px slot with a first letter in muted ink, no tile. */
+export function Mark({ letter, sx }: MarkProps) {
 	return (
-		<div aria-hidden="true" {...stylex.props(styles.mark, styles.markTint(tint), sx)}>
+		<div aria-hidden="true" {...stylex.props(styles.mark, sx)}>
 			{letter}
 		</div>
 	)
@@ -241,23 +240,20 @@ const DOT_TONE = {
 export type StatusProps = {
 	/** The state in words; truncates, with the full text on hover when it is a string. */
 	children: ReactNode
-	/** `filled` settled, `hollow` waiting on someone, `dashed` gone stale. No dot without it. */
-	dot?: "filled" | "hollow" | "dashed"
 	/**
-	 * The dot's colour. `warning` and `danger` colour the words too; a calm state reads muted.
+	 * The 6px dot's colour. `warning` and `danger` colour the words too; a calm state reads muted.
 	 * @default "muted"
 	 */
 	tone?: StatusTone
-	/** Shorthand for `tone="warning"` with a filled dot. */
+	/** Shorthand for `tone="warning"`. */
 	warn?: boolean
 	/** StyleX styles merged after the component's own. */
 	sx?: stylex.StyleXStyles
 }
 
-/** A state in words after a dot: the state after a row's name, or a list's status column. */
+/** A state in words after a solid 6px dot: the state after a row's name, or a list's status column. */
 export function Status(props: StatusProps) {
-	const { children, dot, warn = false, sx } = props
-	const shape = dot ?? (warn ? "filled" : undefined)
+	const { children, warn = false, sx } = props
 	const hue = props.tone ?? (warn ? "warning" : "muted")
 	return (
 		<span
@@ -268,9 +264,7 @@ export function Status(props: StatusProps) {
 				sx,
 			)}
 		>
-			{shape !== undefined && (
-				<span {...stylex.props(styles.dot, DOT_TONE[hue], styles[shape])} aria-hidden="true" />
-			)}
+			<span {...stylex.props(styles.dot, DOT_TONE[hue])} aria-hidden="true" />
 			<span
 				{...(typeof children === "string" ? { title: children } : {})}
 				{...stylex.props(styles.statusText)}

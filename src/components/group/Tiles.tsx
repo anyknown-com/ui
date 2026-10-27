@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, type } from "../../tokens.stylex"
+import { color, type } from "../../tokens.stylex"
 import type { ComponentType, SVGProps } from "react"
 import { ICON_STROKE } from "../icon/icon"
 
-/** What leads a `GroupCell`: a glyph on a 28px tile, a letter on one, or a bare 28px glyph slot. */
+/** What leads a `GroupCell`: a glyph in a 28px slot, a letter in one, or a bare 28px glyph slot. */
 
 /** A lucide icon, or anything drawn the same way. */
 export type TileIcon = ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: number }>
@@ -11,8 +11,6 @@ export type TileIcon = ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: n
 const styles = stylex.create({
 	tile: {
 		alignItems: "center",
-		backgroundColor: color.layer4,
-		borderRadius: corner.small,
 		color: color.text,
 		display: "flex",
 		flexShrink: 0,
