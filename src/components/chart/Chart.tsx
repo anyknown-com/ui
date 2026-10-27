@@ -2,16 +2,17 @@ import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, type KeyboardEvent, type PointerEvent, useRef, useState } from "react"
 import { defineStrings, useStrings } from "../../lib/i18n"
 import { type StyleArg, styled } from "../../lib/styled"
-import { color, focusRing, font, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 import { axisTicks, formatNumber, fraction } from "./axis"
 
-// The frame BarChart shares: three faint ticks, the marks in ink, the labels under them, one
+// The frame BarChart and LineChart share: three faint ticks, the marks in ink, the labels under them, one
 // value at a time on hover or focus, and a table of every number for screen readers. No frame,
 // fill or legend; colour is for status, so the marks are `text`.
 
 const strings = defineStrings({
 	"zh-TW": {
 		bar: "長條圖",
+		line: "折線圖",
 		name: (chart: string, from: string, to: string) => `${chart}，${from} 到 ${to}`,
 		label: "項目",
 		value: "數值",
@@ -19,6 +20,7 @@ const strings = defineStrings({
 	},
 	en: {
 		bar: "Bar chart",
+		line: "Line chart",
 		name: (chart: string, from: string, to: string) => `${chart}, ${from} to ${to}`,
 		label: "Label",
 		value: "Value",
@@ -50,9 +52,22 @@ const styles = stylex.create({
 	},
 	plot: { position: "relative", minWidth: 0 },
 	bar: { height: "7.5rem" },
+	line: { height: "11.25rem" },
 	svg: { position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" },
 	tick: { stroke: color.washHover, strokeWidth: 1 },
 	mark: { fill: color.text },
+	path: { fill: "none", stroke: color.text, strokeWidth: 2, strokeLinejoin: "round", strokeLinecap: "round" },
+	dot: (left: string, bottom: string) => ({
+		position: "absolute",
+		left,
+		bottom,
+		width: "0.5rem",
+		height: "0.5rem",
+		borderRadius: corner.shape,
+		backgroundColor: color.text,
+		transform: "translate(-50%, 50%)",
+		pointerEvents: "none",
+	}),
 	// The tick labels: zero-height rows spread top, middle, bottom, so each centres on its line.
 	ticks: { display: "flex", flexDirection: "column", justifyContent: "space-between" },
 	tickLabel: {
@@ -77,6 +92,8 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 		pointerEvents: "none",
 	}),
+	// Above a line's dot the value needs a little more room than above a bar.
+	lift: { marginBlockEnd: space.xxs },
 	srOnly: {
 		position: "absolute",
 		width: 1,
@@ -101,11 +118,11 @@ export type ChartProps = Omit<ComponentProps<"div">, "children"> & {
 	sx?: StyleArg
 }
 
-type Kind = "bar"
+type Kind = "bar" | "line"
 
 const KEYS: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }
 
-/** Draws `values` as `kind`; BarChart is a thin wrapper around it. */
+/** Draws `values` as `kind`; BarChart and LineChart are thin wrappers around it. */
 export function Chart({
 	kind,
 	labels,
@@ -126,7 +143,9 @@ export function Chart({
 	const active = focus ?? hover
 	const shown = active != null ? values[active] : undefined
 	const slot = n > 0 ? 100 / n : 0
-	const ticks = axisTicks(Math.min(0, ...values), Math.max(0, ...values))
+	// Bars stand on zero; a line only needs to cover its own values.
+	const ends = kind === "bar" ? [0, ...values] : n > 0 ? values : [0]
+	const ticks = axisTicks(Math.min(...ends), Math.max(...ends))
 	const y = (value: number) => 100 - fraction(value, ticks) * 100
 	const every = Math.ceil(n / MAX_LABELS)
 	const withUnit = (value: number) => (unit ? `${formatNumber(value)} ${unit}` : formatNumber(value))
@@ -149,6 +168,12 @@ export function Chart({
 
 	const barWidth = Math.min(slot, 100 / MIN_SLOTS) * BAR
 	const zero = y(0)
+	const x = (index: number) => (index + 0.5) * slot
+	// The top of what is drawn for a value: a bar's upper end, or the line's point.
+	const top = (value: number) => (kind === "bar" ? Math.min(y(value), zero) : y(value))
+	const points = values.map((value, index) => `${x(index)} ${y(value)}`)
+	// One point still draws: a zero-length segment with round caps is a dot.
+	const path = n > 0 ? `M${points.join(" L")}${n === 1 ? ` L${points[0]}` : ""}` : ""
 
 	return (
 		<div {...props} {...styled(props, styles.root, sx)}>
@@ -172,18 +197,22 @@ export function Chart({
 							{...stylex.props(styles.tick)}
 						/>
 					))}
-					{values.map((value, index) => (
-						<rect
-							// oxlint-disable-next-line react/no-array-index-key -- one bar per value, in order
-							key={index}
-							x={(index + 0.5) * slot - barWidth / 2}
-							width={barWidth}
-							y={Math.min(y(value), zero)}
-							height={Math.abs(zero - y(value))}
-							shapeRendering="crispEdges"
-							{...stylex.props(styles.mark)}
-						/>
-					))}
+					{kind === "bar" &&
+						values.map((value, index) => (
+							<rect
+								// oxlint-disable-next-line react/no-array-index-key -- one bar per value, in order
+								key={index}
+								x={x(index) - barWidth / 2}
+								width={barWidth}
+								y={top(value)}
+								height={Math.abs(zero - y(value))}
+								shapeRendering="crispEdges"
+								{...stylex.props(styles.mark)}
+							/>
+						))}
+					{kind === "line" && path !== "" && (
+						<path d={path} vectorEffect="non-scaling-stroke" {...stylex.props(styles.path)} />
+					)}
 				</svg>
 				<div aria-hidden="true" {...stylex.props(styles.hits)}>
 					{values.map((value, index) => (
@@ -197,10 +226,19 @@ export function Chart({
 							{...stylex.props(styles.hit(`${index * slot}%`, `${slot}%`), focus === index && styles.focused)}
 						/>
 					))}
+					{active != null && shown != null && kind === "line" && (
+						<span
+							data-part="chart-point"
+							{...stylex.props(styles.dot(`${x(active)}%`, `${100 - top(shown)}%`))}
+						/>
+					)}
 					{active != null && shown != null && (
 						<span
 							data-part="chart-value"
-							{...stylex.props(styles.tip(`${(active + 0.5) * slot}%`, `${100 - Math.min(y(shown), zero)}%`))}
+							{...stylex.props(
+								styles.tip(`${x(active)}%`, `${100 - top(shown)}%`),
+								kind === "line" && styles.lift,
+							)}
 						>
 							{withUnit(shown)}
 						</span>

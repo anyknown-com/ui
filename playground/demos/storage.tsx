@@ -8,6 +8,7 @@ import {
 	Field,
 	FileList,
 	FileRow,
+	LineChart,
 	PasswordInput,
 	RecoveryKey,
 	type SortState,
@@ -348,6 +349,15 @@ function ChartDemo() {
 				labels={Array.from({ length: 30 }, (_, i) => `10/${i + 1}`)}
 				values={Array.from({ length: 30 }, (_, i) => 28_000 + ((i * 7919) % 16_000))}
 				unit="requests"
+			/>
+			<Label>line, p95 latency by hour</Label>
+			<LineChart
+				labels={Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`)}
+				values={[
+					212, 198, 190, 185, 188, 196, 230, 262, 301, 318, 342, 335, 360, 388, 351, 329, 310, 296, 280, 264,
+					240, 228, 219, 214,
+				]}
+				unit="ms"
 			/>
 		</Demo>
 	)

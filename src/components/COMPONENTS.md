@@ -864,16 +864,20 @@ widget's `Stat` and the prototype's stat row, without the grid.
 - No `delta` colour: a change is words in `note`. Colour is for status only
 
 ### chart
-`BarChart` draws `labels`, `values` and an optional `unit` as one ink bar per value. It is the
-widget's `BarChart`; the library draws its own SVG and ships no chart package, for the same reason
-`Markdown` ships no mermaid.
+`BarChart` and `LineChart` draw `labels`, `values` and an optional `unit`: one ink bar per value,
+or one 2px ink line through them. They are the widget's `BarChart` and `LineChart` and share one
+frame (`chart/Chart.tsx`); the library draws its own SVG and ships no chart package, for the same
+reason `Markdown` ships no mermaid.
 
 - Marks are `text`, not a colour: colour is for status. No frame, fill, legend or axis line; the
   only lines are three 1px `washHover` ticks, faint guides that the tick labels on the right name
 - Three ticks from `axisTicks` (`chart/axis.ts`): round steps (1, 2, 2.5, 3, 4, 5, 6, 8 times a
   power of ten), evenly spaced, so the y range is exactly bottom to top tick. Bars always include
-  zero. The tick labels have no unit; the unit goes with the value and in the table header
-- Bars are square (no corner has this job) and 60% of their slot, never wider than with six slots
+  zero; a line's ticks cover only its values, so a level near 300 ms is not squashed at the top.
+  The tick labels have no unit; the unit goes with the value and in the table header
+- Bars are square (no corner has this job) and 60% of their slot, never wider than with six slots.
+  The line runs through slot centres, so labels sit under bars and points alike; the active point
+  is an 8px ink dot, drawn in HTML because a dot in the stretched viewBox would be an oval
 - One value at a time, above its mark, as plain text with no fill: on mouse hover, on tap (it
   stays after the finger lifts), or on keyboard focus. Each slot also has a native `title`
 - Screen readers: the `<svg>` is `role="img"` named "type, first to last label" (or `aria-label`),

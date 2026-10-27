@@ -34,6 +34,7 @@ import {
 	Input,
 	Kbd,
 	KbdGroup,
+	LineChart,
 	ListHead,
 	ListRow,
 	LiveDot,
@@ -668,6 +669,11 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 				values={[12, 8, 15, 9, 4]}
 				aria-label="Runs per day"
 			/>
+			<LineChart
+				labels={["00", "06", "12", "18"]}
+				values={[310, 342, 388, 325]}
+				aria-label="Latency by hour"
+			/>
 		</Fill>
 	),
 	list: () => (
@@ -848,7 +854,7 @@ export const BLURBS: Record<string, string> = {
 	"call-bar": "The bar a composer turns into during a call.",
 	"data-table": "A table with sorting, filtering and inline edits.",
 	table: "Low-level parts for a mono ledger.",
-	chart: "Bars in ink on three faint ticks, numbers in a table for screen readers.",
+	chart: "Bars or a line in ink on three faint ticks, numbers in a table.",
 	list: "Rows of things you open, with no frame.",
 	"file-row": "One row of a file browser.",
 	dropzone: "A drop area for uploads, with a button too.",
