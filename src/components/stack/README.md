@@ -2,7 +2,7 @@
 
 A flex layout with a token gap. Space is the only separator: no line, no fill, no card. The family exports:
 
-- `Stack` — children in a `column` (default) or a `row` that wraps when it gets narrow. `gap` is `sm` (12px, default), `md` (16px) or `lg` (24px).
+- `Stack` — children in a `column` (default) or a `row` that wraps when it gets narrow. `gap` is `sm` (4px), `md` (12px, default) or `lg` (24px): the three steps of the tight density.
 
 ## When to use
 

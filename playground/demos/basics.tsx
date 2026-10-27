@@ -854,9 +854,9 @@ function StackDemo() {
 		<Demo
 			id="stack"
 			title="stack"
-			note="Space is the only separator. A row wraps when it gets narrow; gap is sm 12px, md 16px or lg 24px."
+			note="Space is the only separator. A row wraps when it gets narrow; gap is sm 4px, md 12px (default) or lg 24px."
 		>
-			<Label>column, gap sm (default)</Label>
+			<Label>column, gap md (default)</Label>
 			<Stack>
 				<Text>First line of a reply.</Text>
 				<Text>Second line, 12px below.</Text>
@@ -867,8 +867,8 @@ function StackDemo() {
 				<Text>Two</Text>
 				<Text>Three</Text>
 			</Stack>
-			<Label>column, gap md</Label>
-			<Stack gap="md">
+			<Label>column, gap sm</Label>
+			<Stack gap="sm">
 				<Text variant="title" as="h3">
 					This week
 				</Text>
