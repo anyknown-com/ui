@@ -1,6 +1,6 @@
 # Message
 
-The desktop conversation layout: a `Thread` of turns, where the person's words sit in a right-aligned sunken bubble and the agent's reply runs full width on the paper.
+The desktop conversation layout: a `Thread` of turns, where the person's words sit right aligned at weight 500 with no bubble, and the agent's reply runs full width from the left edge at weight 400.
 
 ## When to use
 
@@ -10,23 +10,22 @@ The desktop conversation layout: a `Thread` of turns, where the person's words s
 
 ## When not to use
 
-- For the product shell's one-bubble-per-row layout, use [Bubble](../bubble/README.md).
 - For markdown content inside a turn, put [Markdown](../markdown/README.md) in the turn; `TextPart` renders a plain paragraph.
 
 ## Usage
 
 The family:
 
-- `Thread` — the column of turns (32px between turns, 24px above the first; 16px on phone). It adds no inline padding: put the `Thread` and the [Composer](../composer/README.md) in one column so they share the same left and right edges.
-- `UserMessage` — the person's bubble, right aligned, at most 85% wide.
-- `AssistantMessage` — a full-width turn; `streaming` and `pending` show progress.
+- `Thread` — the column of turns (24px between turns and above the first; 16px above the first on phone). It adds no inline padding: put the `Thread` and the [Composer](../composer/README.md) in one column so they share the same left and right edges.
+- `UserMessage` — the person's words, right aligned, weight 500, `type.t3`, at most 85% wide. Add the time as a `textMuted` `type.t1` line after them.
+- `AssistantMessage` — a full-width turn at weight 400; `streaming` and `pending` show progress. Add the time and model as a `textMuted` `type.t1` line after the parts.
 - `TextPart` — one paragraph of reply text. `ActionBar.Copy` copies these parts.
 - `useMessageBody()` — returns a ref to the current assistant turn's element, for parts that read the message (as `ActionBar.Copy` does).
 
-Inside an assistant turn the parts follow the desktop rhythm:
+Inside an assistant turn the parts follow the tight rhythm:
 
-- `TextPart` next to `TextPart`: 8px. Consecutive text parts are grouped into one run.
-- Any other part is a block (a ToolGroup, SubThreadRow, ReasoningFold, InteractionCard, HandoffReceipt, PayloadBlock or CodeBlock, attachments, your own card): 16px above and below it.
+- `TextPart` next to `TextPart`: 4px. Consecutive text parts are grouped into one run.
+- Any other part is a block (a ToolGroup, SubThreadRow, ReasoningFold, InteractionCard, HandoffReceipt, PayloadBlock or CodeBlock, attachments, your own card): 12px above and below it.
 - A `TextPart` counts as text only when it is a direct child of `AssistantMessage`. Wrapped in another component, it is a block.
 - Do not add margins between parts; the turn spaces them.
 
@@ -50,8 +49,8 @@ import { AssistantMessage, TextPart, Thread, UserMessage } from "@anyknown/ui"
 - The streaming caret is `aria-hidden` and only on the last `TextPart`.
 - `prefers-reduced-motion: reduce` stops the caret blink and the pending pulse.
 - On devices without hover (`(hover: none)`), the action bar inside an assistant turn is always visible.
-- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `userAuthor`, `assistantAuthor`, `pending`. Override any with `labels` on `UserMessage` / `AssistantMessage`; `authorLabel` and `pendingLabel` win over `labels`.
-- In forced-colors mode the user bubble gets a 1px outline and the caret and pending dot paint in `CanvasText`.
+- Built-in words follow `<LocaleProvider>` (`zh-TW` default, `en`): `userAuthor`, `assistantAuthor`, `pending`. Override any with `labels` on `UserMessage` / `AssistantMessage`; `pendingLabel` wins over `labels.pending`.
+- In forced-colors mode the caret and pending dot paint in `CanvasText`.
 
 ## Keyboard
 
@@ -60,6 +59,5 @@ No keyboard interaction of its own. Focusable children are whatever the turn hol
 ## Related
 
 - [ActionBar](../action-bar/README.md) — copy and regenerate under an assistant turn.
-- [Bubble](../bubble/README.md) — the product shell's message row.
 - [Markdown](../markdown/README.md) — rich reply content.
 - [ReasoningFold](../reasoning-fold/README.md) — the thinking that came before a reply.

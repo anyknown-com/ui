@@ -134,7 +134,6 @@ export type {
 	TextPartProps,
 } from "./components/message/Message"
 export type { MessageLabels } from "./components/message/Message"
-export { Bubble, type BubbleProps } from "./components/bubble/Bubble"
 export {
 	AttachmentGrid,
 	AttachmentTile,

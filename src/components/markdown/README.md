@@ -12,7 +12,6 @@ Renders one message's markdown — GFM tables, fenced code, task lists and TeX m
 
 - For a single snippet of code with a copy button, use [CodeBlock](../code-block/README.md).
 - For a tool's raw arguments or result, use [PayloadBlock](../payload-block/README.md).
-- For a whole message row in the product shell, use [Bubble](../bubble/README.md), which wraps this.
 
 ## Usage
 
@@ -53,5 +52,5 @@ No keyboard interaction of its own. Focusable children are links, code block cop
 ## Related
 
 - [CodeBlock](../code-block/README.md) — what fenced blocks and inline code render as.
-- [Bubble](../bubble/README.md) — a message row that renders its reply with this.
+- [Message](../message/README.md) — the turn that holds a reply rendered with this.
 - [Checkbox](../checkbox/README.md) — the task list box.

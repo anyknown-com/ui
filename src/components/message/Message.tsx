@@ -8,48 +8,42 @@ import { breakpoint, color, corner, motion, space, type } from "../../tokens.sty
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 // 觸控裝置沒有 hover:只在 hover 才出現的東西要一直顯示
 const NO_HOVER = "@media (hover: none)"
-// forced colors 會換掉底色:泡泡改用框,游標和等待點改塗 CanvasText 才看得見
+// forced colors:游標和等待點改塗 CanvasText 才看得見
 const FORCED = "@media (forced-colors: active)"
-// 使用者泡泡的大角。軟材規格是 18 18 6 18,圓角 token 沒有 18 這一階
-const BUBBLE_CORNER = 18
 
 const blink = stylex.keyframes({ "50%": { opacity: 0 } })
 const pulse = stylex.keyframes({ "50%": { opacity: 0.3, scale: 0.8 } })
 
 const styles = stylex.create({
-	// 和 desktop thread 同一套節奏:換人說話 32,turn 裡區塊前後 16,連續文字 8。
+	// 鉛筆稿的節奏:換人說話 24,turn 裡區塊前後 12,連續文字 4。
 	// 左右不留白:Thread 和 Composer 放在同一欄,共用左右邊。
 	thread: {
 		display: "flex",
 		flexDirection: "column",
-		gap: space.xl,
+		gap: space.lg,
 		paddingBlockStart: { default: space.lg, [breakpoint.phone]: space.md },
 		paddingBlockEnd: space.lg,
 	},
-	turn: { display: "flex", flexDirection: "column", gap: space.md },
-	textRun: { display: "flex", flexDirection: "column", gap: space.xs },
+	turn: { display: "flex", flexDirection: "column", gap: space.sm },
+	textRun: { display: "flex", flexDirection: "column", gap: space.xxs },
 	userTurn: { alignItems: "flex-end" },
-	bubble: {
+	// 使用者的話沒有泡泡:靠右、字重 500
+	user: {
 		maxWidth: "85%",
 		boxSizing: "border-box",
-		backgroundColor: color.surface,
-		borderRadius: BUBBLE_CORNER,
-		borderEndEndRadius: corner.small,
-		paddingBlock: space.sm,
-		paddingInline: space.md,
 		fontSize: type.t3,
+		fontWeight: 500,
 		lineHeight: type.body,
 		color: color.text,
 		overflowWrap: "anywhere",
-		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	assistant: {
 		position: "relative",
-		paddingBottom: space.xl,
-		marginBottom: `calc(${space.xl} * -1)`,
+		paddingBottom: space.lg,
+		marginBottom: `calc(${space.lg} * -1)`,
 		contentVisibility: "auto",
 		containIntrinsicSize: "auto 200px",
-		// content-visibility 帶 paint containment,會切掉貼邊的 ring(InteractionCard 的 1px 框)
+		// content-visibility 帶 paint containment,會切掉貼邊的焦點環
 		overflowClipMargin: space.xs,
 		"--ak-action-bar-opacity": { default: "0", ":hover": "1", [NO_HOVER]: "1" },
 	},
@@ -82,7 +76,7 @@ const styles = stylex.create({
 		display: "inline-block",
 		width: "0.5rem",
 		height: "0.5rem",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		backgroundColor: { default: color.signal, [FORCED]: "CanvasText" },
 		forcedColorAdjust: "none",
 		animationName: { default: pulse, [REDUCED]: "none" },
@@ -128,19 +122,20 @@ export type MessageLabels = StringsOf<typeof strings>
 export type UserMessageProps = {
 	/** What the person said. */
 	children: ReactNode
-	/** The screen-reader prefix that names the author. Wins over `labels.userAuthor`. */
-	authorLabel?: string
 	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<MessageLabels>
 }
 
-/** The person's turn: a sunken bubble at the end of the line, named for screen readers. */
-export function UserMessage({ children, authorLabel, labels }: UserMessageProps) {
+/**
+ * The person's turn: no bubble, weight 500 at the end of the line, named for screen readers.
+ * The time goes in a `textMuted` `type.t1` line the caller adds after the words.
+ */
+export function UserMessage({ children, labels }: UserMessageProps) {
 	const t = useStrings(strings, labels)
 	return (
 		<div {...stylex.props(styles.turn, styles.userTurn)}>
-			<span {...stylex.props(styles.srOnly)}>{authorLabel ?? t.userAuthor}</span>
-			<div {...stylex.props(styles.bubble)}>{children}</div>
+			<span {...stylex.props(styles.srOnly)}>{t.userAuthor}</span>
+			<div {...stylex.props(styles.user)}>{children}</div>
 		</div>
 	)
 }
@@ -152,8 +147,6 @@ export type AssistantMessageProps = {
 	pending?: boolean
 	/** Announced while pending. Wins over `labels.pending`. */
 	pendingLabel?: string
-	/** The screen-reader prefix that names the author. Wins over `labels.assistantAuthor`. */
-	authorLabel?: string
 	/** Overrides for the built-in words; the rest follow `<LocaleProvider>`. */
 	labels?: Partial<MessageLabels>
 	/** The reply's parts: `TextPart`s, tool cards, an action bar. */
@@ -162,12 +155,14 @@ export type AssistantMessageProps = {
 	sx?: StyleArg
 }
 
-/** The assistant's turn: no bubble, its parts on the paper, named for screen readers. */
+/**
+ * The assistant's turn: no bubble, its parts from the left edge at weight 400, full width, named
+ * for screen readers. The time and model go in a `textMuted` `type.t1` line the caller adds.
+ */
 export function AssistantMessage({
 	streaming = false,
 	pending = false,
 	pendingLabel,
-	authorLabel,
 	labels,
 	children,
 	sx,
@@ -181,7 +176,7 @@ export function AssistantMessage({
 	return (
 		<MessageBodyContext value={body}>
 			<div ref={body} {...stylex.props(styles.turn, styles.assistant, sx)}>
-				<span {...stylex.props(styles.srOnly)}>{authorLabel ?? t.assistantAuthor}</span>
+				<span {...stylex.props(styles.srOnly)}>{t.assistantAuthor}</span>
 				{pending ? (
 					<span role="status">
 						<span aria-hidden="true" {...stylex.props(styles.pending)} />

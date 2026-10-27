@@ -474,28 +474,17 @@ Not a component: a global stylesheet (`@anyknown/ui/scrollbar.css`). StyleX can'
 ## Agent & chat (desktop AI-native)
 
 ### message
-Message rhythm in the past area: user messages are right-aligned bubbles, assistant messages are
-full-width plain text. turn 24px / part 8px, body `type.t3` / `type.body` (15 / 1.6).
+Message rhythm in the past area: the person's words are right-aligned with no bubble, assistant
+messages are full-width plain text. turn 24px / part 4px / block 12px, body `type.t3` /
+`type.body` (15 / 1.6).
 
-- The user bubble is a sunken `surface`, no frame, corners 18 18 6 18 (the small corner is the
-  speaker's). 18 has no corner token and is a constant in the component; the 6 is
-  `corner.small`, set with a logical property (`borderEndEndRadius`), so it flips under RTL. The
-  agent gets no bubble and sits directly on the paper
+- The user's words are weight 500, at most 85% wide, no background, no corner. The assistant's
+  are weight 400 from the left edge. Who spoke is position and weight, not a box
+- The time and model are a `textMuted` `type.t1` line the caller adds after the words; there is
+  no `authorLabel` (the hidden author word stays, set through `labels`)
 - The replying dot is `signal`: the agent is working
 - The assistant action bar normally appears only on hover; on `(hover: none)` touch devices it
   is always shown
-
-### bubble
-The product shell's message bubble (0.9): full width, 12 top and bottom, `type.t3` /
-`type.body`. The human's message is a sunken `surface`, 16 left and right, corners 18 18 6 18,
-shown exactly as typed; the reply has no bubble (no background, no side padding) and uses
-`Markdown tables="ruled"`.
-
-- Not the same layout as `UserMessage` / `AssistantMessage`: those are the desktop turn (an 85%
-  right-aligned bubble, full-width reply, streaming cursor, action bar); this is the shell's one
-  bubble per row. Position and width belong to the thread
-- The prop is `from`, not `role`: `role` is an ARIA word, and lint blocks a value that isn't an
-  ARIA role
 
 ### attachment
 Files attached to a message (0.9, moved from the product shell): `AttachmentGrid` is a wrapping

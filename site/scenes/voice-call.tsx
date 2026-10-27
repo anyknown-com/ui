@@ -2,9 +2,9 @@
 // function of the clock `t`; mute holds the clock while it is the person's turn, and hanging up
 // hands the composer back with the transcript left in the thread.
 import {
-	Bubble,
 	CallBar,
 	Composer,
+	Markdown,
 	VoiceIndicator,
 	toast,
 	type CallStatus,
@@ -149,6 +149,7 @@ const styles = stylex.create({
 		paddingBlockEnd: space.lg,
 	},
 	line: { maxWidth: "85%" },
+	said: { fontWeight: 500 },
 	user: { alignSelf: "flex-end" },
 	assistant: { alignSelf: "flex-start" },
 	marker: {
@@ -166,7 +167,11 @@ function Lines({ lines }: { lines: Line[] }) {
 	return lines.map((line, index) => (
 		// A transcript only grows at its end, so a line's index is stable.
 		<div key={index} {...stylex.props(styles.line, line.from === "user" ? styles.user : styles.assistant)}>
-			<Bubble from={line.from}>{line.text}</Bubble>
+			{line.from === "user" ? (
+				<span {...stylex.props(styles.said)}>{line.text}</span>
+			) : (
+				<Markdown>{line.text}</Markdown>
+			)}
 		</div>
 	))
 }

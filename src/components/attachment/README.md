@@ -45,5 +45,5 @@ No keyboard interaction of its own.
 ## Related
 
 - [PendingFiles](../pending-files/README.md) — files before they are sent.
-- [Bubble](../bubble/README.md) — the message the files belong to.
+- [Message](../message/README.md) — the message the files belong to.
 - [FileRow](../file-row/README.md) — files in a storage list.

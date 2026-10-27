@@ -10,7 +10,6 @@ import {
 	AttachmentGrid,
 	AttachmentTile,
 	Badge,
-	Bubble,
 	Button,
 	CallBar,
 	Card,
@@ -544,12 +543,6 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 					<TextPart>Done. All three cases pass.</TextPart>
 				</AssistantMessage>
 			</Thread>
-		</Fill>
-	),
-	bubble: () => (
-		<Fill>
-			<Bubble from="user">Places in Da'an under 25k?</Bubble>
-			<Bubble from="assistant">I found **three** that fit.</Bubble>
 		</Fill>
 	),
 	markdown: () => (

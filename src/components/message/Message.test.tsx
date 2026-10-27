@@ -43,12 +43,12 @@ describe("Message", () => {
 		expect(screen.getByText("助理說:")).toBeInTheDocument()
 	})
 
-	test("built-in words follow the locale; labels and single-word props win", () => {
+	test("built-in words follow the locale; labels win", () => {
 		render(
 			<LocaleProvider locale="en">
 				<Thread>
 					<UserMessage>Question</UserMessage>
-					<UserMessage authorLabel="Ann said:">Again</UserMessage>
+					<UserMessage labels={{ userAuthor: "Ann said:" }}>Again</UserMessage>
 					<AssistantMessage pending labels={{ assistantAuthor: "Agent said:" }} />
 				</Thread>
 			</LocaleProvider>,

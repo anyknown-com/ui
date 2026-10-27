@@ -2,10 +2,13 @@ import {
 	ActionIcon,
 	AttachButton,
 	AttachmentGrid,
+	AssistantMessage,
 	AttachmentTile,
+	Markdown,
+	Thread,
+	UserMessage,
 	Bars,
 	Break,
-	Bubble,
 	Button,
 	CallBar,
 	type CallStatus,
@@ -475,17 +478,19 @@ function PageDemo() {
 	)
 }
 
-function BubbleDemo() {
+function ThreadDemo() {
 	return (
 		<Demo
-			id="bubble"
-			title="bubble"
-			note="What a person says shows as typed; replies are markdown, with ruled tables."
+			id="thread"
+			title="thread"
+			note="What a person says is right aligned at weight 500; the reply is markdown from the left edge."
 		>
-			<div {...stylex.props(styles.column)}>
-				<Bubble from="user">Find me places in Da'an, Zhongshan or Banqiao under 25k a month</Bubble>
-				<Bubble from="assistant">{REPLY}</Bubble>
-			</div>
+			<Thread>
+				<UserMessage>Find me places in Da'an, Zhongshan or Banqiao under 25k a month</UserMessage>
+				<AssistantMessage>
+					<Markdown>{REPLY}</Markdown>
+				</AssistantMessage>
+			</Thread>
 		</Demo>
 	)
 }
@@ -584,7 +589,7 @@ export const webDemos: DemoEntry[] = [
 	{ id: "list", covers: ["list"], Component: ListDemo },
 	{ id: "table", covers: ["table"], Component: TableDemo },
 	{ id: "page", covers: ["page"], Component: PageDemo },
-	{ id: "bubble", covers: ["bubble"], Component: BubbleDemo },
+	{ id: "thread", covers: [], Component: ThreadDemo },
 	{ id: "attachment", covers: ["attachment"], Component: AttachmentDemo },
 	{ id: "payload-block", covers: ["payload-block"], Component: PayloadBlockDemo },
 	{ id: "chatbox", covers: ["attach-button", "pending-files"], Component: ChatboxDemo },
