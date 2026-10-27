@@ -3,7 +3,7 @@
 //   node scripts/design-lint.mjs a.html b.html ...   one row per file, a total row last
 //   node scripts/design-lint.mjs --json a.html ...   the same numbers, for eval scripts
 //
-// Eight counts, all of them rule-detectable and needing no judgment:
+// Eleven counts, all of them rule-detectable and needing no judgment:
 //   hex       invented colors: #rgb / #rrggbb / #rrggbbaa literals (token values count too; a page should reference the variable, not copy the value)
 //   color     colors other than --ak-*: rgb() / hsl() / oklch() / named colors
 //   class     out-of-vocabulary classes: names in class attributes that are not in brand.css
@@ -12,6 +12,9 @@
 //   inline    inline style attributes
 //   stat      stat misuse: more than four ak-stat on a page, or an ak-stat-value number that appears again in a table below
 //   table2    full-width tables with two columns or fewer: the numbers get pushed to the far right and the eye cannot follow (DESIGN.md §3)
+//   line      lines: border declarations that draw something, and <hr> (DESIGN.md §1: space separates, the focus ring is the only line)
+//   shadow    box-shadow that is not none or var(--ak-shadow-*): a shadow on the page is a card (DESIGN.md §1)
+//   fill      background that is not none / transparent or var(--ak-*): a fill behind the words, gradients included (DESIGN.md §1)
 import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { cssClasses } from "./design-check.mjs"
@@ -25,7 +28,7 @@ export function lint(html) {
 	// Only look at what affects visuals: style blocks and style attributes; scripts do not count
 	const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join("\n")
 	const inlineStyles = [...html.matchAll(/\sstyle\s*=\s*"([^"]*)"/gi)].map((m) => m[1])
-	const css = `${styleBlocks}\n${inlineStyles.join("\n")}`
+	const css = `${styleBlocks}\n${inlineStyles.join(";\n")}`
 
 	const hex = (css.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? []).length
 	const color =
@@ -39,6 +42,19 @@ export function lint(html) {
 		if (y1 < 0 || y1 > 1 || y2 < 0 || y2 > 1) easing++
 	}
 	const inline = inlineStyles.length
+	// line / shadow / fill: declarations whose value only resets the property do not count
+	const decls = (re) => [...css.matchAll(re)].map((m) => m[1].replace(/!important/i, "").trim())
+	const reset = /^(?:none|0(?:px)?|hidden|transparent|inherit|initial|unset|currentcolor)$/i
+	const line =
+		decls(
+			/(?<![-\w])border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-(?:width|style|color))?\s*:([^;}"]+)/gi,
+		).filter((v) => !reset.test(v)).length + (html.match(/<hr\b/gi) ?? []).length
+	const shadow = decls(/(?<![-\w])box-shadow\s*:([^;}"]+)/gi).filter(
+		(v) => !reset.test(v) && !/^var\(--ak-shadow-[\w-]+\)$/.test(v),
+	).length
+	const fill = decls(/(?<![-\w])background(?:-color|-image)?\s*:([^;}"]+)/gi).filter(
+		(v) => !reset.test(v) && !/^var\(--ak-[\w-]+\)$/.test(v),
+	).length
 
 	// stat: more than four is misuse; a value equal to any td text re-enlarges a number already in a table
 	const strip = (t) =>
@@ -64,10 +80,23 @@ export function lint(html) {
 	const foreign = classes.filter((c) => !VOCAB.has(c))
 	const cls = foreign.length
 
-	return { hex, color, class: cls, font, easing, inline, stat, table2, foreignClasses: [...new Set(foreign)] }
+	return {
+		hex,
+		color,
+		class: cls,
+		font,
+		easing,
+		inline,
+		stat,
+		table2,
+		line,
+		shadow,
+		fill,
+		foreignClasses: [...new Set(foreign)],
+	}
 }
 
-const KEYS = ["hex", "color", "class", "font", "easing", "inline", "stat", "table2"]
+const KEYS = ["hex", "color", "class", "font", "easing", "inline", "stat", "table2", "line", "shadow", "fill"]
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
 	const args = process.argv.slice(2)
