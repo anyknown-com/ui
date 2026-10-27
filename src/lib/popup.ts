@@ -53,7 +53,7 @@ export function returnFocusOnExit(node: HTMLElement | null) {
 }
 
 export const popupStyles = stylex.create({
-	// float 階:疊在紙上的紙。暗色靠 surfaceRaised 升一階,不畫邊框;
+	// 浮起來的東西:surfaceRaised 加 shadow.float,不畫邊框;
 	// 透明的框只為了 forced-colors —— 那裡陰影會消失,框會被換成系統色
 	surface: {
 		backgroundColor: color.surfaceRaised,
@@ -61,7 +61,7 @@ export const popupStyles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
-		borderRadius: corner.float,
+		borderRadius: corner.box,
 		boxShadow: shadow.float,
 		overflow: "hidden",
 		transformOrigin: "var(--transform-origin)",

@@ -11,7 +11,6 @@ import {
 	DropdownMenu,
 	DropdownRadioGroup,
 	DropdownRadioItem,
-	DropdownSeparator,
 	DropdownSub,
 } from "./DropdownMenu"
 
@@ -44,7 +43,6 @@ function ThreadMenu({ onSelect }: { onSelect?: () => void }) {
 					</DropdownSub>
 				</DropdownSub>
 			</DropdownGroup>
-			<DropdownSeparator />
 			<DropdownCheckboxItem checked={showReceipts} onCheckedChange={setShowReceipts}>
 				顯示換班回條
 			</DropdownCheckboxItem>
@@ -64,13 +62,13 @@ describe("DropdownMenu", () => {
 		expect(trigger).toHaveAttribute("aria-expanded", "true")
 	})
 
-	test("renders group label, shortcut and separator", async () => {
+	test("renders group label, shortcut", async () => {
 		render(<ThreadMenu />)
 		await userEvent.click(screen.getByRole("button", { name: "Thread 動作" }))
 		await screen.findByRole("menu")
 		expect(screen.getByText("這條 thread")).toBeInTheDocument()
 		expect(screen.getByText("⌘N")).toBeInTheDocument()
-		expect(screen.getByRole("separator")).toBeInTheDocument()
+		expect(screen.queryByRole("separator")).not.toBeInTheDocument()
 	})
 
 	test("selects an item with the keyboard and closes", async () => {

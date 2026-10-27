@@ -17,13 +17,13 @@ const styles = stylex.create({
 		alignItems: "center",
 		gap: space.xs,
 		maxWidth: "18rem",
-		// float 階,跟 popover 同一張紙;不再是反色氣泡。透明的框只為了 forced-colors
+		// 浮起來的東西,跟 popover 同一張紙。透明的框只為了 forced-colors
 		backgroundColor: color.surfaceRaised,
 		color: color.text,
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
-		borderRadius: corner.control,
+		borderRadius: corner.box,
 		boxShadow: shadow.float,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,

@@ -8,7 +8,7 @@ import { color, corner, focusRing, font, motion, space, type } from "../../token
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
-	popup: { minWidth: "14rem", padding: space.xxs, margin: 0 },
+	popup: { minWidth: "15rem", padding: "0.375rem", margin: 0 },
 	fit: { minWidth: 0 },
 	subPopup: { animationDuration: { default: motion.fast, [REDUCED]: "0s" } },
 	item: {
@@ -16,23 +16,26 @@ const styles = stylex.create({
 		display: "flex",
 		alignItems: "center",
 		gap: "0.55rem",
-		// 內角 = popup 的 16 − 4 padding
-		borderRadius: corner.control,
-		paddingBlock: "0.42rem",
-		paddingInline: space.xs,
+		minHeight: "2rem",
+		borderRadius: corner.shape,
+		paddingInline: "0.625rem",
 		fontFamily: font.body,
 		fontSize: type.t2,
-		color: color.text,
+		color: color.textMuted,
 		cursor: "pointer",
 		outline: "none",
 		userSelect: "none",
 	},
+	// hover 與鍵盤移動都是 wash 加墨色字;高對比模式下 wash 會消失,改畫系統色的框
 	highlighted: {
-		backgroundColor: color.accentSubtle,
-		outline: `${focusRing.width} solid ${color.focusRing}`,
-		outlineOffset: -2,
-		"@media (forced-colors: active)": { outline: `${focusRing.width} solid Highlight` },
+		backgroundColor: color.wash,
+		color: color.text,
+		"@media (forced-colors: active)": {
+			outline: `${focusRing.width} solid Highlight`,
+			outlineOffset: -2,
+		},
 	},
+	checked: { color: color.text, fontWeight: 500 },
 	disabled: { opacity: 0.5, cursor: "not-allowed" },
 	danger: { color: color.danger },
 	icon: { color: color.textMuted, flex: "none", display: "flex" },
@@ -43,25 +46,19 @@ const styles = stylex.create({
 		lineHeight: 1,
 		color: color.textMuted,
 	},
-	arrow: { marginInlineStart: "auto", color: color.textFaint, display: "flex" },
+	arrow: { marginInlineStart: "auto", color: color.textMuted, display: "flex" },
 	// The submenu opens on the inline end, which is the left under RTL: the chevron points there.
 	arrowRtl: { transform: "scaleX(-1)" },
-	tick: { width: "0.9rem", flex: "none", color: color.accent, display: "flex", justifyContent: "center" },
+	tick: { width: "0.9rem", flex: "none", color: color.text, display: "flex", justifyContent: "center" },
 	radioLabel: { flexGrow: 1, whiteSpace: "nowrap" },
 	groupLabel: {
 		fontSize: type.t1,
-		fontWeight: 500,
 		lineHeight: type.snug,
 		color: color.textMuted,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
-	},
-	separator: {
-		borderTopWidth: 1,
-		borderTopStyle: "solid",
-		borderTopColor: color.border,
-		marginBlock: space.xxs,
-		marginInline: space.xxs,
+		fontWeight: 400,
+		paddingBlockStart: space.xxs,
+		paddingBlockEnd: "0.125rem",
+		paddingInline: "0.625rem",
 	},
 })
 
@@ -97,13 +94,15 @@ function Tick() {
 	)
 }
 
-const itemClassName = (variant?: "danger") => (state: { highlighted: boolean; disabled: boolean }) =>
-	stylex.props(
-		styles.item,
-		variant === "danger" && styles.danger,
-		state.highlighted && styles.highlighted,
-		state.disabled && styles.disabled,
-	).className ?? ""
+const itemClassName =
+	(variant?: "danger") => (state: { highlighted: boolean; disabled: boolean; checked?: boolean }) =>
+		stylex.props(
+			styles.item,
+			state.checked === true && styles.checked,
+			state.highlighted && styles.highlighted,
+			variant === "danger" && styles.danger,
+			state.disabled && styles.disabled,
+		).className ?? ""
 
 export type DropdownItemProps = {
 	/** A leading icon; decorative (hidden from assistive tech). */
@@ -233,11 +232,6 @@ export function DropdownGroup({ label, children }: DropdownGroupProps) {
 	)
 }
 
-/** A line between groups of items (`role="separator"`). */
-export function DropdownSeparator() {
-	return <Menu.Separator {...stylex.props(styles.separator)} />
-}
-
 export type DropdownSubProps = {
 	/** The submenu trigger's label. */
 	label: ReactNode
@@ -303,7 +297,7 @@ export type DropdownMenuProps = {
 	 * lists (a few `DropdownRadioItem`s) that should not stretch to the default width. @default false
 	 */
 	fit?: boolean
-	/** Items, groups, separators and submenus. */
+	/** Items, groups and submenus. */
 	children: ReactNode
 }
 

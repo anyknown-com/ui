@@ -49,7 +49,7 @@ const styles = stylex.create({
 		display: "flex",
 		gap: space.xs,
 		width: "min(20rem, calc(100vw - 2.5rem))",
-		borderRadius: corner.float,
+		borderRadius: corner.box,
 		outline: {
 			default: "none",
 			":focus-visible": {
@@ -65,7 +65,7 @@ const styles = stylex.create({
 	bottomLeft: { bottom: space.md, insetInlineStart: space.md },
 	topRight: { top: space.md, insetInlineEnd: space.md },
 	topLeft: { top: space.md, insetInlineStart: space.md },
-	// float 階的白紙。透明的框只為了 forced-colors(那裡陰影會消失)
+	// 浮起來的紙。透明的框只為了 forced-colors(那裡陰影會消失)
 	toast: {
 		position: "relative",
 		overflow: "hidden",
@@ -76,7 +76,7 @@ const styles = stylex.create({
 		borderWidth: 1,
 		borderStyle: "solid",
 		borderColor: { default: "transparent", [FORCED]: "CanvasText" },
-		borderRadius: corner.float,
+		borderRadius: corner.box,
 		boxShadow: shadow.float,
 		paddingBlock: space.sm,
 		paddingInlineStart: space.md,
@@ -106,23 +106,20 @@ const styles = stylex.create({
 		insetInlineEnd: space.sm,
 		bottom: space.xxs,
 		height: 3,
-		borderRadius: corner.pill,
-		backgroundColor: color.accentSubtle,
+		borderRadius: corner.shape,
+		backgroundColor: color.wash,
 		overflow: "hidden",
 	},
 	countLine: {
 		display: "block",
 		height: "100%",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		animationName: drain,
 		animationTimingFunction: "linear",
 		animationFillMode: "forwards",
 	},
-	lineDefault: { backgroundColor: color.textFaint },
-	lineSuccess: { backgroundColor: color.success },
-	lineDanger: { backgroundColor: color.danger },
-	lineWarning: { backgroundColor: color.warning },
-	lineInfo: { backgroundColor: color.signal },
+	// 倒數那行不上狀態色:顏色只給前面的點
+	line: { backgroundColor: color.textMuted },
 	running: (ms: number, paused: boolean) => ({
 		animationDuration: `${ms}ms`,
 		animationPlayState: paused ? "paused" : "running",
@@ -135,7 +132,7 @@ const styles = stylex.create({
 		width: "1.25rem",
 		height: "1.25rem",
 	},
-	dot: { width: "0.5rem", height: "0.5rem", borderRadius: corner.pill },
+	dot: { width: "0.375rem", height: "0.375rem", borderRadius: corner.shape },
 	dotDefault: { backgroundColor: color.text },
 	dotSuccess: { backgroundColor: color.success },
 	dotDanger: { backgroundColor: color.danger },
@@ -154,8 +151,8 @@ const styles = stylex.create({
 		minWidth: space.lg,
 		height: "1.375rem",
 		paddingInline: "0.375rem",
-		borderRadius: corner.pill,
-		backgroundColor: color.accentSubtle,
+		borderRadius: corner.shape,
+		backgroundColor: color.wash,
 		color: color.text,
 		fontSize: scale.t1,
 		fontWeight: 600,
@@ -173,8 +170,8 @@ const styles = stylex.create({
 		color: color.text,
 		cursor: "pointer",
 		paddingInline: space.sm,
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 		outline: {
 			default: "none",
 			":focus-visible": {
@@ -190,9 +187,9 @@ const styles = stylex.create({
 		placeItems: "center",
 		width: space.lg,
 		height: space.lg,
-		borderRadius: corner.pill,
-		color: { default: color.textFaint, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		borderRadius: corner.shape,
+		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		cursor: "pointer",
 		outline: {
 			default: "none",
@@ -220,11 +217,11 @@ const styles = stylex.create({
 })
 
 const TONE = {
-	success: { dot: styles.dotSuccess, line: styles.lineSuccess },
-	danger: { dot: styles.dotDanger, line: styles.lineDanger },
-	warning: { dot: styles.dotWarning, line: styles.lineWarning },
-	info: { dot: styles.dotInfo, line: styles.lineInfo },
-	default: { dot: styles.dotDefault, line: styles.lineDefault },
+	success: { dot: styles.dotSuccess },
+	danger: { dot: styles.dotDanger },
+	warning: { dot: styles.dotWarning },
+	info: { dot: styles.dotInfo },
+	default: { dot: styles.dotDefault },
 } as const
 
 // success / danger / warning / info 是唸給螢幕閱讀器的前綴:顏色看不到,類型要用說的
@@ -763,7 +760,7 @@ function ToastItem({ record, paused, onClose, t }: ToastItemProps) {
 				<span key={record.epoch} aria-hidden="true" {...stylex.props(styles.countdown)}>
 					<span
 						data-countdown=""
-						{...stylex.props(styles.countLine, tone.line, styles.running(record.duration, paused))}
+						{...stylex.props(styles.countLine, styles.line, styles.running(record.duration, paused))}
 					/>
 				</span>
 			)}

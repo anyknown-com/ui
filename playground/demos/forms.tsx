@@ -7,7 +7,6 @@ import {
 	DropdownMenu,
 	DropdownRadioGroup,
 	DropdownRadioItem,
-	DropdownSeparator,
 	DirectionProvider,
 	DropdownSub,
 	Field,
@@ -310,7 +309,6 @@ function DropdownDemo() {
 							</DropdownSub>
 						</DropdownSub>
 					</DropdownGroup>
-					<DropdownSeparator />
 					<DropdownCheckboxItem checked={receipts} onCheckedChange={setReceipts}>
 						Show handoff receipts
 					</DropdownCheckboxItem>

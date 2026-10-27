@@ -1,6 +1,6 @@
 # DropdownMenu
 
-A menu of actions that opens from a trigger button, with groups, separators, checkbox items, radio items, shortcut hints, danger items and nested submenus, built on Base UI Menu.
+A menu of actions that opens from a trigger button, with groups, checkbox items, radio items, shortcut hints, danger items and nested submenus, built on Base UI Menu.
 
 ## When to use
 
@@ -20,7 +20,7 @@ A menu of actions that opens from a trigger button, with groups, separators, che
 ```tsx
 import {
   Button, DropdownCheckboxItem, DropdownGroup, DropdownItem,
-  DropdownMenu, DropdownSeparator, DropdownSub,
+  DropdownMenu, DropdownSub,
 } from "@anyknown/ui"
 
 <DropdownMenu trigger={<Button variant="secondary">Thread actions</Button>}>
@@ -31,7 +31,6 @@ import {
       <DropdownItem onSelect={exportJson}>JSON</DropdownItem>
     </DropdownSub>
   </DropdownGroup>
-  <DropdownSeparator />
   <DropdownCheckboxItem checked={showReceipts} onCheckedChange={setShowReceipts}>
     Show handoff receipts
   </DropdownCheckboxItem>
@@ -53,11 +52,11 @@ import { Button, DropdownMenu, DropdownRadioGroup, DropdownRadioItem } from "@an
 </DropdownMenu>
 ```
 
-The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`, `fit`), `DropdownItem` (`onSelect`, `icon`, `shortcut`, `variant`, `disabled`, `closeOnClick`), `DropdownCheckboxItem` (`checked` / `defaultChecked` / `onCheckedChange`, `disabled`, `closeOnClick`), `DropdownRadioGroup` (`value`, `onValueChange`), `DropdownRadioItem` (`value`, `disabled`, `closeOnClick`), `DropdownGroup`, `DropdownSeparator` and `DropdownSub` (`label`, `icon`, `disabled`; submenus nest to any depth).
+The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenChange`, `side`, `align`, `fit`), `DropdownItem` (`onSelect`, `icon`, `shortcut`, `variant`, `disabled`, `closeOnClick`), `DropdownCheckboxItem` (`checked` / `defaultChecked` / `onCheckedChange`, `disabled`, `closeOnClick`), `DropdownRadioGroup` (`value`, `onValueChange`), `DropdownRadioItem` (`value`, `disabled`, `closeOnClick`), `DropdownGroup` (its label and the space around it separate groups) and `DropdownSub` (`label`, `icon`, `disabled`; submenus nest to any depth).
 
 ## Accessibility
 
-- Base UI Menu: the `trigger` element gets `aria-haspopup` and `aria-expanded`; the popup is `role="menu"` with `menuitem`, `menuitemcheckbox` and `menuitemradio` (both with `aria-checked`), and `separator`; a `DropdownRadioGroup` is a `group`. `DropdownGroup`'s `label` names its group.
+- Base UI Menu: the `trigger` element gets `aria-haspopup` and `aria-expanded`; the popup is `role="menu"` with `menuitem`, `menuitemcheckbox` and `menuitemradio` (both with `aria-checked`); a `DropdownRadioGroup` is a `group`. `DropdownGroup`'s `label` names its group.
 - The trigger must be a single focusable element with its own name (a `Button`, or an `IconButton` with `label`).
 - `shortcut` is shown visually with `aria-hidden` and exposed as `aria-keyshortcuts`, so it is not part of the item's name. The menu does not bind the shortcut; the app must.
 - `icon` and the submenu chevron are `aria-hidden`. Under `<DirectionProvider direction="rtl">` the chevron points to the inline end (left), where the submenu opens.

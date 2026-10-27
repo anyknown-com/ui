@@ -52,7 +52,7 @@ The family is `Select`, `SelectGroup` (a labelled group) and `SelectItem` (`valu
 - The search box is named by `searchLabel`. Without the search box, a visually hidden input carries the Select's name.
 - Each chip's remove button is named by `remove(item)`. Clicking it does not open the list.
 - The empty state shows the query (`empty(query)`).
-- Highlighted option: `accentSubtle` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
+- Highlighted option: `wash` fill; in forced-colors mode a 2px `Highlight` outline.
 - Focus returns to the trigger as soon as the popup starts to close, not after the fade.
 - The popup sits above dialogs, so a Select inside a Dialog opens on top.
 - The popup grow-in and fade-out are off under `prefers-reduced-motion: reduce`.

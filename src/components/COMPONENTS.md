@@ -135,7 +135,7 @@ should be a Radio or Select.
 ### select
 Trigger plus popover (search box on top, grouped list). The trigger uses input's
 `controlStyles` directly (background, frame and focus are the input's); the popup is the float
-tier (see popover); option inner corner 12 = popup 16 − 4 padding. Group titles are small
+tier (see popover); options are pills (`corner.shape`), highlight is `wash`, no line under the search row. Group titles are small
 sentence-case text, not uppercase mono.
 
 - Settled requirements: text search filter (an empty result shows an empty state with the
@@ -145,9 +145,9 @@ sentence-case text, not uppercase mono.
 
 ### dropdown
 Action menu (versus Select, which picks a value). The popup is the float tier (see popover);
-item inner corner 12.
+items are pills (`corner.shape`), hover and highlight are `wash`, groups are split by space and the group label.
 
-- Settled requirements: nested submenus (any depth), group label, separator, checkbox item,
+- Settled requirements: nested submenus (any depth), group label (no separator line), checkbox item,
   radio item, shortcut hint, danger item
 - Radio item check at the inline end: a radio group is a short list of values on a toolbar
   button (effort, a filter), read as "label, and is it on". A leading tick column pushes every
@@ -157,7 +157,7 @@ item inner corner 12.
   line up with icons.
 - Radio item closes on choose by default (Base UI's default is to stay open): choosing one
   value ends the task, unlike toggling a checkbox.
-- `fit` is an option, not the default: the 14rem minimum keeps action menus from changing width
+- `fit` is an option, not the default: the 15rem minimum keeps action menus from changing width
   between triggers and gives short labels a comfortable target. A choice menu on a compact
   toolbar wants the opposite (as wide as its longest label plus the check), so it opts in.
   Changing the default would resize every existing menu.
@@ -279,7 +279,7 @@ with an action button, or a danger toast, doesn't auto-dismiss**; it waits for t
 it. A keyboard user has to Tab through the whole page to reach it, and 5 seconds isn't enough
 (WCAG 2.2.1). It counts down only if the caller passes `timeout` explicitly.
 
-- It is a float-tier sheet: `surfaceRaised` background, `shadow.float`, `corner.float` (16), no
+- It is a float-tier sheet: `surfaceRaised` background, `shadow.float`, `corner.box` (24), no
   frame. On the left a 20px slot holds the color dot (default ink, success green, danger red) or
   the loading spinner (`signal`, while `toast.promise` is pending), so the title doesn't jump
   when the state changes. A toast with a description has a 500-weight title, with the dot and
@@ -333,7 +333,7 @@ it. A keyboard user has to Tab through the whole page to reach it, and 5 seconds
 Plain hint popup: appears after a 400ms delay on hover and keyboard focus (0 under reduced
 motion), holds a single line of text (optionally a Kbd). **Never interactive content**. It is
 the same tier as popover (float: `surfaceRaised` background, `shadow.float`), no longer an
-inverted bubble; it is small, so its corner is `corner.control` (12), not 16.
+inverted bubble; its corner is `corner.box` (24), the same as every floating box.
 
 ### popover
 The positioned-popup base: a surface card anchored to a trigger. select / dropdown / combobox
@@ -341,7 +341,7 @@ sit on top of it, and it also carries rich content directly (memory details, mem
 
 - It is the float tier, defined once in `popupStyles.surface` in `lib/popup.ts`:
   `surfaceRaised` background (so it rises one step in dark mode), `shadow.float`,
-  `corner.float` (16), no frame. The border is 1px transparent: under forced-colors the shadow
+  `corner.box` (24), no frame. The border is 1px transparent: under forced-colors the shadow
   disappears and the transparent border is replaced with a system color, so the popup still
   has an edge. Composer's popups use the same styles
 - Exit is in the same styles: when Base UI closes it sets `[data-ending-style]`, the surface
