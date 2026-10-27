@@ -425,6 +425,10 @@ Shortcut key: Geist Mono `textMuted` text only, with no border, fill or shadow. 
 Loading skeleton: placeholder shapes plus shimmer. Shapes must match the real layout (a thread
 skeleton looks like a thread) so nothing jumps when loading finishes.
 
+- Bones are `wash` with `corner.shape`; the shimmer sweeps `washHover` across them. The thread
+  skeleton is a right-aligned bar for the person and text lines for the reply: no bubble, no
+  avatar circle
+
 ### progress
 A progress bar says "the agent is working", so its fill is `signal`; ring / ball are readouts
 (context usage), not work in progress, so they stay ink `accent`.

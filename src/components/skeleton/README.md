@@ -2,9 +2,9 @@
 
 Loading placeholders shaped like the content they stand in for, with a slow shimmer, so the layout does not jump when the content arrives. The family exports:
 
-- `Skeleton` — one bone: a `line` (default), a `block`, or a `circle`.
+- `Skeleton` — one bone in `wash` with `corner.shape`, shimmering to `washHover`: a `line` (default), a `block`, or a `circle`.
 - `SkeletonGroup` — wraps the bones of one loading region and announces it once.
-- `ThreadSkeleton` — a ready-made thread: a user bubble and an assistant reply per message.
+- `ThreadSkeleton` — a ready-made thread: a right-aligned bar for the person and a few text lines for the reply, per message.
 
 ## When to use
 
@@ -41,7 +41,7 @@ A `line` is 0.8rem tall and full width unless you set `width` / `height`. A `cir
 - Always wrap bones in a `SkeletonGroup` (or use `ThreadSkeleton`); bare bones give assistive technology no sign that anything is loading.
 - `ThreadSkeleton`'s default label (`labels.loading`) follows `<LocaleProvider>` (zh-TW, en). `label` wins over `labels.loading`.
 - Under `prefers-reduced-motion: reduce` the shimmer gradient and animation are removed; the bones stay as flat shapes.
-- Under `forced-colors: active` each bone drops its fill and sheen and keeps a 1 px `GrayText` border.
+- Under `forced-colors: active` each bone drops its fill and shimmer and keeps a 1 px `GrayText` border.
 
 ## Keyboard
 
