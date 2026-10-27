@@ -1,6 +1,6 @@
 import { DEMO_GROUPS } from "../playground/demos"
 import { Button, CodeBlock, StatusBadge, SubThreadRow } from "@anyknown/ui"
-import { breakpoint, color, corner, font, shadow, space, type } from "@anyknown/ui/tokens.stylex"
+import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { COMPONENT_DOCS, COMPONENT_GROUPS, REPO, guideByKey } from "./content"
 import { Page, PageHead, Section, grid, item } from "./layout"
@@ -17,25 +17,22 @@ const styles = stylex.create({
 		alignItems: "center",
 		minHeight: "2.5rem",
 		paddingInline: space.md,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		fontSize: type.t2,
 		fontWeight: 500,
 		textDecoration: "none",
-		color: color.accentText,
-		backgroundColor: color.accent,
+		color: color.bg,
+		backgroundColor: color.text,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
-	secondary: { color: color.text, backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 } },
+	secondary: { color: color.text, backgroundColor: { default: color.wash, ":hover": color.washHover } },
 	hero: { alignItems: "center" },
 	heroScene: {
 		height: { default: "34rem", [breakpoint.tablet]: "28rem" },
 		minWidth: 0,
 		padding: space.sm,
 		boxSizing: "border-box",
-		// In dark the desk step sits too close to the sheet, so media frames take layer4 there.
-		backgroundColor: `light-dark(${color.layer1}, ${color.layer4})`,
-		borderRadius: corner.sheet,
 	},
 	// Get started: the code blocks of the three ways sit on one line whatever the copy above them.
 	way: { gridTemplateRows: "auto 1fr auto auto" },
@@ -44,8 +41,6 @@ const styles = stylex.create({
 		aspectRatio: "16 / 10",
 		boxSizing: "border-box",
 		padding: space.lg,
-		backgroundColor: `light-dark(${color.layer3}, ${color.layer4})`,
-		borderRadius: corner.card,
 		display: "grid",
 		alignContent: "center",
 		minWidth: 0,
@@ -53,31 +48,22 @@ const styles = stylex.create({
 	center: { display: "flex", alignItems: "center", justifyContent: "center", gap: space.xs },
 	flush: { marginInlineStart: 0 },
 	badges: { display: "flex", flexWrap: "wrap", gap: space.xs },
-	deskSpecimen: { backgroundColor: `light-dark(${color.layer1}, ${color.layer4})` },
 	paper: {
 		display: "grid",
 		alignContent: "start",
 		gap: space.xs,
 		padding: space.md,
-		backgroundColor: color.layer2,
-		borderRadius: corner.card,
 	},
 	bar: {
 		display: "block",
 		height: space.xs,
 		width: "60%",
-		borderRadius: corner.pill,
-		backgroundColor: color.bone,
+		borderRadius: corner.shape,
+		backgroundColor: color.wash,
 	},
 	barLong: { width: "85%" },
 	barShort: { width: "45%" },
-	restCard: {
-		marginTop: space.xs,
-		padding: space.sm,
-		backgroundColor: color.layer2,
-		borderRadius: corner.control,
-		boxShadow: shadow.rest,
-	},
+	restCard: { marginTop: space.xs },
 	figure: { margin: 0 },
 	h2: { fontFamily: font.display, fontSize: type.t5, lineHeight: type.dense, fontWeight: 600, margin: 0 },
 	group: { marginTop: space.xxl },
@@ -85,14 +71,14 @@ const styles = stylex.create({
 	card: {
 		textDecoration: "none",
 		color: color.text,
-		borderRadius: corner.card,
+		borderRadius: corner.box,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
 	stack: { display: "grid", gap: space.sm, justifyItems: "start" },
 	codes: { display: "grid", gap: space.xs, justifySelf: "stretch", maxWidth: "44rem" },
 	foot: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0 },
-	link: { color: color.link, textUnderlineOffset: 2 },
+	link: { color: color.text, textUnderlineOffset: 2 },
 })
 
 const AGENT_SCENE = sceneById("agent-working")
@@ -178,7 +164,7 @@ export function HomePage() {
 			<Section title="The rules in one look">
 				<div {...stylex.props(grid.thirds)}>
 					<figure {...stylex.props(item.root, styles.figure)}>
-						<div aria-hidden="true" {...stylex.props(styles.specimen, styles.deskSpecimen)}>
+						<div aria-hidden="true" {...stylex.props(styles.specimen)}>
 							<div {...stylex.props(styles.paper)}>
 								<span {...stylex.props(styles.bar, styles.barLong)} />
 								<span {...stylex.props(styles.bar)} />
@@ -188,8 +174,10 @@ export function HomePage() {
 							</div>
 						</div>
 						<figcaption {...stylex.props(item.text)}>
-							<b {...stylex.props(item.title)}>Gray desk, white paper</b>
-							<span {...stylex.props(item.line)}>Depth comes from tone and shadow, not borders.</span>
+							<b {...stylex.props(item.title)}>One sheet, no lines</b>
+							<span {...stylex.props(item.line)}>
+								Space and weight set the order; only what floats has a shadow.
+							</span>
 						</figcaption>
 					</figure>
 					<figure {...stylex.props(item.root, styles.figure)}>

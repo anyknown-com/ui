@@ -19,7 +19,7 @@
 
 body {
 	margin: 0;
-	background: var(--ak-layer1);
+	background: var(--ak-bg);
 	color: var(--ak-text);
 	font-family: var(--ak-font-body);
 	-webkit-text-size-adjust: 100%;
@@ -92,10 +92,10 @@ body {
 
 .prose a,
 .prose-inline a {
-	color: var(--ak-link);
+	color: var(--ak-text);
 	text-decoration: underline;
 	text-underline-offset: 2px;
-	border-radius: var(--ak-corner-small);
+	border-radius: var(--ak-corner-check);
 }
 
 .prose a:focus-visible,
@@ -109,16 +109,13 @@ body {
 	font-family: var(--ak-font-mono);
 	font-size: 0.86em;
 	color: var(--ak-text);
-	background: var(--ak-layer4);
-	border-radius: var(--ak-corner-small);
+	background: var(--ak-wash);
+	border-radius: var(--ak-corner-check);
 	padding: 0.1em 0.3em;
 	overflow-wrap: anywhere;
 }
 
 .prose pre {
-	background: var(--ak-layer3);
-	border-radius: var(--ak-corner-card);
-	padding: var(--ak-space-sm) var(--ak-space-md);
 	overflow-x: auto;
 }
 
@@ -140,7 +137,6 @@ body {
 
 .prose th,
 .prose td {
-	border-bottom: 1px solid var(--ak-border);
 	padding: var(--ak-space-xs) var(--ak-space-sm) var(--ak-space-xs) 0;
 	text-align: start;
 	vertical-align: top;
@@ -156,9 +152,8 @@ body {
 	font-family: var(--ak-font-mono);
 	font-size: var(--ak-type-t1);
 	color: var(--ak-text);
-	background: var(--ak-layer2);
-	box-shadow: 0 0 0 1px var(--ak-border-strong);
-	border-radius: var(--ak-corner-small);
+	background: var(--ak-wash);
+	border-radius: var(--ak-corner-check);
 	padding: 0.1em 0.4em;
 	white-space: nowrap;
 }
@@ -166,12 +161,10 @@ body {
 .prose blockquote {
 	margin: 0;
 	padding-inline-start: var(--ak-space-sm);
-	border-inline-start: 2px solid var(--ak-border-strong);
 	color: var(--ak-text-muted);
 }
 
 .prose hr {
 	border: none;
-	border-top: 1px solid var(--ak-border);
 	margin: var(--ak-space-lg) 0;
 }

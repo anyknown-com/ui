@@ -76,7 +76,7 @@ const styles = stylex.create({
 		margin: 0,
 		textWrap: "pretty",
 	},
-	link: { fontSize: type.t3, color: color.link, textUnderlineOffset: 2, whiteSpace: "nowrap" },
+	link: { fontSize: type.t3, color: color.text, textUnderlineOffset: 2, whiteSpace: "nowrap" },
 })
 
 /**

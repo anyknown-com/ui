@@ -1,5 +1,5 @@
 import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
-import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
+import { breakpoint, color, corner, font, shadow, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import { createContext, use, useState } from "react"
 import { ComponentPage, NotFound } from "./ComponentPage"
@@ -103,7 +103,7 @@ const styles = stylex.create({
 		color: color.text,
 		textDecoration: "none",
 		marginInlineEnd: { default: space.sm, [MOBILE]: "auto" },
-		borderRadius: corner.small,
+		borderRadius: corner.shape,
 		outline: focus,
 		outlineOffset: 2,
 	},
@@ -121,17 +121,17 @@ const styles = stylex.create({
 		alignItems: "center",
 		minHeight: "2.25rem",
 		paddingInline: space.sm,
-		borderRadius: corner.control,
+		borderRadius: corner.shape,
 		fontSize: type.t2,
 		fontWeight: 500,
 		whiteSpace: "nowrap",
 		textDecoration: "none",
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		outline: focus,
 		outlineOffset: -2,
 	},
-	sectionActive: { color: color.text, backgroundColor: color.accentSubtle },
+	sectionActive: { color: color.text, backgroundColor: color.wash },
 	controls: {
 		display: "flex",
 		flexWrap: "wrap",
@@ -144,8 +144,8 @@ const styles = stylex.create({
 	toggleGroup: {
 		display: "flex",
 		gap: 2,
-		backgroundColor: color.accentSubtle,
-		borderRadius: corner.pill,
+		backgroundColor: color.wash,
+		borderRadius: corner.shape,
 		padding: 2,
 	},
 	toggle: {
@@ -155,7 +155,7 @@ const styles = stylex.create({
 		color: { default: color.textMuted, ":hover": color.text },
 		backgroundColor: "transparent",
 		borderWidth: 0,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		minHeight: "1.75rem",
 		paddingInline: space.sm,
 		cursor: "pointer",
@@ -163,8 +163,8 @@ const styles = stylex.create({
 	},
 	toggleActive: {
 		color: color.text,
-		backgroundColor: color.layer2,
-		boxShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
+		backgroundColor: color.washHover,
+		fontWeight: 600,
 	},
 	menuButton: { display: { default: "none", [MOBILE]: "inline-flex" }, alignItems: "center" },
 	rail: {
@@ -198,27 +198,22 @@ const styles = stylex.create({
 	link: {
 		display: "block",
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		textDecoration: "none",
 		fontSize: type.t2,
 		lineHeight: type.tight,
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
-		borderRadius: corner.control,
+		borderRadius: corner.shape,
 		outline: focus,
 		outlineOffset: -2,
 	},
-	active: { color: color.text, backgroundColor: color.accentSubtle, fontWeight: 500 },
-	// The desk is body (layer1); the content is the white sheet on it. On a phone the sheet
-	// runs to both edges and the bottom.
+	active: { color: color.text, backgroundColor: color.wash, fontWeight: 600 },
+	// One sheet: the page is the paper, with no desk behind it and no card on it.
 	main: {
 		minWidth: 0,
 		paddingBlock: { default: space.xxl, [MOBILE]: space.lg },
 		paddingInline: { default: space.xl, [MOBILE]: space.md },
-		marginBottom: { default: space.xs, [MOBILE]: 0 },
-		marginInline: { default: space.xs, [MOBILE]: 0 },
-		backgroundColor: color.layer2,
-		borderRadius: { default: corner.sheet, [MOBILE]: `${corner.sheet} ${corner.sheet} 0 0` },
 	},
 	mainWithRail: { marginInlineStart: 0 },
 	// One content width for every page. Reading text inside it keeps its own measure and stays
@@ -229,9 +224,10 @@ const styles = stylex.create({
 		insetInlineStart: space.sm,
 		top: { default: "-10rem", ":focus": space.sm },
 		zIndex: 1,
-		backgroundColor: color.layer2,
+		backgroundColor: color.surfaceRaised,
+		boxShadow: shadow.float,
 		color: color.text,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		outline: focus,

@@ -9,7 +9,7 @@ const styles = stylex.create({
 	tile: {
 		color: color.text,
 		textDecoration: "none",
-		borderRadius: corner.card,
+		borderRadius: corner.box,
 		outline: { default: "none", ":focus-visible": `2px solid ${color.focusRing}` },
 		outlineOffset: 3,
 	},
@@ -19,7 +19,7 @@ const styles = stylex.create({
 		gap: space.sm,
 		fontSize: type.t3,
 	},
-	pagerLink: { color: color.link, textUnderlineOffset: 2 },
+	pagerLink: { color: color.text, textUnderlineOffset: 2 },
 })
 
 // One line per situation for its tile; the full moment is on the situation's own page.

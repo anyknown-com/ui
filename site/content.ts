@@ -89,7 +89,6 @@ export const COMPONENT_GROUPS: { title: string; names: string[] }[] = [
 		title: "Agent & chat",
 		names: [
 			"message",
-			"bubble",
 			"markdown",
 			"code-block",
 			"payload-block",

@@ -1,5 +1,5 @@
 import { DEMOS } from "../playground/demos"
-import { breakpoint, color, corner, font, space, type } from "@anyknown/ui/tokens.stylex"
+import { breakpoint, color, font, space, type } from "@anyknown/ui/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
 import {
 	type ApiComponent,
@@ -30,9 +30,6 @@ const styles = stylex.create({
 		display: "grid",
 		alignContent: "start",
 		gap: space.xs,
-		backgroundColor: color.layer3,
-		borderRadius: corner.card,
-		padding: space.lg,
 		minWidth: 0,
 	},
 	whenTitle: {
@@ -68,27 +65,18 @@ const styles = stylex.create({
 		color: color.textMuted,
 		paddingBlock: space.xs,
 		paddingInline: space.xs,
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 	},
 	tbody: { display: { default: "table-row-group", [MOBILE]: "block" } },
 	tr: {
 		display: { default: "table-row", [MOBILE]: "grid" },
 		gap: { default: null, [MOBILE]: space.xxs },
 		paddingBlock: { default: null, [MOBILE]: space.sm },
-		borderBottomWidth: { default: 0, [MOBILE]: 1 },
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 	},
 	td: {
 		display: { default: "table-cell", [MOBILE]: "block" },
 		verticalAlign: "top",
 		paddingBlock: { default: space.xs, [MOBILE]: 0 },
 		paddingInline: { default: space.xs, [MOBILE]: 0 },
-		borderBottomWidth: { default: 1, [MOBILE]: 0 },
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
 		color: color.textMuted,
 		lineHeight: type.snug,
 		minWidth: 0,
@@ -104,9 +92,6 @@ const styles = stylex.create({
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		color: color.warning,
-		backgroundColor: color.warningSubtle,
-		borderRadius: corner.pill,
-		paddingInline: space.xs,
 		marginInlineStart: space.xxs,
 	},
 	mobileLabel: {
@@ -123,10 +108,10 @@ const styles = stylex.create({
 		flexWrap: "wrap",
 		gap: space.md,
 	},
-	link: { color: color.link, textUnderlineOffset: 2 },
+	link: { color: color.text, textUnderlineOffset: 2 },
 	seenIn: { listStyle: "none", margin: 0, padding: 0, display: "grid", gap: space.sm, maxWidth: "44rem" },
 	seenItem: { display: "grid", gap: space.xxs },
-	seenLink: { color: color.link, textUnderlineOffset: 2, fontSize: type.t3, fontWeight: 600 },
+	seenLink: { color: color.text, textUnderlineOffset: 2, fontSize: type.t3, fontWeight: 600 },
 	seenMoment: { fontSize: type.t2, lineHeight: type.snug, color: color.textMuted, margin: 0 },
 })
 
