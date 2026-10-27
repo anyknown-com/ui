@@ -18,4 +18,10 @@ describe("themes", () => {
 			expect(source, `${group} 沒有被 theme`).toContain(`stylex.createTheme(${group}, {`)
 		}
 	})
+
+	test("wash 在亮暗兩套都有", () => {
+		const source = readFileSync(join(process.cwd(), "src/themes.stylex.ts"), "utf8")
+		expect(source).toContain('wash: "rgba(23, 23, 23, 0.06)"')
+		expect(source).toContain('wash: "rgba(240, 240, 240, 0.06)"')
+	})
 })

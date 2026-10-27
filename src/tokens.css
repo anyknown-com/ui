@@ -45,6 +45,9 @@ html {
 	--ak-layer3: #f9f9f9;
 	--ak-layer4: #ededed;
 	--ak-layer5: #e6e6e6;
+	--ak-wash: rgba(23, 23, 23, 0.06);
+	--ak-wash-hover: rgba(23, 23, 23, 0.11);
+	--ak-wash-strong: rgba(23, 23, 23, 0.26);
 
 	--ak-shadow-rest: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
 	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);
@@ -123,6 +126,9 @@ html {
 	--ak-tone-rail-layer2: #ffffff;
 	--ak-tone-rail-layer3: #ededed;
 
+	--ak-corner-shape: 9999px;
+	--ak-corner-box: 24px;
+	--ak-corner-check: 4px;
 	--ak-corner-small: 6px;
 	--ak-corner-control: 12px;
 	--ak-corner-card: 14px;
@@ -179,6 +185,9 @@ html {
 		--ak-layer3: #181818;
 		--ak-layer4: #242424;
 		--ak-layer5: #2b2b2b;
+		--ak-wash: rgba(240, 240, 240, 0.06);
+		--ak-wash-hover: rgba(240, 240, 240, 0.11);
+		--ak-wash-strong: rgba(240, 240, 240, 0.26);
 
 		--ak-shadow-rest: 0 0 0 1px #2b2b2b;
 		--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
@@ -230,6 +239,9 @@ html {
 	--ak-layer3: #181818;
 	--ak-layer4: #242424;
 	--ak-layer5: #2b2b2b;
+	--ak-wash: rgba(240, 240, 240, 0.06);
+	--ak-wash-hover: rgba(240, 240, 240, 0.11);
+	--ak-wash-strong: rgba(240, 240, 240, 0.26);
 
 	--ak-shadow-rest: 0 0 0 1px #2b2b2b;
 	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4);
@@ -281,6 +293,9 @@ html {
 	--ak-layer3: #f9f9f9;
 	--ak-layer4: #ededed;
 	--ak-layer5: #e6e6e6;
+	--ak-wash: rgba(23, 23, 23, 0.06);
+	--ak-wash-hover: rgba(23, 23, 23, 0.11);
+	--ak-wash-strong: rgba(23, 23, 23, 0.26);
 
 	--ak-shadow-rest: 0 0 0 1px #dfdfdf, 0 2px 6px rgba(0, 0, 0, 0.05);
 	--ak-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1);

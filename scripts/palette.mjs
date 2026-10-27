@@ -169,6 +169,17 @@ for (const [k, [s, l, d]] of Object.entries(ROLES))
 // text on dangerSolid
 role.onDangerSolid = { light: onSolid("red", "light"), dark: onSolid("red", "dark") }
 
+// wash: ink at 6% / 11% / 26%, written as rgba in tokens.stylex.ts. Checks use it composited over bg.
+const WASH_INK = { light: [23, 23, 23], dark: [240, 240, 240] }
+const composite = (ink, a, bgHex) =>
+	"#" +
+	ink
+		.map((c, i) => Math.round(c * a + parseInt(bgHex.slice(1 + 2 * i, 3 + 2 * i), 16) * (1 - a)))
+		.map((v) => v.toString(16).padStart(2, "0"))
+		.join("")
+		.toUpperCase()
+role.wash = Object.fromEntries(MODES.map((m) => [m, composite(WASH_INK[m], 0.06, role.bg[m])]))
+
 // tone: four surfaces that color has no name for
 const tone = {
 	layer6: { light: scales.gray.light[6], dark: scales.gray.dark[6] },
@@ -189,6 +200,7 @@ const CHECKS = [
 	["textMuted", "surface", 4.5, "text"],
 	["textMuted", "surfaceRaised", 4.5, "text"],
 	["textMuted", "layer4", 4.5, "text"],
+	["textMuted", "wash", 4.5, "text"],
 	// textFaint only needs 3:1: icon, chevron, placeholder, separator; no text meant to be read
 	["textFaint", "bg", 3, "non-text"],
 	["textFaint", "surface", 3, "non-text"],
@@ -234,5 +246,14 @@ for (const m of MODES) {
 console.log("\nfailures:", failures)
 
 const pairs = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, [v.light, v.dark]]))
-console.log(JSON.stringify({ color: pairs(role), tone: pairs(tone) }, null, 1))
+console.log(
+	JSON.stringify(
+		{
+			color: pairs(Object.fromEntries(Object.entries(role).filter(([k]) => k !== "wash"))),
+			tone: pairs(tone),
+		},
+		null,
+		1,
+	),
+)
 if (failures > 0) process.exitCode = 1

@@ -43,6 +43,9 @@ export const lightColor = stylex.createTheme(color, {
 	layer3: "#F9F9F9",
 	layer4: "#EDEDED",
 	layer5: "#E6E6E6",
+	wash: "rgba(23, 23, 23, 0.06)",
+	washHover: "rgba(23, 23, 23, 0.11)",
+	washStrong: "rgba(23, 23, 23, 0.26)",
 })
 
 export const lightShadow = stylex.createTheme(shadow, {
@@ -100,6 +103,9 @@ export const darkColor = stylex.createTheme(color, {
 	layer3: "#181818",
 	layer4: "#242424",
 	layer5: "#2B2B2B",
+	wash: "rgba(240, 240, 240, 0.06)",
+	washHover: "rgba(240, 240, 240, 0.11)",
+	washStrong: "rgba(240, 240, 240, 0.26)",
 })
 
 export const darkShadow = stylex.createTheme(shadow, {

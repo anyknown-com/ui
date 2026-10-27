@@ -30,6 +30,8 @@ describe("tokens.css", () => {
 			"--ak-motion-ease-out",
 			"--ak-z-index-popup",
 			"--ak-corner-control",
+			"--ak-corner-box",
+			"--ak-wash",
 			"--ak-shadow-float",
 		])
 			expect(want.light.has(name), name).toBe(true)

@@ -53,6 +53,11 @@ export const color = stylex.defineVars({
 	layer3: { default: "#F9F9F9", [DARK]: "#181818" },
 	layer4: { default: "#EDEDED", [DARK]: "#242424" },
 	layer5: { default: "#E6E6E6", [DARK]: "#2B2B2B" },
+	// Ink at 6% / 11% / 26% (rgba, so native-gen can read it). A wash is a tint on things you press,
+	// not another sheet; washStrong is for bars, slider tracks, sheet handles and scrollbars.
+	wash: { default: "rgba(23, 23, 23, 0.06)", [DARK]: "rgba(240, 240, 240, 0.06)" },
+	washHover: { default: "rgba(23, 23, 23, 0.11)", [DARK]: "rgba(240, 240, 240, 0.11)" },
+	washStrong: { default: "rgba(23, 23, 23, 0.26)", [DARK]: "rgba(240, 240, 240, 0.26)" },
 })
 
 // 三階 elevation,越靠近使用者陰影越深。陰影一律用黑,不染色;
@@ -297,6 +302,12 @@ export const tone = stylex.defineVars({
 // 圓角跟尺寸走:越靠近使用者越圓。巢狀時內層圓角 = 外層 − padding。
 // 前七個是軟材的角色名;ib / md / btn / sm / xs 是舊名,元件改完前保留。
 export const corner = stylex.defineVars({
+	// shape: a pill, for things always one line tall (button, chip, single-line field, menu row)
+	shape: "9999px",
+	// box: for boxes that grow with their content (composer, textarea, menu, dialog, sheet top, toast, tooltip, image)
+	box: "24px",
+	// check: the checkbox square only
+	check: "4px",
 	// checkbox、kbd、小 chip 的內角
 	small: "6px",
 	// input、select、textarea、segmented 外框
