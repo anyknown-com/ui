@@ -167,11 +167,10 @@ items are pills (`corner.shape`), hover and highlight are `wash`, groups are spl
 ## Basics
 
 ### button
-Pill (`corner.pill`). Heights lg / md / sm = 48 / 40 / 32; the default md 40 is the touch
+Pill (`corner.shape`). Heights lg / md / sm = 48 / 40 / 32; the default md 40 is the touch
 height. xs 28 is only for crowded toolbars and isn't one of the three steps. `icon` is a circle
-whose diameter follows that step's height. Hover: solid variants mix 14% toward the page
-background, secondary goes one step deeper (`layer5`), ghost variants go transparent →
-`accentSubtle` / `dangerSubtle`. Pressing scales to `0.98` in 120ms ease-out; no scaling under
+whose diameter follows that step's height. Hover: primary mixes 12% toward the page background,
+secondary and danger go from `wash` to `washHover`, ghost goes transparent → `wash`. Pressing scales to `0.98` in 120ms ease-out; no scaling under
 reduced motion.
 
 - **There is one press feedback**: `press.button` in `lib/styled.ts` (`:active:not(:disabled)`
@@ -183,11 +182,10 @@ reduced motion.
 
 | variant | background | label color | used for |
 | --- | --- | --- | --- |
-| `primary` | `accent` (ink) | `accentText` | the main action, one per screen |
-| `secondary` | `accentSubtle` (sunken, no frame) | `text` | secondary actions |
+| `primary` | `text` (solid ink) | `bg` | the main action, one per page |
+| `secondary` | `wash` | `text` | secondary actions |
 | `ghost` | transparent | `textMuted` | a quiet third option |
-| `danger` | `dangerSolid` | `onDangerSolid` | irreversible deletion, at most one per screen |
-| `dangerGhost` | transparent | `danger` | "red text on white": the meaning shows without the weight |
+| `danger` | `wash` | `danger`, weight 600 | irreversible deletion; the words say red, no solid fill |
 
 - children are wrapped in a `position: relative` span
 
@@ -386,24 +384,22 @@ compete by z-index with dialog / toast at that level, so per-component numbers l
   stacking context; it is not part of this table
 
 ### tabs
-Switches content at the same level. Underline is the default; pills are for filter-style
-switching.
+Switches content at the same level. One look, no variants: the tabs are words, the open one is
+`text` in weight 600 on a sliding `wash` capsule, the others `textMuted`; no track, no line.
 
 - Base UI 1.7 uses **manual activation** (arrow keys move focus, Enter/Space switch), and a
   disabled tab stays focusable instead of being skipped; that's the APG default. A visible
   disabled style must use `state.disabled`; `:disabled` never matches
-- Underline moves in 240ms `cubic-bezier(.16,1,.3,1)`; both edges move monotonically toward the
-  target, **no backtracking, no overshoot**
-- pills: the track is a sunken `surface` (`corner.control`, no frame); the selected tab is a
-  raised sheet (`surfaceRaised` + `shadow.rest`) that slides under the tab. Inner corner = 12 −
-  4 inset = 8. A white sheet on the track is only 1.09:1, so the sheet gets an extra 1px
-  `borderControl` ring (over 3:1) to show which tab is selected
+- The capsule moves in 240ms `cubic-bezier(.16,1,.3,1)`; both edges move monotonically toward
+  the target, **no backtracking, no overshoot**
+- The prototype (`data-part="tabs"`) draws the open tab as a `wash` capsule, not the underline
+  `sketch-language-ui.md` Phase 10 first named; the prototype is the CEO-approved spec and wins
 - The indicator position isn't measured by us: Base UI's `Tabs.Indicator` already writes
-  `--active-tab-*` as inline style, and the pill's `width` / `height` / `translate` read those
+  `--active-tab-*` as inline style, and the capsule's `width` / `height` / `translate` read those
   variables
 - `--active-tab-left` is a physical distance from the list's left edge, RTL included, so the
-  underline and pill anchor at `left: 0`, not `insetInlineStart` (under RTL that would count
-  from the right edge and the indicator would run the wrong way)
+  capsule anchors at `left: 0`, not `insetInlineStart` (under RTL that would count from the
+  right edge and the indicator would run the wrong way)
 - Dead ends: a "stretchy" underline (double spring + stretch-and-sag): "way too much". Splitting
   x and width onto separate curves overshoots and pulls back, breaking "no edge may backtrack"
 
@@ -547,7 +543,7 @@ always muted italic, a supporting voice.
 ### action-bar
 The hover action row under an assistant message. **Its height is always reserved** (padding-
 bottom + negative margin-bottom trick); hover only toggles opacity, so the turn rhythm never
-jumps. Each button is a ghost pill with an `accentSubtle` background only on hover.
+jumps. Each button is a ghost pill with a `wash` background only on hover; the copied state is `text`.
 
 ### code-block
 Header (language label + copy button) plus a `type.code` / `type.snug` (13 / 1.45) mono body.
@@ -841,18 +837,16 @@ dictionary editor.
 
 ### ghost / icon-button / segmented / spin / status-chip
 Small controls moved from the product's ui-next: `Ghost` / `GhostLink` are text pills with no
-background (background only on hover); `IconButton` carries a Tooltip (its name is the tooltip)
+background (`wash` only on hover; `danger` is red words); `IconButton` carries a Tooltip (its name is the tooltip)
 except while `open` (the popover it owns is showing); `Segmented` is a group of `aria-pressed`
 buttons, not tabs; `Spin` is the 12px ring inside a button (9px `small`); `StatusChip`'s variant
 is a one-letter status code (`r` `w` `d` `n` `a` `f` `plain`), told apart by the word's colour only
 (no fill or ring); `Pill` is the mono words, with an optional 6px dot, on a fold's first line.
 
-- `IconButton` is a circle (`corner.pill`), presses to 0.98, focus ring `focusRing`, hover
-  `ink.n8`
-- `Segmented` speaks the same language as pills tabs: a sunken `surface` track
-  (`corner.control`, no frame), the selected segment a `surfaceRaised` + `shadow.rest` sheet
-  with a 1px `borderControl` ring (as in pills tabs, over 3:1 against the track). In a grid it
-  still wraps only its own options
+- `IconButton` is a circle (`corner.shape`), presses to 0.98, focus ring `focusRing`, hover
+  `wash`; a count draws as a 6px `signal` dot (the number is read aloud only)
+- `Segmented` speaks the same language as `Tabs`: no track, the selected segment a `wash`
+  capsule in weight 600 (`data-part="toggles"`). In a grid it still wraps only its own options
 - `StatusChip`'s `a` (running) and `Pill`'s `live` dot use `signal`, and `Pill`'s `done` dot is `success`: the agent is working
 
 ### card

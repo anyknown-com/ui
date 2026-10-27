@@ -3,36 +3,33 @@ import * as stylex from "@stylexjs/stylex"
 import type { KeyboardEvent } from "react"
 import { press } from "../../lib/styled"
 import { useControllableState } from "../../lib/useControllableState"
-import { breakpoint, color, corner, focusRing, font, radius, shadow, space, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, focusRing, font, space, type } from "../../tokens.stylex"
 
-/** `.seg`: a few words on a sunken track; the chosen one is a sheet of paper raised on it. */
+/** `.seg`: a few words with no track; the chosen one is a wash capsule in weight 600. */
 
 const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
 	root: {
 		alignSelf: "flex-start",
-		// 在 grid 裡也只包住自己的選項:軌道拉滿整列會像一條空的輸入框
+		// 在 grid 裡也只包住自己的選項
 		justifySelf: "start",
-		backgroundColor: color.surface,
-		borderRadius: corner.control,
 		display: "inline-flex",
 		gap: 2,
 		maxWidth: "100%",
 		overflowX: { default: "visible", [breakpoint.phone]: "auto" },
-		padding: space.xxs,
 		scrollbarWidth: "none",
 	},
 	item: {
-		backgroundColor: { default: "transparent", ":hover": "transparent" },
-		// 內層圓角 = 外框 12 − 內距 4
-		borderRadius: radius.md,
+		backgroundColor: "transparent",
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
 		cursor: "pointer",
 		fontFamily: font.body,
 		fontSize: type.t2,
+		fontWeight: 400,
 		height: { default: 28, [breakpoint.phone]: 40 },
 		lineHeight: type.body,
 		margin: 0,
@@ -42,16 +39,11 @@ const styles = stylex.create({
 		paddingInline: space.sm,
 		whiteSpace: "nowrap",
 	},
-	// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊。
-	// forced-colors 會拿掉陰影、把底色洗掉:選中的那格改成 Highlight 底
+	// forced-colors 會把 wash 洗掉:選中的那格改成 Highlight 底
 	on: {
-		backgroundColor: {
-			default: color.surfaceRaised,
-			":hover": color.surfaceRaised,
-			[FORCED]: "Highlight",
-		},
-		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
+		backgroundColor: { default: color.wash, [FORCED]: "Highlight" },
 		color: { default: color.text, ":hover": color.text, [FORCED]: "HighlightText" },
+		fontWeight: 600,
 		forcedColorAdjust: { default: "auto", [FORCED]: "none" },
 		outline: {
 			default: "none",

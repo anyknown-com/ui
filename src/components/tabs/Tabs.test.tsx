@@ -4,9 +4,9 @@ import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "./Tabs"
 
-function ThreadTabs({ variant }: { variant?: "underline" | "pills" }) {
+function ThreadTabs() {
 	return (
-		<Tabs defaultValue="chat" variant={variant}>
+		<Tabs defaultValue="chat">
 			<TabsList aria-label="Thread 檢視">
 				<TabsTab value="chat">對話</TabsTab>
 				<TabsTab value="memory">記憶</TabsTab>
@@ -65,9 +65,10 @@ describe("Tabs", () => {
 		expect(panel).toHaveAttribute("tabindex", "0")
 	})
 
-	test("pills variant keeps tab semantics", () => {
-		render(<ThreadTabs variant="pills" />)
+	test("the open tab is marked selected", () => {
+		render(<ThreadTabs />)
 		expect(screen.getByRole("tab", { name: "對話" })).toHaveAttribute("aria-selected", "true")
+		expect(screen.getByRole("tab", { name: "記憶" })).toHaveAttribute("aria-selected", "false")
 	})
 })
 
@@ -133,27 +134,20 @@ function forcedCss(element: Element) {
 }
 
 describe("Tabs in forced-colors", () => {
-	test("the underline indicator is Highlight; a disabled tab is GrayText", () => {
+	test("the indicator is Highlight; a disabled tab is GrayText", () => {
 		render(<ThreadTabs />)
 		const indicator = screen.getByRole("tablist").lastElementChild as HTMLElement
 		expect(forcedCss(indicator)).toMatch(/background-color: highlight/i)
 		expect(forcedCss(screen.getByRole("tab", { name: "換班紀錄" }))).toMatch(/color: graytext/i)
 	})
 
-	test("pills: a Highlight pill under HighlightText words", () => {
-		render(<ThreadTabs variant="pills" />)
-		const indicator = screen.getByRole("tablist").lastElementChild as HTMLElement
-		expect(forcedCss(indicator)).toMatch(/background-color: highlight/i)
+	test("the open tab words are HighlightText on the Highlight indicator", () => {
+		render(<ThreadTabs />)
 		expect(forcedCss(screen.getByRole("tab", { name: "對話" }))).toMatch(/color: highlighttext/i)
 	})
 })
 
-test("axe: underline and pills, with a disabled tab", async () => {
-	const { container } = render(
-		<>
-			<ThreadTabs />
-			<ThreadTabs variant="pills" />
-		</>,
-	)
+test("axe: tabs with a disabled tab", async () => {
+	const { container } = render(<ThreadTabs />)
 	await expectNoAxeViolations(container)
 })

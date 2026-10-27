@@ -29,19 +29,19 @@ const styles = stylex.create({
 		fontSize: type.t1,
 		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		// 24px both ways, also for an icon-only ActionBar.Button: the WCAG 2.5.8 minimum
 		minHeight: "1.5rem",
 		minWidth: "1.5rem",
 		justifyContent: "center",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
-	done: { color: color.accent },
+	done: { color: color.text },
 	icon: { flex: "none" },
 })
 

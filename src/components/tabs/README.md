@@ -1,11 +1,11 @@
 # Tabs
 
-Switches between panels of content at the same level, built on Base UI Tabs, with an underline style (default) and a pills style for filter-like switches.
+Switches between panels of content at the same level, built on Base UI Tabs, drawn as words, the open one in weight 600 on a sliding `wash` capsule.
 
 ## When to use
 
 - Views of the same object that the user moves between ("Chat" / "Memory" / "Handoffs").
-- A time-range or filter switch that swaps the content below it (`variant="pills"`).
+- A time-range or filter switch that swaps the content below it.
 
 ## When not to use
 
@@ -30,7 +30,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@anyknown/ui"
 </Tabs>
 ```
 
-The family is `Tabs` (root; `variant` `"underline"` or `"pills"`), `TabsList` (`aria-label`), `TabsTab` (`value`, `disabled`) and `TabsPanel` (`value`).
+The family is `Tabs` (root), `TabsList` (`aria-label`), `TabsTab` (`value`, `disabled`) and `TabsPanel` (`value`).
 
 - Uncontrolled: `defaultValue` picks the first open tab; `onValueChange` still reports switches.
 - Controlled: pass `value` with `onValueChange`; the selected tab follows `value` only.
@@ -42,9 +42,9 @@ The family is `Tabs` (root; `variant` `"underline"` or `"pills"`), `TabsList` (`
 - Roving tabindex: the tab list is one tab stop.
 - Activation is manual: arrow keys move focus, and Enter or Space selects.
 - A disabled tab has `aria-disabled="true"`, stays focusable, never activates, and looks different.
-- Both variants keep tab semantics. In `pills`, the selected tab has a 1px `borderControl` ring so it stands out from the track.
-- The underline and pill indicators move without overshoot (`motion.slide`, 240ms); the movement is off under `prefers-reduced-motion: reduce`.
-- In forced-colors mode the underline and the selected pill are `Highlight` (pill text `HighlightText`), and a disabled tab is `GrayText`.
+- The selected tab is `text` in weight 600 on the `wash` capsule; the others are `textMuted`.
+- The capsule moves without overshoot (`motion.slide`, 240ms); the movement is off under `prefers-reduced-motion: reduce`.
+- In forced-colors mode the capsule is `Highlight` (selected text `HighlightText`), and a disabled tab is `GrayText`.
 
 ## Keyboard
 
@@ -61,5 +61,5 @@ The `dir` attribute alone does not mirror the arrow keys; Base UI reads the dire
 
 ## Related
 
-- [Segmented](../segmented/README.md) — same look as `pills`, for toggles without panels.
+- [Segmented](../segmented/README.md) — same look, for toggles without panels.
 - [RadioGroup](../radio/README.md) — for a form choice.

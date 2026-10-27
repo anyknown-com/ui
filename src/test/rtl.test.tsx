@@ -143,7 +143,7 @@ describe("RTL", () => {
 	test("Tabs: wrapping, Home and End follow the list order under RTL", async () => {
 		render(
 			<Rtl>
-				<Tabs defaultValue="a" variant="pills">
+				<Tabs defaultValue="a">
 					<TabsList aria-label="Views">
 						<TabsTab value="a">A</TabsTab>
 						<TabsTab value="b">B</TabsTab>

@@ -12,7 +12,7 @@ import { Text } from "./Text"
 const probe = stylex.create({
 	text: { color: color.text },
 	muted: { color: color.textMuted },
-	accent: { color: color.accent },
+	accent: { color: color.text },
 })
 
 // dev build 會多帶一顆可讀的 debug class(`Text__styles.base`),atomic 的是雜湊那顆

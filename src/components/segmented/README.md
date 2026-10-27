@@ -1,6 +1,6 @@
 # Segmented
 
-A row of a few short words on a sunken track, where the chosen one is a raised sheet: a radio group drawn as a segmented control.
+A row of a few short words with no track, where the chosen one is a `wash` capsule in weight 600: a radio group drawn as a segmented control.
 
 ## When to use
 
@@ -44,7 +44,7 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`,
 - A disabled option is a native `disabled` button, so it takes no focus and the arrow keys skip it. With `disabled` on the group, every option is disabled, the group gets `aria-disabled="true"`, and Tab skips it.
 - Focus ring: a 2px `focusRing` outline inset 2px on `:focus-visible`.
 - Under `forced-colors: active` the checked option fills with `Highlight` and `HighlightText` words (its focus ring is `HighlightText`); disabled options draw in `GrayText`.
-- Each option is 28px tall (40px on phones), above the 24px minimum target. On phones the track scrolls sideways when it does not fit.
+- Each option is 28px tall (40px on phones), above the 24px minimum target. On phones the row scrolls sideways when it does not fit.
 - Options shrink to 0.98 on press (shared `press.button`); no scale and no transition under `prefers-reduced-motion: reduce`.
 
 ## Keyboard
@@ -61,6 +61,6 @@ In a right-to-left context (`<DirectionProvider direction="rtl">`, even inside `
 
 ## Related
 
-- [Tabs](../tabs/README.md) — the `pills` variant shares this look but switches panels.
+- [Tabs](../tabs/README.md) — shares this look but switches panels.
 - [RadioGroup](../radio/README.md) — for form choices.
 - [Switch](../switch/README.md) — for one on/off setting.

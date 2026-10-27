@@ -167,7 +167,7 @@ function StackedSettings() {
 	return (
 		<DialogActions>
 			<Button
-				variant="dangerGhost"
+				variant="danger"
 				onClick={async () => {
 					const ok = await dialog.confirm({
 						title: "Delete this workspace?",
@@ -213,7 +213,6 @@ function ButtonDemo() {
 				<Button>New thread</Button>
 				<Button variant="secondary">Rename</Button>
 				<Button variant="ghost">Cancel</Button>
-				<Button variant="dangerGhost">Decline</Button>
 				<Button variant="danger">Delete memory</Button>
 			</Row>
 			<Row>
@@ -734,7 +733,7 @@ function TabsDemo() {
 				<TabsPanel value="handoff">Fable handed off to Opus yesterday at 18:00.</TabsPanel>
 				<TabsPanel value="files">Not available yet.</TabsPanel>
 			</Tabs>
-			<Tabs defaultValue="today" variant="pills">
+			<Tabs defaultValue="today">
 				<TabsList aria-label="Time range">
 					<TabsTab value="today">Today</TabsTab>
 					<TabsTab value="week">This week</TabsTab>

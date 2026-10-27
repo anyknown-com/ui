@@ -10,8 +10,8 @@ const FORCED = "@media (forced-colors: active)"
 const styles = stylex.create({
 	root: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":hover": color.layer3 },
-		borderRadius: corner.pill,
+		backgroundColor: { default: "transparent", ":hover": color.wash },
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -42,13 +42,13 @@ const styles = stylex.create({
 		whiteSpace: "nowrap",
 	},
 	danger: {
-		backgroundColor: { default: "transparent", ":hover": color.dangerSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		color: { default: color.danger, ":hover": color.danger },
 	},
 })
 
 export type GhostProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
-	/** Red words and a red hover, for an action that warns. @default false */
+	/** Red words and a wash hover, for an action that warns. @default false */
 	danger?: boolean
 	/** A ref to the `<button>` element. */
 	ref?: Ref<HTMLButtonElement>

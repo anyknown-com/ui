@@ -350,7 +350,7 @@ export function Scene({ compact }: SceneProps) {
 									</Button>
 								</span>
 								<Part name="button" inline>
-									<Button variant="dangerGhost" size="sm" onClick={forget}>
+									<Button variant="danger" size="sm" onClick={forget}>
 										{count === 1 ? "Forget 1 memory" : `Forget ${count} memories`}
 									</Button>
 								</Part>

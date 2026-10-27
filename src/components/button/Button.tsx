@@ -18,7 +18,7 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		fontWeight: 500,
 		lineHeight: type.dense,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		// forced-colors 會洗掉底色,膠囊就只剩字:那裡補一圈框,停用的是 GrayText
 		borderStyle: "solid",
 		borderWidth: { default: 0, [FORCED]: 1 },
@@ -61,33 +61,26 @@ const styles = stylex.create({
 	iconSm: { paddingInline: 0, width: "2rem" },
 	iconXs: { paddingInline: 0, width: "1.75rem" },
 	primary: {
-		color: color.accentText,
+		color: color.bg,
 		backgroundColor: {
-			default: color.accent,
-			":hover": `color-mix(in srgb, ${color.accent} 86%, ${color.bg})`,
+			default: color.text,
+			":hover": `color-mix(in srgb, ${color.text} 88%, ${color.bg})`,
 		},
 	},
-	// 凹下去的一塊:accentSubtle 底、沒有框;hover 再深一階
+	// 一層 wash,沒有框;hover 深一階
 	secondary: {
 		color: color.text,
-		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 	},
 	ghost: {
-		color: color.textMuted,
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		color: { default: color.textMuted, ":hover": color.text },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 	},
+	// 紅字 600 加 wash:不可逆的動作靠字色說,不用實心紅
 	danger: {
-		color: color.onDangerSolid,
-		backgroundColor: {
-			default: color.dangerSolid,
-			":hover": `color-mix(in srgb, ${color.dangerSolid} 86%, ${color.bg})`,
-		},
-	},
-	// 「白底紅字」:份量走 ghost,語意走 danger token(和 interaction-card 收據列
-	// rejected 的 ✓ 同一個 token)
-	dangerGhost: {
 		color: color.danger,
-		backgroundColor: { default: "transparent", ":hover": color.dangerSubtle },
+		fontWeight: 600,
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 	},
 	label: { position: "relative", display: "inline-flex", alignItems: "center", gap: space.xs },
 	// 等待中:字還在(撐住寬度、也還是按鈕的名字),只是看不見;轉圈疊在正中間
@@ -101,12 +94,12 @@ const styles = stylex.create({
 	},
 })
 
-type Variant = "primary" | "secondary" | "ghost" | "danger" | "dangerGhost"
+type Variant = "primary" | "secondary" | "ghost" | "danger"
 
 export type ButtonProps = ComponentProps<"button"> & {
 	/**
-	 * `primary` ink for the one main action, `secondary` sunken, `ghost` quiet, `danger` solid red
-	 * for what cannot be undone, `dangerGhost` red words for a lighter destructive action.
+	 * `primary` solid ink for the one main action of a page, `secondary` a wash, `ghost` quiet,
+	 * `danger` red words on a wash for what cannot be undone.
 	 * @default "primary"
 	 */
 	variant?: Variant

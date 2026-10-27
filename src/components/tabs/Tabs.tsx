@@ -1,60 +1,49 @@
 import { Tabs as BaseTabs } from "@base-ui/react/tabs"
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, createContext, useContext } from "react"
+import type { ReactNode } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, focusRing, font, ink, motion, radius, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const FORCED = "@media (forced-colors: active)"
 
-const VariantContext = createContext<"underline" | "pills">("underline")
-
 const styles = stylex.create({
 	root: { display: "grid", gap: space.md },
-	list: { display: "flex", gap: space.xxs, position: "relative" },
-	underlineList: {
-		borderBottomWidth: 1,
-		borderBottomStyle: "solid",
-		borderBottomColor: color.border,
-	},
-	pillsList: {
-		// 只包住自己的 pills:整條拉滿時,4px 的內距在一大片空白旁邊會看起來像沒有間距
+	list: {
+		display: "flex",
+		gap: 2,
+		position: "relative",
 		width: "fit-content",
 		maxWidth: "100%",
-		// 凹下去的 surface 軌道,不加框;選中的那格是浮在上面的一張紙
-		backgroundColor: color.surface,
-		borderRadius: corner.control,
-		padding: space.xxs,
-		gap: "0.15rem",
 	},
 	tab: {
-		backgroundColor: { default: "transparent", ":hover": ink.n6 },
+		backgroundColor: "transparent",
 		borderWidth: 0,
 		fontFamily: font.body,
 		fontSize: type.t2,
-		fontWeight: 500,
+		fontWeight: 400,
 		lineHeight: type.snug,
 		color: { default: color.textMuted, ":hover": color.text },
 		paddingBlock: space.xxs,
-		paddingInline: space.xs,
-		borderRadius: radius.md,
+		paddingInline: space.sm,
+		borderRadius: corner.shape,
 		cursor: "pointer",
-		transitionProperty: "color, background-color",
+		transitionProperty: "color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
+		zIndex: 1, // literal-ok: local stacking, the tab words over the sliding wash
 	},
 	tabDisabled: {
 		opacity: 0.4,
 		cursor: "not-allowed",
-		color: { default: color.textFaint, [FORCED]: "GrayText" },
+		color: { default: color.textMuted, [FORCED]: "GrayText" },
 		forcedColorAdjust: "none",
 	},
-	tabSelectedUnderline: { color: color.accent },
-	// forced-colors:選中的那格疊在 Highlight 的藥丸上,字要 HighlightText
-	tabSelectedPills: {
+	// forced-colors:選中的那格疊在 Highlight 上,字要 HighlightText
+	tabSelected: {
 		color: { default: color.text, [FORCED]: "HighlightText" },
-		backgroundColor: "transparent",
+		fontWeight: 600,
 		forcedColorAdjust: "none",
 		outline: {
 			default: "none",
@@ -64,38 +53,19 @@ const styles = stylex.create({
 			},
 		},
 	},
-	pillTab: { zIndex: 1 }, // literal-ok: local stacking, the tab words over the sliding pill
-	// Base UI 給的 --active-tab-left 是從清單「左緣」量的物理距離(RTL 也是),所以這裡錨在
-	// left: 0 而不是 insetInlineStart —— 後者在 RTL 會從右緣起算,指示條往反方向跑
+	// Base UI 把 --active-tab-* 寫成 inline style;wash 的膠囊滑到選中的那格後面。
+	// --active-tab-left 是從清單「左緣」量的物理距離(RTL 也是),所以錨在 left: 0
 	indicator: {
-		position: "absolute",
-		bottom: -1,
-		left: 0,
-		height: 2,
-		width: "var(--active-tab-width)",
-		translate: "var(--active-tab-left)",
-		// forced-colors 會把底色洗成 Canvas,底線就不見了
-		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
-		forcedColorAdjust: "none",
-		transitionProperty: "translate, width",
-		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
-		transitionTimingFunction: motion.easeOut,
-	},
-	// Indicator 本來就把 --active-tab-* 寫成 inline style,pills 直接拿它當滑動的藥丸。
-	pillIndicator: {
 		position: "absolute",
 		insetBlockStart: 0,
 		left: 0,
 		width: "var(--active-tab-width)",
 		height: "var(--active-tab-height)",
 		translate: "var(--active-tab-left) var(--active-tab-top)",
-		// 內層圓角 = 軌道 12 − 內距 4
-		borderRadius: radius.md,
-		// forced-colors 會拿掉陰影、洗掉底色:藥丸改成 Highlight
-		backgroundColor: { default: color.surfaceRaised, [FORCED]: "Highlight" },
+		borderRadius: corner.shape,
+		// forced-colors 會洗掉底色:改成 Highlight
+		backgroundColor: { default: color.wash, [FORCED]: "Highlight" },
 		forcedColorAdjust: "none",
-		// 白紙對 surface 軌道只有 1.09:1;外圈一條 borderControl 環讓選中的那格有 3:1 的邊
-		boxShadow: `0 0 0 1px ${color.borderControl}, ${shadow.rest}`,
 		pointerEvents: "none",
 		transitionProperty: "translate, width",
 		transitionDuration: { default: motion.slide, [REDUCED]: "0s" },
@@ -106,7 +76,7 @@ const styles = stylex.create({
 		fontSize: type.t2,
 		color: color.textMuted,
 		paddingBlock: space.xxs,
-		borderRadius: radius.sm,
+		borderRadius: corner.check,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
 	},
@@ -119,8 +89,6 @@ export type TabsProps = {
 	defaultValue?: string
 	/** The value of the tab the person opens. */
 	onValueChange?: (value: string) => void
-	/** `underline` marks the open tab with a sliding line; `pills` with a raised pill on a sunken track. @default "underline" */
-	variant?: "underline" | "pills"
 	/** A class name added to the root element. */
 	className?: string
 	/** A `TabsList` and its `TabsPanel`s. */
@@ -131,13 +99,11 @@ export type TabsProps = {
  * A set of panels where one shows at a time, switched by a row of tabs. ArrowLeft / ArrowRight
  * move between tabs; under `<DirectionProvider direction="rtl">` they swap, so ArrowLeft is next.
  */
-export function Tabs({ variant = "underline", children, ...props }: TabsProps) {
+export function Tabs({ children, ...props }: TabsProps) {
 	return (
-		<VariantContext value={variant}>
-			<BaseTabs.Root {...props} {...styled(props, styles.root)}>
-				{children}
-			</BaseTabs.Root>
-		</VariantContext>
+		<BaseTabs.Root {...props} {...styled(props, styles.root)}>
+			{children}
+		</BaseTabs.Root>
 	)
 }
 
@@ -152,17 +118,10 @@ export type TabsListProps = {
 
 /** The row of tabs inside `Tabs`; it draws the sliding indicator. */
 export function TabsList({ children, ...rest }: TabsListProps) {
-	const variant = useContext(VariantContext)
-
 	return (
-		<BaseTabs.List
-			{...rest}
-			{...styled(rest, styles.list, variant === "underline" ? styles.underlineList : styles.pillsList)}
-		>
+		<BaseTabs.List {...rest} {...styled(rest, styles.list)}>
 			{children}
-			<BaseTabs.Indicator
-				{...stylex.props(variant === "underline" ? styles.indicator : styles.pillIndicator)}
-			/>
+			<BaseTabs.Indicator {...stylex.props(styles.indicator)} />
 		</BaseTabs.List>
 	)
 }
@@ -178,17 +137,12 @@ export type TabsTabProps = {
 
 /** One tab in a `TabsList`. */
 export function TabsTab({ children, ...rest }: TabsTabProps) {
-	const variant = useContext(VariantContext)
 	return (
 		<BaseTabs.Tab
 			{...rest}
 			className={(state) =>
-				stylex.props(
-					styles.tab,
-					variant === "pills" && styles.pillTab,
-					state.disabled && styles.tabDisabled,
-					state.active && (variant === "underline" ? styles.tabSelectedUnderline : styles.tabSelectedPills),
-				).className ?? ""
+				stylex.props(styles.tab, state.disabled && styles.tabDisabled, state.active && styles.tabSelected)
+					.className ?? ""
 			}
 		>
 			{children}

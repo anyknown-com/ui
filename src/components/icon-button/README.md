@@ -7,7 +7,7 @@ A round button that holds one glyph and shows its name in a tooltip, for toolbar
 - A toolbar or sidebar action where a glyph is enough and the name can live in a tooltip.
 - A navigation button that stands for a page (`current` sets `aria-current="page"`).
 - A button that owns a popover or a toggled mode and should look held down while it is open (`open`).
-- A glyph with a small count in its corner (`badge`).
+- A glyph with a 6px dot in its corner when it counts something (`badge`).
 
 ## When not to use
 
@@ -25,7 +25,7 @@ import { IconButton } from "@anyknown/ui"
 </IconButton>
 ```
 
-Sizes are 36 / 32 / 28 px for `md` / `sm` / `xs` (default `md`). `side` places the tooltip (default `right`). `badge` shows a count when it is above 0. All other `<button>` props pass through except `type`, which is always `button`.
+Sizes are 36 / 32 / 28 px for `md` / `sm` / `xs` (default `md`). `side` places the tooltip (default `right`). `badge` shows a 6px `signal` dot when it is above 0; the number is only read aloud. All other `<button>` props pass through except `type`, which is always `button`.
 
 ## Accessibility
 

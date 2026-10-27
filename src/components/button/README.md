@@ -5,7 +5,7 @@ A pill-shaped push button for an action on the page, from the one ink primary ac
 ## When to use
 
 - The main action on a screen (`primary`, one per screen) and the actions beside it (`secondary`, `ghost`).
-- An irreversible delete (`danger`, at most one per screen), or a refusal that should read as danger without the weight (`dangerGhost`).
+- An irreversible delete (`danger`: red words on a wash, no solid red).
 - A round button whose whole label is one icon, inside a row of sized buttons (`icon`).
 
 ## When not to use
@@ -25,7 +25,7 @@ import { Button } from "@anyknown/ui"
 <Button type="submit" loading={saving}>Save</Button>
 ```
 
-Variants: `primary` (default), `secondary`, `ghost`, `danger`, `dangerGhost`. Sizes are 48 / 40 / 32 px for `lg` / `md` / `sm` (default `md`, the touch height); `xs` (28 px) is only for crowded toolbars. `icon` makes the button a circle whose diameter is the size's height. `loading` overlays a [Spin](../spin/README.md) on a hidden label (the width stays) and ignores clicks and form submission until it is false again. All other `<button>` props pass through; `sx` overrides the base styles.
+Variants: `primary` (default), `secondary`, `ghost`, `danger`. Sizes are 48 / 40 / 32 px for `lg` / `md` / `sm` (default `md`, the touch height); `xs` (28 px) is only for crowded toolbars. `icon` makes the button a circle whose diameter is the size's height. `loading` overlays a [Spin](../spin/README.md) on a hidden label (the width stays) and ignores clicks and form submission until it is false again. All other `<button>` props pass through; `sx` overrides the base styles.
 
 ## Accessibility
 

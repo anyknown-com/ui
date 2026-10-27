@@ -69,7 +69,6 @@ describe("Button", () => {
 				<Button variant="secondary">a</Button>
 				<Button variant="ghost">a</Button>
 				<Button variant="danger">a</Button>
-				<Button variant="dangerGhost">a</Button>
 				<Button size="lg">a</Button>
 				<Button size="xs" icon>
 					a

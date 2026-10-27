@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 import { press } from "../../lib/styled"
-import { color, corner, focusRing, font, ink, type } from "../../tokens.stylex"
+import { color, corner, focusRing, space } from "../../tokens.stylex"
 import { Tooltip } from "../tooltip/Tooltip"
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react"
 
@@ -8,14 +8,14 @@ const FORCED = "@media (forced-colors: active)"
 
 /**
  * `.ib`: a circle that holds one glyph. Nothing at rest, an ink wash under the pointer, the
- * name in a tooltip; a badge in the corner when it counts something.
+ * name in a tooltip; a 6px signal dot in the corner when it counts something.
  */
 
 const styles = stylex.create({
 	root: {
 		alignItems: "center",
-		backgroundColor: { default: "transparent", ":hover": ink.n8 },
-		borderRadius: corner.pill,
+		backgroundColor: { default: "transparent", ":hover": color.wash },
+		borderRadius: corner.shape,
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
@@ -44,24 +44,22 @@ const styles = stylex.create({
 		width: "2.25rem",
 	},
 	current: { color: color.text },
-	open: { backgroundColor: ink.n8, color: color.text },
+	open: { backgroundColor: color.wash, color: color.text },
 	sm: { height: "2rem", width: "2rem" },
 	xs: { height: "1.75rem", width: "1.75rem" },
+	// 數字不畫,只有一顆 6px 的 signal 點說「有新的」
 	badge: {
-		backgroundColor: color.accent,
-		borderRadius: corner.pill,
-		color: color.accentText,
-		fontFamily: font.mono,
-		fontSize: type.t1,
-		fontWeight: 500,
-		height: 16,
-		insetInlineEnd: 2,
-		lineHeight: "16px",
-		minWidth: 16,
-		paddingInline: 4,
+		backgroundColor: color.signal,
+		borderRadius: corner.shape,
+		// 數字只給讀屏器:字級 0,畫出來的只有那顆點
+		fontSize: 0,
+		height: 6,
+		lineHeight: 0,
+		overflow: "hidden",
+		insetInlineEnd: space.xxs,
 		position: "absolute",
-		textAlign: "center",
-		top: 2,
+		top: space.xxs,
+		width: 6,
 	},
 })
 
@@ -76,7 +74,7 @@ export type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "typ
 	open?: boolean
 	/** The circle's diameter: `md` 36px, `sm` 32px, `xs` 28px. @default "md" */
 	size?: "md" | "sm" | "xs"
-	/** A count in the corner; hidden when it is 0 or missing. */
+	/** A 6px signal dot in the corner when the count is above 0; the number is only read aloud. */
 	badge?: number
 	/** The one icon the button shows. */
 	children: ReactNode

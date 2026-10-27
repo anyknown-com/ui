@@ -15,7 +15,7 @@ const styles = stylex.create({
 		lineHeight: type.snug,
 		color: color.text,
 	},
-	required: { color: color.danger },
+	required: { color: color.textMuted },
 	optional: { fontWeight: 400, fontSize: type.t1, color: color.textMuted },
 })
 
@@ -28,7 +28,7 @@ const strings = defineStrings({
 export type LabelLabels = StringsOf<typeof strings>
 
 export type LabelProps = ComponentProps<"label"> & {
-	/** A red `*` after the name, hidden from screen readers (the control's `required` says it). */
+	/** A muted `*` after the name, hidden from screen readers (the control's `required` says it). */
 	required?: boolean
 	/** A muted "optional" after the name. */
 	optional?: boolean
