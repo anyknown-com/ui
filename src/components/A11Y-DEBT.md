@@ -11,10 +11,8 @@ Numbers are WCAG 2 contrast ratios computed from the hex values in `src/tokens.s
 
 ## Resolved: text in `textFaint`
 
-`textFaint` is a 3:1 color, so the rule is: no text that has to be read. Icons, chevrons,
-separators, the `—` in an empty cell, and disabled states may use it; all other text uses
-`textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark on every background). No text uses `textFaint`
-any more; the last one, the `KbdGroup` separator, moved to `textMuted` in 0.10.
+`textFaint` is gone in 0.16.0. Text that has to be read uses `textMuted` (≥ 5.36:1 light / ≥ 7.30:1 dark
+on every background); icons and separators use `textMuted` or `borderControl`.
 
 ## Intentional
 
@@ -29,7 +27,7 @@ any more; the last one, the `KbdGroup` separator, moved to `textMuted` in 0.10.
 | Placeholders in `Input`, `Textarea`, `PasswordInput`, `Composer` and the `DataTable` filter | `textFaint`: 3.75 / 4.88 | `textMuted`: 6.35 / 9.15 on `surface` |
 | `Select` trigger placeholder, `DecisionCard` free-text placeholder | `textFaint` on `surface`: 3.75 / 4.88 | `textMuted`: 6.35 / 9.15 |
 | `Select` search box placeholder | `textFaint` on `surfaceRaised`: 3.95 / 4.53 | `textMuted` |
-| `DiffViewer` changed words: the only signal was `successHl` on `successSubtle` / `dangerHl` on `dangerSubtle` (1.15–1.23:1) | color only | Added words are `<ins>` with an underline, removed words `<del>` with a strike-through, and `Mark` / `MarkText` under forced colors. Each line has a `+` / `−` sign in `text` and a visually hidden "Added line" / "Removed line" prefix. The fill difference is still 1.15–1.23:1, but it is no longer the only signal. |
+| `DiffViewer` changed words: the only signal was a pale fill (1.15–1.23:1) | color only | Added words are `<ins>` with an underline, removed words `<del>` with a strike-through, and `Mark` / `MarkText` under forced colors. Each line has a `+` / `−` sign in `text` and a visually hidden "Added line" / "Removed line" prefix.  |
 | `Checkbox` / `Radio` without a `label` | 16.8px target | a 24px native input over the 16.8px box |
 | `Switch` | 22.4px tall | a 24px tall native input over the 22.4px track |
 | `Dropzone` cancel button | 22.4px | 30.4px with an `::after` that does not affect layout |
@@ -45,6 +43,4 @@ any more; the last one, the `KbdGroup` separator, moved to `textMuted` in 0.10.
 | Token pair | Old | New (light / dark) | Fix |
 | --- | --- | --- | --- |
 | `textFaint` as text (select group titles and hints, dropdown shortcuts, label "optional", list column names, diff line numbers) | 2.44–3.16 | now `textMuted`: ≥ 5.36 / ≥ 7.30 | all readable text moved to `textMuted` |
-| unchecked checkbox / radio border, switch track when off | 1.76 (`borderStrong`) | 3.75 / 3.80 (`borderControl` on `surface`) | control boundaries use `borderControl` |
-| `accent` on `accentSubtle` (Badge accent, pills tabs selected) | 4.18 (dark) | 15.31 / 13.62 | ink accent on neutral gray |
-| `danger` on `dangerSubtle` (Badge danger) | 4.48 (dark) | 4.59 / 7.47 | red step 9 (light) / step 11 (dark) on red step 3 |
+| unchecked checkbox / radio border, switch track when off | 1.76 (`borderStrong`) | 3.75 / 3.80 (`borderControl` on `bg`) | control boundaries use `borderControl` |

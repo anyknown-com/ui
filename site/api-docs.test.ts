@@ -38,14 +38,13 @@ describe("api-docs", () => {
 		expect(folders.filter((f) => !documented.has(f))).toEqual(["icon"])
 	})
 
-	test("reads token groups with light/dark values and deprecations", () => {
+	test("reads token groups with light/dark values", () => {
 		const groups = tokenDocs().groups
 		const color = groups.find((g) => g.name === "color")
 		expect(color?.tokens.find((t) => t.key === "signal")).toMatchObject({
 			light: expect.any(String),
 			dark: expect.any(String),
 		})
-		expect(groups.find((g) => g.name === "text")?.deprecated).toBeTruthy()
 		expect(groups.find((g) => g.name === "zIndex")).toMatchObject({ kind: "consts" })
 		expect(groups.find((g) => g.name === "type")?.tokens.find((t) => t.key === "t3")?.description).not.toBe(
 			"",

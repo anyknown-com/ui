@@ -51,16 +51,16 @@ The playground and the docs site use the same section ids.
    use native elements; no primitive needed. Today Base UI backs dialog, popover, tooltip,
    select, dropdown and tabs. Slider is deliberately hand-written (see COMPONENTS.md)
 2. Every color, space, corner, type size and motion value comes from `tokens.stylex.ts`; no
-   hard-coded values. From 0.16.0 the old token names (`text.*`, `radius.*`, the old `corner`
+   hard-coded values. From 0.16.0 the old token names (the `text`, `radius`, `tone` and `ink` groups, the old `corner`
    ladder, the old shadows such as `raised` and `popover`) are deleted; no old name stays as
    an alias
 3. **Type comes from the `type` scale**: `type.t1`–`t4` (11 / 13 / 15 / 17px) for UI,
    `t5`–`t7` (22 / 28 / 36px) for headings, `type.code` for mono blocks, and the line heights
    `body` / `snug` / `tight` / `dense`. Phone-size inputs use `type.phoneInput` (16px) under
-   `breakpoint.phone`. The old `text.*` scale is deprecated
+   `breakpoint.phone`. The old `text.*` scale is gone
 4. **Motion never bounces**: things that slide use `motion.slide` (240ms) with `motion.easeOut`
    (`cubic-bezier(.16,1,.3,1)`); progress uses `motion.fast` (120ms) linear. No edge may move
-   backward or overshoot. `motion.spring` is deprecated and unused
+   backward or overshoot. There is no spring token
 5. **No `useEffect`**: use a ref callback with cleanup (React 19). Measure sizes with a ref
    callback plus `ResizeObserver`. Three components still have one (`Formula`'s lazy Temml
    import, `ReasoningFold`'s auto-collapse timer, `DataTable`'s indeterminate header checkbox);

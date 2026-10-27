@@ -41,7 +41,7 @@ export function renderThemes(groups) {
 // Regenerate with pnpm gen:themes (themes.test.ts fails when it drifts).
 //
 // For apps where the user picks the theme (e.g. next-themes). Tokens follow the OS; applying a theme pins it.
-// **Apply the whole set**: applying only color leaves shadows and tones on the other theme.
+// **Apply the whole set**: applying only color leaves shadows on the other theme.
 import * as stylex from "@stylexjs/stylex"
 import { ${imports} } from "./tokens.stylex"
 

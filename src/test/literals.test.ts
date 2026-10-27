@@ -7,7 +7,7 @@ import { expect, test } from "vitest"
  *
  * - `duration`   a raw `120ms` (use `motion.*`; `"0s"` for reduced motion is fine)
  * - `zIndex`     a raw `zIndex: 70` (portal layers are `zIndex.*` in tokens.stylex.ts)
- * - `hex`        a raw `#RRGGBB` colour (use `color.*` / `tone.*`)
+ * - `hex`        a raw `#RRGGBB` colour (use `color.*`)
  * - `fontSize`   a raw `fontSize: 12` / `"0.75rem"` (use `type.*`)
  * - `breakpoint` a raw `@media (max-width: 45rem)` (use `breakpoint.*`)
  *

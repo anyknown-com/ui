@@ -29,7 +29,7 @@ describe("tokens.css", () => {
 			"--ak-motion-quick",
 			"--ak-motion-ease-out",
 			"--ak-z-index-popup",
-			"--ak-corner-control",
+			"--ak-corner-shape",
 			"--ak-corner-box",
 			"--ak-wash",
 			"--ak-shadow-float",

@@ -10,49 +10,19 @@ const DARK = "@media (prefers-color-scheme: dark)"
 
 export const color = stylex.defineVars({
 	bg: { default: "#FFFFFF", [DARK]: "#121212" },
-	surface: { default: "#F9F9F9", [DARK]: "#181818" },
 	surfaceRaised: { default: "#FFFFFF", [DARK]: "#1F1F1F" },
-	border: { default: "#DFDFDF", [DARK]: "#2B2B2B" },
-	borderStrong: { default: "#D3D3D3", [DARK]: "#4A4A4A" },
 	// 控制項邊界(input、checkbox、radio、switch 關):對底色要 3:1 才算看得到
 	borderControl: { default: "#808080", [DARK]: "#747474" },
 	text: { default: "#171717", [DARK]: "#F0F0F0" },
 	textMuted: { default: "#5C5C5C", [DARK]: "#BABABA" },
-	textFaint: { default: "#808080", [DARK]: "#868686" },
-	accent: { default: "#171717", [DARK]: "#F0F0F0" },
-	accentText: { default: "#FFFFFF", [DARK]: "#121212" },
-	accentSubtle: { default: "#EDEDED", [DARK]: "#242424" },
-	// 連結:墨色加底線,不用藍
-	link: { default: "#171717", [DARK]: "#F0F0F0" },
 	// 藍:只給 agent 正在做事、焦點環、進度。不當按鈕底色,不拿來裝飾。
 	signal: { default: "#0169DA", [DARK]: "#89BAFE" },
-	signalSubtle: { default: "#E9F2FF", [DARK]: "#101E33" },
 	danger: { default: "#CA322E", [DARK]: "#FE8C80" },
-	dangerSubtle: { default: "#FEECEA", [DARK]: "#301512" },
-	// 只給不可復原的刪除按鈕;onDangerSolid 是上面的字
-	dangerSolid: { default: "#CA322E", [DARK]: "#D23934" },
-	onDangerSolid: { default: "#FFFFFF", [DARK]: "#FFFFFF" },
 	success: { default: "#246E3A", [DARK]: "#76CF8A" },
-	successSubtle: { default: "#E4F7E7", [DARK]: "#0C2412" },
 	warning: { default: "#955E02", [DARK]: "#FAB45F" },
-	warningSubtle: { default: "#FFEEDC", [DARK]: "#2B1A04" },
-	// info 併進 signal:資訊提示跟「agent 在跟你說話」是同一件事。focusRing 也是 signal。
-	info: { default: "#0169DA", [DARK]: "#89BAFE" },
-	infoSubtle: { default: "#E9F2FF", [DARK]: "#101E33" },
 	focusRing: { default: "#0169DA", [DARK]: "#89BAFE" },
 	// dialog 的 backdrop:黑 32%,不加 blur(backdrop-filter 是反模式)。
 	scrim: { default: "rgba(0, 0, 0, 0.32)", [DARK]: "rgba(0, 0, 0, 0.32)" },
-	bone: { default: "#EDEDED", [DARK]: "#1F1F1F" },
-	sheen: { default: "#F9F9F9", [DARK]: "#242424" },
-	successHl: { default: "#C5EDCC", [DARK]: "#0B3719" },
-	dangerHl: { default: "#FFD6D0", [DARK]: "#4C1D19" },
-	// 分層底色:rail → main → 訊息 → fold → 列,越深的一階數字越大。
-	// 面與面靠深淺分,不靠邊框;hover 升一階,對應表在 lib/layers.ts。
-	layer1: { default: "#F2F2F2", [DARK]: "#0A0A0A" },
-	layer2: { default: "#FFFFFF", [DARK]: "#121212" },
-	layer3: { default: "#F9F9F9", [DARK]: "#181818" },
-	layer4: { default: "#EDEDED", [DARK]: "#242424" },
-	layer5: { default: "#E6E6E6", [DARK]: "#2B2B2B" },
 	// Ink at 6% / 11% / 26% (rgba, so native-gen can read it). A wash is a tint on things you press,
 	// not another sheet; washStrong is for bars, slider tracks, sheet handles and scrollbars.
 	wash: { default: "rgba(23, 23, 23, 0.06)", [DARK]: "rgba(240, 240, 240, 0.06)" },
@@ -60,15 +30,9 @@ export const color = stylex.defineVars({
 	washStrong: { default: "rgba(23, 23, 23, 0.26)", [DARK]: "rgba(240, 240, 240, 0.26)" },
 })
 
-// 三階 elevation,越靠近使用者陰影越深。陰影一律用黑,不染色;
-// rest 的 1px 環是 border 色(暗色只有環,底色升一階由元件給 surface)。
-// float、modal 在暗色要配 surfaceRaised 底。
+// Two elevations, for things that float. Shadows are always black, never tinted.
+// float and modal need a surfaceRaised fill in dark.
 export const shadow = stylex.defineVars({
-	// 紙上的卡片:tool card、檔案列、附件
-	rest: {
-		default: "0 0 0 1px #DFDFDF, 0 2px 6px rgba(0, 0, 0, 0.05)",
-		[DARK]: "0 0 0 1px #2B2B2B",
-	},
 	// popover、dropdown、select、tooltip、toast
 	float: {
 		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
@@ -76,32 +40,6 @@ export const shadow = stylex.defineVars({
 	},
 	// dialog、sheet
 	modal: {
-		default: "0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16)",
-		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
-	},
-	// 舊名,值跟著最接近的新階走,元件改完前不會跟新階打架。新程式碼用上面三個。
-	/** @deprecated Use `shadow.rest` (same value). */
-	raised: {
-		default: "0 0 0 1px #DFDFDF, 0 2px 6px rgba(0, 0, 0, 0.05)",
-		[DARK]: "0 0 0 1px #2B2B2B",
-	},
-	/** @deprecated Use `shadow.float` (same value). */
-	popover: {
-		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
-		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
-	},
-	/** @deprecated Use `shadow.float` (same value). */
-	pop: {
-		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
-		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
-	},
-	/** @deprecated Use `shadow.float` (same value). */
-	dock: {
-		default: "0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.1)",
-		[DARK]: "0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.4)",
-	},
-	/** @deprecated Use `shadow.modal` (same value). */
-	sheet: {
 		default: "0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.16)",
 		[DARK]: "0 2px 4px rgba(0, 0, 0, 0.6), 0 24px 56px rgba(0, 0, 0, 0.6)",
 	},
@@ -114,37 +52,6 @@ export const font = stylex.defineVars({
 	mono: "'Geist Mono Variable', 'Geist Mono', 'Noto Sans TC Variable', 'Noto Sans TC', ui-monospace, monospace",
 })
 
-/**
- * @deprecated The old type scale. Use `type`; each key names its replacement. Values are left
- * as they were, so code still on `text` renders exactly as before.
- */
-export const text = stylex.defineVars({
-	/** @deprecated Use `type.t1` (11px; this is 12px). */
-	xs: "0.75rem",
-	/** @deprecated Use `type.t2` (13px; this is 14px). */
-	sm: "0.875rem",
-	/** @deprecated Use `type.t3` (15px; this is 16px), or `type.phoneInput` for a phone-size input. */
-	base: "1rem",
-	/** @deprecated Use `type.t4` (17px; this is 18px). */
-	lg: "1.125rem",
-	/** @deprecated Use `type.t5` (same 22px). */
-	xl: "1.375rem",
-	/** @deprecated Use `type.t6` (same 28px). */
-	xxl: "1.75rem",
-	/** @deprecated Use `type.t7` (same 36px). */
-	display: "2.25rem",
-	/** @deprecated Use `type.code` (same 13px). */
-	code: "0.8125rem",
-	/** @deprecated Use `type.dense` (same 1.2). */
-	leadingTight: "1.2",
-	/** @deprecated Use `type.snug` (1.45). */
-	leadingSnug: "1.4",
-	/** @deprecated Use `type.snug` (1.45). */
-	leadingNormal: "1.5",
-	/** @deprecated Use `type.body` (same 1.6). */
-	leadingRelaxed: "1.6",
-})
-
 export const space = stylex.defineVars({
 	xxs: "0.25rem",
 	xs: "0.5rem",
@@ -153,14 +60,6 @@ export const space = stylex.defineVars({
 	lg: "1.5rem",
 	xl: "2rem",
 	xxl: "3rem",
-})
-
-export const radius = stylex.defineVars({
-	sm: "0.375rem",
-	md: "0.5rem",
-	lg: "0.75rem",
-	xl: "1rem",
-	full: "9999px",
 })
 
 /**
@@ -198,11 +97,6 @@ export const motion = stylex.defineVars({
 	easeInOut: "cubic-bezier(0.42, 0, 0.58, 1)",
 	/** Spinners and indeterminate progress, which must keep a constant speed. */
 	linear: "linear",
-	/**
-	 * @deprecated Overshoots, and the house rule is "motion never bounces"; nothing uses it.
-	 * Use `easeOut`. Kept only because it is in the published API.
-	 */
-	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
 })
 
 /**
@@ -251,8 +145,7 @@ export const focusRing = stylex.defineVars({
 	width: "2px",
 })
 
-// Product-level scales: the type scale, the corner each kind of control wears,
-// the ink washes hover paints with, and the four surfaces `color` has no name for.
+// Product-level scales: the type scale and the three corners.
 
 /**
  * The one type scale. Sizes are rem so they follow the reader's font-size setting; the px in
@@ -292,15 +185,7 @@ export const type = stylex.defineVars({
 	dense: "1.2",
 })
 
-export const tone = stylex.defineVars({
-	layer6: { default: "#D3D3D3", [DARK]: "#373737" },
-	faint: { default: "#808080", [DARK]: "#868686" },
-	railLayer2: { default: "#FFFFFF", [DARK]: "#1F1F1F" },
-	railLayer3: { default: "#EDEDED", [DARK]: "#242424" },
-})
-
-// 圓角跟尺寸走:越靠近使用者越圓。巢狀時內層圓角 = 外層 − padding。
-// 前七個是軟材的角色名;ib / md / btn / sm / xs 是舊名,元件改完前保留。
+// Three corners, by what the thing is. Nested: inner corner = outer corner minus padding.
 export const corner = stylex.defineVars({
 	// shape: a pill, for things always one line tall (button, chip, single-line field, menu row)
 	shape: "9999px",
@@ -308,39 +193,4 @@ export const corner = stylex.defineVars({
 	box: "24px",
 	// check: the checkbox square only
 	check: "4px",
-	// checkbox、kbd、小 chip 的內角
-	small: "6px",
-	// input、select、textarea、segmented 外框
-	control: "12px",
-	// 紙上的卡片(rest)
-	card: "14px",
-	// toast、popover、dropdown
-	float: "16px",
-	// composer、主紙
-	sheet: "20px",
-	// dialog
-	modal: "24px",
-	// 按鈕、badge、tag、switch、進度條、LiveDot 外框
-	pill: "9999px",
-	/** @deprecated Pre-tactile name; nothing uses it. Use a role name (`corner.control`). */
-	ib: "0.6rem",
-	/** @deprecated Pre-tactile name; nothing uses it. Use a role name (`corner.small`). */
-	md: "0.5rem",
-	/** @deprecated Pre-tactile name; nothing uses it. Buttons are `corner.pill`. */
-	btn: "0.55rem",
-	/** @deprecated Pre-tactile name; nothing uses it. Use `corner.small`. */
-	sm: "0.4rem",
-	/** @deprecated Pre-tactile name; nothing uses it. Use `corner.small`. */
-	xs: "0.3rem",
-})
-
-export const ink = stylex.defineVars({
-	n4: "color-mix(in srgb, currentColor 4%, transparent)",
-	n5: "color-mix(in srgb, currentColor 5%, transparent)",
-	n6: "color-mix(in srgb, currentColor 6%, transparent)",
-	n8: "color-mix(in srgb, currentColor 8%, transparent)",
-	n10: "color-mix(in srgb, currentColor 10%, transparent)",
-	n12: "color-mix(in srgb, currentColor 12%, transparent)",
-	n14: "color-mix(in srgb, currentColor 14%, transparent)",
-	n18: "color-mix(in srgb, currentColor 18%, transparent)",
 })

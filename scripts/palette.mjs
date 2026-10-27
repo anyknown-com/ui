@@ -1,7 +1,7 @@
 // Color system: 12-step OKLCH primitives -> semantic tokens, one set each for light and dark.
 //
 // The primitives (the 12 steps of gray / blue / red / amber / green) live only in this script and are not exported;
-// components only touch semantic tokens (color and tone in tokens.stylex.ts).
+// components only touch semantic tokens (color in tokens.stylex.ts).
 //
 // Each step has the same job in every scale and both themes:
 //   1–2   backgrounds (paper, desktop)
@@ -14,7 +14,7 @@
 //
 // To change colors: do not hand-tune the hex of a single token. Edit the scales below (GRAY / STEPS / HUES) or the ROLES mapping, then run
 //   node scripts/palette.mjs
-// Check the contrast table first (failures must be 0), then paste the JSON printed at the end back into src/tokens.stylex.ts (color, tone)
+// Check the contrast table first (failures must be 0), then paste the JSON printed at the end back into src/tokens.stylex.ts (color)
 // and src/tokens.css, then run pnpm gen:themes.
 
 // ---------- OKLCH → sRGB ----------
@@ -120,54 +120,22 @@ for (const [name, h] of Object.entries(HUES)) {
 		scales[name][m] = steps.map(hex)
 	}
 }
-// Text on a solid (step 9): white or gray 12, whichever reads better
-const onSolid = (name, m) => {
-	const s9 = scales[name][m][8]
-	return ["#FFFFFF", scales.gray.light[11]].sort((a, b) => ratio(b, s9) - ratio(a, s9))[0]
-}
-
 // ---------- Semantic tokens: [scale, light step, dark step] ----------
 const ROLES = {
-	layer1: ["gray", 3, 1], // desktop: the bottom layer of the app
-	bg: ["gray", 1, 2], // paper: base of the main content
-	layer2: ["gray", 1, 2], // paper (same as bg)
-	surface: ["gray", 2, 3], // recessed blocks: input, user bubble, code
-	surfaceRaised: ["gray", 1, 4], // raised: card, popover, toast, dialog
-	layer3: ["gray", 2, 3],
-	layer4: ["gray", 4, 5], // hover
-	layer5: ["gray", 5, 6], // pressed
-	accentSubtle: ["gray", 4, 5], // secondary button base
-	bone: ["gray", 4, 4], // skeleton
-	sheen: ["gray", 2, 5], // skeleton sweep
-	border: ["gray", 6, 6], // divider (not a control border)
-	borderStrong: ["gray", 7, 8], // stronger divider
-	borderControl: ["gray", 9, 9], // control border: input, checkbox, radio, switch off
-	textFaint: ["gray", 9, 10], // icon, placeholder, chevron, separator; no text meant to be read
+	bg: ["gray", 1, 2], // the one sheet
+	surfaceRaised: ["gray", 1, 4], // raised: popover, toast, dialog, field
+	borderControl: ["gray", 9, 9], // control border: unchecked checkbox and radio only
 	textMuted: ["gray", 11, 11], // secondary text
-	text: ["gray", 12, 12], // primary text
-	accent: ["gray", 12, 12], // primary action: solid ink button, checked, switch on
-	accentText: ["gray", 1, 2], // text on the primary action
-	link: ["gray", 12, 12], // link: ink with an underline
+	text: ["gray", 12, 12], // primary text, ink button, link
 	signal: ["blue", 9, 11], // the agent is working, progress
-	signalSubtle: ["blue", 3, 3], // base for agent status
 	focusRing: ["blue", 9, 11], // focus ring
-	info: ["blue", 9, 11], // info (merged into signal)
-	infoSubtle: ["blue", 3, 3],
-	danger: ["red", 9, 11], // delete, failure (text and icon)
-	dangerSolid: ["red", 9, 9], // base of an irreversible delete button
-	dangerSubtle: ["red", 3, 3], // base for failure
-	dangerHl: ["red", 5, 5], // diff removed line
+	danger: ["red", 9, 11], // delete, failure (text and dot)
 	warning: ["amber", 11, 11], // warning text
-	warningSubtle: ["amber", 3, 3],
 	success: ["green", 11, 11], // success text
-	successSubtle: ["green", 3, 3],
-	successHl: ["green", 5, 5], // diff added line
 }
 const role = {}
 for (const [k, [s, l, d]] of Object.entries(ROLES))
 	role[k] = { light: scales[s].light[l - 1], dark: scales[s].dark[d - 1] }
-// text on dangerSolid
-role.onDangerSolid = { light: onSolid("red", "light"), dark: onSolid("red", "dark") }
 
 // wash: ink at 6% / 11% / 26%, written as rgba in tokens.stylex.ts. Checks use it composited over bg.
 const WASH_INK = { light: [23, 23, 23], dark: [240, 240, 240] }
@@ -180,49 +148,20 @@ const composite = (ink, a, bgHex) =>
 		.toUpperCase()
 role.wash = Object.fromEntries(MODES.map((m) => [m, composite(WASH_INK[m], 0.06, role.bg[m])]))
 
-// tone: four surfaces that color has no name for
-const tone = {
-	layer6: { light: scales.gray.light[6], dark: scales.gray.dark[6] },
-	faint: role.textFaint,
-	railLayer2: role.surfaceRaised, // base of a resting card
-	railLayer3: role.layer4, // hover inside the rail
-}
-
 // ---------- Checks ----------
 // [foreground, background, minimum WCAG contrast, purpose]. text = text meant to be read (4.5:1); non-text = icon, border, focus ring (3:1)
 const CHECKS = [
 	["text", "bg", 7, "text"],
-	["text", "layer1", 7, "text"],
-	["text", "surface", 7, "text"],
 	["text", "surfaceRaised", 7, "text"],
 	["textMuted", "bg", 4.5, "text"],
-	["textMuted", "layer1", 4.5, "text"],
-	["textMuted", "surface", 4.5, "text"],
 	["textMuted", "surfaceRaised", 4.5, "text"],
-	["textMuted", "layer4", 4.5, "text"],
 	["textMuted", "wash", 4.5, "text"],
-	// textFaint only needs 3:1: icon, chevron, placeholder, separator; no text meant to be read
-	["textFaint", "bg", 3, "non-text"],
-	["textFaint", "surface", 3, "non-text"],
 	["borderControl", "bg", 3, "non-text"],
-	["borderControl", "surface", 3, "non-text"],
-	["borderControl", "layer1", 3, "non-text"],
-	["accentText", "accent", 4.5, "text"],
-	["link", "bg", 4.5, "text"],
 	["focusRing", "bg", 3, "non-text"],
-	["focusRing", "layer1", 3, "non-text"],
 	["signal", "bg", 4.5, "text"],
-	["signal", "surface", 3, "non-text"],
-	["signal", "signalSubtle", 4.5, "text"],
 	["danger", "bg", 4.5, "text"],
-	["danger", "dangerSubtle", 4.5, "text"],
-	["onDangerSolid", "dangerSolid", 4.5, "text"],
 	["warning", "bg", 4.5, "text"],
-	["warning", "warningSubtle", 4.5, "text"],
 	["success", "bg", 4.5, "text"],
-	["success", "successSubtle", 4.5, "text"],
-	["text", "successHl", 7, "text"],
-	["text", "dangerHl", 7, "text"],
 ]
 let failures = 0
 for (const m of MODES) {
@@ -250,7 +189,6 @@ console.log(
 	JSON.stringify(
 		{
 			color: pairs(Object.fromEntries(Object.entries(role).filter(([k]) => k !== "wash"))),
-			tone: pairs(tone),
 		},
 		null,
 		1,

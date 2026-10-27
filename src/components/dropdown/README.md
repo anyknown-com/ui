@@ -62,7 +62,7 @@ The family is `DropdownMenu` (root; `trigger`, `open` / `defaultOpen` / `onOpenC
 - `icon` and the submenu chevron are `aria-hidden`. Under `<DirectionProvider direction="rtl">` the chevron points to the inline end (left), where the submenu opens.
 - `variant="danger"` is color only; the item text must say what happens.
 - `disabled` items (and a disabled `DropdownSub`) stay focusable with `aria-disabled`, so they can be found, but do nothing.
-- Highlighted item: `accentSubtle` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
+- Highlighted item: `wash` fill and a 2px `focusRing` outline; in forced-colors mode the outline is `Highlight`.
 - The popup grow-in, the fade-out and the submenu animation are off under `prefers-reduced-motion: reduce`.
 - When the menu closes (Escape, Tab, or choosing an item, also from a submenu), focus returns to the trigger as soon as the exit starts, not after the fade.
 - The menu has no built-in words, so nothing here follows `<LocaleProvider>`; all text comes from you.

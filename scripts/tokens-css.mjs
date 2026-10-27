@@ -15,7 +15,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
 
 /** Old names already published as --ak-*: removing them would break CSS consumers; clean them up in the next major. */
-const PUBLISHED = new Set(["shadow.raised", "shadow.popover", "motion.spring"])
+const PUBLISHED = new Set([])
 
 /** Each group: { name, vars: [{ key, light, dark? }] }; dark exists only for entries with a [DARK] variant. */
 export function readGroups(source = readFileSync(join(root, "src/tokens.stylex.ts"), "utf8")) {
