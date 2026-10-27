@@ -1,6 +1,6 @@
 # EmptyState
 
-An invitation to act where there is nothing to show yet: an optional line icon, a heading, one sentence, and the next action, in a sunken area of the sheet.
+An invitation to act where there is nothing to show yet: an optional line icon, a heading, one sentence, and the next action, left-aligned on the page, with no fill or corner.
 
 ## When to use
 

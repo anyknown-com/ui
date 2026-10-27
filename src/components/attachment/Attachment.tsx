@@ -1,12 +1,12 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, shadow, type } from "../../tokens.stylex"
+import { color, corner, space, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { FileGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
 
 /**
- * What a message carries, as 150px tiles in a wrapping row. A picture fills its tile and its
- * caption turns white over it; any other file is a glyph in the corner under its name.
+ * What a message carries, in a wrapping row. A picture is a 150px tile with `corner.box` and its
+ * caption turns white over it; any other file is a glyph and its name, with no card.
  */
 
 const styles = stylex.create({
@@ -18,11 +18,8 @@ const styles = stylex.create({
 		gap: 16,
 		lineHeight: type.tight,
 	},
-	// rest 卡片:紙上的一張紙
 	tile: {
-		backgroundColor: color.surfaceRaised,
-		borderRadius: corner.card,
-		boxShadow: shadow.rest,
+		borderRadius: corner.box,
 		color: color.text,
 		flexShrink: 0,
 		fontSize: type.t2,
@@ -33,19 +30,26 @@ const styles = stylex.create({
 		position: "relative",
 		width: 150,
 	},
-	photo: { height: "100%", inset: 0, objectFit: "cover", position: "absolute", width: "100%" },
-	glyph: {
-		color: color.textMuted,
-		height: 28,
-		insetBlockEnd: 16,
-		insetInlineStart: 16,
-		position: "absolute",
-		width: 28,
+	file: {
+		alignItems: "center",
+		color: color.text,
+		display: "flex",
+		fontSize: type.t2,
+		gap: space.xs,
+		lineHeight: type.tight,
+		margin: 0,
+		maxWidth: 240,
+		minHeight: 28,
 	},
+	photo: { height: "100%", inset: 0, objectFit: "cover", position: "absolute", width: "100%" },
+	glyph: { color: color.textMuted, flexShrink: 0, height: 20, width: 20 },
 	caption: {
 		display: "flex",
 		flexDirection: "column",
 		gap: 2,
+		minWidth: 0,
+	},
+	captionOnImage: {
 		insetBlockStart: 0,
 		insetInline: 0,
 		paddingBlock: 12,
@@ -77,13 +81,13 @@ export function AttachmentTile({ name, label, preview, sx }: AttachmentTileProps
 	const image = preview !== undefined
 
 	return (
-		<figure {...stylex.props(styles.tile, sx)}>
+		<figure {...stylex.props(image ? styles.tile : styles.file, sx)}>
 			{image ? (
 				<img src={preview} alt="" {...stylex.props(styles.photo)} />
 			) : (
 				<FileGlyph {...stylex.props(styles.glyph)} strokeWidth={ICON_STROKE} />
 			)}
-			<figcaption {...stylex.props(styles.caption, image && styles.onImage)}>
+			<figcaption {...stylex.props(styles.caption, image && styles.captionOnImage, image && styles.onImage)}>
 				<span title={name} {...stylex.props(styles.name)}>
 					{name}
 				</span>

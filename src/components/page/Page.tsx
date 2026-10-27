@@ -53,8 +53,6 @@ const styles = stylex.create({
 		marginBlock: `0 ${space.xs}`,
 	},
 	code: {
-		backgroundColor: color.layer3,
-		borderRadius: corner.small,
 		color: color.textMuted,
 		fontFamily: font.mono,
 		fontSize: type.t1,
@@ -68,13 +66,11 @@ const styles = stylex.create({
 		wordBreak: "break-word",
 	},
 	panel: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
 		color: color.text,
 		fontSize: type.t2,
 		lineHeight: type.body,
 	},
-	padded: { display: "flex", flexDirection: "column", gap: space.xs, padding: space.sm },
+	padded: { display: "flex", flexDirection: "column", gap: space.xs },
 	stat: {
 		alignItems: "center",
 		color: color.textMuted,
@@ -85,15 +81,15 @@ const styles = stylex.create({
 		lineHeight: type.body,
 	},
 	sbar: {
-		backgroundColor: color.layer4,
-		borderRadius: corner.pill,
+		backgroundColor: color.washStrong,
+		borderRadius: corner.shape,
 		flex: "none",
 		height: 4,
 		overflow: "hidden",
 		width: "8rem",
 	},
 	sfill: (percent: number) => ({
-		backgroundColor: color.accent,
+		backgroundColor: color.text,
 		display: "block",
 		height: "100%",
 		width: `${percent}%`,
@@ -101,8 +97,8 @@ const styles = stylex.create({
 	bars: { alignItems: "flex-end", display: "flex", gap: 2, height: "6rem" },
 	bar: {
 		backgroundColor: {
-			default: `color-mix(in srgb, ${color.accent} 60%, transparent)`,
-			":hover": color.accent,
+			default: color.washStrong,
+			":hover": color.text,
 		},
 		borderRadius: "2px 2px 0 0",
 		flex: 1,

@@ -1,18 +1,12 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ElementType, ReactNode } from "react"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 
 const styles = stylex.create({
 	root: {
 		display: "grid",
-		justifyItems: "center",
-		gap: space.xs,
-		textAlign: "center",
-		paddingBlock: space.xl,
-		paddingInline: space.lg,
-		// 紙裡凹下去的一塊:底色分區,不框虛線
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
+		justifyItems: "start",
+		gap: space.sm,
 		fontFamily: font.body,
 	},
 	// 線條 icon、跟文字同一個墨色,不墊圓底
@@ -42,7 +36,7 @@ export type EmptyStateProps = {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
 }
 
-/** A centred placeholder for a place with nothing in it yet: an icon, a title, a sentence and an action. */
+/** A placeholder for a place with nothing in it yet: an icon, a title, a sentence and an action. */
 export function EmptyState({ icon, title, description, action, headingLevel = 3 }: EmptyStateProps) {
 	const Heading = `h${headingLevel}` as ElementType
 	return (

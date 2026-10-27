@@ -2,19 +2,14 @@ import * as stylex from "@stylexjs/stylex"
 import { Fragment, type ReactNode, useState } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
-import { color, corner, focusRing, font, motion, shadow, space, type } from "../../tokens.stylex"
+import { color, corner, focusRing, font, motion, space, type } from "../../tokens.stylex"
 import { Checkbox } from "../checkbox/Checkbox"
 import { CheckGlyph, Glyph } from "../icon/glyphs"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
-	// rest 階的卡片:surfaceRaised,淺色是白紙,暗色底色升一階
 	card: {
-		backgroundColor: color.surfaceRaised,
-		borderRadius: corner.card,
-		boxShadow: shadow.rest,
-		padding: space.md,
 		display: "grid",
 		gap: space.sm,
 		fontFamily: font.body,
@@ -22,9 +17,7 @@ const styles = stylex.create({
 	intro: { margin: 0, fontSize: type.t1, color: color.textMuted },
 	keyBox: {
 		position: "relative",
-		// 卡片裡凹下去的一塊,不加框
-		backgroundColor: color.surface,
-		borderRadius: corner.small,
+		borderRadius: corner.box,
 		padding: space.md,
 		cursor: "pointer",
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
@@ -75,10 +68,9 @@ const styles = stylex.create({
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xxs,
-		// secondary 膠囊:凹下去的 accentSubtle 底,無框
-		backgroundColor: { default: color.accentSubtle, ":hover": color.layer5 },
+		backgroundColor: { default: color.wash, ":hover": color.washHover },
 		borderWidth: 0,
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		color: color.text,
 		fontFamily: font.body,
 		fontSize: type.t2,
@@ -96,11 +88,7 @@ const styles = stylex.create({
 	warning: {
 		display: "flex",
 		gap: space.xs,
-		backgroundColor: color.warningSubtle,
-		color: color.text,
-		borderRadius: corner.small,
-		paddingBlock: space.xs,
-		paddingInline: space.xs,
+		color: color.warning,
 		fontSize: type.t2,
 	},
 	warningIcon: { color: color.warning, flex: "none", marginTop: "0.1rem" },

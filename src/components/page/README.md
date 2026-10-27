@@ -13,11 +13,11 @@ The words and surfaces around a settings or dashboard page's rows: the page's on
 
 - For the rows in a section, use [SettingsRows](../settings-rows/README.md), [Group](../group/README.md), [Table](../table/README.md) or [List](../list/README.md). These parts only go around them.
 - For code with a language label and a copy button, use [CodeBlock](../code-block/README.md). `Snippet` is a muted `<pre>` with neither.
-- For task progress, use [Progress](../progress/README.md). `StatBar` is a 4px reading, not a loading bar.
+- For task progress, use [Progress](../progress/README.md). `StatBar` (a `washStrong` track with a `text` fill) is a 4px reading, not a loading bar.
 
 ## Usage
 
-All of these assume they sit on the shell's white sheet (`layer2`).
+All of these sit directly on the page (`bg`), with no fill behind them.
 
 The family:
 
@@ -25,8 +25,8 @@ The family:
 - `PageNumber` — a number inside a summary or stat line, mono, in the text color.
 - `SectionLabel` — a section's mono `t1` label, with an `end` slot on the right. `first` reduces the top margin.
 - `PageSub`, `FootNote`, `Hint` — muted sentences (under a section, under a group, above a control).
-- `Snippet` — a muted mono `<pre>` that wraps.
-- `Panel` — a sunken `surface` region, with no border. `padded` is for prose.
+- `Snippet` — a muted mono `<pre>` that wraps, with no fill.
+- `Panel` — a section of the page with no fill and no corner. `padded` is for prose.
 - `StatLine`, `StatBar` (`percent`, `label`, `text`), `Bars` (`values`, `tip`, `from`, `to`, `labels`).
 - `Faint` — muted inline text.
 - `B` and `Sub` are deprecated aliases of `PageNumber` and `PageSub`.

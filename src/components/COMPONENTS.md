@@ -454,8 +454,8 @@ ring / ball are readouts (context usage), not work in progress, so the arc is in
 
 ### empty-state
 An empty state is a call to action: icon + one line + the main action. The copy always says
-"what to do next", not just "there's nothing here". It is a sunken block in the paper
-(`surface` background, `corner.card`), no dashed frame; the icon is a line drawing in the text
+"what to do next", not just "there's nothing here". It is left-aligned on the page with
+no fill, corner or frame; the icon is a line drawing in the text
 color, with no round backing.
 
 ### scrollbar
@@ -489,10 +489,9 @@ messages are full-width plain text. turn 24px / part 4px / block 12px, body `typ
 
 ### attachment
 Files attached to a message (0.9, moved from the product shell): `AttachmentGrid` is a wrapping
-row of 150px squares with gap 16; `AttachmentTile` is a rest card (`surfaceRaised` background,
-`shadow.rest`, `corner.card`) with the name and a one-word kind (`PDF`) on top. With `preview`
-it is the image, `object-fit: cover`, and the caption turns white with a shadow; without, a
-28px file glyph sits in the bottom-left corner.
+row with gap 16; `AttachmentTile` has no card. With `preview` it is a 150px square image
+(`corner.box`, `object-fit: cover`) and the name and one-word kind (`PDF`) turn white with a
+shadow on top of it; without, it is a 20px file glyph, the name and the kind in one row.
 
 - Not `FileRow`: that is a row in file management (selection, actions); this is an attachment
   visible in a message
@@ -756,9 +755,8 @@ Recovery key card, **shown once** when a vault is created or its key reissued.
   button), one-click copy (turns into ✓), download as .txt, a warning card, and an "I've written
   it down" checkbox (`ack` / `onAckChange`) that the caller uses to **gate the primary button**;
   the component itself has no primary button
-- It is a rest card (`surfaceRaised` background, `shadow.rest`, `corner.card`); the key area and
-  warning are sunken blocks inside it, no frame, `corner.small`; action buttons are secondary
-  pills
+- It has no card; the key is Geist Mono text with no fill, the warning is amber (`warning`) text,
+  and action buttons are `wash` pills
 
 ### dropzone
 Drag-and-drop upload area: idle is a sunken `surface` background with a `borderStrong` dashed
@@ -872,7 +870,7 @@ Not a component but the icon conventions: `icon.ts` exports `icon` (StyleX sizes
 
 ### group / page / settings-rows / table
 Page skeleton parts: `Group` + `GroupRow` / `GroupItem` form a grouped list (see the next section);
-`PageHead` / `SectionLabel` / `Panel` / `Snippet` are the page's text and surfaces;
+`PageHead` / `SectionLabel` / `Panel` / `Snippet` are the page's text and sections (no fill);
 `SettingsRows` + `SettingsRow` are settings rows with the label on the left and the control on
 the right; `Table` + `Tr` + `TableCell` are low-level table parts (for sorting and paging use
 `DataTable`). Type from `type`, corners from `corner`. Rows have no fill and no lines; hover
