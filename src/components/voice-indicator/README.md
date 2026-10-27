@@ -1,6 +1,6 @@
 # VoiceIndicator
 
-A small pill that shows at a glance whether the voice agent is idle, listening, thinking or speaking, drawn as one animated line next to a status sentence.
+A line and a sentence, with no fill, that show at a glance whether the voice agent is idle, listening, thinking or speaking, drawn as one animated line next to a status sentence.
 
 ## When to use
 

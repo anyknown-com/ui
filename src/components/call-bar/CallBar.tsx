@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, ink, type } from "../../tokens.stylex"
+import { color, corner, font, shadow, type } from "../../tokens.stylex"
 import { formatClock } from "../../lib/format"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { IconButton } from "../icon-button/IconButton"
@@ -61,11 +61,12 @@ export type CallBarLabels = StringsOf<typeof strings>
 const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
-	// 取代 chatbox 的位置,所以跟 Composer 同一張凹下去的 surface 紙
+	// 取代 chatbox 的位置,所以跟 ComposerFrame 一樣浮在底部:surfaceRaised、shadow.float、corner.box
 	box: {
 		alignItems: "center",
-		backgroundColor: color.surface,
-		borderRadius: corner.sheet,
+		backgroundColor: color.surfaceRaised,
+		borderRadius: corner.box,
+		boxShadow: shadow.float,
 		boxSizing: "border-box",
 		color: color.text,
 		display: "flex",
@@ -74,7 +75,7 @@ const styles = stylex.create({
 		lineHeight: type.snug,
 		padding: 8,
 		paddingInlineStart: 16,
-		// Forced colors drop the surface paper; an outline keeps the bar's edge.
+		// Forced colors drop the shadow; an outline keeps the bar's edge.
 		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	dot: { marginInlineEnd: 2 },
@@ -88,7 +89,7 @@ const styles = stylex.create({
 	// IconButton's `open` wash, drawn here because `open` would drop the button's tooltip.
 	// The pressed wash is a background, which forced colors drop: draw a ring instead.
 	mutedButton: {
-		backgroundColor: ink.n8,
+		backgroundColor: color.wash,
 		color: color.text,
 		borderStyle: { default: "none", [FORCED]: "solid" },
 		borderWidth: { default: 0, [FORCED]: 1 },

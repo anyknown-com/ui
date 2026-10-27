@@ -678,10 +678,16 @@ blocked by a pending card.
 - No `useEffect`: moving the caret uses `flushSync` in the handler to commit first, then
   `setSelectionRange`; `sources` queries fire from the edit / caret handlers, and an
   incrementing id discards stale responses
-- Look: a sunken `surface` sheet, no frame, `corner.sheet` (20), `type.t3` / `type.body`; send
-  is a 40px ink round button (falls back to `accentSubtle` when empty), and icon buttons and
-  the model picker are pills
-- On focus the whole sheet gets a 2px `focusRing` outline (`:focus-within`)
+- Look: it draws itself in `ComposerFrame`, the chatbox's floating box: `surfaceRaised`,
+  `shadow.float`, `corner.box` (24), no frame, 10 / 10 / 8 / 16 padding (the sketch's
+  `chatbox`). `type.t3` / `type.body` in the field. Send is a 32px pill: solid ink with text,
+  `wash` and `textMuted` when empty (`send`). Icon buttons and the model picker have no fill;
+  hover and an open popup give them `wash` (`model-chip`). Mention rows are `corner.shape`
+  pills like DropdownMenu rows, the active one `wash`
+- On focus the whole box gets a 2px `focusRing` outline (`:focus-within`)
+- `ComposerFrame` (`children`, `dragging?`, `sx?`) is exported so an app's own chatbox gets the
+  same box; `dragging` turns the ring into a dashed one while a file is over it. It keeps a
+  transparent 1px border for forced-colors mode, where the shadow is gone
 
 ### attach-button / pending-files
 Chatbox attachments (0.9, moved from the product shell). `AttachButton` is a 36px `IconButton`
@@ -695,9 +701,10 @@ one outline `Chip` per file with `×` to remove, gap 6, wrapping.
   progress bars; the chatbox needs only a button and a row of chips
 
 ### call-bar
-What the chatbox turns into during a call (0.9, moved from the product shell): the same sunken
-`surface` sheet as Composer, `corner.sheet`, 16 on the left and 8 elsewhere; a breathing dot,
-status text, mono `mm:ss`, mute, and a red hang-up.
+What the chatbox turns into during a call (0.9, moved from the product shell): it floats at the
+bottom like `ComposerFrame` (`surfaceRaised`, `shadow.float`, `corner.box`), 16 on the left and
+8 elsewhere; a breathing dot, status text, mono `mm:ss`, mute (`wash` while muted), and a red
+hang-up.
 
 - **Controlled; it stores no state**: `status` / `seconds` / `muted` all come from the call
   session, and `onMute(next)` hands over the value to switch to. The old version ran its own
@@ -719,8 +726,8 @@ three stages STT → runtime LLM → TTS.
   `speaking` a travelling wave. Earlier it was bars and a pulsing dot
 - The drawing area has **a fixed size**, so changing state never shifts layout; the copy says
   you can interrupt ("Speaking… interrupting will cut in" = barge-in)
-- The frame is a `surface` pill, no frame line; the moving line is `signal` (listening,
-  thinking and speaking are all the agent working). Idle is `textFaint`
+- No fill and no frame: a line and a sentence. The moving line is `signal` (listening, thinking
+  and speaking are all the agent working). Idle is `textMuted`
 - Reduced motion: all animation off, the path freezes at a fixed frame, and a static uppercase
   mono text label appears instead
 

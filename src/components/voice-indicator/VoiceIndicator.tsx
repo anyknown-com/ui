@@ -4,31 +4,25 @@ import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { usePrefersReducedMotion } from "../../lib/motion"
 import { useAnimationFrame } from "../../lib/useAnimationFrame"
 import { type VoiceState, voicePath } from "../../lib/voice"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const FORCED = "@media (forced-colors: active)"
 
 const styles = stylex.create({
+	// 沒有底:一條線加一行字
 	voice: {
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		backgroundColor: color.surface,
-		borderRadius: corner.pill,
-		paddingBlock: space.xs,
-		paddingInlineStart: space.sm,
-		paddingInlineEnd: space.md,
 		fontFamily: font.body,
-		// Forced colors drop the surface pill; an outline keeps its edge.
-		outline: { default: null, [FORCED]: "1px solid CanvasText" },
 	},
 	viz: { width: "3rem", height: "1.5rem", flex: "none", overflow: "visible" },
 	// Forced colors: idle reads GrayText, active reads Highlight, and the drawn shape and the
 	// status text differ as well, so the state never rests on colour alone.
 	fibre: {
 		fill: "none",
-		stroke: { default: color.textFaint, [FORCED]: "GrayText" },
+		stroke: { default: color.textMuted, [FORCED]: "GrayText" },
 		strokeWidth: 1.6,
 		strokeLinecap: "round",
 	},

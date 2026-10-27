@@ -185,6 +185,7 @@ export { HandoffReceipt } from "./components/handoff-receipt/HandoffReceipt"
 export type { HandoffReceiptProps, HandoffReason } from "./components/handoff-receipt/HandoffReceipt"
 export type { HandoffReceiptLabels } from "./components/handoff-receipt/HandoffReceipt"
 export { Composer } from "./components/composer/Composer"
+export { ComposerFrame } from "./components/composer/ComposerFrame"
 export { AttachButton, type AttachButtonProps } from "./components/attach-button/AttachButton"
 export type { AttachButtonLabels } from "./components/attach-button/AttachButton"
 export {
@@ -195,6 +196,7 @@ export {
 export type { PendingFilesLabels } from "./components/pending-files/PendingFiles"
 export type { ComposerProps, SourceRef, SlashCommand } from "./components/composer/Composer"
 export type { ComposerLabels } from "./components/composer/Composer"
+export type { ComposerFrameProps } from "./components/composer/ComposerFrame"
 export { VoiceIndicator, type VoiceIndicatorProps } from "./components/voice-indicator/VoiceIndicator"
 export type { VoiceIndicatorLabels } from "./components/voice-indicator/VoiceIndicator"
 export {

@@ -7,24 +7,11 @@ import { useControllableState } from "../../lib/useControllableState"
 import { popupStyles } from "../../lib/popup"
 import { breakpoint, color, corner, focusRing, font, motion, space, type, zIndex } from "../../tokens.stylex"
 import { autoGrow } from "../textarea/Textarea"
+import { ComposerFrame } from "./ComposerFrame"
 
 const REDUCED = "@media (prefers-reduced-motion: reduce)"
 
 const styles = stylex.create({
-	// 凹下去的 surface 紙,無框;打字時外圈一條 signal 焦點環
-	composer: {
-		position: "relative",
-		backgroundColor: color.surface,
-		borderRadius: corner.sheet,
-		paddingBlockStart: space.sm,
-		paddingBlockEnd: space.xs,
-		paddingInlineStart: space.md,
-		paddingInlineEnd: space.xs,
-		display: "grid",
-		gap: space.xs,
-		outline: { default: "none", ":focus-within": `${focusRing.width} solid ${color.focusRing}` },
-		outlineOffset: 0,
-	},
 	textarea: {
 		width: "100%",
 		boxSizing: "border-box",
@@ -52,49 +39,55 @@ const styles = stylex.create({
 		gap: space.xxs,
 		marginInlineStart: `calc(${space.xs} * -1)`,
 	},
+	// 平常沒有底;hover 與打開(aria-expanded)時 wash
 	iconButton: {
 		display: "grid",
 		placeItems: "center",
 		width: 32,
 		height: 32,
-		borderRadius: corner.pill,
-		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		borderRadius: corner.shape,
+		color: { default: color.textMuted, ":hover": color.text, ":is([aria-expanded=true])": color.text },
+		backgroundColor: {
+			default: "transparent",
+			":hover": color.wash,
+			":is([aria-expanded=true])": color.wash,
+		},
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
-	iconButtonOn: { backgroundColor: color.accentSubtle, color: color.accent },
+	iconButtonOn: { backgroundColor: color.wash, color: color.text },
 	spacer: { flex: 1 },
+	// prototype 的 model-chip:28px、字重 400、平常沒有底,hover 時 wash
 	model: {
-		height: 32,
+		height: 28,
 		fontFamily: font.body,
 		fontSize: type.t2,
-		fontWeight: 500,
+		fontWeight: 400,
 		lineHeight: 1,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		borderWidth: 0,
-		borderRadius: corner.pill,
-		paddingInline: space.sm,
+		borderRadius: corner.shape,
+		paddingInline: "10px",
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
-	// 圓的墨色送出鈕;空值時退成凹下的灰
+	// prototype 的 send:有字是 32px 的實心墨色,空著是 wash 加 textMuted
 	send: {
 		display: "grid",
 		placeItems: "center",
-		width: 40,
-		height: 40,
+		width: 32,
+		height: 32,
 		flex: "none",
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.accent, ":disabled": color.accentSubtle },
-		color: { default: color.accentText, ":disabled": color.textFaint },
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.text, ":disabled": color.wash },
+		color: { default: color.bg, ":disabled": color.textMuted },
 		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: 2,
@@ -107,32 +100,33 @@ const styles = stylex.create({
 		width: `min(20rem, calc(100% - ${space.md}))`,
 		transformOrigin: "bottom",
 	},
+	// 跟 DropdownGroup 的標籤一樣:小字、textMuted
 	groupLabel: {
-		fontFamily: font.mono,
+		fontFamily: font.body,
 		fontSize: type.t1,
-		fontWeight: 600,
-		lineHeight: 1,
-		letterSpacing: "0.08em",
-		textTransform: "uppercase",
+		fontWeight: 400,
+		lineHeight: type.snug,
 		color: color.textMuted,
-		paddingBlock: space.xxs,
-		paddingInline: space.xs,
+		paddingBlockStart: space.xxs,
+		paddingBlockEnd: "0.125rem",
+		paddingInline: "0.625rem",
 	},
 	list: { listStyle: "none", margin: 0, padding: space.xxs },
+	// 跟 DropdownMenu 的列一樣:至少 32px 的膠囊,選中是 wash
 	option: {
 		display: "flex",
 		alignItems: "center",
 		gap: space.xs,
-		borderRadius: corner.control,
-		paddingBlock: "0.42rem",
-		paddingInline: space.xs,
+		minHeight: "2rem",
+		borderRadius: corner.shape,
+		paddingInline: "0.625rem",
 		fontFamily: font.body,
 		fontSize: type.t2,
 		color: color.text,
 		cursor: "pointer",
 	},
 	optionActive: {
-		backgroundColor: color.accentSubtle,
+		backgroundColor: color.wash,
 		outline: `${focusRing.width} solid ${color.focusRing}`,
 		outlineOffset: -2,
 		"@media (forced-colors: active)": { outline: `${focusRing.width} solid Highlight` },
@@ -458,7 +452,7 @@ export function Composer({
 	}
 
 	return (
-		<div {...stylex.props(styles.composer)}>
+		<ComposerFrame>
 			{open && (
 				<div {...stylex.props(popupStyles.surface, styles.popup)}>
 					<div {...stylex.props(styles.groupLabel)}>{mode === "commands" ? commandsLabel : sourcesLabel}</div>
@@ -565,6 +559,6 @@ export function Composer({
 				</button>
 			</div>
 			{hint != null && <p {...stylex.props(styles.hint)}>{hint}</p>}
-		</div>
+		</ComposerFrame>
 	)
 }
