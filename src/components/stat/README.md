@@ -35,6 +35,10 @@ import { Stack, Stat } from "@anyknown/ui"
 - The note carries its meaning in words ("up 12%"), never in colour alone.
 - Figures are tabular, so numbers in a row of stats keep their width when they change.
 
+## Keyboard
+
+No keyboard interaction of its own.
+
 ## Related
 
 - [Stack](../stack/README.md) — lays a row of stats out and wraps it when narrow.

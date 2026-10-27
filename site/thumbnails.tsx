@@ -63,6 +63,7 @@ import {
 	Slider,
 	Spin,
 	Stack,
+	Stat,
 	Spinner,
 	StatLine,
 	StatBar,
@@ -343,6 +344,12 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 			<LiveDot label="Still running" />
 			<span {...stylex.props(styles.muted)}>Reading loop.ts</span>
 		</Row>
+	),
+	stat: () => (
+		<Stack direction="row" gap="lg">
+			<Stat label="Runs" value="42" />
+			<Stat label="Spend" value="$3.10" note="this week" />
+		</Stack>
 	),
 	"empty-state": () => (
 		<Fill>
@@ -793,6 +800,7 @@ export const BLURBS: Record<string, string> = {
 	"status-chip": "Mono chips that mark what a tool call did.",
 	"live-dot": "A breathing blue dot that says it is still running.",
 	"empty-state": "An invitation to act where there is nothing yet.",
+	stat: "A big number with a label above it and a note below.",
 	input: "A single-line text field, floating above the page.",
 	textarea: "A multi-line text field that grows with its content.",
 	label: "Form labels and a field wrapper with help and errors.",

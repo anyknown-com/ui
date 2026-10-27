@@ -65,6 +65,7 @@ export const COMPONENT_GROUPS: { title: string; names: string[] }[] = [
 			"status-chip",
 			"live-dot",
 			"empty-state",
+			"stat",
 		],
 	},
 	{
