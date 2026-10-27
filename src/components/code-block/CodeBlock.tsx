@@ -77,7 +77,7 @@ const styles = stylex.create({
 	// 行內 code 只換 Geist Mono
 	inline: {
 		fontFamily: font.mono,
-		fontSize: "0.9em",
+		fontSize: "0.9em", // literal-ok: relative to the surrounding text, no absolute step fits
 	},
 })
 

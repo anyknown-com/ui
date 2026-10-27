@@ -52,7 +52,7 @@ const styles = stylex.create({
 		backgroundColor: color.signal,
 		borderRadius: corner.shape,
 		// 數字只給讀屏器:字級 0,畫出來的只有那顆點
-		fontSize: 0,
+		fontSize: 0, // literal-ok: hides the number, only the dot is drawn
 		height: 6,
 		lineHeight: 0,
 		overflow: "hidden",
