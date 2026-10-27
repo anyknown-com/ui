@@ -5,6 +5,65 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.16.0 — 2026-10-27
+
+The visual language changes from a layered ledger to a pencil sketch: one sheet, no lines, no fills behind words, hierarchy from spacing, weight and size, colour only for state. Every removed token and prop below has no alias; [MIGRATION.md](MIGRATION.md) has the old-to-new table and Before/After for each.
+
+### Breaking
+
+- **Tokens, colour:** removed `surface`, `border`, `borderStrong`, `textFaint`, `accent`, `accentText`, `accentSubtle`, `link`, `signalSubtle`, `dangerSubtle`, `dangerSolid`, `onDangerSolid`, `successSubtle`, `warningSubtle`, `info`, `infoSubtle`, `bone`, `sheen`, `successHl`, `dangerHl` and `layer1`–`layer5`. `layerUp` and `LayerName` (`src/lib/layers.ts`) are removed from the exports.
+- **Tokens, shadow:** removed `rest`, `raised`, `popover`, `pop`, `dock`, `sheet`. `float` and `modal` stay.
+- **Tokens, corner:** removed `small`, `control`, `card`, `float`, `sheet`, `modal`, `pill`, `ib`, `md`, `btn`, `sm`, `xs`. Use `shape`, `box` and `check`.
+- **Tokens, groups:** the `tone`, `radius`, `ink` and `text` groups are removed (the `text.*` sizes become `type.t1`–`t7` and `type.code`; the `text.leading*` names become `type.dense`, `type.snug`, `type.body`). `motion.spring` is removed.
+- **brand.css:** `ak-callout-info` is removed. `.ak-page` has no desk or second layer; tables, `hr`, blockquote bars, code backgrounds and stat rules are gone.
+- **Card:** removed.
+- **Bubble:** removed; use `Message`, `UserMessage` or `AssistantMessage`.
+- **DropdownSeparator:** removed.
+- **Message:** `UserMessage` and `AssistantMessage` lose `authorLabel`; use `labels.userAuthor` and `labels.assistantAuthor`.
+- **Badge:** the `accent` and `outline` variants are removed, and `dot` is a `boolean` (a 6px dot in the variant colour) instead of a tone name.
+- **Chip:** loses `variant`.
+- **RadioGroup:** loses `variant`; only the plain layout remains.
+- **Tabs:** loses `variant`; only the underline remains, with an ink indicator.
+- **Button:** the `dangerGhost` variant is removed. `danger` takes its look (red text, weight 600, wash on hover, no solid red).
+- **DecisionCard:** loses `blocking`. `InteractionCardLabels` loses `decide`; the waiting labels read "等你允許" and "等你回答", and the answered decision label reads "已回答".
+- **Mark:** loses `tint`.
+- **Status (group):** loses `dot`; the dot is always solid.
+- **GroupCell:** `tone` no longer accepts `"accent"`.
+- **Markdown:** loses `tables`; there is one table style.
+- **HandoffReceipt:** loses `memoryTitle`, `summaryTitle`, `ledgerTitle`, `memoryLabel`, `summaryLabel` and `ledgerLabel`; use `labels`.
+- **Skeleton, ThreadSkeleton:** the user bubble and the AI avatar circle are gone (`userBubble` is a right-aligned bar).
+- **Input, Textarea, Select:** no border; `invalid` no longer draws a red frame.
+- **Table, DataTable, FileList, Dropzone, EmptyState, Attachment, RecoveryKey, Page sections:** no card, background, lines, shadow or dashed outline. `DataTable` columns gain `numeric`.
+- **CodeBlock, PayloadBlock, DiffViewer, Kbd, ReasoningFold, SubThreadRow, ToolGroup:** no fills, frames, left lines, row rules, row chevrons, glyphs or `LiveDot`.
+
+### Added
+
+- **Tokens:** `color.wash`, `color.washHover`, `color.washStrong` (and `--ak-wash`, `--ak-wash-hover`, `--ak-wash-strong`); `corner.shape` (9999px), `corner.box` (24px), `corner.check` (4px).
+- **ComposerFrame:** the floating frame (`children`, `dragging`, `sx`) that `Composer` and the chatbox share.
+- **ToolGroup:** `ToolGroupCall.failed`, `ToolGroupCall.duration` and `ToolGroupProps.title`.
+- **Badge:** variants `neutral`, `mono`, `live`, `success`, `warning` and `danger`, drawn as a word with an optional 6px dot.
+- **Stack:** column or row layout with token gaps (`direction`, `gap`).
+- **Stat:** a label, a tabular number and an optional note, without a card.
+- **BarChart, LineChart:** SVG charts with three ticks, a focusable value per mark and a data table for screen readers.
+- **design-lint:** counts lines, shadows and fills.
+
+### Changed
+
+- **Message:** the user's words are right-aligned at weight 500 with no bubble; the AI reply runs from the left edge.
+- **Markdown, CodeBlock, PayloadBlock, DiffViewer, Kbd:** no lines or fills; code is Geist Mono at 16px indent; diff lines are coloured text only.
+- **ToolGroup, SubThreadRow, ReasoningFold, HandoffReceipt:** muted single lines with the arrow after the words; status is a coloured word.
+- **PermissionCard, DecisionCard:** sit on the page with an amber label and a 6px dot.
+- **Skeleton:** bones are `wash`.
+- **Button, Segmented, Tabs:** solid ink primary, wash capsules, ink indicator.
+- **Input, Select, Textarea:** float as shadowed pills (`corner.box` for textarea).
+- **Checkbox, Radio, Switch, Slider:** drawn in ink; the checkbox keeps a 4px box, the rest are pills.
+- **Menus, Tooltip, Toast, Dialog, Sheet:** floating pills and `corner.box` panels; the sheet has a wash grab bar.
+- **Composer:** floats on `ComposerFrame`.
+- **Group, List, Settings rows, Table, DataTable, FileRow, Dropzone, EmptyState, Attachment, RecoveryKey, Page:** no fill, lines or card.
+- **StatusChip, Pill, StatusBadge, Progress, LiveDot:** lose their fills, rings and subtle backgrounds.
+- **Scrollbar:** the handle is `washStrong`.
+- **Playground and site:** drawn as one sheet with no lines.
+
 ## 0.15.0 — 2026-10-26
 
 ### Changed

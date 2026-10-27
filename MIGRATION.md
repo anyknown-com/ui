@@ -1,4 +1,181 @@
-# Migrating to the next release (unreleased)
+# Migrating from 0.15 to 0.16
+
+The language is now a pencil sketch. Eight rules decide every removal below:
+
+1. One sheet of paper. Nothing has a desk, a card or a frame.
+2. No lines. Hierarchy comes from spacing, weight and size, not borders or rules.
+3. No fill behind words. A `wash` shows only on hover or selection.
+4. Only floating things have a face (`surfaceRaised` plus `shadow.float` or `shadow.modal`), one layer at most.
+5. Colour says state, on words or a 6px dot only. There is no accent colour; the primary button is solid ink.
+6. Who spoke is shown by position and weight, not by a bubble.
+7. Three corners: `corner.shape` (a pill for one-line shapes), `corner.box` (24px for anything that grows with its content) and `corner.check` (4px, the checkbox).
+8. Tight density: 4, 12 and 24px steps, rows at least 28px.
+
+## Old tokens to new
+
+Removing means taking the property or line away, not making it transparent.
+
+| Old                                                                                                                     | New                                                          |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `layer1`, `layer2`, `surface` as a page or row background; `tone.railLayer2`                                            | removed (the page is `bg`)                                   |
+| `layer3`, `layer4`, `ink.n4`–`n8`, `accentSubtle`, any `*Subtle`, `bone`, `tone.railLayer3` as a hover or selected fill | `wash`                                                       |
+| `layer5`, `ink.n10`–`n14`, `sheen`, `layerUp.*`                                                                         | `washHover`                                                  |
+| `tone.layer6`, `ink.n18`, `borderStrong` as a fill (handle, track, scrollbar)                                           | `washStrong`                                                 |
+| `border`, `borderStrong` as a frame or divider; `shadow.rest`, `shadow.raised`                                          | removed                                                      |
+| `shadow.popover`, `pop`, `dock`                                                                                         | `shadow.float`                                               |
+| `shadow.sheet`                                                                                                          | `shadow.modal`                                               |
+| `textFaint`, `tone.faint`                                                                                               | `textMuted`                                                  |
+| `accent`, `link`                                                                                                        | `text`                                                       |
+| `accentText`, `onDangerSolid`                                                                                           | `bg`                                                         |
+| `dangerSolid`                                                                                                           | `danger` (as text colour)                                    |
+| `info`                                                                                                                  | `signal`                                                     |
+| `successHl`, `dangerHl`                                                                                                 | removed (a diff is coloured text only)                       |
+| `radius.full`, `corner.pill`, `corner.btn`, `corner.control`                                                            | `corner.shape`                                               |
+| `radius.sm`, `corner.small`, `corner.sm`, `corner.xs`                                                                   | `corner.check`                                               |
+| `radius.md`, `radius.lg`, `radius.xl`, `corner.card`, `float`, `sheet`, `modal`, `ib`, `md`                             | `corner.box` (a one-line row becomes `corner.shape`)         |
+| `text.xs` / `sm` / `base` / `lg` / `xl` / `xxl` / `display` / `code`                                                    | `type.t1` / `t2` / `t3` / `t4` / `t5` / `t6` / `t7` / `code` |
+| `text.leadingTight`                                                                                                     | `type.dense`                                                 |
+| `text.leadingSnug`, `text.leadingNormal`                                                                                | `type.snug`                                                  |
+| `text.leadingRelaxed`                                                                                                   | `type.body`                                                  |
+| `motion.spring`                                                                                                         | `motion.easeOut`                                             |
+
+New tokens: `color.wash` (6%), `color.washHover` (11%), `color.washStrong` (26%), `corner.shape`, `corner.box`, `corner.check`. `font`, `space`, `type`, `zIndex`, `breakpoint`, `iconSize` and `focusRing` are unchanged.
+
+## Removed components and props
+
+### `Card`, `Bubble`, `DropdownSeparator`, `layerUp`
+
+**What changed:** the components and `layerUp` / `LayerName` are removed. An object is a section of the page; a message is text.
+
+Before:
+
+```tsx
+<Card><Stat label="Runs" value="12" /></Card>
+<Bubble>Hello</Bubble>
+<DropdownSeparator />
+const bg = layerUp.layer2
+```
+
+After:
+
+```tsx
+<Stat label="Runs" value="12" />
+<AssistantMessage>Hello</AssistantMessage>
+{/* no separator: group items with space */}
+```
+
+### `Badge`: `dot` is a boolean, no `accent` or `outline`
+
+Before:
+
+```tsx
+<Badge variant="accent" dot="danger">Failed</Badge>
+<Badge variant="outline">Draft</Badge>
+```
+
+After:
+
+```tsx
+<Badge variant="danger" dot>Failed</Badge>
+<Badge variant="neutral">Draft</Badge>
+```
+
+Variants are `neutral`, `mono`, `live`, `success`, `warning`, `danger`.
+
+### `Chip`: no `variant`
+
+Before: `<Chip variant="outline">Tag</Chip>` (`variant` defaulted to `"outline"`). After: `<Chip>Tag</Chip>` (always a wash pill).
+
+### `RadioGroup`: no `variant`
+
+Before: `<RadioGroup variant="card" ...>`. After: `<RadioGroup ...>`.
+
+### `Tabs`: no `variant`
+
+Before: `<Tabs variant="pills" ...>`. After: `<Tabs ...>` (underline, ink indicator).
+
+### `Button`: no `dangerGhost`
+
+Before: `<Button variant="dangerGhost">Delete</Button>`. After: `<Button variant="danger">Delete</Button>` (red text, weight 600, wash on hover).
+
+### `DecisionCard`: no `blocking`; `InteractionCardLabels` has no `decide`
+
+Before:
+
+```tsx
+<DecisionCard blocking labels={{ decide: "Decide" }} ... />
+```
+
+After:
+
+```tsx
+<DecisionCard ... />
+```
+
+The waiting labels now read "等你允許" and "等你回答"; the answered decision label reads "已回答".
+
+### `Mark`: no `tint`
+
+Before: `<Mark letter="A" tint="#3b82f6" />`. After: `<Mark letter="A" />` (the letter sits on `wash`).
+
+### `Status` (group): no `dot`
+
+Before: `<Status dot="hollow" ...>` (`"filled"`, `"hollow"` or `"dashed"`). After: `<Status ...>` (the dot is always solid).
+
+### `GroupCell`: `tone` has no `"accent"`
+
+Before: `<GroupCell tone="accent" ...>`. After: `<GroupCell ...>` or `tone="danger"` when it states a problem.
+
+### `Message`: no `authorLabel`
+
+Before:
+
+```tsx
+<UserMessage authorLabel="Me">Hi</UserMessage>
+```
+
+After:
+
+```tsx
+<UserMessage labels={{ userAuthor: "Me" }}>Hi</UserMessage>
+```
+
+### `Markdown`: no `tables`
+
+Before: `<Markdown tables="ruled">{text}</Markdown>` (`"grid"` or `"ruled"`). After: `<Markdown>{text}</Markdown>`.
+
+### `HandoffReceipt`: no per-field titles or labels
+
+Before:
+
+```tsx
+<HandoffReceipt memoryTitle="Memory" summaryLabel="Summary" ... />
+```
+
+After:
+
+```tsx
+<HandoffReceipt labels={{ ... }} ... />
+```
+
+### `Skeleton` / `ThreadSkeleton`: no bubble, no avatar
+
+`userBubble` is a right-aligned bar; the AI avatar circle is gone. Delete any sizing that relied on them.
+
+### Text fields: no border, no red frame
+
+`invalid` no longer draws a red frame; show the error as text under the field in `danger`.
+
+## Checklist
+
+- [ ] `rg -n 'layer[1-5]|layerUp|LayerName|\bsurface\b|borderStrong|textFaint|accentSubtle|accentText|signalSubtle|dangerSubtle|dangerSolid|onDangerSolid|successSubtle|warningSubtle|infoSubtle|successHl|dangerHl|\bsheen\b|\bbone\b|shadow\.(rest|raised|popover|pop|dock|sheet)|motion\.spring'` has no output.
+- [ ] `rg -n 'corner\.(small|control|card|float|sheet|modal|pill|ib|md|btn|sm|xs)|\bradius\.|\btone\.|\bink\.|\btext\.(xs|sm|base|lg|xl|xxl|display|code|leading)'` has no output.
+- [ ] `rg -n '<(Card|Bubble|DropdownSeparator)\b|dangerGhost|authorLabel|ak-callout-info'` has no output.
+- [ ] `rg -n 'variant="(accent|outline|card)"'` has no output for `Badge`, `Chip`, `RadioGroup` and `Tabs`.
+- [ ] `rg -n 'blocking|tint=|tables=|memoryTitle|summaryTitle|ledgerTitle|memoryLabel|summaryLabel|ledgerLabel'` has no output for the removed props above.
+- [ ] Look at the app in light and dark; no frame, divider or card should remain.
+
+# Migrating from 0.14 to 0.15
 
 ## Body font: Figtree → Geist
 
@@ -16,6 +193,8 @@ pnpm add @fontsource-variable/geist
 ```
 
 With a Google Fonts `<link>`, change `family=Figtree:...` to `family=Geist:wght@100..900`. An app that keeps loading only Figtree falls back to Noto Sans TC for Latin text.
+
+# Migrating from 0.12 to 0.13
 
 ## `ToolCard` → `ToolGroup` / `SubThreadRow`
 
@@ -99,56 +278,58 @@ do not need to change anything.
 Before (0.9):
 
 ```tsx
-import { Toast } from "@base-ui/react/toast"
-import { Toaster, toastManager } from "@anyknown/ui"
+import { Toast } from "@base-ui/react/toast";
+import { Toaster, toastManager } from "@anyknown/ui";
 
 // A scoped viewport needed Base UI's manager
-const scoped = Toast.createToastManager()
+const scoped = Toast.createToastManager();
 
 function Embedded() {
-	return <Toaster manager={scoped} />
+  return <Toaster manager={scoped} />;
 }
 
 // Direct manager calls used Base UI's fields
 toastManager.add({
-	title: "Draft deleted",
-	type: "danger",
-	priority: "high",
-	actionProps: { children: "Undo", onClick: restoreDraft },
-})
+  title: "Draft deleted",
+  type: "danger",
+  priority: "high",
+  actionProps: { children: "Undo", onClick: restoreDraft },
+});
 ```
 
 After (0.10):
 
 ```tsx
-import { Toaster, createToastManager, toast, toastManager } from "@anyknown/ui"
+import { Toaster, createToastManager, toast, toastManager } from "@anyknown/ui";
 
 // Our manager; wrap the subtree so useToast() inside reaches it
-const scoped = createToastManager()
+const scoped = createToastManager();
 
 function Embedded({ children }: { children: React.ReactNode }) {
-	return <Toaster manager={scoped}>{children}</Toaster>
+  return <Toaster manager={scoped}>{children}</Toaster>;
 }
 
 // `action` replaces actionProps; pressing it runs onClick, then closes the toast.
 // `priority` is gone: `danger` toasts are role="alert", the others role="status".
 toastManager.add({
-	title: "Draft deleted",
-	type: "danger",
-	action: { label: "Undo", onClick: restoreDraft },
-})
+  title: "Draft deleted",
+  type: "danger",
+  action: { label: "Undo", onClick: restoreDraft },
+});
 
 // Or, the shorter form
-toast.danger("Draft deleted", { action: { label: "Undo", onClick: restoreDraft } })
+toast.danger("Draft deleted", {
+  action: { label: "Undo", onClick: restoreDraft },
+});
 ```
 
 If you relied on hidden toasts coming back when others closed, raise `limit`, or give repeated
 toasts the same `key` so they update one toast (shown as ×N) instead of stacking:
 
 ```tsx
-<Toaster limit={5} />
+<Toaster limit={5} />;
 
-toast("Synced", { key: "sync" })
+toast("Synced", { key: "sync" });
 ```
 
 ### 2. `ConfirmDialog` needs a `confirmLabel`
@@ -162,10 +343,10 @@ Before (0.9):
 
 ```tsx
 <ConfirmDialog
-	trigger={<Button variant="danger">Delete</Button>}
-	title="Delete this memory?"
-	danger
-	onConfirm={deleteMemory}
+  trigger={<Button variant="danger">Delete</Button>}
+  title="Delete this memory?"
+  danger
+  onConfirm={deleteMemory}
 />
 ```
 
@@ -173,11 +354,11 @@ After (0.10):
 
 ```tsx
 <ConfirmDialog
-	trigger={<Button variant="danger">Delete</Button>}
-	title="Delete this memory?"
-	danger
-	confirmLabel="Delete memory"
-	onConfirm={deleteMemory}
+  trigger={<Button variant="danger">Delete</Button>}
+  title="Delete this memory?"
+  danger
+  confirmLabel="Delete memory"
+  onConfirm={deleteMemory}
 />
 ```
 
@@ -186,10 +367,10 @@ required. It is new in 0.10, so no existing call breaks:
 
 ```tsx
 const ok = await dialog.confirm({
-	title: "Archive this thread?",
-	confirmLabel: "Archive thread",
-	tone: "danger",
-})
+  title: "Archive this thread?",
+  confirmLabel: "Archive thread",
+  tone: "danger",
+});
 ```
 
 `dialog.confirm` needs a `<Dialogs />` host mounted once near the root.
@@ -211,34 +392,40 @@ Before (0.9):
 
 ```tsx
 <Segmented
-	label="Language"
-	value={lang}
-	options={[
-		{ value: "zh", label: "中文" },
-		{ value: "en", label: "English" },
-	]}
-	onChange={setLang}
-/>
+  label="Language"
+  value={lang}
+  options={[
+    { value: "zh", label: "中文" },
+    { value: "en", label: "English" },
+  ]}
+  onChange={setLang}
+/>;
 
-expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true")
+expect(screen.getByRole("button", { name: "English" })).toHaveAttribute(
+  "aria-pressed",
+  "true",
+);
 ```
 
 After (0.10):
 
 ```tsx
 <Segmented
-	label="Language"
-	value={lang}
-	options={[
-		{ value: "zh", label: "中文" },
-		{ value: "en", label: "English" },
-	]}
-	onValueChange={setLang}
-/>
+  label="Language"
+  value={lang}
+  options={[
+    { value: "zh", label: "中文" },
+    { value: "en", label: "English" },
+  ]}
+  onValueChange={setLang}
+/>;
 
-expect(screen.getByRole("radio", { name: "English" })).toHaveAttribute("aria-checked", "true")
+expect(screen.getByRole("radio", { name: "English" })).toHaveAttribute(
+  "aria-checked",
+  "true",
+);
 // Tab reaches only the checked segment; use arrow keys to move between segments
-await user.keyboard("{ArrowRight}")
+await user.keyboard("{ArrowRight}");
 ```
 
 ### 4. `CallBarLabels` has no `unmute`
@@ -253,30 +440,30 @@ Before (0.9):
 
 ```tsx
 <CallBar
-	status="listening"
-	seconds={42}
-	muted={muted}
-	onMute={setMuted}
-	onHangUp={hangUp}
-	labels={{ mute: "Mute", unmute: "Unmute", hangUp: "Hang up" }}
-/>
+  status="listening"
+  seconds={42}
+  muted={muted}
+  onMute={setMuted}
+  onHangUp={hangUp}
+  labels={{ mute: "Mute", unmute: "Unmute", hangUp: "Hang up" }}
+/>;
 
-screen.getByRole("button", { name: "Unmute" })
+screen.getByRole("button", { name: "Unmute" });
 ```
 
 After (0.10):
 
 ```tsx
 <CallBar
-	status="listening"
-	seconds={42}
-	muted={muted}
-	onMute={setMuted}
-	onHangUp={hangUp}
-	labels={{ mute: "Mute", hangUp: "Hang up" }}
-/>
+  status="listening"
+  seconds={42}
+  muted={muted}
+  onMute={setMuted}
+  onHangUp={hangUp}
+  labels={{ mute: "Mute", hangUp: "Hang up" }}
+/>;
 
-screen.getByRole("button", { name: "Mute", pressed: true })
+screen.getByRole("button", { name: "Mute", pressed: true });
 ```
 
 Under `<LocaleProvider locale="en">` the English words are built in, so you can drop `labels`.
@@ -294,19 +481,19 @@ Under `<LocaleProvider locale="en">` the English words are built in, so you can 
 Before (0.9):
 
 ```tsx
-<PasswordInput showLabel="Show passphrase" hideLabel="Hide passphrase" />
+<PasswordInput showLabel="Show passphrase" hideLabel="Hide passphrase" />;
 
-await user.click(screen.getByRole("button", { name: "Show passphrase" }))
-screen.getByRole("button", { name: "Hide passphrase" })
+await user.click(screen.getByRole("button", { name: "Show passphrase" }));
+screen.getByRole("button", { name: "Hide passphrase" });
 ```
 
 After (0.10):
 
 ```tsx
-<PasswordInput showLabel="Show passphrase" />
+<PasswordInput showLabel="Show passphrase" />;
 
-await user.click(screen.getByRole("button", { name: "Show passphrase" }))
-screen.getByRole("button", { name: "Show passphrase", pressed: true })
+await user.click(screen.getByRole("button", { name: "Show passphrase" }));
+screen.getByRole("button", { name: "Show passphrase", pressed: true });
 ```
 
 Under `<LocaleProvider locale="en">` the English name is built in, so you can drop `showLabel`.
@@ -437,25 +624,32 @@ these props entirely.
 
 ### Generic export names → family-prefixed names
 
-| Deprecated  | Use                  |
-| ----------- | -------------------- |
-| `B`         | `PageNumber`         |
-| `Sub`       | `PageSub`            |
-| `Item`      | `GroupItem`          |
-| `Row`       | `GroupRow`           |
-| `Head`      | `TableHead`          |
-| `Value`     | `SettingsValue`      |
-| `Cell`      | `TableCell`          |
-| `RowProps`  | `GroupRowProps`      |
-| `HeadProps` | `TableHeadProps`     |
-| `CellProps` | `TableCellProps`     |
+| Deprecated  | Use              |
+| ----------- | ---------------- |
+| `B`         | `PageNumber`     |
+| `Sub`       | `PageSub`        |
+| `Item`      | `GroupItem`      |
+| `Row`       | `GroupRow`       |
+| `Head`      | `TableHead`      |
+| `Value`     | `SettingsValue`  |
+| `Cell`      | `TableCell`      |
+| `RowProps`  | `GroupRowProps`  |
+| `HeadProps` | `TableHeadProps` |
+| `CellProps` | `TableCellProps` |
 
 ```tsx
 // Before
-import { Group, Item, Row, Table, Head, Cell } from "@anyknown/ui"
+import { Group, Item, Row, Table, Head, Cell } from "@anyknown/ui";
 
 // After
-import { Group, GroupItem, GroupRow, Table, TableHead, TableCell } from "@anyknown/ui"
+import {
+  Group,
+  GroupItem,
+  GroupRow,
+  Table,
+  TableHead,
+  TableCell,
+} from "@anyknown/ui";
 ```
 
 The props and behaviour are the same; only the names change.
@@ -465,64 +659,64 @@ The props and behaviour are the same; only the names change.
 `type` is the one type scale, in rem. Each `text` key names its replacement. Four sizes are 1px
 smaller in the new scale, so check those screens after you switch.
 
-| `text`           | `type`                                     | Size change  |
-| ---------------- | ------------------------------------------ | ------------ |
-| `xs`             | `t1`                                       | 12px → 11px  |
-| `sm`             | `t2`                                       | 14px → 13px  |
-| `base`           | `t3` (`phoneInput` for a phone-size field) | 16px → 15px  |
-| `lg`             | `t4`                                       | 18px → 17px  |
-| `xl`             | `t5`                                       | same (22px)  |
-| `xxl`            | `t6`                                       | same (28px)  |
-| `display`        | `t7`                                       | same (36px)  |
-| `code`           | `code`                                     | same (13px)  |
-| `leadingTight`   | `dense`                                    | same (1.2)   |
-| `leadingSnug`    | `snug`                                     | 1.4 → 1.45   |
-| `leadingNormal`  | `snug`                                     | 1.5 → 1.45   |
-| `leadingRelaxed` | `body`                                     | same (1.6)   |
+| `text`           | `type`                                     | Size change |
+| ---------------- | ------------------------------------------ | ----------- |
+| `xs`             | `t1`                                       | 12px → 11px |
+| `sm`             | `t2`                                       | 14px → 13px |
+| `base`           | `t3` (`phoneInput` for a phone-size field) | 16px → 15px |
+| `lg`             | `t4`                                       | 18px → 17px |
+| `xl`             | `t5`                                       | same (22px) |
+| `xxl`            | `t6`                                       | same (28px) |
+| `display`        | `t7`                                       | same (36px) |
+| `code`           | `code`                                     | same (13px) |
+| `leadingTight`   | `dense`                                    | same (1.2)  |
+| `leadingSnug`    | `snug`                                     | 1.4 → 1.45  |
+| `leadingNormal`  | `snug`                                     | 1.5 → 1.45  |
+| `leadingRelaxed` | `body`                                     | same (1.6)  |
 
 ```ts
 // Before
-import { text } from "@anyknown/ui/tokens.stylex"
+import { text } from "@anyknown/ui/tokens.stylex";
 
 const styles = stylex.create({
-	note: { fontSize: text.sm, lineHeight: text.leadingRelaxed },
-})
+  note: { fontSize: text.sm, lineHeight: text.leadingRelaxed },
+});
 
 // After: `type` reads oddly as a binding next to TypeScript's `type` keyword, so alias it
-import { type as scale } from "@anyknown/ui/tokens.stylex"
+import { type as scale } from "@anyknown/ui/tokens.stylex";
 
 const styles = stylex.create({
-	note: { fontSize: scale.t2, lineHeight: scale.body },
-})
+  note: { fontSize: scale.t2, lineHeight: scale.body },
+});
 ```
 
 ### Legacy corner, shadow and motion names
 
-| Deprecated                                       | Use                                       |
-| ------------------------------------------------ | ----------------------------------------- |
-| `corner.ib`                                      | `corner.control`                          |
-| `corner.md`, `corner.sm`, `corner.xs`            | `corner.small`                            |
-| `corner.btn`                                     | `corner.pill`                             |
-| `shadow.raised`                                  | `shadow.rest`                             |
-| `shadow.popover`, `shadow.pop`, `shadow.dock`    | `shadow.float`                            |
-| `shadow.sheet`                                   | `shadow.modal`                            |
-| `motion.spring`                                  | `motion.easeOut`                          |
+| Deprecated                                    | Use              |
+| --------------------------------------------- | ---------------- |
+| `corner.ib`                                   | `corner.control` |
+| `corner.md`, `corner.sm`, `corner.xs`         | `corner.small`   |
+| `corner.btn`                                  | `corner.pill`    |
+| `shadow.raised`                               | `shadow.rest`    |
+| `shadow.popover`, `shadow.pop`, `shadow.dock` | `shadow.float`   |
+| `shadow.sheet`                                | `shadow.modal`   |
+| `motion.spring`                               | `motion.easeOut` |
 
 The deprecated shadow names already hold the same value as their replacement. The deprecated
 corner names keep their old values.
 
 ```ts
-import { corner, shadow } from "@anyknown/ui/tokens.stylex"
+import { corner, shadow } from "@anyknown/ui/tokens.stylex";
 
 // Before
 const styles = stylex.create({
-	panel: { borderRadius: corner.md, boxShadow: shadow.pop },
-})
+  panel: { borderRadius: corner.md, boxShadow: shadow.pop },
+});
 
 // After
 const styles = stylex.create({
-	panel: { borderRadius: corner.small, boxShadow: shadow.float },
-})
+  panel: { borderRadius: corner.small, boxShadow: shadow.float },
+});
 ```
 
 ## Behaviour changes you may notice
@@ -534,22 +728,23 @@ These do not need code changes, but they can change screenshots, tests or how a 
   inside it too, so toasts and dialogs follow the language:
 
   ```tsx
-  import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui"
+  import { Dialogs, LocaleProvider, Toaster } from "@anyknown/ui";
 
   export function Root() {
-  	return (
-  		<LocaleProvider locale="en">
-  			<Toaster>
-  				<Dialogs>
-  					<App />
-  				</Dialogs>
-  			</Toaster>
-  		</LocaleProvider>
-  	)
+    return (
+      <LocaleProvider locale="en">
+        <Toaster>
+          <Dialogs>
+            <App />
+          </Dialogs>
+        </Toaster>
+      </LocaleProvider>
+    );
   }
   ```
 
   Unknown locales fall back to English. A `labels` prop overrides single words.
+
 - **Segmented** is a radio group (see breaking change 3).
 - **ListSort**: an active column's accessible name is "X, sorted" (`X，排序中` in zh-TW), and the
   arrow is hidden from screen readers. Tests that find it by its column name alone must use the
