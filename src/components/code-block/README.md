@@ -1,6 +1,6 @@
 # CodeBlock
 
-A sunken block of monospace code with a language label and a copy button; `InlineCode` is the same treatment for a few words inside a sentence.
+A block of Geist Mono code with a language label and a copy button, indented 16px, with no background, corner or line; `InlineCode` only switches a few words inside a sentence to Geist Mono.
 
 ## When to use
 

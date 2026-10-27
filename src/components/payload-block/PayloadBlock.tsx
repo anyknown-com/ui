@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, font, type } from "../../tokens.stylex"
+import { color, font, type } from "../../tokens.stylex"
 import type { ReactNode } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { useCopy } from "../../lib/useCopy"
@@ -8,8 +8,8 @@ import { CheckGlyph, CopyGlyph } from "../icon/glyphs"
 import { ICON_STROKE } from "../icon/icon"
 
 /**
- * What a tool was called with, or what it gave back: mono in a sunken block that scrolls sideways,
- * a copy button in its corner. No language header, unlike `CodeBlock`.
+ * What a tool was called with, or what it gave back: Geist Mono indented one step (16px), no
+ * background and no corner, scrolling sideways, a copy button at its end. No language header, unlike `CodeBlock`.
  *
  * This package ships no highlighter. A shell that has one (shiki, say) passes `highlight` and
  * draws the code itself; without it the code is plain text. Nothing here goes through `innerHTML`.
@@ -19,8 +19,6 @@ const COPIED_MS = 1500
 
 const styles = stylex.create({
 	block: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
 		color: color.text,
 		fontFamily: font.mono,
 		fontSize: type.t2,

@@ -17,7 +17,7 @@ Renders one message's markdown — GFM tables, fenced code, task lists and TeX m
 
 The family:
 
-- `Markdown` — the renderer. `children` is the markdown string; `tables` is `"grid"` (default) or `"ruled"`; `renderBlock`, `copyLabel` and `copiedLabel` pass through to fenced blocks; `labels` overrides the task-box names.
+- `Markdown` — the renderer. `children` is the markdown string; `renderBlock`, `copyLabel` and `copiedLabel` pass through to fenced blocks; `labels` overrides the task-box names.
 - `Formula` — TeX to MathML. `display` makes it a block.
 
 ```tsx

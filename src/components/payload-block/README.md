@@ -1,6 +1,6 @@
 # PayloadBlock
 
-A sunken monospace block for what a tool was called with or gave back, with a copy button in its corner and no language header.
+A block of Geist Mono for what a tool was called with or gave back, indented 16px with no background or corner, a copy button at its end and no language header.
 
 ## When to use
 

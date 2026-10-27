@@ -1,6 +1,6 @@
 # DiffViewer
 
-A unified diff of one file: line-level additions and removals on soft success and danger backgrounds, the changed words marked inside a line, and long unchanged runs folded away.
+A unified diff of one file: line-level additions and removals told apart by `success` and `danger` text colour on the `+` / `-` line (no background), the changed words underlined or struck through inside a line, and long unchanged runs folded away.
 
 ## When to use
 

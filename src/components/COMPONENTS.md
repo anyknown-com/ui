@@ -419,8 +419,7 @@ pressable). Same family.
   button's ref, not the span's)
 
 ### kbd
-Shortcut key: `surface` background + border + a 1px bottom shadow for a key-cap feel,
-`corner.small`, Geist Mono. Three arrangements: single key, combination, sequence.
+Shortcut key: Geist Mono `textMuted` text only, with no border, fill or shadow. Three arrangements: single key, combination, sequence.
 
 ### skeleton
 Loading skeleton: placeholder shapes plus shimmer. Shapes must match the real layout (a thread
@@ -547,9 +546,9 @@ Header (language label + copy button) plus a `type.code` / `type.snug` (13 / 1.4
 The language label shows `lang` as passed. Overflow **scrolls horizontally only inside the
 block**; the page never scrolls sideways.
 
-- Sunken `surface`, `corner.card`, no frame; header and body share one background with no line
-  between. The copy button is a pill
-- `InlineCode` is likewise `surface`, `corner.small`, no frame
+- No background, no corner, no line; the block is indented 16px. The copy button is a
+  `corner.shape` pill whose hover is `wash`
+- `InlineCode` only switches to Geist Mono
 
 ### markdown
 Markdown inside one message: GFM tables, fenced code, TeX math, task lists. `marked` is used
@@ -566,14 +565,14 @@ itself: **nothing in the component goes through `innerHTML`**, so a model that e
   OS accent color and ignores the theme)
 - Tables **size to their content**, not `minWidth: 100%`: stretching a two-column table to the
   message width just pushes the text to the far edges. The outer wrapper is the scrolling layer
-- `tables="ruled"` is the in-bubble table: no frame, no background, a thin `border` line under
-  the header and between rows, none under the last row; header 13px `textMuted` 500, cells
-  `8px 24px 8px 0`. The default `grid` is unchanged (memory attachment bodies still use it).
-  Earlier the product overrode it with `[data-bubble] th/td { … !important }`; no longer needed
+- One table, no `tables` prop: no lines, no fill, no corner; the head is `type.t1` `textMuted`
+  500, numbers are tabular, rows are `space.xxs` apart, cells end-padded `space.lg`
+- A blockquote has no left line: it is indented one step (16px) in `textMuted`. `---` renders
+  nothing. Links are `text` with an underline
 - `breaks: true`. This is a message, not a document: a lone newline means the writer really
   wanted a line break
 - Body `type.t3` / `type.body` (15 / 1.6), paragraphs and list items at the same line height;
-  images `corner.card`
+  images `corner.box`
 - No diagrams: mermaid alone unpacks to 84MB, and a design system shouldn't make every app that
   installs it carry that. `renderBlock({lang, code})` is the hook for a shell to plug in its
   own; without it, it falls back to a code block
@@ -599,7 +598,7 @@ spans.
 
 ### payload-block
 Arguments a tool was called with and the result it returned (0.9, moved from the product
-shell): sunken `surface`, no frame, `corner.card`, mono `type.t2` / `type.snug`, content padded
+shell): no background, no corner, mono `type.t2` / `type.snug`, content padded
 16 left, 48 right, 12 top and bottom, scrolling horizontally, with a 32px copy button in the
 top-right (`IconButton`, switching from check back to copy after 1.5 s). No language header;
 that's the difference from `CodeBlock`.
@@ -793,16 +792,14 @@ uploading).
 Line-level unified diff plus inline word-level highlight. For plan review takeovers and i18n
 translation comparison.
 
-- Added / removed lines use the success / danger **subtle background** (not saturated colors);
-  signs and stats use the matching text color
-- Inline highlight marks only the changed words (`<mark>`, an `*Hl` color one step deeper than
-  the line background)
+- Added / removed lines only change text color (`success` / `danger`); no background, and the
+  `+` / `−` sign stays as the non-color mark
+- Inline word marks are an underline (added) or a strike-through (removed), no fill
 - Code in mono `type.code` (13px); two line-number columns (before / after) in `type.t1`
   (11px) `textMuted`, not selectable
-- Sunken `surface`, `corner.card`, no frame; no line between the title bar and the lines
-- Collapsed unchanged runs: a "⋯ N unchanged lines" row expands and collapses, `layer4`
-  background (hover `layer5`), no top or bottom line
-- File title bar: kind dot (modified yellow / added green / deleted red) + path + `+N −N`
+- No background, no corner, no line between the title bar and the lines
+- Collapsed unchanged runs: a "⋯ N unchanged lines" row expands and collapses; hover is `wash`
+- File title bar: kind dot (6px; modified yellow / added green / deleted red) + path + `+N −N`
   stats; added = after only, deleted = before only
 
 ### data-table

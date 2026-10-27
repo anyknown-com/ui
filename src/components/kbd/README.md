@@ -1,6 +1,6 @@
 # Kbd
 
-Keyboard shortcut labels: a key cap drawn with a border and a 1 px bottom shadow in the mono face. The family exports:
+Keyboard shortcut labels: a key drawn as Geist Mono `textMuted` text, with no border, fill or shadow. The family exports:
 
 - `Kbd` — one key, a native `<kbd>`.
 - `KbdGroup` — several keys from `keys`: a combo pressed together (no `separator`), or a sequence pressed in turn (with `separator`).

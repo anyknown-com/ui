@@ -47,21 +47,16 @@ describe("Markdown", () => {
 		expect(screen.getByText("2")).toHaveStyle({ textAlign: "end" })
 	})
 
-	test("ruled tables draw a hairline between rows and none under the last", () => {
-		render(<Markdown tables="ruled">{"| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |"}</Markdown>)
-		expect(screen.getByRole("columnheader", { name: "a" })).toHaveStyle({
-			borderBottomWidth: "1px",
-			fontWeight: "500",
-			paddingInlineStart: "0px",
-		})
-		expect(screen.getByRole("cell", { name: "1" })).toHaveStyle({ borderBottomWidth: "1px" })
-		expect(screen.getByRole("cell", { name: "3" })).toHaveStyle({ borderBottomWidth: "0px" })
+	test("tables have no lines or fill; the head is muted and the columns line up", () => {
+		render(<Markdown>{"| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |"}</Markdown>)
+		expect(screen.getByRole("columnheader", { name: "a" })).toHaveStyle({ fontWeight: "500" })
+		expect(screen.getByRole("cell", { name: "1" })).not.toHaveStyle({ borderBottomWidth: "1px" })
 	})
 
-	test("tables are a grid unless asked to be ruled", () => {
-		render(<Markdown>{"| a |\n| --- |\n| 1 |"}</Markdown>)
-		expect(screen.getByRole("columnheader", { name: "a" })).toHaveStyle({ fontWeight: "600" })
-		expect(screen.getByRole("cell", { name: "1" })).toHaveStyle({ borderBottomWidth: "1px" })
+	test("a horizontal rule renders nothing and a quote has no rule beside it", () => {
+		const { container } = render(<Markdown>{"前\n\n---\n\n> 引言"}</Markdown>)
+		expect(container.querySelector("hr")).toBeNull()
+		expect(screen.getByText("引言").closest("blockquote")).not.toHaveStyle({ borderInlineStartWidth: "2px" })
 	})
 
 	test("task list items keep their checkbox state", () => {
@@ -152,7 +147,7 @@ describe("Markdown", () => {
 			const { container } = render(
 				<>
 					<Markdown>{source}</Markdown>
-					<Markdown tables="ruled">{"| a | b |\n| --- | --- |\n| 1 | 2 |"}</Markdown>
+					<Markdown>{"| a | b |\n| --- | --- |\n| 1 | 2 |"}</Markdown>
 					<Markdown>{"$$\\int_0^1 x\\,dx$$"}</Markdown>
 				</>,
 			)

@@ -11,12 +11,8 @@ const REDUCED = "@media (prefers-reduced-motion: reduce)"
 const blink = stylex.keyframes({ "50%": { opacity: 0 } })
 
 const styles = stylex.create({
-	// 凹下去的 surface,無框;標頭跟本體同一塊底,不畫分隔線
-	block: {
-		borderRadius: corner.card,
-		backgroundColor: color.surface,
-		overflow: "hidden",
-	},
+	// 沒有底、沒有角、沒有線;整塊縮一格(16px)
+	block: { overflow: "hidden" },
 	head: {
 		display: "flex",
 		alignItems: "center",
@@ -39,19 +35,19 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: type.t2,
 		color: { default: color.textMuted, ":hover": color.text },
-		backgroundColor: { default: "transparent", ":hover": color.accentSubtle },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		paddingBlock: space.xxs,
 		paddingInline: space.xs,
 		// 24px: the smallest pointer target WCAG 2.5.8 allows
 		minHeight: "1.5rem",
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		cursor: "pointer",
 		transitionProperty: "background-color, color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
 		outlineOffset: -1,
 	},
-	copied: { color: color.accent },
+	copied: { color: color.text },
 	pre: {
 		margin: 0,
 		paddingBlockStart: space.xxs,
@@ -78,13 +74,10 @@ const styles = stylex.create({
 		animationTimingFunction: "steps(2, start)",
 		animationIterationCount: "infinite",
 	},
+	// 行內 code 只換 Geist Mono
 	inline: {
 		fontFamily: font.mono,
-		fontSize: type.code,
-		lineHeight: type.snug,
-		backgroundColor: color.surface,
-		borderRadius: corner.small,
-		paddingInline: "0.3em",
+		fontSize: "0.9em",
 	},
 })
 

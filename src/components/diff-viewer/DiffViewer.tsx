@@ -15,12 +15,8 @@ const unfold = stylex.keyframes({
 })
 
 const styles = stylex.create({
-	// 凹下去的 surface,無框;標頭跟行之間不畫線
-	diff: {
-		backgroundColor: color.surface,
-		borderRadius: corner.card,
-		overflow: "hidden",
-	},
+	// 沒有底、沒有角、沒有線
+	diff: { overflow: "hidden" },
 	head: {
 		display: "flex",
 		alignItems: "center",
@@ -33,7 +29,7 @@ const styles = stylex.create({
 		lineHeight: 1,
 		color: color.text,
 	},
-	dot: { width: "0.5rem", height: "0.5rem", borderRadius: corner.pill, flex: "none" },
+	dot: { width: 6, height: 6, borderRadius: corner.shape, flex: "none" },
 	dotModified: { backgroundColor: color.warning },
 	dotAdded: { backgroundColor: color.success },
 	dotDeleted: { backgroundColor: color.danger },
@@ -65,11 +61,12 @@ const styles = stylex.create({
 		lineHeight: 1.55,
 		whiteSpace: "pre",
 		minWidth: "max-content",
-		// 明寫:加/刪行的底上 text 都 ≥ 11.7:1,繼承到 host 的色就不保證
+		// 明寫:繼承到 host 的色就不保證對比
 		color: color.text,
 	},
-	lineAdd: { backgroundColor: color.successSubtle },
-	lineDel: { backgroundColor: color.dangerSubtle },
+	// 只上字色:+ / − 那行
+	lineAdd: { color: color.success },
+	lineDel: { color: color.danger },
 	number: {
 		flex: "none",
 		width: "2.6rem",
@@ -80,21 +77,21 @@ const styles = stylex.create({
 		fontSize: type.t1,
 		lineHeight: 1.85,
 	},
-	sign: { flex: "none", width: "1.1rem", textAlign: "center", userSelect: "none", color: color.textFaint },
-	// + / − 是不靠顏色的那個記號;用 text 色,success/danger 在淺色的加刪底上只有 4.6–5.6:1
-	signAdd: { color: color.text },
-	signDel: { color: color.text },
+	sign: { flex: "none", width: "1.1rem", textAlign: "center", userSelect: "none", color: color.textMuted },
+	// + / − 是不靠顏色的那個記號,跟著行的字色
+	signAdd: { color: "inherit" },
+	signDel: { color: "inherit" },
 	code: { paddingInlineEnd: space.md },
-	// 字級的變更:底色跟行底只差 1.15:1,所以另外畫底線 / 刪除線,forced-colors 換成 Mark
+	// 字級的變更:不靠底色,畫底線 / 刪除線,forced-colors 換成 Mark
 	change: { borderRadius: 2, textDecorationThickness: "1px" },
 	changeAdd: {
-		backgroundColor: { default: color.successHl, [FORCED]: "Mark" },
+		backgroundColor: { default: "transparent", [FORCED]: "Mark" },
 		color: { default: "inherit", [FORCED]: "MarkText" },
 		textDecorationLine: "underline",
 		textUnderlineOffset: "0.2em",
 	},
 	changeDel: {
-		backgroundColor: { default: color.dangerHl, [FORCED]: "Mark" },
+		backgroundColor: { default: "transparent", [FORCED]: "Mark" },
 		color: { default: "inherit", [FORCED]: "MarkText" },
 		textDecorationLine: "line-through",
 	},
@@ -105,7 +102,7 @@ const styles = stylex.create({
 		width: "100%",
 		boxSizing: "border-box",
 		cursor: "pointer",
-		backgroundColor: { default: color.layer4, ":hover": color.layer5 },
+		backgroundColor: { default: "transparent", ":hover": color.wash },
 		paddingBlock: space.xxs,
 		paddingInline: space.sm,
 		fontFamily: font.mono,

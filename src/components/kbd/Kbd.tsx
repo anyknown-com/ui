@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ComponentProps, Fragment, type ReactNode, createContext, useContext } from "react"
 import { styled } from "../../lib/styled"
-import { color, corner, font, space, type } from "../../tokens.stylex"
+import { color, font, space, type } from "../../tokens.stylex"
 
 /** Set to `"inverted"` to draw the `Kbd`s inside on a dark or coloured surface, such as a tooltip. */
 export const KbdToneContext = createContext<"default" | "inverted">("default")
@@ -13,33 +13,20 @@ const styles = stylex.create({
 		minWidth: "1.4rem",
 		height: "1.4rem",
 		paddingInline: space.xxs,
-		backgroundColor: color.surface,
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderBottomColor: color.borderStrong,
-		borderRadius: corner.small,
-		boxShadow: `0 1px 0 ${color.borderStrong}`,
 		fontFamily: font.mono,
 		fontSize: type.t1,
 		fontWeight: 500,
 		lineHeight: 1,
 		color: color.textMuted,
 	},
-	inverted: {
-		backgroundColor: "color-mix(in srgb, currentColor 16%, transparent)",
-		borderColor: "color-mix(in srgb, currentColor 28%, transparent)",
-		borderBottomColor: "color-mix(in srgb, currentColor 28%, transparent)",
-		boxShadow: "none",
-		color: "inherit",
-	},
+	inverted: { color: "inherit" },
 	combo: { display: "inline-flex", gap: "0.2rem", alignItems: "center" },
 	sequence: { display: "inline-flex", gap: space.xxs, alignItems: "center", color: color.textMuted },
 })
 
 export type KbdProps = ComponentProps<"kbd">
 
-/** One keyboard key, drawn as a small keycap. Native `<kbd>` props pass through. */
+/** One keyboard key, drawn as Geist Mono `textMuted` text, no frame, fill or shadow. Native `<kbd>` props pass through. */
 export function Kbd(props: KbdProps) {
 	const tone = useContext(KbdToneContext)
 	return <kbd {...props} {...styled(props, styles.key, tone === "inverted" && styles.inverted)} />

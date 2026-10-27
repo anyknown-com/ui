@@ -42,56 +42,32 @@ const styles = stylex.create({
 	item: { lineHeight: type.body },
 	// The item's own text follows it on the same line, so the box must not take the whole row.
 	task: { display: "inline-flex", marginInlineEnd: space.xxs, verticalAlign: "middle" },
+	// 沒有左線、沒有 hr:縮一格(16px)的灰字
 	quote: {
 		margin: 0,
-		paddingInlineStart: space.sm,
-		borderInlineStartWidth: 2,
-		borderInlineStartStyle: "solid",
-		borderInlineStartColor: color.border,
+		paddingInlineStart: space.md,
 		color: color.textMuted,
 		display: "grid",
 		gap: space.xs,
 	},
-	rule: {
-		border: "none",
-		borderBlockStartWidth: 1,
-		borderBlockStartStyle: "solid",
-		borderBlockStartColor: color.border,
-		margin: 0,
-	},
-	link: { color: color.link, textDecorationLine: "underline", textUnderlineOffset: "0.15em" },
-	image: { maxWidth: "100%", height: "auto", borderRadius: corner.card },
+	link: { color: color.text, textDecorationLine: "underline", textUnderlineOffset: "0.15em" },
+	image: { maxWidth: "100%", height: "auto", borderRadius: corner.box },
 	// The table itself must not shrink to fit; the wrapper scrolls instead. A squashed table on a
 	// phone is unreadable, a scrolling one is merely narrow.
 	tableWrap: { overflowX: "auto", maxWidth: "100%" },
 	// Sized by its own content, not stretched to the message width: a two-column table pulled out
 	// to full width puts its cells at opposite ends of the screen and is harder to read, not easier.
-	table: { borderCollapse: "collapse" },
+	// 一種表格:沒有線、沒有底;表頭是 textMuted 的 type.t1,數字 tabular,列距 space.xxs
+	table: { borderCollapse: "collapse", marginBlock: space.xxs },
 	cell: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
 		paddingBlock: space.xxs,
-		paddingInline: space.xs,
-		textAlign: "start",
-		verticalAlign: "top",
-	},
-	head: { backgroundColor: color.surface, fontWeight: 600 },
-	// Ruled: no frame and no fill, a hairline under the head and between rows, none under the last.
-	ruledTable: { borderCollapse: "collapse", marginBlock: 4 },
-	ruledCell: {
-		borderColor: color.border,
-		borderStyle: "solid",
-		borderWidth: 0,
-		borderBottomWidth: 1,
-		paddingBlock: 8,
-		paddingInlineEnd: 24,
 		paddingInlineStart: 0,
+		paddingInlineEnd: space.lg,
 		textAlign: "start",
 		verticalAlign: "top",
+		fontVariantNumeric: "tabular-nums",
 	},
-	ruledHead: { color: color.textMuted, fontSize: type.t2, fontWeight: 500 },
-	ruledLast: { borderBottomWidth: 0 },
+	head: { color: color.textMuted, fontSize: type.t1, fontWeight: 500 },
 })
 
 const ALIGN = { left: "start", center: "center", right: "end" } as const
@@ -121,18 +97,12 @@ export type MarkdownProps = Omit<ComponentProps<"div">, "children"> & {
 	/** Passed through to code blocks, so a shell can localise their copy button. */
 	copyLabel?: string
 	copiedLabel?: string
-	/**
-	 * `grid` frames every cell and fills the head; `ruled` draws only a hairline under the head and
-	 * between rows, with a muted head, for a table that sits inside a bubble.
-	 * @default "grid"
-	 */
-	tables?: "grid" | "ruled"
 	/** Overrides for the built-in words (task-list checkbox names); the rest follow `<LocaleProvider>`. */
 	labels?: Partial<MarkdownLabels>
 	sx?: StyleArg
 }
 
-type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel" | "tables"> & {
+type Context = Pick<MarkdownProps, "renderBlock" | "copyLabel" | "copiedLabel"> & {
 	t: MarkdownLabels
 }
 
@@ -257,20 +227,15 @@ function renderList(token: Tokens.List, context: Context, key: string): ReactNod
 }
 
 function renderTable(token: Tokens.Table, context: Context, key: string): ReactNode {
-	const ruled = context.tables === "ruled"
-	const last = token.rows.length - 1
 	return (
 		<div key={key} {...stylex.props(styles.tableWrap)}>
-			<table {...stylex.props(ruled ? styles.ruledTable : styles.table)}>
+			<table {...stylex.props(styles.table)}>
 				<thead>
 					<tr>
 						{token.header.map((cell, index) => (
 							<th
 								key={index}
-								{...stylex.props(
-									ruled ? styles.ruledCell : styles.cell,
-									ruled ? styles.ruledHead : styles.head,
-								)}
+								{...stylex.props(styles.cell, styles.head)}
 								style={{ textAlign: ALIGN[token.align[index] ?? "left"] }}
 							>
 								{renderInline(cell.tokens, context, `${key}.h.${index}`)}
@@ -284,10 +249,7 @@ function renderTable(token: Tokens.Table, context: Context, key: string): ReactN
 							{row.map((cell, index) => (
 								<td
 									key={index}
-									{...stylex.props(
-										ruled ? styles.ruledCell : styles.cell,
-										ruled && rowIndex === last && styles.ruledLast,
-									)}
+									{...stylex.props(styles.cell)}
 									style={{ textAlign: ALIGN[token.align[index] ?? "left"] }}
 								>
 									{renderInline(cell.tokens, context, `${key}.${rowIndex}.${index}`)}
@@ -366,9 +328,6 @@ function renderBlocks(tokens: Token[], context: Context, keyPrefix = "b"): React
 					</blockquote>,
 				)
 				return
-			case "hr":
-				out.push(<hr key={key} {...stylex.props(styles.rule)} />)
-				return
 			case "html":
 				// Never parsed, never injected — the source is shown as code. Markdown from a model is
 				// untrusted input and this package has no sanitiser to lean on, so `<script>` is
@@ -416,7 +375,6 @@ export function Markdown({
 	renderBlock,
 	copyLabel,
 	copiedLabel,
-	tables = "grid",
 	labels,
 	sx,
 	...rest
@@ -425,7 +383,7 @@ export function Markdown({
 	const tokens = parser.lexer(children)
 	return (
 		<div {...rest} {...styled(rest, styles.root, sx)}>
-			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel, tables, t })}
+			{renderBlocks(tokens, { renderBlock, copyLabel, copiedLabel, t })}
 		</div>
 	)
 }
