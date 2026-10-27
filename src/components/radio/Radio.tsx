@@ -18,17 +18,6 @@ const styles = stylex.create({
 		opacity: { default: 1, ":has(:disabled)": 0.5 },
 		fontFamily: font.body,
 	},
-	card: {
-		borderWidth: 1,
-		borderStyle: "solid",
-		borderColor: color.border,
-		borderRadius: corner.control,
-		paddingBlock: space.sm,
-		paddingInline: space.sm,
-		transitionProperty: "border-color, background-color",
-		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
-	},
-	cardOn: { borderColor: color.accent, backgroundColor: color.accentSubtle },
 	// 看得到的圓 17px,可以按的原生 input 是蓋在上面、置中的 24px(WCAG 2.5.8),不影響版面
 	input: {
 		position: "absolute",
@@ -52,7 +41,7 @@ const styles = stylex.create({
 		borderWidth: 1.5,
 		borderStyle: "solid",
 		borderColor: { default: color.borderControl, [FORCED]: "ButtonText" },
-		borderRadius: corner.pill,
+		borderRadius: corner.shape,
 		backgroundColor: { default: color.bg, [FORCED]: "Canvas" },
 		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -67,21 +56,21 @@ const styles = stylex.create({
 		// forced-colors 會把墨色底洗掉,選中就看不出來:圓點自己給系統色
 		forcedColorAdjust: "none",
 	},
-	// 選中是墨色實心,中間一顆 accentText 的點(跟 checkbox 的勾同一個配色)
+	// 選中是墨色實心,中間一顆 bg 的點(跟 checkbox 的勾同一個配色)
 	dotOn: {
-		borderColor: { default: color.accent, [FORCED]: "Highlight" },
-		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+		borderColor: { default: color.text, [FORCED]: "Highlight" },
+		backgroundColor: { default: color.text, [FORCED]: "Highlight" },
 	},
 	dotDisabled: { borderColor: { default: color.borderControl, [FORCED]: "GrayText" } },
 	dotOnDisabled: {
-		borderColor: { default: color.accent, [FORCED]: "GrayText" },
-		backgroundColor: { default: color.accent, [FORCED]: "GrayText" },
+		borderColor: { default: color.text, [FORCED]: "GrayText" },
+		backgroundColor: { default: color.text, [FORCED]: "GrayText" },
 	},
 	fill: {
 		width: "0.4rem",
 		height: "0.4rem",
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.accentText, [FORCED]: "HighlightText" },
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.bg, [FORCED]: "HighlightText" },
 		scale: "0",
 		transitionProperty: "scale",
 		transitionDuration: { default: motion.quick, [REDUCED]: "0s" },
@@ -115,13 +104,7 @@ export function Radio({ value, label, description, onChange, disabled, ...props 
 		.join(" ")
 
 	return (
-		<label
-			{...stylex.props(
-				styles.root,
-				group.variant === "card" && styles.card,
-				group.variant === "card" && checked && styles.cardOn,
-			)}
-		>
+		<label {...stylex.props(styles.root)}>
 			<span
 				{...stylex.props(
 					styles.dot,

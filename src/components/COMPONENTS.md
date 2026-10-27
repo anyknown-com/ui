@@ -81,30 +81,27 @@ label + control + help/error), which wires `for` / `aria-describedby` automatica
 A hidden native `<input type="checkbox">` plus a drawn box.
 
 - Unchecked is a 1.5px `borderControl` ring (earlier `borderStrong`, which was 1.76:1; see
-  [A11Y-DEBT.md](./A11Y-DEBT.md)). Checked / indeterminate is a solid `accent` (ink) square with
-  an `accentText` check (or dash), drawn with `stroke-dashoffset` in 160ms. Corner `corner.small`
+  [A11Y-DEBT.md](./A11Y-DEBT.md)). Checked / indeterminate is a solid `text` (ink) square with
+  a `bg` check (or dash), drawn with `stroke-dashoffset` in 160ms. Corner `corner.check` (4px)
 - The dasharray (32) has to be longer than the path (about 18): an earlier 24 with a 28 path
   leaked a tail when unchecked
 - The field context's `invalid` draws a `danger` border
 
 ### radio
-Native `<input type="radio">` plus `fieldset/legend`. `variant="card"` lights up the whole card
-when selected.
+Native `<input type="radio">` plus `fieldset/legend`. No variants: options are plain rows.
 
 - Unselected is a 1.5px `borderControl` ring (earlier `borderStrong`). Selected is a solid
-  `accent` (ink) circle with an `accentText` dot (same pairing as the checkbox check); the dot
+  `text` (ink) circle with a `bg` dot (same pairing as the checkbox check); the dot
   scales 0 → 1 in 160ms ease-out, no overshoot
-- The `card` frame is `corner.control`
+- The circle is `corner.shape`
 
 ### switch
 An on/off that takes effect immediately (versus Checkbox, which takes effect on submit). Native
 checkbox plus `role="switch"`.
 
-- The track is a solid pill: off `borderControl` (earlier `borderStrong`, under 3:1), on `accent`
-  (ink). The thumb is a round knob floating on the track, with `shadow.rest`. Off, it is always
-  white (`bg` would turn it black in dark mode); on, it is `accentText`: white in light mode; in
-  dark mode the ink is light, so the knob flips to dark, otherwise a white knob on a near-white
-  track can't be told apart
+- The track is a 34×20 pill (`corner.shape`): off `washHover`, on `text` (ink). The thumb is a
+  14px round knob with no shadow: off `textMuted` (clears 3:1 on its own, so the track needs no
+  edge), on `bg`
 - The thumb slides in 180ms ease-out, **no overshoot**. A double bounce with
   `cubic-bezier(.34,1.56,.64,1)` was tried; overshoot is always out
 - The knob moves `inset-inline-start`, not `translate`: translate's x is physical, so under
@@ -120,9 +117,8 @@ should be a Radio or Select.
   honest
 - Arrow keys ±5% (of the range, not the step), Home / End to the ends; values always clamp,
   then snap back to the step
-- Track `layer4`, fill `accent`, thumb a 1.5rem `accentText` circle with a 0.2rem `accent` ring
-  and no shadow (same colors as the switch knob when on). Earlier: `borderStrong` fill and a
-  pill-shaped `surfaceRaised` thumb with `shadow.rest`
+- A 4px `washStrong` rail (inside a 24px-tall hit area), `text` fill, and a 16px `text` thumb
+  with a 2px `bg` ring (`corner.shape`), as in the sketch prototype
 - Thumb moves in `motion.normal` (200ms) `easeOut`, and **the transition is off while
   dragging** (otherwise the finger leads and the thumb lags). The fill width moves with the same
   duration and curve and is also off while dragging; if only the thumb animated, clicking the

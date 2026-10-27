@@ -56,16 +56,6 @@ describe("RadioGroup", () => {
 		)
 		for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled()
 	})
-
-	test("card variant still exposes radio semantics", () => {
-		render(
-			<RadioGroup legend="訂閱來源" value="claude" variant="card">
-				<Radio value="claude" label="Claude" />
-				<Radio value="chatgpt" label="ChatGPT" />
-			</RadioGroup>,
-		)
-		expect(screen.getByRole("radio", { name: "Claude" })).toBeChecked()
-	})
 })
 
 describe("RadioGroup uncontrolled", () => {
@@ -130,7 +120,7 @@ describe("Radio target and a11y", () => {
 		const { container } = render(
 			<>
 				<Threshold />
-				<RadioGroup legend="方案" variant="card" defaultValue="pro">
+				<RadioGroup legend="方案" defaultValue="pro">
 					<Radio value="free" label="Free" description="免費" />
 					<Radio value="pro" label="Pro" />
 				</RadioGroup>

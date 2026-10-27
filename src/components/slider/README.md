@@ -39,9 +39,9 @@ It works controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`,
 - Accessible name: `label` (rendered as text and linked with `aria-labelledby`) or `aria-label`. One of them is needed.
 - Use `valueText` so the value is read as a word ("High"), not "0.62".
 - Disabled: `aria-disabled="true"`, `tabIndex={-1}` (out of the tab order), keys and pointer ignored, 50% opacity.
-- The track and thumb are 24px tall, which meets the 24px minimum target.
+- The visible rail is 4px and the thumb 16px, but the control is 24px tall, which meets the 24px minimum target.
 - Focus ring: a 2px `focusRing` outline on `:focus-visible` (`Highlight` under forced colors).
-- Under `forced-colors: active` the track gets a `ButtonText` frame and the fill and thumb ring paint in `Highlight`; disabled draws in `GrayText`.
+- Under `forced-colors: active` the rail paints in `ButtonText` and the fill and thumb in `Highlight`; disabled draws in `GrayText`.
 - The fill and thumb move together (200ms ease-out); the transition is off while dragging and under `prefers-reduced-motion: reduce`.
 - Pointer: pressing the track focuses the slider and captures the pointer until release.
 - Right-to-left: the thumb and fill are placed with logical properties, so under `dir="rtl"` the track fills from the right and a drag measures from the right edge. The Slider reads either `<DirectionProvider direction="rtl">` or the computed CSS `direction`.

@@ -208,16 +208,16 @@ describe("Slider", () => {
 	test("forced-colors: track border, Highlight fill and thumb, Highlight focus ring", () => {
 		const { container } = render(<Slider defaultValue={0.5} aria-label="音量" />)
 		const slider = screen.getByRole("slider")
-		const [fill, thumb] = container.querySelectorAll("[role='slider'] > span")
-		expect(forcedCss(slider)).toMatch(/border-width: 1px/)
+		const [rail, fill, thumb] = container.querySelectorAll("[role='slider'] > span")
+		expect(forcedCss(rail)).toMatch(/background-color: buttontext/i)
 		expect(forcedCss(slider)).toMatch(/focus-visible.*solid highlight/i)
 		expect(forcedCss(fill)).toMatch(/background-color: highlight/i)
-		expect(forcedCss(thumb)).toMatch(/border-color: highlight/i)
+		expect(forcedCss(thumb)).toMatch(/background-color: highlight/i)
 	})
 
 	test("forced-colors: a disabled slider draws in GrayText", () => {
 		const { container } = render(<Slider defaultValue={0.5} aria-label="音量" disabled />)
-		const [fill, thumb] = container.querySelectorAll("[role='slider'] > span")
+		const [_rail, fill, thumb] = container.querySelectorAll("[role='slider'] > span")
 		expect(forcedCss(fill)).toMatch(/graytext/i)
 		expect(forcedCss(thumb)).toMatch(/graytext/i)
 	})

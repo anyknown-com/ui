@@ -39,7 +39,7 @@ It works controlled (`checked` + `onCheckedChange`) or uncontrolled (`defaultChe
 - The thumb moves with `inset-inline-start`, so it follows `dir="rtl"`.
 - The track and thumb transitions (180ms) are instant under `prefers-reduced-motion: reduce`.
 - Disabled: the whole row dims to 50% and shows `not-allowed`.
-- The track is drawn 22.4px tall, but the transparent native input over it is at least 24px tall, so the target meets 24px even without `label`. With a label the whole row is also clickable.
+- The track is drawn 20px tall, but the transparent native input over it is at least 24px tall, so the target meets 24px even without `label`. With a label the whole row is also clickable.
 
 ## Keyboard
 

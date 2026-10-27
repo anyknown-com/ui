@@ -43,7 +43,7 @@ const styles = stylex.create({
 		borderWidth: 1.5,
 		borderStyle: "solid",
 		borderColor: { default: color.borderControl, [FORCED]: "ButtonText" },
-		borderRadius: corner.small,
+		borderRadius: corner.check,
 		backgroundColor: { default: color.bg, [FORCED]: "Canvas" },
 		transitionProperty: "border-color, background-color",
 		transitionDuration: { default: motion.fast, [REDUCED]: "0s" },
@@ -59,8 +59,8 @@ const styles = stylex.create({
 		forcedColorAdjust: "none",
 	},
 	boxOn: {
-		borderColor: { default: color.accent, [FORCED]: "Highlight" },
-		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+		borderColor: { default: color.text, [FORCED]: "Highlight" },
+		backgroundColor: { default: color.text, [FORCED]: "Highlight" },
 	},
 	// The box opts out of forced colours, so danger would show as is: use ButtonText and mark
 	// the error with a thicker dashed frame instead of colour.
@@ -71,13 +71,13 @@ const styles = stylex.create({
 	},
 	boxDisabled: { borderColor: { default: color.borderControl, [FORCED]: "GrayText" } },
 	boxOnDisabled: {
-		borderColor: { default: color.accent, [FORCED]: "GrayText" },
-		backgroundColor: { default: color.accent, [FORCED]: "GrayText" },
+		borderColor: { default: color.text, [FORCED]: "GrayText" },
+		backgroundColor: { default: color.text, [FORCED]: "GrayText" },
 	},
 	svg: { display: "block", width: "100%", height: "100%" },
 	mark: {
 		fill: "none",
-		stroke: { default: color.accentText, [FORCED]: "HighlightText" },
+		stroke: { default: color.bg, [FORCED]: "HighlightText" },
 		strokeWidth: 2.4,
 		strokeLinecap: "round",
 		strokeLinejoin: "round",

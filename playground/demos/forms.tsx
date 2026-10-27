@@ -156,7 +156,7 @@ function RadioDemo() {
 					description="Hand off close to the limit. The longest single session."
 				/>
 			</RadioGroup>
-			<RadioGroup legend="Subscription" variant="card" value={source} onValueChange={setSource}>
+			<RadioGroup legend="Subscription" value={source} onValueChange={setSource}>
 				<Radio value="claude" label="Claude" description="Use your existing Claude subscription." />
 				<Radio value="chatgpt" label="ChatGPT" description="Use your existing ChatGPT subscription." />
 			</RadioGroup>

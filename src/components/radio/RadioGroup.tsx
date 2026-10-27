@@ -8,7 +8,6 @@ type RadioGroupContextValue = {
 	name: string
 	value: string
 	disabled: boolean
-	variant: "plain" | "card"
 	select: (value: string) => void
 }
 
@@ -46,8 +45,6 @@ export type RadioGroupProps = Omit<ComponentProps<"fieldset">, "onChange" | "def
 	value?: string
 	/** The option picked at first, for an uncontrolled group. @default "" */
 	defaultValue?: string
-	/** `plain` lists bare options; `card` puts each option in a bordered card that highlights when picked. @default "plain" */
-	variant?: "plain" | "card"
 	/** The newly picked option's value. */
 	onValueChange?: (value: string) => void
 	/** The `Radio` options. */
@@ -60,7 +57,6 @@ export function RadioGroup({
 	name,
 	value,
 	defaultValue = "",
-	variant = "plain",
 	onValueChange,
 	disabled = false,
 	children,
@@ -70,8 +66,8 @@ export function RadioGroup({
 	const resolvedName = name ?? fallbackName
 	const [selected, select] = useControllableState(value, defaultValue, onValueChange)
 	const context = useMemo(
-		() => ({ name: resolvedName, value: selected, disabled, variant, select }),
-		[resolvedName, selected, disabled, variant, select],
+		() => ({ name: resolvedName, value: selected, disabled, select }),
+		[resolvedName, selected, disabled, select],
 	)
 	return (
 		<fieldset {...props} disabled={disabled} {...styled(props, styles.fieldset)}>

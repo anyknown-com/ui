@@ -16,8 +16,6 @@ const styles = stylex.create({
 	control: {
 		position: "relative",
 		height: "1.5rem",
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.layer4, [FORCED]: "Canvas" },
 		cursor: "pointer",
 		touchAction: "none",
 		outline: {
@@ -28,45 +26,51 @@ const styles = stylex.create({
 			},
 		},
 		outlineOffset: 2,
-		// forced-colors 會把底色洗成 Canvas、拿掉填充:這裡自己給系統色,軌道多一圈 ButtonText 的框
+		// forced-colors 會把底色洗成 Canvas、拿掉填充:這裡自己給系統色
 		forcedColorAdjust: "none",
-		borderStyle: "solid",
-		borderWidth: { default: 0, [FORCED]: 1 },
-		borderColor: "ButtonText",
 	},
-	disabled: { cursor: "not-allowed", opacity: 0.5, borderColor: "GrayText" },
+	disabled: { cursor: "not-allowed", opacity: 0.5 },
+	// 看得到的軌道只有 4px:24px 高的控制區是按的範圍
+	rail: {
+		position: "absolute",
+		insetInline: 0,
+		insetBlockStart: "calc(50% - 2px)",
+		height: 4,
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.washStrong, [FORCED]: "ButtonText" },
+	},
 	// 值 = 墨色實心,跟 switch 開的軌道同一個配色;鈕永遠包在填充的末端裡
 	fill: {
 		position: "absolute",
 		insetInlineStart: 0,
-		insetBlock: 0,
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.accent, [FORCED]: "Highlight" },
+		insetBlockStart: "calc(50% - 2px)",
+		height: 4,
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.text, [FORCED]: "Highlight" },
 		// 跟鈕同一個時長與曲線:只有鈕在動的話,點一下軌道時填充先跳到位、鈕才慢慢跟上
 		transitionProperty: "width",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
 	},
-	// 鈕是 accentText 的圓,外圈一環墨色把它跟軌道隔開(跟 switch 開的鈕同色)
+	// 鈕是墨色的圓,外圈 2px 的 bg 把它跟軌道隔開
 	thumb: {
 		position: "absolute",
-		insetBlock: 0,
+		insetBlockStart: "calc(50% - 8px)",
 		boxSizing: "border-box",
-		width: "1.5rem",
-		borderWidth: "0.2rem",
-		borderStyle: "solid",
-		borderColor: { default: color.accent, [FORCED]: "Highlight" },
-		borderRadius: corner.pill,
-		backgroundColor: { default: color.accentText, [FORCED]: "Canvas" },
+		width: 16,
+		height: 16,
+		borderRadius: corner.shape,
+		backgroundColor: { default: color.text, [FORCED]: "Highlight" },
+		boxShadow: { default: `0 0 0 2px ${color.bg}`, [FORCED]: "none" },
 		transitionProperty: "inset-inline-start",
 		transitionDuration: { default: motion.normal, [REDUCED]: "0s" },
 		transitionTimingFunction: motion.easeOut,
 	},
-	fillDisabled: { backgroundColor: { default: color.accent, [FORCED]: "GrayText" } },
-	thumbDisabled: { borderColor: { default: color.accent, [FORCED]: "GrayText" } },
+	fillDisabled: { backgroundColor: { default: color.text, [FORCED]: "GrayText" } },
+	thumbDisabled: { backgroundColor: { default: color.text, [FORCED]: "GrayText" } },
 	still: { transitionDuration: { default: "0s", [REDUCED]: "0s" } },
-	grown: (ratio: number) => ({ width: `calc(1.5rem + (100% - 1.5rem) * ${ratio})` }),
-	slid: (ratio: number) => ({ insetInlineStart: `calc((100% - 1.5rem) * ${ratio})` }),
+	grown: (ratio: number) => ({ width: `calc(1rem + (100% - 1rem) * ${ratio})` }),
+	slid: (ratio: number) => ({ insetInlineStart: `calc((100% - 1rem) * ${ratio})` }),
 })
 
 function snap(raw: number, min: number, max: number, step: number): number {
@@ -241,6 +245,7 @@ export function Slider({
 				}}
 				{...stylex.props(styles.control, disabled && styles.disabled)}
 			>
+				<span aria-hidden="true" {...stylex.props(styles.rail)} />
 				<span
 					aria-hidden="true"
 					{...stylex.props(

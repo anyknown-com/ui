@@ -6,7 +6,6 @@
 
 - Exactly one choice out of two to about six options that should all stay visible.
 - Options that need a sentence of explanation each (`description`).
-- A choice between plans or sources shown as selectable cards (`variant="card"`).
 
 ## When not to use
 
@@ -39,7 +38,6 @@ import { Radio, RadioGroup } from "@anyknown/ui"
 - Focus ring: a 2px `focusRing` outline around the dot when the input has `:focus-visible` (`Highlight` under forced colors).
 - Under `forced-colors: active` the dot is a `ButtonText` ring on `Canvas`; checked fills with `Highlight` and a `HighlightText` center; disabled draws in `GrayText`.
 - The dot scale (160ms) and color transitions are instant under `prefers-reduced-motion: reduce`.
-- `variant="card"` marks the selected card with an ink border and `accentSubtle` fill; the native checked state carries the meaning.
 - The dot is drawn at about 17px, but the transparent native input over it is at least 24×24px, so the target meets 24px even without `label`.
 
 ## Keyboard
