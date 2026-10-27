@@ -37,6 +37,10 @@ import { Stack } from "@anyknown/ui"
 - Pass `role="group"` and `aria-label` through when the children form a named set.
 - A wrapping row keeps all its content on screen at 375px wide and at 200% zoom: nothing scrolls sideways.
 
+## Keyboard
+
+No keyboard interaction of its own.
+
 ## Related
 
 - [Stat](../stat/README.md) — a number with a label, often placed in a row `Stack`.

@@ -62,6 +62,7 @@ import {
 	SkeletonGroup,
 	Slider,
 	Spin,
+	Stack,
 	Spinner,
 	StatLine,
 	StatBar,
@@ -712,6 +713,13 @@ export const THUMBNAILS: Record<string, ComponentType> = {
 			</Group>
 		</Fill>
 	),
+	stack: () => (
+		<Stack direction="row" gap="lg">
+			<Text>Runs</Text>
+			<Text>Spend</Text>
+			<Text>Failed</Text>
+		</Stack>
+	),
 	"settings-rows": () => (
 		<Fill>
 			<SettingsRows>
@@ -830,4 +838,5 @@ export const BLURBS: Record<string, string> = {
 	group: "A grouped settings list with no frame.",
 	"settings-rows": "Settings rows with a name, help and a control.",
 	page: "The heading and surfaces around a settings page.",
+	stack: "A column or a wrapping row of blocks, spaced by token gaps.",
 }
