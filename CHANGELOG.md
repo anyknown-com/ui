@@ -5,6 +5,13 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.17.0 — 2026-11-01
+
+### Changed
+
+- **ComposerFrame:** no focus ring while the text area has focus; the dashed drag-over ring stays, and forced-colors mode still draws a `Highlight` ring.
+- **ToolGroup:** a call's mark is the lucide `check` / `x` glyph instead of the text "✓" / "✕". The mark is an image named by the new built-in strings `succeeded` / `failed` (zh-TW 成功 / 失敗), so screen readers hear the status.
+
 ## 0.16.0 — 2026-10-27
 
 The visual language changes from a layered ledger to a pencil sketch: one sheet, no lines, no fills behind words, hierarchy from spacing, weight and size, colour only for state. Every removed token and prop below has no alias; [MIGRATION.md](MIGRATION.md) has the old-to-new table and Before/After for each.
