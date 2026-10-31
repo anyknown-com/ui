@@ -115,6 +115,23 @@ describe("ToolGroup", () => {
 		expect(paths(/boom/)).toEqual(["M18 6 6 18", "m6 6 12 12"])
 		expect(paths(/ok/)).toEqual(["M20 6 9 17l-5-5"])
 		expect(screen.getByRole("button", { name: /ok/ }).textContent).not.toMatch(/[✓✕]/)
+		expect(screen.getByRole("button", { name: /^失敗 ?boom$/ })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: /^成功 ?ok$/ })).toBeInTheDocument()
+	})
+
+	test("the mark reads succeeded or failed under an en LocaleProvider", () => {
+		render(
+			<LocaleProvider locale="en">
+				<ToolGroup
+					calls={[
+						{ id: "1", tool: "shell", summary: "ok" },
+						{ id: "2", tool: "shell", summary: "boom", failed: true },
+					]}
+				/>
+			</LocaleProvider>,
+		)
+		expect(screen.getByRole("button", { name: /^failed ?boom$/ })).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: /^succeeded ?ok$/ })).toBeInTheDocument()
 	})
 
 	test("duration 寫在列尾", () => {

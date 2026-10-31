@@ -113,10 +113,14 @@ const styles = stylex.create({
 const strings = defineStrings({
 	"zh-TW": {
 		title: (count: number, tools: readonly string[]) => `用了 ${count} 次工具：${tools.join("、")}`,
+		succeeded: "成功",
+		failed: "失敗",
 	},
 	en: {
 		title: (count: number, tools: readonly string[]) =>
 			`Made ${count} tool ${count === 1 ? "call" : "calls"}: ${tools.join(", ")}`,
+		succeeded: "succeeded",
+		failed: "failed",
 	},
 })
 
@@ -194,7 +198,7 @@ export function ToolGroup({
 			{open && (
 				<ul {...stylex.props(styles.list)}>
 					{calls.map((call) => (
-						<ToolItem key={call.id} call={call} highlight={highlight} />
+						<ToolItem key={call.id} call={call} highlight={highlight} t={t} />
 					))}
 				</ul>
 			)}
@@ -202,14 +206,26 @@ export function ToolGroup({
 	)
 }
 
-function ToolItem({ call, highlight }: { call: ToolGroupCall; highlight?: (code: string) => ReactNode }) {
+function ToolItem({
+	call,
+	highlight,
+	t,
+}: {
+	call: ToolGroupCall
+	highlight?: (code: string) => ReactNode
+	t: ToolGroupLabels
+}) {
 	const [open, setOpen] = useState(false)
 	const risk = call.risk ?? []
 
 	return (
 		<li {...stylex.props(styles.item)}>
 			<Ghost aria-expanded={open} title={call.tool} onClick={() => setOpen(!open)} sx={styles.row}>
-				<span {...stylex.props(styles.mark, call.failed && styles.failedMark)}>
+				<span
+					role="img"
+					aria-label={call.failed ? t.failed : t.succeeded}
+					{...stylex.props(styles.mark, call.failed && styles.failedMark)}
+				>
 					{call.failed ? <XGlyph {...stylex.props(icon.sm)} /> : <CheckGlyph {...stylex.props(icon.sm)} />}
 				</span>
 				<span {...stylex.props(styles.summary)}>{call.summary}</span>
