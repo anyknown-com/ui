@@ -25,10 +25,7 @@ const styles = stylex.create({
 		boxShadow: shadow.float,
 		outline: {
 			default: "none",
-			":focus-within": {
-				default: `${focusRing.width} solid ${color.focusRing}`,
-				[FORCED]: `${focusRing.width} solid Highlight`,
-			},
+			":focus-within": { default: null, [FORCED]: `${focusRing.width} solid Highlight` },
 		},
 		outlineOffset: 0,
 	},
@@ -51,9 +48,9 @@ export type ComposerFrameProps = {
 }
 
 /**
- * The chatbox's floating box: `surfaceRaised`, `shadow.float`, `corner.box`, no frame, and a
- * focus ring while anything inside has focus. `Composer` draws itself in it; an app's own
- * chatbox uses it for the same look.
+ * The chatbox's floating box: `surfaceRaised`, `shadow.float`, `corner.box`, no frame and no
+ * focus ring (forced colors keep one). `Composer` draws itself in it; an app's own chatbox uses
+ * it for the same look.
  */
 export function ComposerFrame({ children, dragging = false, sx }: ComposerFrameProps) {
 	return (

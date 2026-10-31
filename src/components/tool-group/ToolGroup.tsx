@@ -5,6 +5,7 @@ import { useControllableState } from "../../lib/useControllableState"
 import { color, font, motion, space, type } from "../../tokens.stylex"
 import { Ghost } from "../ghost/Ghost"
 import { Chevron } from "../icon/Chevron"
+import { CheckGlyph, XGlyph } from "../icon/glyphs"
 import { ICON_STROKE, icon } from "../icon/icon"
 import { PayloadBlock } from "../payload-block/PayloadBlock"
 
@@ -209,7 +210,7 @@ function ToolItem({ call, highlight }: { call: ToolGroupCall; highlight?: (code:
 		<li {...stylex.props(styles.item)}>
 			<Ghost aria-expanded={open} title={call.tool} onClick={() => setOpen(!open)} sx={styles.row}>
 				<span {...stylex.props(styles.mark, call.failed && styles.failedMark)}>
-					{call.failed ? "✕" : "✓"}
+					{call.failed ? <XGlyph {...stylex.props(icon.sm)} /> : <CheckGlyph {...stylex.props(icon.sm)} />}
 				</span>
 				<span {...stylex.props(styles.summary)}>{call.summary}</span>
 				{risk.length > 0 ? <span {...stylex.props(styles.risk)}>{risk.join(" · ")}</span> : <span />}

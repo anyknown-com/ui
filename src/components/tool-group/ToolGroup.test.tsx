@@ -17,6 +17,13 @@ const CALLS: ToolGroupCall[] = [
 	{ id: "3", tool: "web.fetch", summary: "example.org" },
 ]
 
+/** The `d` of every path in the glyph of the row with this name. */
+function paths(name: RegExp) {
+	return [...screen.getByRole("button", { name }).querySelectorAll("svg path")].map((path) =>
+		path.getAttribute("d"),
+	)
+}
+
 describe("ToolGroup", () => {
 	test("標題數呼叫次數,每個工具只列一次", () => {
 		render(<ToolGroup calls={CALLS} />)
@@ -87,7 +94,7 @@ describe("ToolGroup", () => {
 			/>,
 		)
 		expect(screen.getByRole("button", { name: /stripe/ }).textContent).toBe(
-			"✓stripe/charges_create花錢 · 刪除",
+			"stripe/charges_create花錢 · 刪除",
 		)
 	})
 
@@ -105,8 +112,9 @@ describe("ToolGroup", () => {
 				]}
 			/>,
 		)
-		expect(screen.getByRole("button", { name: /boom/ })).toHaveTextContent("✕")
-		expect(screen.getByRole("button", { name: /ok/ })).toHaveTextContent("✓")
+		expect(paths(/boom/)).toEqual(["M18 6 6 18", "m6 6 12 12"])
+		expect(paths(/ok/)).toEqual(["M20 6 9 17l-5-5"])
+		expect(screen.getByRole("button", { name: /ok/ }).textContent).not.toMatch(/[✓✕]/)
 	})
 
 	test("duration 寫在列尾", () => {
