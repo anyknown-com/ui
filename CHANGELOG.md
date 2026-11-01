@@ -5,6 +5,12 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.17.1 — 2026-11-02
+
+### Fixed
+
+- **Tooltip:** the bubble and its positioner take no pointer events, so a tap or click on the bubble reaches the control under it. Before, a tooltip shown on a focused trigger (for example after a sheet closed with Escape) blocked taps on the button next to it. The bubble is no longer hoverable (`disableHoverablePopup`); moving the pointer off the trigger hides it.
+
 ## 0.17.0 — 2026-11-01
 
 ### Changed
