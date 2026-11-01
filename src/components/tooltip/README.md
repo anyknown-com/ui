@@ -32,6 +32,7 @@ Props: `content`, `shortcut`, `side` (`"top"` default), `align` (`"center"` defa
 - The child must be one focusable element, so keyboard users can open the tooltip by focusing it.
 - The tooltip has no built-in words; `content` is yours, so nothing here follows `<LocaleProvider>`.
 - It sits above dialogs and popovers.
+- It takes no pointer events: a tap or click on the bubble lands on what is under it, and the pointer cannot hover the bubble to keep it open.
 - Under `prefers-reduced-motion: reduce` the hover delay is 0 and the fade-in is off.
 - A transparent border keeps an edge in forced-colors mode.
 

@@ -12,7 +12,10 @@ const FORCED = "@media (forced-colors: active)"
 const fade = stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } })
 
 const styles = stylex.create({
+	// 只是字:taps 與點擊穿過去,落到底下的按鈕(手機上 focus 回來時泡泡會蓋住旁邊那顆)
+	passThrough: { pointerEvents: "none" },
 	bubble: {
+		pointerEvents: "none",
 		display: "inline-flex",
 		alignItems: "center",
 		gap: space.xs,
@@ -77,7 +80,7 @@ export function Tooltip({
 
 	if (disabled) return children
 	return (
-		<BaseTooltip.Root open={open} onOpenChange={setOpen}>
+		<BaseTooltip.Root open={open} onOpenChange={setOpen} disableHoverablePopup>
 			<BaseTooltip.Trigger
 				delay={reduced ? 0 : delay}
 				aria-describedby={open ? id : undefined}
@@ -88,7 +91,7 @@ export function Tooltip({
 					side={side}
 					align={align}
 					sideOffset={6}
-					{...stylex.props(layerStyles.tooltip)}
+					{...stylex.props(layerStyles.tooltip, styles.passThrough)}
 				>
 					<BaseTooltip.Popup id={id} role="tooltip" {...stylex.props(styles.bubble)}>
 						{content}

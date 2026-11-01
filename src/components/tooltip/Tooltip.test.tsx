@@ -110,4 +110,17 @@ describe("Tooltip regressions", () => {
 			expect(document.getElementById(id as string)).not.toBeNull()
 		})
 	})
+
+	test("the bubble does not catch pointer events, so taps reach the button under it", async () => {
+		render(
+			<Tooltip content="封存 thread" delay={0}>
+				<Button>封存</Button>
+			</Tooltip>,
+		)
+		await userEvent.tab()
+		const tip = await screen.findByRole("tooltip")
+		// 泡泡和包著它的 positioner 都要放行;只設泡泡的話,同大小的 positioner 還是會吃掉 tap
+		expect(getComputedStyle(tip).pointerEvents).toBe("none")
+		expect(getComputedStyle(tip.parentElement as HTMLElement).pointerEvents).toBe("none")
+	})
 })
