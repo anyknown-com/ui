@@ -507,7 +507,7 @@ replaced `ToolCard` (icon tile, verb + target, progress bar, duration), which no
   read ×2、shell" (calls counted, each tool once in first-use order) or `title` when given
 - The list is indented 16px, no frame, no rules, rows `space.xxs` apart
 - A row is at least 28px: a ✓ (`textMuted`) or a `danger` ✕ when `failed`, the summary in Geist Mono,
-  the risk words in muted, then `duration` in muted tabular `t1`
+  the risk words in muted, then `duration` in muted tabular `t2`, the row's size
 - Open, a row shows the input in a PayloadBlock and the output as muted Geist Mono `t1`
   (at most 9.6em tall, scrolls), indented under the summary
 - Risk comes in as words, not keys: the package does not know the product's risk names

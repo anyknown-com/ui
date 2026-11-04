@@ -86,7 +86,7 @@ const styles = stylex.create({
 	},
 	time: {
 		color: color.textMuted,
-		fontSize: type.t1,
+		fontSize: type.t2,
 		fontVariantNumeric: "tabular-nums",
 		gridColumn: 4,
 		whiteSpace: "nowrap",
