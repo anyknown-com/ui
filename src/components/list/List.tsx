@@ -1,11 +1,11 @@
 import * as stylex from "@stylexjs/stylex"
-import { color, corner, type } from "../../tokens.stylex"
+import { breakpoint, color, corner, type } from "../../tokens.stylex"
 import type { HTMLAttributes, ReactNode } from "react"
 import { type StringsOf, defineStrings, useStrings } from "../../lib/i18n"
 import { Ghost, type GhostProps } from "../ghost/Ghost"
 
 /**
- * A list of things you open: a muted head over the columns, then 28px rows that are each one
+ * A list of things you open: a muted head over the columns, then 28px rows (44px on a phone) that are each one
  * button, no frame and no lines around them. Unlike `Table` (a mono ledger) nothing here is mono. The columns
  * are the caller's: one grid template in `sx`, the same on the head and every row, and whatever
  * the list does on a phone (drop the head, wrap a row to two lines) goes in that `sx` too.
@@ -47,7 +47,7 @@ const styles = stylex.create({
 		fontSize: type.t3,
 		height: "auto",
 		lineHeight: type.tight,
-		minHeight: 28,
+		minHeight: { default: 28, [breakpoint.phone]: 44 },
 		overflowWrap: "anywhere",
 		paddingBlock: 4,
 		paddingInline: 8,

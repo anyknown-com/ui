@@ -1,6 +1,6 @@
 # List
 
-A list of things you open, such as memories or questions: a muted head over the columns, then 28px rows, each one button, with no frame and no mono.
+A list of things you open, such as memories or questions: a muted head over the columns, then rows at least 28px tall (44px under `breakpoint.phone`), each one button, with no frame and no mono.
 
 ## When to use
 
@@ -21,7 +21,7 @@ The family:
 
 - `ListHead` — the column names, `t1` and muted. It accepts any `<div>` attribute, such as `aria-hidden`.
 - `ListSort` — a column name (a plain string) that orders the list. When `active`, it goes dark, ` ↓` follows it, and its name gains "sorted". `labels.sorted(column)` changes that word.
-- `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 28` and grows when it wraps.
+- `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 28`, 44 under `breakpoint.phone`, and grows when it wraps. Inside a [Sheet](../sheet/README.md) on a wider screen it stays 28px; give it `minHeight: 44` in `sx` there.
 - `WeightDot` — the 6px dot in front of a question. `weight="light"` is a muted dot (it goes ahead if nobody answers); `soon` (about to go ahead) and `weight="heavy"` (it waits for you) are both an amber dot.
 
 ```tsx
