@@ -41,7 +41,7 @@ import { Input, Label } from "@anyknown/ui"
 - `Field` owns the control `id`: a caller `id` on the child is ignored, so put exactly one control in a Field.
 - The control gets `aria-describedby` pointing at the error then the help, `aria-invalid="true"` when `error` is set, and `required` / `disabled` from the Field (a prop on the control wins).
 - The error is a `<p role="alert">`, so it is announced when it appears.
-- The whole Field dims to 50% when its control is disabled.
+- The whole Field dims to 50% once when its control is disabled: the control dims itself, the Field dims its label, help and error.
 - Controls that read the Field: Input, Textarea, Checkbox, Switch, PasswordInput and Select (its trigger takes the id, so the label names it; a multiple Select is named through `labelId`). Radio reads `aria-describedby`, `required` and `disabled` but not the `id`. Slider and Segmented do not read the Field; give them their own `aria-label` or `label`.
 
 ## Keyboard

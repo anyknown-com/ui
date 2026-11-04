@@ -7,7 +7,7 @@ import { Label } from "./Label"
 
 const styles = stylex.create({
 	group: { display: "grid", gap: space.xxs },
-	dimmed: { opacity: { default: 1, ":has(:disabled)": 0.5 } },
+	dimmed: { opacity: { default: 1, [stylex.when.ancestor(":has(:disabled)")]: 0.5 } },
 	help: { margin: 0, fontFamily: font.body, fontSize: type.t1, color: color.textMuted },
 	error: { margin: 0, fontFamily: font.body, fontSize: type.t1, color: color.danger },
 })
@@ -23,7 +23,7 @@ export type FieldProps = Omit<ComponentProps<"div">, "children"> & {
 	required?: boolean
 	/** Adds a muted "optional" after the label. */
 	optional?: boolean
-	/** Disables the control and dims the whole field. @default false */
+	/** Disables the control and dims the whole field once. @default false */
 	disabled?: boolean
 	/** The one form control (`Input`, `Textarea`, …) the field labels and describes. */
 	children: ReactNode
@@ -60,21 +60,27 @@ export function Field({
 	)
 
 	return (
-		<div {...props} {...styled(props, styles.group, styles.dimmed)}>
+		<div {...props} {...styled(props, styles.group, stylex.defaultMarker())}>
 			<FieldContext value={value}>
 				{label != null && (
-					<Label id={labelId} htmlFor={controlId} required={required} optional={optional}>
+					<Label
+						id={labelId}
+						htmlFor={controlId}
+						required={required}
+						optional={optional}
+						sx={styles.dimmed}
+					>
 						{label}
 					</Label>
 				)}
 				{children}
 				{error != null && (
-					<p id={errorId} role="alert" {...stylex.props(styles.error)}>
+					<p id={errorId} role="alert" {...stylex.props(styles.error, styles.dimmed)}>
 						{error}
 					</p>
 				)}
 				{help != null && (
-					<p id={helpId} {...stylex.props(styles.help)}>
+					<p id={helpId} {...stylex.props(styles.help, styles.dimmed)}>
 						{help}
 					</p>
 				)}
