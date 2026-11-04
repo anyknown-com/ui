@@ -5,6 +5,18 @@ import { describe, expect, test, vi } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Checkbox } from "./Checkbox"
 
+function Parent() {
+	const [state, setState] = useState<"mixed" | boolean>("mixed")
+	return (
+		<Checkbox
+			label="全選記憶"
+			indeterminate={state === "mixed"}
+			checked={state === true}
+			onCheckedChange={setState}
+		/>
+	)
+}
+
 describe("Checkbox", () => {
 	test("renders a native checkbox labelled by its text", () => {
 		render(<Checkbox label="記住這台裝置" />)
@@ -79,17 +91,6 @@ describe("Checkbox description", () => {
 	})
 
 	test("clears the mixed state once the user toggles", async () => {
-		function Parent() {
-			const [state, setState] = useState<"mixed" | boolean>("mixed")
-			return (
-				<Checkbox
-					label="全選記憶"
-					indeterminate={state === "mixed"}
-					checked={state === true}
-					onCheckedChange={setState}
-				/>
-			)
-		}
 		render(<Parent />)
 		const box = screen.getByRole("checkbox", { name: "全選記憶" }) as HTMLInputElement
 		expect(box.indeterminate).toBe(true)
@@ -113,9 +114,9 @@ function forcedCss(element: Element) {
 	return css
 }
 
-describe("Checkbox in forced-colors", () => {
-	const box = (name: string) => screen.getByRole("checkbox", { name }).parentElement as HTMLElement
+const drawnBox = (name: string) => screen.getByRole("checkbox", { name }).parentElement as HTMLElement
 
+describe("Checkbox in forced-colors", () => {
 	test("unchecked is a ButtonText frame on Canvas; checked fills with Highlight", () => {
 		render(
 			<>
@@ -123,10 +124,10 @@ describe("Checkbox in forced-colors", () => {
 				<Checkbox label="on" defaultChecked />
 			</>,
 		)
-		expect(forcedCss(box("off"))).toMatch(/border-color: buttontext/i)
-		expect(forcedCss(box("off"))).toMatch(/background-color: canvas/i)
-		expect(forcedCss(box("on"))).toMatch(/background-color: highlight/i)
-		expect(forcedCss(box("on"))).toMatch(/has\(:focus-visible\).*solid highlight/i)
+		expect(forcedCss(drawnBox("off"))).toMatch(/border-color: buttontext/i)
+		expect(forcedCss(drawnBox("off"))).toMatch(/background-color: canvas/i)
+		expect(forcedCss(drawnBox("on"))).toMatch(/background-color: highlight/i)
+		expect(forcedCss(drawnBox("on"))).toMatch(/has\(:focus-visible\).*solid highlight/i)
 	})
 
 	test("disabled draws in GrayText, checked or not", () => {
@@ -136,8 +137,8 @@ describe("Checkbox in forced-colors", () => {
 				<Checkbox label="on" disabled defaultChecked />
 			</>,
 		)
-		expect(forcedCss(box("off"))).toMatch(/border-color: graytext/i)
-		expect(forcedCss(box("on"))).toMatch(/background-color: graytext/i)
+		expect(forcedCss(drawnBox("off"))).toMatch(/border-color: graytext/i)
+		expect(forcedCss(drawnBox("on"))).toMatch(/background-color: graytext/i)
 	})
 
 	test("invalid is a dashed ButtonText frame, not the raw danger colour", () => {
@@ -147,8 +148,8 @@ describe("Checkbox in forced-colors", () => {
 				<Checkbox label="bad" aria-invalid="true" />
 			</>,
 		)
-		expect(forcedCss(box("ok"))).not.toMatch(/dashed/)
-		const css = forcedCss(box("bad"))
+		expect(forcedCss(drawnBox("ok"))).not.toMatch(/dashed/)
+		const css = forcedCss(drawnBox("bad"))
 		expect(css).toMatch(/border-style: dashed/)
 		expect(css).toMatch(/border-width: 2px/)
 		expect(css).toMatch(/border-color: buttontext/i)

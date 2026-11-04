@@ -3,6 +3,8 @@ import { describe, expect, test } from "vitest"
 import { expectNoAxeViolations } from "../../test/axe"
 import { Stack } from "./Stack"
 
+const cls = (id: string) => screen.getByTestId(id).className
+
 describe("Stack", () => {
 	test("renders its children in order inside a div", () => {
 		render(
@@ -31,7 +33,6 @@ describe("Stack", () => {
 				</Stack>
 			</>,
 		)
-		const cls = (id: string) => screen.getByTestId(id).className
 		expect(cls("col")).not.toBe(cls("row"))
 		expect(new Set([cls("col"), cls("sm"), cls("lg")]).size).toBe(3)
 	})

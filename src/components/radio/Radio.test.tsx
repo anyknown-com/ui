@@ -86,6 +86,8 @@ function forcedCss(element: Element) {
 	return css
 }
 
+const dot = (name: string) => screen.getByRole("radio", { name }).parentElement as HTMLElement
+
 describe("Radio in forced-colors", () => {
 	test("checked fills with Highlight, disabled draws in GrayText", () => {
 		render(
@@ -99,7 +101,6 @@ describe("Radio in forced-colors", () => {
 				</RadioGroup>
 			</>,
 		)
-		const dot = (name: string) => screen.getByRole("radio", { name }).parentElement as HTMLElement
 		expect(forcedCss(dot("A"))).toMatch(/background-color: highlight/i)
 		expect(forcedCss(dot("B"))).toMatch(/border-color: buttontext/i)
 		expect(forcedCss(dot("C"))).toMatch(/background-color: graytext/i)

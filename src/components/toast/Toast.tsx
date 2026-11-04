@@ -653,7 +653,7 @@ export function Toaster({
 			const doc = node.ownerDocument
 			const hotkey = (event: KeyboardEvent) => {
 				if (event.key !== HOTKEY || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-				if (!own.getSnapshot().toasts.some((t) => !t.leaving)) return
+				if (!own.getSnapshot().toasts.some((record) => !record.leaving)) return
 				event.preventDefault()
 				if (!node.contains(doc.activeElement)) returnTo.current = doc.activeElement as HTMLElement | null
 				node.focus()
@@ -699,7 +699,7 @@ export function Toaster({
 	const dismiss = (id: string) => {
 		const node = region.current
 		const inside = node?.contains(node.ownerDocument.activeElement) ?? false
-		const last = own.getSnapshot().toasts.filter((t) => !t.leaving).length <= 1
+		const last = own.getSnapshot().toasts.filter((record) => !record.leaving).length <= 1
 		own.close(id)
 		if (!inside) return
 		if (!last) node?.focus()

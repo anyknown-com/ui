@@ -15,6 +15,14 @@ const ENTRIES: Entry[] = [
 	{ key: "thread.handoff", zh: "換班", en: "Handoff", status: "review" },
 ]
 
+function statusBadge(row: Entry) {
+	return (
+		<Badge variant={row.status === "ok" ? "live" : row.status === "missing" ? "danger" : "neutral"}>
+			{row.status}
+		</Badge>
+	)
+}
+
 function Dictionary({ onCommit }: { onCommit?: (row: Entry, next: string) => void }) {
 	const [filter, setFilter] = useState("")
 	const [sort, setSort] = useState<SortState>(null)
@@ -29,11 +37,7 @@ function Dictionary({ onCommit }: { onCommit?: (row: Entry, next: string) => voi
 				id: "status",
 				header: "狀態",
 				value: (row) => row.status,
-				cell: (row) => (
-					<Badge variant={row.status === "ok" ? "live" : row.status === "missing" ? "danger" : "neutral"}>
-						{row.status}
-					</Badge>
-				),
+				cell: statusBadge,
 			},
 		],
 		[onCommit],
@@ -46,7 +50,7 @@ function Dictionary({ onCommit }: { onCommit?: (row: Entry, next: string) => voi
 		)
 		if (!sort) return filtered
 		const column = columns.find((c) => c.id === sort.col)
-		return [...filtered].sort((a, b) => {
+		return filtered.toSorted((a, b) => {
 			const result = (column?.value?.(a) ?? "").localeCompare(column?.value?.(b) ?? "")
 			return sort.dir === "asc" ? result : -result
 		})
@@ -394,6 +398,8 @@ describe("DataTable regressions", () => {
 	})
 })
 
+const bodyRows = () => screen.getAllByRole("row").slice(1)
+
 describe("DataTable keyboard rows", () => {
 	const columns: DataTableColumn<Entry>[] = [
 		{ id: "key", header: "key", value: (row) => row.key },
@@ -409,7 +415,6 @@ describe("DataTable keyboard rows", () => {
 			defaultSelected={defaultSelected}
 		/>
 	)
-	const bodyRows = () => screen.getAllByRole("row").slice(1)
 
 	test("the rows are one tab stop; ↑ / ↓ move focus and the tab stop with it", async () => {
 		render(openable(vi.fn()))
@@ -468,21 +473,31 @@ describe("DataTable keyboard rows", () => {
 	})
 })
 
-describe("DataTable virtual rows", () => {
-	type Line = { id: string }
-	const many = (count: number): Line[] => Array.from({ length: count }, (_, i) => ({ id: `row-${i}` }))
-	const lines = (rows: Line[], onOpen?: (row: Line) => void) => (
-		<DataTable
-			label="紀錄"
-			rows={rows}
-			rowKey={(row) => row.id}
-			columns={[{ id: "id", header: "id", value: (row) => row.id }]}
-			onOpen={onOpen}
-		/>
-	)
-	// Plain selectors: role queries over 1000 mounted rows are slow enough to time out.
-	const bodyRows = () => Array.from(document.querySelectorAll<HTMLElement>("tbody tr:not([aria-hidden])"))
+type Line = { id: string }
 
+const many = (count: number): Line[] => Array.from({ length: count }, (_, i) => ({ id: `row-${i}` }))
+
+const lines = (rows: Line[], onOpen?: (row: Line) => void) => (
+	<DataTable
+		label="紀錄"
+		rows={rows}
+		rowKey={(row) => row.id}
+		columns={[{ id: "id", header: "id", value: (row) => row.id }]}
+		onOpen={onOpen}
+	/>
+)
+
+// Plain selectors: role queries over 1000 mounted rows are slow enough to time out.
+const mountedRows = () => Array.from(document.querySelectorAll<HTMLElement>("tbody tr:not([aria-hidden])"))
+
+const isRegion = (element: Element) => element.getAttribute("role") === "region"
+
+function scrollRegion(region: HTMLElement, top: number) {
+	Object.defineProperty(region, "scrollTop", { configurable: true, value: top })
+	fireEvent.scroll(region)
+}
+
+describe("DataTable virtual rows", () => {
 	// jsdom lays nothing out: give the scroll region a 320px viewport and let scrollTo move it.
 	let restore: () => void
 	beforeEach(() => {
@@ -490,8 +505,7 @@ describe("DataTable virtual rows", () => {
 		const saved = props.map((prop) => Object.getOwnPropertyDescriptor(Element.prototype, prop))
 		const savedOffset = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetHeight")
 		const scrollTo = Object.getOwnPropertyDescriptor(Element.prototype, "scrollTo")
-		const region = (element: Element) => element.getAttribute("role") === "region"
-		const size = (element: Element) => (region(element) ? 320 : 0)
+		const size = (element: Element) => (isRegion(element) ? 320 : 0)
 		Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
 			configurable: true,
 			get: function (this: Element) {
@@ -508,7 +522,9 @@ describe("DataTable virtual rows", () => {
 		Object.defineProperty(Element.prototype, "scrollHeight", {
 			configurable: true,
 			get: function (this: Element) {
-				return region(this) ? Number(this.querySelector("table")?.getAttribute("aria-rowcount") ?? 0) * 33 : 0
+				return isRegion(this)
+					? Number(this.querySelector("table")?.getAttribute("aria-rowcount") ?? 0) * 33
+					: 0
 			},
 		})
 		Element.prototype.scrollTo = function (this: Element, options?: ScrollToOptions | number) {
@@ -527,16 +543,11 @@ describe("DataTable virtual rows", () => {
 	})
 	afterEach(() => restore())
 
-	function scrollRegion(region: HTMLElement, top: number) {
-		Object.defineProperty(region, "scrollTop", { configurable: true, value: top })
-		fireEvent.scroll(region)
-	}
-
 	test("5000 rows mount only a window, and scrolling brings later rows in", async () => {
 		render(lines(many(5000)))
 		const table = screen.getByRole("table", { name: "紀錄" })
 		expect(table).toHaveAttribute("aria-rowcount", "5001")
-		const mounted = bodyRows()
+		const mounted = mountedRows()
 		expect(mounted.length).toBeGreaterThan(0)
 		expect(mounted.length).toBeLessThan(60)
 		expect(screen.getByText("row-0")).toBeInTheDocument()
@@ -547,23 +558,23 @@ describe("DataTable virtual rows", () => {
 		expect(await screen.findByText("row-4000")).toBeInTheDocument()
 		expect(screen.queryByText("row-0")).not.toBeInTheDocument()
 		expect(screen.getByText("row-4000").closest("tr")).toHaveAttribute("aria-rowindex", "4002")
-		expect(bodyRows().length).toBeLessThan(60)
+		expect(mountedRows().length).toBeLessThan(60)
 	})
 
 	test("the row count follows a filter, and 1000 rows or fewer are all mounted", () => {
 		const { rerender } = render(lines(many(5000)))
 		rerender(lines(many(1500)))
 		expect(document.querySelector("table")).toHaveAttribute("aria-rowcount", "1501")
-		expect(bodyRows().length).toBeLessThan(60)
+		expect(mountedRows().length).toBeLessThan(60)
 		rerender(lines(many(1000)))
 		expect(document.querySelector("table")).not.toHaveAttribute("aria-rowcount")
-		expect(bodyRows()).toHaveLength(1000)
+		expect(mountedRows()).toHaveLength(1000)
 	})
 
 	test("↓ past the mounted window scrolls the next row in and focuses it", async () => {
 		const onOpen = vi.fn()
 		render(lines(many(5000), onOpen))
-		const mounted = bodyRows()
+		const mounted = mountedRows()
 		const last = mounted[mounted.length - 1] as HTMLElement
 		const lastIndex = Number(last.dataset.index)
 		last.focus()

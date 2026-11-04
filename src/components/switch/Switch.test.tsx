@@ -68,6 +68,9 @@ function forcedCss(element: Element) {
 	return css
 }
 
+const track = (name: string) => screen.getByRole("switch", { name }).parentElement as HTMLElement
+const thumb = (name: string) => track(name).lastElementChild as HTMLElement
+
 describe("Switch in forced-colors", () => {
 	test("the track gets a frame; on is a Highlight track with a HighlightText thumb", () => {
 		render(
@@ -76,8 +79,6 @@ describe("Switch in forced-colors", () => {
 				<Switch aria-label="on" defaultChecked />
 			</>,
 		)
-		const track = (name: string) => screen.getByRole("switch", { name }).parentElement as HTMLElement
-		const thumb = (name: string) => track(name).lastElementChild as HTMLElement
 		expect(forcedCss(track("off"))).toMatch(/border-width: 1px/)
 		expect(forcedCss(track("off"))).toMatch(/background-color: canvas/i)
 		expect(forcedCss(thumb("off"))).toMatch(/background-color: buttontext/i)
@@ -87,8 +88,7 @@ describe("Switch in forced-colors", () => {
 
 	test("disabled draws in GrayText", () => {
 		render(<Switch aria-label="on" disabled defaultChecked />)
-		const track = screen.getByRole("switch").parentElement as HTMLElement
-		expect(forcedCss(track)).toMatch(/background-color: graytext/i)
+		expect(forcedCss(track("on"))).toMatch(/background-color: graytext/i)
 	})
 })
 
