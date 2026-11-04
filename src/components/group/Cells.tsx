@@ -65,7 +65,7 @@ const styles = stylex.create({
 		minHeight: { default: 28, [breakpoint.phone]: 44 },
 		paddingInline: 16,
 	},
-	inputLabel: { whiteSpace: "nowrap" },
+	inputLabel: { overflowWrap: "anywhere", paddingBlock: 2 },
 	input: {
 		backgroundColor: "transparent",
 		borderColor: "transparent",
@@ -191,7 +191,7 @@ export type InputCellProps = Omit<InputProps, "sx" | "size" | "aria-label"> & {
 	sx?: stylex.StyleXStyles
 }
 
-/** A one-line field: its name in a 96px column, the input borderless after it. */
+/** A one-line field: its name in a 96px column that wraps, the input borderless after it. */
 export function InputCell({ label, sx, ...props }: InputCellProps) {
 	return (
 		<label {...stylex.props(styles.inputCell, sx)}>
