@@ -9,7 +9,7 @@ release can break the API; every break is listed under **Breaking** and explaine
 
 ### Fixed
 
-- **SegmentedControl:** segments are at least 44px tall under the phone breakpoint, like every control you tap on a phone.
+- **Segmented:** segments are at least 44px tall under the phone breakpoint, like every control you tap on a phone.
 
 ### Internal
 
