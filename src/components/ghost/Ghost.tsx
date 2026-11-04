@@ -45,6 +45,7 @@ const styles = stylex.create({
 		backgroundColor: { default: "transparent", ":hover": color.wash },
 		color: { default: color.danger, ":hover": color.danger },
 	},
+	link: { color: color.text, textDecorationLine: "underline", textUnderlineOffset: "0.15em" },
 })
 
 export type GhostProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
@@ -78,13 +79,13 @@ export type GhostLinkProps = {
 	sx?: stylex.StyleXStyles
 }
 
-/** The same word, as a link that leaves the app. */
+/** The same word, as a link that leaves the app: ink and underlined. */
 export function GhostLink({ href, children, external = false, sx }: GhostLinkProps) {
 	return (
 		<a
 			href={href}
 			{...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-			{...stylex.props(styles.root, press.button, sx)}
+			{...stylex.props(styles.root, styles.link, press.button, sx)}
 		>
 			{children}
 		</a>

@@ -1,11 +1,11 @@
 # Ghost
 
-A word that is a button: a 28 px muted text pill with no background until the pointer is on it. The family also exports `GhostLink`, the same word as a link.
+A word that is a button: a 28 px muted text pill with no background until the pointer is on it. The family also exports `GhostLink`, the same word as a link, in ink and underlined.
 
 ## When to use
 
 - A low-weight action in dense chrome, such as "Edit" or "Show all" beside a heading.
-- A link that leaves the app, styled the same as the actions around it (`GhostLink`, `external` for a new tab).
+- A link that leaves the app, the same shape as the actions around it but in ink and underlined (`GhostLink`, `external` for a new tab).
 - A small destructive word that should still read as danger (`danger`).
 
 ## When not to use
