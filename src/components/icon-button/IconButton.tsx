@@ -19,7 +19,7 @@ const styles = stylex.create({
 		borderStyle: "none",
 		borderWidth: 0,
 		color: { default: color.textMuted, ":hover": color.text },
-		cursor: "pointer",
+		cursor: { default: "pointer", ":disabled": "not-allowed" },
 		display: "inline-grid",
 		flex: "none",
 		fontFamily: "inherit",
@@ -28,6 +28,7 @@ const styles = stylex.create({
 		justifyItems: "center",
 		lineHeight: "inherit",
 		margin: 0,
+		opacity: { default: 1, ":disabled": 0.5 },
 		// Forced colors drop the hover wash, which is the only edge the circle has: draw one instead.
 		outline: {
 			default: "none",
