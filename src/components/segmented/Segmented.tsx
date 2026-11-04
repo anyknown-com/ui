@@ -30,7 +30,7 @@ const styles = stylex.create({
 		fontFamily: font.body,
 		fontSize: type.t2,
 		fontWeight: 400,
-		height: { default: 28, [breakpoint.phone]: 40 },
+		height: { default: 28, [breakpoint.phone]: 44 },
 		lineHeight: type.body,
 		margin: 0,
 		outline: { default: "none", ":focus-visible": `${focusRing.width} solid ${color.focusRing}` },
