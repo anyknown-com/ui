@@ -74,8 +74,8 @@ const styles = stylex.create({
 	},
 	pending: {
 		display: "inline-block",
-		width: "0.5rem",
-		height: "0.5rem",
+		width: 6,
+		height: 6,
 		borderRadius: corner.shape,
 		backgroundColor: { default: color.signal, [FORCED]: "CanvasText" },
 		forcedColorAdjust: "none",
