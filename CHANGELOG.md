@@ -5,6 +5,16 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.17.4 — 2026-11-05
+
+### Fixed
+
+- **SegmentedControl:** segments are at least 44px tall under the phone breakpoint, like every control you tap on a phone.
+
+### Internal
+
+- Lint is at 0 warnings: test helpers moved to module scope, Toast no longer shadows `t`. The TypeScript `lib` is ES2023 (tests use `toSorted`); the build target is unchanged.
+
 ## 0.17.3 — 2026-11-05
 
 ### Fixed
