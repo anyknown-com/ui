@@ -5,6 +5,13 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.17.3 — 2026-11-05
+
+### Fixed
+
+- **GroupCell, InputCell, TextCell, SliderCell:** cells start on the same left edge as the group's label and footer (12px), so a group has one left edge.
+- **ToolGroup:** a call's duration is 13px like the call text, still muted. Text is no longer both smaller and gray.
+
 ## 0.17.2 — 2026-11-05
 
 ### Fixed
