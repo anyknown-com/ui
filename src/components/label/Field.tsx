@@ -63,13 +63,7 @@ export function Field({
 		<div {...props} {...styled(props, styles.group, stylex.defaultMarker())}>
 			<FieldContext value={value}>
 				{label != null && (
-					<Label
-						id={labelId}
-						htmlFor={controlId}
-						required={required}
-						optional={optional}
-						sx={styles.dimmed}
-					>
+					<Label id={labelId} htmlFor={controlId} required={required} optional={optional} sx={styles.dimmed}>
 						{label}
 					</Label>
 				)}
