@@ -21,7 +21,7 @@ The family:
 
 - `ListHead` — the column names, `t1` and muted. It accepts any `<div>` attribute, such as `aria-hidden`.
 - `ListSort` — a column name (a plain string) that orders the list. When `active`, it goes dark, ` ↓` follows it, and its name gains "sorted". `labels.sorted(column)` changes that word.
-- `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 40` and grows when it wraps.
+- `ListRow` — one row, one [Ghost](../ghost/README.md) button. Its children are the cells. It has `minHeight: 28` and grows when it wraps.
 - `WeightDot` — the 6px dot in front of a question. `weight="light"` is a muted dot (it goes ahead if nobody answers); `soon` (about to go ahead) and `weight="heavy"` (it waits for you) are both an amber dot.
 
 ```tsx
