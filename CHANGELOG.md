@@ -5,6 +5,17 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## 0.17.2 — 2026-11-05
+
+### Fixed
+
+- **InputCell:** long labels wrap inside the label column instead of running into the input.
+- **Field:** a disabled field fades once. The control already fades itself, so Field now dims only its label, help and error text.
+- **Message:** the waiting dot is 6px, like every status dot.
+- **IconButton:** a disabled icon button fades and shows the not-allowed cursor, like a disabled Button.
+- **GhostLink:** drawn in ink with an underline, like every link.
+- **List:** rows are at least 44px tall under the phone breakpoint (28px elsewhere). In a sheet on a wider screen, pass `minHeight: 44` in `sx`.
+
 ## 0.17.1 — 2026-11-02
 
 ### Fixed
