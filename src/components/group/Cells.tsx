@@ -10,7 +10,7 @@ import { Slider } from "../slider/Slider"
 import { Textarea, type TextareaProps } from "../textarea/Textarea"
 
 /**
- * The lines of a `Group`: 28px (44px on a phone), 16px in, only space between them. A cell is a setting to read, a way into a page, one choice of several, or a field.
+ * The lines of a `Group`: 28px (44px on a phone), on the header's edge, only space between them. A cell is a setting to read, a way into a page, one choice of several, or a field.
  */
 
 // iOS Safari 在 16px 以下的欄位 focus 時會放大整頁;手機上欄位一律 16px
@@ -27,7 +27,7 @@ const styles = stylex.create({
 		lineHeight: type.snug,
 		minHeight: { default: 28, [breakpoint.phone]: 44 },
 		paddingBlock: space.xs,
-		paddingInline: 16,
+		paddingInline: space.sm,
 		textAlign: "start",
 		width: "100%",
 	},
@@ -63,7 +63,7 @@ const styles = stylex.create({
 		gridTemplateColumns: "96px minmax(0, 1fr)",
 		lineHeight: type.snug,
 		minHeight: { default: 28, [breakpoint.phone]: 44 },
-		paddingInline: 16,
+		paddingInline: space.sm,
 	},
 	inputLabel: { overflowWrap: "anywhere", paddingBlock: 2 },
 	input: {
@@ -88,7 +88,7 @@ const styles = stylex.create({
 		fontSize: type.t3,
 		lineHeight: type.body,
 		paddingBlock: 12,
-		paddingInline: 16,
+		paddingInline: space.sm,
 	},
 	textarea: {
 		backgroundColor: "transparent",
@@ -112,7 +112,7 @@ const styles = stylex.create({
 		gap: 10,
 		lineHeight: type.snug,
 		paddingBlock: 12,
-		paddingInline: 16,
+		paddingInline: space.sm,
 	},
 	sliderLine: { display: "flex", justifyContent: "space-between" },
 	sliderValue: { color: color.textMuted },

@@ -938,8 +938,8 @@ the page itself (no fill, no frame, no shadow, no lines; only space between them
 - Lines are cells: `GroupCell` (text, a second `detail` line, `value` / `control` on the right),
   `InputCell` (a 96px name column + a frameless Input), `TextCell` (a growing Textarea),
   `SliderCell` (name and reading on one line, slider below). 28px minimum (44px at
-  `breakpoint.phone`), 16px left and right, `type.t3`; hover and focus-within are a `wash`,
-  `corner.shape` (`corner.box` for `TextCell`, which grows)
+  `breakpoint.phone`), `space.sm` left and right on the header's edge, `type.t3`; hover and
+  focus-within are a `wash`, `corner.shape` (`corner.box` for `TextCell`, which grows)
 - Fields inside `InputCell` / `TextCell` drop their own frame and ring; the whole row draws
   focus: on `:focus-within` the background is a `wash`, plus a 2px `focusRing` outline
   (`outlineOffset: -2`). Background alone would be too faint to tell where focus is
