@@ -28,6 +28,11 @@ describe("Input", () => {
 		expect(screen.getByTestId("icon").closest("[aria-hidden]")).not.toBeNull()
 	})
 
+	test("a search field is flat: no shadow", () => {
+		render(<Input type="search" aria-label="搜尋" />)
+		expect(getComputedStyle(screen.getByRole("searchbox", { name: "搜尋" })).boxShadow).toBe("none")
+	})
+
 	test("onValueChange hears the text, next to onChange (uncontrolled)", async () => {
 		const onChange = vi.fn()
 		const onValueChange = vi.fn()

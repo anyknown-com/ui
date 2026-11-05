@@ -1,12 +1,12 @@
 # Input
 
-A single-line text field drawn as a floating pill (`surfaceRaised`, `shadow.float`, no frame), with the same focus and error styling as Textarea, Select and PasswordInput.
+A single-line text field drawn as a floating pill (`surfaceRaised`, `shadow.float`, no frame), with the same focus and error styling as Textarea, Select and PasswordInput. A `type="search"` field is flat instead: a `wash` fill and no shadow.
 
 ## When to use
 
 - Short free text: a name, an email, a URL, a search query.
 - Keys, ids and URLs that people read character by character (`mono`).
-- A search box with a leading icon (`leadingIcon`).
+- A search box with a leading icon (`leadingIcon`); give it `type="search"` so it is drawn flat.
 
 ## When not to use
 

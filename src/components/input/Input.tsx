@@ -7,6 +7,7 @@ import { useFieldControl } from "../label/fieldContext"
 const FORCED = "@media (forced-colors: active)"
 
 // 輸入框是浮起來的一格:surfaceRaised 底 + shadow.float,沒有框;邊界由陰影分出來。
+// 搜尋框(type="search")例外:平的 wash 底,不浮、沒有陰影。
 // focus 是 2px 實心 focusRing。forced colors 時陰影消失,所以只在那時畫一圈透明 1px 邊
 // (高對比下會顯示成系統色)。invalid 只設 aria-invalid;紅字在 Field 的 error,
 // forced colors 下改畫 2px 虛線框。
@@ -51,6 +52,7 @@ export const controlStyles = stylex.create({
 })
 
 const styles = stylex.create({
+	search: { backgroundColor: { default: color.wash, ":hover": color.washHover }, boxShadow: "none" },
 	mono: { fontFamily: font.mono },
 	affix: { position: "relative", display: "block", width: "100%" },
 	icon: {
@@ -108,6 +110,7 @@ export function Input({
 				controlStyles.base,
 				controlStyles[size],
 				isInvalid && controlStyles.invalid,
+				props.type === "search" && styles.search,
 				mono && styles.mono,
 				Boolean(leadingIcon) && (size === "sm" ? styles.withIconSm : styles.withIconMd),
 				sx,

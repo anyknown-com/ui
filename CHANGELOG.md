@@ -5,6 +5,12 @@ All notable changes to `@anyknown/ui` are recorded here. The format follows
 release can break the API; every break is listed under **Breaking** and explained in
 [MIGRATION.md](MIGRATION.md).
 
+## Unreleased
+
+### Fixed
+
+- **Input:** a `type="search"` field is flat: a `wash` fill and no shadow, never a floating surface.
+
 ## 0.17.4 — 2026-11-05
 
 ### Fixed
